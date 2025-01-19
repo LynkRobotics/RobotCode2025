@@ -5,6 +5,8 @@
 package frc.robot;
 
 import frc.robot.commands.TeleopSwerve;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.subsystems.Swerve;
 
 import java.util.function.Supplier;
@@ -34,6 +36,9 @@ public class RobotContainer {
 
   /* Subsystems */
   private final Swerve s_Swerve = new Swerve();
+  private final ElevatorSubsystem s_Elevator = new ElevatorSubsystem();
+  private final PoseSubsystem s_Pose = new PoseSubsystem();
+
 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
