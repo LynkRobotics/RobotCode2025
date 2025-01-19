@@ -110,7 +110,7 @@ public class PoseSubsystem extends SubsystemBase {
     }
     
     public Rotation2d getGyroYaw() {
-        return Rotation2d.fromDegrees(gyro.getYaw().getValueAsDouble());
+        return Rotation2d.fromDegrees(gyro.getYaw().getValue());
     }
 
     public void zeroGyro() {
@@ -119,7 +119,7 @@ public class PoseSubsystem extends SubsystemBase {
     }
 
     public void hack() {
-        gyro.setYaw(gyro.getYaw().getValueAsDouble() + 180.0);
+        gyro.setYaw(gyro.getYaw().getValue() + 180.0);
     }
 
     public Pose2d getPose() {

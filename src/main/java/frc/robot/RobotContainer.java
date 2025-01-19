@@ -265,15 +265,14 @@ public class RobotContainer {
         SmartDashboard.putData("autoSetup/SetSwerveCoast", Commands.runOnce(() -> { DogLog.log("Auto/Status", "Coasting Swerve Motors");}).andThen(Commands.runOnce(s_Swerve::setMotorsToCoast, s_Swerve)).andThen(Commands.runOnce(() -> { DogLog.log("Auto/Status", "Swerve Motors Coasted");})).ignoringDisable(true));
         SmartDashboard.putData("autoSetup/SetSwerveBrake", Commands.runOnce(() -> { DogLog.log("Auto/Status", "Braking Swerve Motors");}).andThen(Commands.runOnce(s_Swerve::setMotorsToBrake, s_Swerve)).andThen(Commands.runOnce(() -> { DogLog.log("Auto/Status", "Swerve Motors Braked");})).ignoringDisable(true));
         SmartDashboard.putData("autoSetup/SetSwerveAligned", Commands.runOnce(() -> { DogLog.log("Auto/Status", "Aligning Swerve Motors");}).andThen(Commands.run(s_Swerve::alignStraight, s_Swerve)).andThen(Commands.runOnce(() -> { DogLog.log("Auto/Status", "Swerve Motors Aligned");})).ignoringDisable(true));
-        
-        DogLog.setOptions(new DogLogOptions().withNtPublish(Constants.atHQ));
-        DogLog.setOptions(new DogLogOptions().withCaptureConsole(true));
-        DogLog.setOptions(new DogLogOptions().withCaptureDs(true));
-        DogLog.setOptions(new DogLogOptions().withCaptureNt(true));
-        DogLog.setOptions(new DogLogOptions().withLogExtras(true));
-        DogLog.setOptions(new DogLogOptions().withLogEntryQueueCapacity(1000));
 
-
+        DogLog.setOptions(new DogLogOptions(
+            Constants.atHQ, //Whether logged values should be published to NetworkTables
+            false, //Whether all NetworkTables fields should be saved to the log file.
+            true, //Whether driver station data (robot enable state and joystick inputs) should be saved to the log file.
+            true, //Whether to log extra data, like PDH currents, CAN usage, etc.
+            1000 //The size of the log message queue to use
+            ));
 
         // Configure the button bindings
         configureButtonBindings();

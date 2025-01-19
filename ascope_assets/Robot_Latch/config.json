@@ -1,0 +1,44 @@
+{
+  "name": "Latch",
+  "rotations": [
+    {
+      "axis": "x",
+      "degrees": 90
+    },
+    {
+      "axis": "z",
+      "degrees": 90
+    }
+  ],
+  "position": [
+    0,
+    0,
+    0.043
+  ],
+  "cameras": [
+    {
+      "name": "Speaker Cam",
+      "rotations": [
+        {
+          "axis": "y",
+          "degrees": -30
+        },
+        {
+          "axis": "z",
+          "degrees": 180
+        }
+      ],
+      "position": [
+        -0.1651,
+        0.0,
+        0.33655
+      ],
+      "resolution": [
+        1280,
+        720
+      ],
+      "fov": 75
+    }
+  ],
+  "components": []
+}
