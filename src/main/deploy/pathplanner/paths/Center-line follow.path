@@ -1,0 +1,106 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.1,
+        "y": 7.4
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 8.1,
+        "y": 4.4
+      },
+      "isLocked": false,
+      "linkedName": "Center-line Amp-side"
+    },
+    {
+      "anchor": {
+        "x": 8.1,
+        "y": 0.7462996744175311
+      },
+      "prevControl": {
+        "x": 8.1,
+        "y": 3.746299674417531
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Center-line Source-Side"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.05,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Intake note"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Amp Shot"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Intake note"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Amp Shot"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Intake note"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Amp Shot"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Intake note"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 0.8,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -60.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Other",
+  "previewStartingState": {
+    "rotation": -60.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

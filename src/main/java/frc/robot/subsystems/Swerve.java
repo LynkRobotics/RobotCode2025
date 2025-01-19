@@ -34,7 +34,7 @@ public class Swerve extends SubsystemBase {
                                     translation.getX(), 
                                     translation.getY(), 
                                     rotation, 
-                                    PoseSubsystem.getInstance().getHeading() //fix
+                                    PoseSubsystem.getInstance().getHeading()
                                 );
 
         driveRobotRelative(desiredChassisSpeeds, isOpenLoop);

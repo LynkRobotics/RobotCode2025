@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.0,
+        "y": 3.610224674994805
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.7500000000000002,
+        "y": 3.177211973102586
+      },
+      "isLocked": false,
+      "linkedName": "Source-side angle shot"
+    },
+    {
+      "anchor": {
+        "x": 1.72,
+        "y": 1.3
+      },
+      "prevControl": {
+        "x": 1.72,
+        "y": 2.3
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "SS Drop"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.2,
+    "maxAcceleration": 9.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -90.0,
+    "rotateFast": true
+  },
+  "reversed": false,
+  "folder": "Source Side",
+  "previewStartingState": {
+    "rotation": -45.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

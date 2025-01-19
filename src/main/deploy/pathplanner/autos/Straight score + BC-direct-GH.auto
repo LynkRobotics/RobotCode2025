@@ -1,0 +1,143 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.48,
+      "y": 5.54
+    },
+    "rotation": 0.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Startup delay"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot without aiming"
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Subwoofer to B"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake note"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot without aiming"
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "B to C"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake note"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "C to G"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake note"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "G to source-side shot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake note"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Source-side shot to H"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "H to G"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Straight-on",
+  "choreoAuto": false
+}

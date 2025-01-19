@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.4416145195926755,
+        "y": 7.323065555222019
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.5123251977113303,
+        "y": 7.252354877103365
+      },
+      "isLocked": false,
+      "linkedName": "AS Rush Start"
+    },
+    {
+      "anchor": {
+        "x": 2.0,
+        "y": 6.744683307548434
+      },
+      "prevControl": {
+        "x": 1.9292893218813452,
+        "y": 6.815393985667089
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Amp-side shot"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.2,
+    "maxAcceleration": 9.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 30.0,
+    "rotateFast": true
+  },
+  "reversed": false,
+  "folder": "Amp Side",
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

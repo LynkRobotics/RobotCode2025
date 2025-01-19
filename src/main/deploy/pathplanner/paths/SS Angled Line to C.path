@@ -1,0 +1,58 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.31,
+        "y": 4.05
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.5863495361294053,
+        "y": 4.326349536129405
+      },
+      "isLocked": false,
+      "linkedName": "Source-side Angled Line"
+    },
+    {
+      "anchor": {
+        "x": 2.74,
+        "y": 4.23
+      },
+      "prevControl": {
+        "x": 1.9400000000000002,
+        "y": 4.23
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "C Note"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.6,
+      "rotationDegrees": -30.0,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 3.8,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -30.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Source Side",
+  "previewStartingState": {
+    "rotation": -45.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

@@ -1,0 +1,100 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.31,
+      "y": 4.05
+    },
+    "rotation": -45.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Startup delay"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake note"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "SS Angled Line to F"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.5
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "F to close shot through stage"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Set Instant Pose"
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake note"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "SS Close to F"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Source-side",
+  "choreoAuto": false
+}

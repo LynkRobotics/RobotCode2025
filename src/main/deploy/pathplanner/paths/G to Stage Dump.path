@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.32,
+        "y": 2.45
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 8.233397459621557,
+        "y": 2.5
+      },
+      "isLocked": false,
+      "linkedName": "G Note"
+    },
+    {
+      "anchor": {
+        "x": 5.65,
+        "y": 4.1
+      },
+      "prevControl": {
+        "x": 6.842958413189554,
+        "y": 3.899415798831598
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Stage Dump"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.2,
+    "maxAcceleration": 9.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -35.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Amp Side",
+  "previewStartingState": {
+    "rotation": -90.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

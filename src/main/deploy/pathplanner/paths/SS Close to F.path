@@ -1,0 +1,74 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.35,
+        "y": 3.9
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.0554875655205853,
+        "y": 2.3974877040663176
+      },
+      "isLocked": false,
+      "linkedName": "Source-side close shot"
+    },
+    {
+      "anchor": {
+        "x": 4.230909552728196,
+        "y": 3.190431108134944
+      },
+      "prevControl": {
+        "x": 3.551327062752329,
+        "y": 2.645047465853389
+      },
+      "nextControl": {
+        "x": 5.061202155406424,
+        "y": 3.85676376162071
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.35,
+        "y": 4.1
+      },
+      "prevControl": {
+        "x": 4.660031865518277,
+        "y": 4.113976955226638
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "F Note"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.8,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.2,
+    "maxAcceleration": 9.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Source Side",
+  "previewStartingState": {
+    "rotation": -45.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

@@ -1,0 +1,58 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.7,
+        "y": 5.54
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.0860900085436542,
+        "y": 5.727850001154548
+      },
+      "isLocked": false,
+      "linkedName": "Straight shot"
+    },
+    {
+      "anchor": {
+        "x": 8.35,
+        "y": 5.75
+      },
+      "prevControl": {
+        "x": 4.924183091790895,
+        "y": 6.9968953826339835
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "E Note"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": -16.6992442339935,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.2,
+    "maxAcceleration": 9.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -20.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Note to Note",
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

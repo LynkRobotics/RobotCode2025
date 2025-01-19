@@ -1,0 +1,93 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.48,
+      "y": 5.54
+    },
+    "rotation": 0.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Startup delay"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot without aiming"
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Subwoofer to B"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake note"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot without aiming"
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "B to C"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake note"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C to B"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "B to source-side exit"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Straight-on",
+  "choreoAuto": false
+}

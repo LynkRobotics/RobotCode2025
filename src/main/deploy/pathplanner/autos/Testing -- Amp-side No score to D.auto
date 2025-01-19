@@ -1,0 +1,44 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.68,
+      "y": 6.68
+    },
+    "rotation": 60.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Startup delay"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake note"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Amp-side SW to D"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Testing",
+  "choreoAuto": false
+}

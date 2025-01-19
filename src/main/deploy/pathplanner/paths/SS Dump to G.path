@@ -1,0 +1,58 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.854111344586325,
+        "y": 1.5579005703465956
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.684369732375829,
+        "y": 1.6698455215092252
+      },
+      "isLocked": false,
+      "linkedName": "SS Dump"
+    },
+    {
+      "anchor": {
+        "x": 8.32,
+        "y": 2.45
+      },
+      "prevControl": {
+        "x": 7.456641882374675,
+        "y": 1.812392915694923
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "G Note"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.65,
+      "rotationDegrees": 35.0,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.2,
+    "maxAcceleration": 9.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 35.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Source Side",
+  "previewStartingState": {
+    "rotation": -10.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

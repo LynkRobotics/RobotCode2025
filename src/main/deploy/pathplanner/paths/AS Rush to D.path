@@ -1,0 +1,68 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.4416145195926755,
+        "y": 7.323065555222019
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.749463135289907,
+        "y": 7.518969219756621
+      },
+      "isLocked": false,
+      "linkedName": "AS Rush Start"
+    },
+    {
+      "anchor": {
+        "x": 2.89,
+        "y": 7.67
+      },
+      "prevControl": {
+        "x": 1.6754036298981685,
+        "y": 7.638266388805505
+      },
+      "nextControl": {
+        "x": 4.104596370101831,
+        "y": 7.701733611194495
+      },
+      "isLocked": false,
+      "linkedName": "A Bypass"
+    },
+    {
+      "anchor": {
+        "x": 8.3,
+        "y": 7.45
+      },
+      "prevControl": {
+        "x": 6.300000000000001,
+        "y": 7.45
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "D Note"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.2,
+    "maxAcceleration": 9.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Amp Side",
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

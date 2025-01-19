@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.32,
+        "y": 2.45
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.102149537026347,
+        "y": -0.13321864825547752
+      },
+      "isLocked": false,
+      "linkedName": "G Note"
+    },
+    {
+      "anchor": {
+        "x": 2.0,
+        "y": 3.610224674994805
+      },
+      "prevControl": {
+        "x": 3.604544299997691,
+        "y": 0.29851986976701333
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Source-side angle shot"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.2,
+    "maxAcceleration": 9.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -36.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Source Side",
+  "previewStartingState": {
+    "rotation": 35.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

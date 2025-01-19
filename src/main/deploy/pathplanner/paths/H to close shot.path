@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.3,
+        "y": 0.8
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.982681374933276,
+        "y": 0.8000000000000008
+      },
+      "isLocked": false,
+      "linkedName": "H Note"
+    },
+    {
+      "anchor": {
+        "x": 1.35,
+        "y": 3.9
+      },
+      "prevControl": {
+        "x": 1.3499999999999999,
+        "y": 2.078432604085395
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Source-side close shot"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.2,
+    "maxAcceleration": 9.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -45.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Source Side",
+  "previewStartingState": {
+    "rotation": 0.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

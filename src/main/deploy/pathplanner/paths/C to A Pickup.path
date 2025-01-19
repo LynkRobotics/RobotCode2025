@@ -1,0 +1,74 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.74,
+        "y": 4.23
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.2079141940102063,
+        "y": 4.916249105225484
+      },
+      "isLocked": false,
+      "linkedName": "C Note"
+    },
+    {
+      "anchor": {
+        "x": 2.019996767266262,
+        "y": 5.681206271503453
+      },
+      "prevControl": {
+        "x": 2.0141965649306486,
+        "y": 5.247288252426383
+      },
+      "nextControl": {
+        "x": 2.0257969696018754,
+        "y": 6.115124290580523
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.018172581799709,
+        "y": 6.931258226152816
+      },
+      "prevControl": {
+        "x": 2.654351490521163,
+        "y": 6.632738356385804
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "A Pickup"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.2,
+      "rotationDegrees": 45.0,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.5,
+    "maxAcceleration": 6.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 45.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Note to Note",
+  "previewStartingState": {
+    "rotation": -30.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}
