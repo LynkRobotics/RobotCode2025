@@ -15,7 +15,7 @@ import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -70,10 +70,10 @@ public class VisionSubsystem extends SubsystemBase {
         System.exit(1);
       }
     } else {
-      kTagLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+      kTagLayout = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField();
     }
 
-    photonEstimator = new PhotonPoseEstimator(kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, Constants.Vision.robotToCam);
+    photonEstimator = new PhotonPoseEstimator(kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Constants.Vision.robotToCam);
     photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
     overrideRotation = false;
@@ -174,12 +174,15 @@ public class VisionSubsystem extends SubsystemBase {
     return distance;
   }
 
-  public boolean updatePoseEstimate(PoseEstimator<SwerveDriveWheelPositions> poseEstimator) {
-    Optional<EstimatedRobotPose> optVisionEst = photonEstimator.update();
+  public boolean updatePoseEstimate(PoseEstimator<SwerveModulePosition[]> poseEstimator) {
+    PhotonPipelineResult result = camera.getLatestResult(); // TODO Switch to getAllUnreadResults(), but need to revisit periodic(), too
+    Optional<EstimatedRobotPose> optVisionEst = photonEstimator.update(result);
     EstimatedRobotPose visionEst;
     double latestTimestamp;
     boolean newResult;
     
+    // TODO Consider updating standard deviations
+
     if (!optVisionEst.isPresent()) {
       return false;
     }

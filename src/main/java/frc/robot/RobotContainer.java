@@ -5,12 +5,7 @@ import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.FollowPathHolonomic;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
@@ -326,19 +321,7 @@ public class RobotContainer {
         leftClimberButton.whileTrue(new ClimberPositionCommand(Constants.Climber.retractedPosition, LEDSubsystem.TempState.RETRACTING, s_LeftClimber));
         rightClimberButton.whileTrue(new ClimberPositionCommand(Constants.Climber.retractedPosition, LEDSubsystem.TempState.RETRACTING, s_RightClimber));
 
-        /* Buttons to set the next shot */
-        ampButton.onTrue(Commands.runOnce(s_Shooter::toggleAmp).withName("Toggle amp shot"));
-        defaultShotButton.onTrue(Commands.runOnce(() -> { s_Shooter.setNextShot(null); }).withName("Set default shot"));
-        dumpShotButton.onTrue(Commands.runOnce(() -> { s_Shooter.setNextShot(Speed.DUMP); }).withName("Set dump shot"));
-        slideShotButton.onTrue(Commands.runOnce(() -> { s_Shooter.setNextShot(Speed.SLIDE); }).withName("Set slide shot"));
-
         ejectButton.whileTrue(new EjectCommand(s_Intake, s_Index, s_Shooter));
-
-        ampShotButton.whileTrue(ampPathCommand().withName("Amp path & shoot"));
-        sourceAlignButton.whileTrue(sourcePathCommand().withName("Source align"));
-        SmartDashboard.putData("Speaker align", pathCommand("To Speaker"));
-        SmartDashboard.putData("Speaker Amp-Side align", pathCommand("To Speaker-AmpSide"));
-        SmartDashboard.putData("Speaker Source-Side align", pathCommand("To Speaker-SourceSide"));
 
         SmartDashboard.putData("pose/Align to zero", Commands.runOnce(() -> { PoseSubsystem.setTargetAngle(new Rotation2d()); }).withName("Align to zero"));
         SmartDashboard.putData("pose/Align to 90", Commands.runOnce(() -> { PoseSubsystem.setTargetAngle(new Rotation2d(Math.PI / 2.0)); }).withName("Align to 90"));
@@ -442,8 +425,6 @@ public class RobotContainer {
                 )
             ).withName("Smart ADE OTF");
         chooser.addOption("Smart ADE OTF", smartADEOTF);
-
-        chooser.addOption("Choreo Test", choreoTestCommand());
     }
 
     public void teleopInit() {
@@ -456,102 +437,5 @@ public class RobotContainer {
         if (optBrakeAfterTeleop.get()) {
             s_Swerve.setDriveMotorsToBrake();
         }
-    }
-
-    private Command ampPathCommand() {
-        PathPlannerPath path = PathPlannerPath.fromPathFile("To Amp");
-
-        return Commands.sequence(
-            Commands.runOnce(s_Vision::enableRotationAmpOverride),
-            new FollowPathHolonomic(
-                path,
-                s_Pose::getPose, // Robot pose supplier
-                s_Swerve::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                s_Swerve::driveRobotRelativeAuto, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-                new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                    new PIDConstants(8.0, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(2.0, 0.0, 0.0), // Rotation PID constants
-                    Constants.Swerve.maxSpeed, // Max module speed, in m/s
-                    Constants.Swerve.driveRadius, // Drive base radius in meters. Distance from robot center to furthest module.
-                    new ReplanningConfig() // Default path replanning config. See the API for the options here
-                ),
-                Robot::isRed,
-                s_Swerve // Reference to this subsystem to set requirements
-            ),
-            Commands.runOnce(s_Vision::disableRotationAmpOverride),
-            Commands.runOnce(() -> { s_Shooter.setNextShot(Speed.AMP); }),
-            new ShootCommand(s_Shooter, s_Index, false)
-        ).handleInterrupt(s_Vision::disableRotationAmpOverride);
-    }
-
-    private Command sourcePathCommand() {
-        PathPlannerPath path = PathPlannerPath.fromPathFile("To Source");
-
-        return Commands.sequence(
-            Commands.runOnce(s_Vision::enableRotationSourceOverride),
-            new FollowPathHolonomic(
-                path,
-                s_Pose::getPose, // Robot pose supplier
-                s_Swerve::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                s_Swerve::driveRobotRelativeAuto, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-                new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                    new PIDConstants(8.0, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(2.0, 0.0, 0.0), // Rotation PID constants
-                    Constants.Swerve.maxSpeed, // Max module speed, in m/s
-                    Constants.Swerve.driveRadius, // Drive base radius in meters. Distance from robot center to furthest module.
-                    new ReplanningConfig() // Default path replanning config. See the API for the options here
-                ),
-                Robot::isRed,
-                s_Swerve // Reference to this subsystem to set requirements
-            ),
-            Commands.runOnce(s_Vision::disableRotationSourceOverride)
-        ).handleInterrupt(s_Vision::disableRotationSourceOverride);
-    }
-
-    private Command pathCommand(String pathName) {
-        PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
-
-        return Commands.sequence(
-            Commands.runOnce(s_Vision::enableRotationTargetOverride),
-            new FollowPathHolonomic(
-                path,
-                s_Pose::getPose, // Robot pose supplier
-                s_Swerve::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                s_Swerve::driveRobotRelativeAuto, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-                new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                    new PIDConstants(8.0, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(2.0, 0.0, 0.0), // Rotation PID constants
-                    Constants.Swerve.maxSpeed, // Max module speed, in m/s
-                    Constants.Swerve.driveRadius, // Drive base radius in meters. Distance from robot center to furthest module.
-                    new ReplanningConfig() // Default path replanning config. See the API for the options here
-                ),
-                Robot::isRed,
-                s_Swerve // Reference to this subsystem to set requirements
-            ),
-            Commands.runOnce(s_Vision::disableRotationTargetOverride)
-        ).handleInterrupt(s_Vision::disableRotationTargetOverride)
-        .withName(pathName);
-    }
-
-    private Command choreoTestCommand() {
-        PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory("Choreo-Straight");
-
-        return Commands.sequence(
-            new FollowPathHolonomic(
-                path,
-                s_Pose::getPose, // Robot pose supplier
-                s_Swerve::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                s_Swerve::driveRobotRelativeAuto, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-                new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                    new PIDConstants(8.0, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(2.0, 0.0, 0.0), // Rotation PID constants
-                    Constants.Swerve.maxSpeed, // Max module speed, in m/s
-                    Constants.Swerve.driveRadius, // Drive base radius in meters. Distance from robot center to furthest module.
-                    new ReplanningConfig() // Default path replanning config. See the API for the options here
-                ),
-                Robot::isRed,
-                s_Swerve // Reference to this subsystem to set requirements
-            )
-        ).handleInterrupt(s_Vision::disableRotationSourceOverride);
     }
 }

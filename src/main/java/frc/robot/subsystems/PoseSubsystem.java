@@ -7,10 +7,10 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
-import com.pathplanner.lib.util.ReplanningConfig;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
@@ -72,19 +72,25 @@ public class PoseSubsystem extends SubsystemBase {
         field = new Field2d();
         SmartDashboard.putData("pose/Field", field);
 
-        AutoBuilder.configureHolonomic(
+        RobotConfig config;
+        try {
+            config = RobotConfig.fromGUISettings();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        AutoBuilder.configure(
             this::getPose,
             this::setPose,
             s_Swerve::getSpeeds, 
-            s_Swerve::driveRobotRelativeAuto,
+            (speeds, feedforwards) -> s_Swerve.driveRobotRelativeAuto(speeds),
             // TODO Configure PIDs
-            new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+            new PPHolonomicDriveController(
                 new PIDConstants(8.0, 0.0, 0.0), // Translation PID constants
-                new PIDConstants(1.5, 0.0, 0.0), // Rotation PID constants
-                Constants.Swerve.maxSpeed, // Max module speed, in m/s
-                Constants.Swerve.driveRadius, // Drive base radius in meters. Distance from robot center to furthest module.
-                new ReplanningConfig() // Default path replanning config. See the API for the options here
+                new PIDConstants(1.5, 0.0, 0.0)  // Rotation PID constants
             ),
+            config,
             Robot::isRed,
             s_Swerve // Reference to Swerve subsystem to set requirements
         );
@@ -110,16 +116,12 @@ public class PoseSubsystem extends SubsystemBase {
     }
     
     public Rotation2d getGyroYaw() {
-        return Rotation2d.fromDegrees(gyro.getYaw().getValue());
+        return new Rotation2d(gyro.getYaw().getValue());
     }
 
     public void zeroGyro() {
         gyro.setYaw(0);
         DogLog.log("Pose/Gyro/Status", "Zeroed Gyro Yaw");
-    }
-
-    public void hack() {
-        gyro.setYaw(gyro.getYaw().getValue() + 180.0);
     }
 
     public Pose2d getPose() {
