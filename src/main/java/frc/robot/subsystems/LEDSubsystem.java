@@ -38,17 +38,9 @@ public class LEDSubsystem extends SubsystemBase {
   public enum BaseState {
     DISABLED,
     READY,
-    EMPTY,
-    NOTE,
-    SHOOTABLE // TODO Set SHOOTABLE state without conflicting with NOTE
   }
 
   public enum TempState {
-    INTAKING,
-    SHINTAKING,
-    SHOOTING,
-    EXTENDING,
-    RETRACTING,
     ERROR
   }
 
@@ -96,17 +88,7 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   private Color tempStateColor(TempState state) {
-    if (state == TempState.INTAKING) {
-      return Colors.blue;
-    } else if (state == TempState.SHINTAKING) {
-      return Colors.cyan;
-    } else if (state == TempState.SHOOTING) {
-      return Colors.green;
-    } else if (state == TempState.EXTENDING) {
-      return Colors.magenta;
-    } else if (state == TempState.RETRACTING) {
-      return Colors.lynk;
-    } else if (state == TempState.ERROR) {
+    if (state == TempState.ERROR) {
       return Colors.red;
     } else {
       DogLog.log("LED/Status", "tempStateColor: Unknown state: " + state);
@@ -119,12 +101,6 @@ public class LEDSubsystem extends SubsystemBase {
       return Colors.disabled;
     } else if (state == BaseState.READY) {
       return Colors.lynk;
-    } else if (state == BaseState.EMPTY) {
-      return Colors.white;
-    } else if (state == BaseState.NOTE) {
-      return Colors.yellow;
-    } else if (state == BaseState.SHOOTABLE) {
-      return Colors.green;
     } else {
       DogLog.log("LED/Status", "baseStateColor: Unknown state: " + state);
       return Colors.off;
