@@ -6,13 +6,13 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.Command;
 
-public class AimCommand extends Command {
+public class AimCommand extends LoggedCommandBase {
     private final Swerve s_Swerve;
     private final VisionSubsystem s_Vision;
 
     public AimCommand(Swerve s_Swerve, VisionSubsystem s_Vision) {
+        super();
         this.s_Swerve = s_Swerve;
         this.s_Vision = s_Vision;
         addRequirements(s_Swerve);
@@ -20,6 +20,7 @@ public class AimCommand extends Command {
 
     @Override
     public void initialize() {
+        super.initialize();
         PoseSubsystem.angleErrorReset();
     }
 
@@ -41,6 +42,7 @@ public class AimCommand extends Command {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        super.end(interrupted);
         s_Swerve.drive(new Translation2d(0, 0), 0.0, false);
     }
 

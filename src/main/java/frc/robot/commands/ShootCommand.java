@@ -13,7 +13,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.util.TunableOption;
 import frc.robot.Constants;
 import frc.robot.subsystems.IndexSubsystem;
@@ -24,7 +23,7 @@ import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.LEDSubsystem.TempState;
 
-public class ShootCommand extends Command {
+public class ShootCommand extends LoggedCommandBase {
   private final ShooterSubsystem shooter;
   private final IndexSubsystem index;
   private Swerve swerve = null;
@@ -41,6 +40,7 @@ public class ShootCommand extends Command {
   private static final TunableOption optSetPoseWhenShooting = new TunableOption("Set pose when shooting", true);
 
   public ShootCommand(ShooterSubsystem shooter, IndexSubsystem index) {
+    super();
     addRequirements(shooter, index);
     this.shooter = shooter;
     this.index = index;
@@ -72,6 +72,8 @@ public class ShootCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    super.initialize();
+
     // System.out.println("Spinning up shooter");
     shooterReady = false;
     LEDSubsystem.setTempState(TempState.SHOOTING);
@@ -101,6 +103,8 @@ public class ShootCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    super.execute();
+
     if (cancelled) {
       return;
     }
@@ -184,6 +188,8 @@ public class ShootCommand extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    super.end(interrupted);
+
     // Stop feeding
     index.stop();
 

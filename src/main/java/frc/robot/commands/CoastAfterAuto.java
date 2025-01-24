@@ -1,13 +1,12 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
 
 import dev.doglog.DogLog;
 
 import frc.robot.subsystems.Swerve;
 
-public class CoastAfterAuto extends Command {
+public class CoastAfterAuto extends LoggedCommandBase {
     private final Swerve s_Swerve;
     private final double cutoff = 0.1;
     private boolean triggered = false;
@@ -19,6 +18,7 @@ public class CoastAfterAuto extends Command {
 
     @Override
     public void execute() {
+        super.execute();
         if (!triggered && DriverStation.isAutonomousEnabled() && DriverStation.getMatchTime() <= cutoff) {
             DogLog.log("Auto/Status", "Coasting swerve drive motors");
             triggered = true;

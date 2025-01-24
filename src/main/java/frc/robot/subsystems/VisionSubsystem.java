@@ -4,11 +4,11 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.TunableOption;
 import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.commands.LoggedCommands;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.estimator.PoseEstimator;
@@ -80,7 +80,7 @@ public class VisionSubsystem extends SubsystemBase {
     PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
 
     SmartDashboard.putData("vision/Field", field);
-    SmartDashboard.putData("vision/Calibrate", Commands.runOnce(this::calibrate, this).withName("Calibrate Vision").ignoringDisable(true));
+    SmartDashboard.putData("vision/Calibrate", LoggedCommands.runOnce("Calibrate Vision", this::calibrate, this).ignoringDisable(true));
   }
 
   public void enableRotationTargetOverride() { overrideRotation = true; }

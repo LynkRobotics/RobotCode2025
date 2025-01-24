@@ -6,15 +6,13 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.IndexSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.LEDSubsystem.TempState;
 
-public class ShooterIntakeCommand extends Command {
+public class ShooterIntakeCommand extends LoggedCommandBase {
   private final ShooterSubsystem shooter;
   private final IndexSubsystem index;
   private final GenericHID controller;
@@ -31,6 +29,7 @@ public class ShooterIntakeCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    super.initialize();
     pulling = true;
     seenIt = false;
     shooter.intake();
@@ -63,6 +62,8 @@ public class ShooterIntakeCommand extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    super.end(interrupted);
+    
     shooter.stop();
     index.stop();
 
@@ -70,10 +71,13 @@ public class ShooterIntakeCommand extends Command {
 
     if (!interrupted) {
       CommandScheduler.getInstance().schedule(
-        Commands.startEnd(
-          () -> { controller.setRumble(RumbleType.kLeftRumble, 1.0); controller.setRumble(RumbleType.kRightRumble, 1.0); },
-          () -> { controller.setRumble(RumbleType.kLeftRumble, 0.0); controller.setRumble(RumbleType.kRightRumble, 0.0); })
-        .raceWith(Commands.waitSeconds(0.5)));
+        LoggedCommands.race(
+          "Rumble",
+          LoggedCommands.startEnd(
+            "Do rumble",
+            () -> { controller.setRumble(RumbleType.kLeftRumble, 1.0); controller.setRumble(RumbleType.kRightRumble, 1.0); },
+            () -> { controller.setRumble(RumbleType.kLeftRumble, 0.0); controller.setRumble(RumbleType.kRightRumble, 0.0); }),
+          LoggedCommands.waitSeconds("Rumble wait", 0.5)));
     }
   }
 

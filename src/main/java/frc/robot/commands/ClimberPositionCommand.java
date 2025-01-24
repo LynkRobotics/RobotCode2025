@@ -6,14 +6,13 @@ package frc.robot.commands;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.util.TunableOption;
 import frc.robot.Constants;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.LEDSubsystem.TempState;
 
-public class ClimberPositionCommand extends Command {
+public class ClimberPositionCommand extends LoggedCommandBase {
   private final ClimberSubsystem s_Climber;
   private final double position;
   private final LEDSubsystem.TempState ledState;
@@ -22,6 +21,7 @@ public class ClimberPositionCommand extends Command {
   
   /** Creates a new PushClimberCommand. */
   public ClimberPositionCommand(double position, LEDSubsystem.TempState ledState, ClimberSubsystem s_Climber) {
+    super();
     this.s_Climber = s_Climber;
     addRequirements(s_Climber);
 
@@ -32,6 +32,7 @@ public class ClimberPositionCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    super.initialize();
     cancelled = false;
     if (DriverStation.getMatchTime() > Constants.Climber.timeCutOff) {
       DogLog.log("Climber/Status", "ERROR: Current match time " + DriverStation.getMatchTime() + " exceeds the cutoff time of " + Constants.Climber.timeCutOff);
@@ -51,13 +52,11 @@ public class ClimberPositionCommand extends Command {
     s_Climber.setPosition(position);
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {}
-
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    super.end(interrupted);
+
     s_Climber.stop();
 
     if (cancelled) {
