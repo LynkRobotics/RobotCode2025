@@ -198,6 +198,37 @@ public final class Constants {
         public static final double centerToReferenceOffset = -Units.inchesToMeters(27.0/2.0 + 3.0); // Reference point is outside of bumper
     }
 
+    public static final class Elevator {
+        /* IDs */
+        /* TODO Verify IDs */
+        public static final int leftID = 17;
+        public static final int rightID = 4;
+        /* CANBus */
+        public static final String CanBus = "rio";
+        /* Motor Config Values */
+        public static final double peakForwardVoltage = 1.5; // TODO Raise peak voltage
+        public static final double peakReverseVoltage = -1.5; // TODO Raise peak voltage
+        public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
+        public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
+
+        // TODO Set a range of positions
+        public static final double xPosition = 10.0;
+        public static final double positionError = 1.0;
+        public static final double slowVoltage = 1.0;
+
+        // TODO Tune PID / FF
+        public static final double RPSperVolt = 100.0; // RPS increase with every volt
+        public static final double kP = 0.0; // output per unit of error in position (output/rotation)
+        public static final double kI = 0.0; // output per unit of integrated error in position (output/(rotation*s))
+        public static final double kD = 0.0; // output per unit of error in velocity (output/rps)
+        public static final double kS = 0.0; // output to overcome static friction (output)
+        public static final double kV = 1.0 / RPSperVolt; // output per unit of target velocity (output/rps)
+        public static final double kA = 0.0; // output per unit of target acceleration (output/(rps/s))
+        public static final double kG = 0.0; // do not factory in gravity
+        public static final double cruiseVelocity = 10.0; // RPS
+        public static final double acceleration = cruiseVelocity * 0.5; // Accelerate in 0.5 seconds
+    }
+
     public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
         public static final double kMaxSpeedMetersPerSecond = 3;
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;

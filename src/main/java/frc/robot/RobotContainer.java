@@ -48,6 +48,8 @@ public class RobotContainer {
     private final VisionSubsystem s_Vision = new VisionSubsystem();
     @SuppressWarnings ("unused")
     private final PoseSubsystem s_Pose = new PoseSubsystem(s_Swerve, s_Vision);
+    @SuppressWarnings ("unused")
+    private final ElevatorSubsystem s_Elevator = new ElevatorSubsystem();
 
     private final SendableChooser<Command> autoChooser;
 
