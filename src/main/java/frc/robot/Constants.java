@@ -190,118 +190,12 @@ public final class Constants {
         public static final double zoneMiddleEnd = 12.5;
     }
 
-    public class Intake {
-        /* IDs */
-        public static final int intakeMotorID = 3;
-        /* CANBus */
-        public static final String intakeMotorCanBus = "rio";
-        /* Motor Speed Values */
-        public static final double intakingSpeed = 0.50;
-        public static final double ejectingSpeed = -0.50;
-        public static final double stoppingSpeed = 0.00;
-        /* Motor Config Values */
-        public static final double peakForwardVoltage = 12.0;
-        public static final double peakReverseVoltage = -12.0;
-        public static final InvertedValue motorOutputInverted = InvertedValue.Clockwise_Positive;
-        public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
-    }
-
-    public class Shooter {
-        /* IDs */
-        public static final int topShooterID = 4; 
-        public static final int bottomShooterID = 17;
-        /* CANBus */
-        public static final String shooterMotorCanBus = "rio";
-        /* Motor Speed Values */
-        public static final double idleSpeed = 2500; 
-        public static final double intakeSpeed = -800;
-        public static final double stopSpeed = 0.00;
-        public static final double topSpeed = 6000;
-        public static final double maxRPMError = 60.0;
-        public static final double maxRPMErrorLong = 30.0;
-        public static final double slideShotVelocityErrorMax = 100.0;
-        public static final double dumpShotVelocityErrorMax = 60.0;
-        public static final double shuttleShotVelocityErrorMax = 75.0;
-        public static final double farDistance = Units.inchesToMeters(114.0); // when more precision is required
-        /* Motor Config Values */
-        public static final double peakForwardVoltage = 12.0;
-        public static final double peakReverseVoltage = -12.0;
-        public static final InvertedValue motorOutputInverted = InvertedValue.Clockwise_Positive;
-        public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
-        public static final double kP = 0.25; // Voltage per 1 RPS of error
-        public static final double kI = 0.0;
-        public static final double kD = 0.0;
-        public static final double kS = 0.21;  // Voltage to overcome static friction
-        public static final double RPMsPerVolt = 490;
-        /* Time to complete shot once Note no longer detected */
-        public static final double postShotTimeout = 0.1; // in seconds
-    }
-
-    public class Index {
-        /* IDs */
-        public static final int indexMotorID = 13;
-        public static final int leftIndexSensorID = 0;
-        public static final int rightIndexSensorID = 1;
-        /* CANBus */
-        public static final String indexMotorCanBus = "rio";
-        /* Motor Speed Values */
-        public static final double indexSpeed = 0.80;
-        public static final double feedSpeed = 1.00;
-        public static final double softFeedSpeed = 0.25;
-        public static final double ejectSpeed = -1.00;
-        public static final double stopSpeed = 0.00;
-        /* Timer Values */
-        public static final double waitToShootTime = 0.75;
-        /* Motor Config Values */
-        public static final double peakForwardVoltage = 12.0;
-        public static final double peakReverseVoltage = -12.0;
-        public static final InvertedValue motorOutputInverted = InvertedValue.Clockwise_Positive;
-        public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
-    }
-
-    public class Climber {
-        /* IDs */
-        public static final int rightID = 47;
-        public static final int leftID = 48;
-        /* CANBus */
-        public static final String CanBus = "rio";
-        /* Motor Config Values */
-        public static final double peakForwardVoltage = 12.0;
-        public static final double peakReverseVoltage = -12.0;
-        public static final InvertedValue motorOutputInverted = InvertedValue.Clockwise_Positive;
-        public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
-
-        public static final double extendedPosition = -230.0;
-        // public static final double midPosition = -100.0; //-450.0;  
-        public static final double retractedPosition = -15.0;
-        public static final double positionError = 1.0;
-        public static final double slowVoltage = 1.5;
-
-        public static final double RPSperVolt = 7.9; // RPS increase with every volt
-        public static final double kP = 0.50; // output per unit of error in position (output/rotation)
-        public static final double kI = 0.0; // output per unit of integrated error in position (output/(rotation*s))
-        public static final double kD = 0.0; // output per unit of error in velocity (output/rps)
-        public static final double kS = 0.22; // output to overcome static friction (output)
-        public static final double kV = 1.0 / RPSperVolt; // output per unit of target velocity (output/rps)
-        public static final double kA = 0.0; // output per unit of target acceleration (output/(rps/s))
-        public static final double kG = 0.0; // do not factory in gravity
-        public static final double cruiseVelocity = 120.0; // RPS
-        public static final double acceleration = cruiseVelocity * 0.5; // Accelerate in 0.5 seconds
-        
-        public static final double timeCutOff = 25.0;
-    }
-
     public static final class Vision {
         public static final String cameraName = "AprilTagCam";
         public static final Transform3d robotToCam = new Transform3d(
             new Translation3d(-0.148, 0.005, 0.325),
             new Rotation3d(Units.degreesToRadians(1.2), Units.degreesToRadians(-30.7), Math.PI)); // As measured by PhotonVision
         public static final double centerToReferenceOffset = -Units.inchesToMeters(27.0/2.0 + 3.0); // Reference point is outside of bumper
-        public static final double maxAngleError = 1.0; // degrees
-        public static final double calibrationFactorBlue = atHQ ? 0.98 : 1.0;
-        public static final double calibrationOffsetBlue = atHQ ? Units.inchesToMeters(0.29) : Units.inchesToMeters(0.0);
-        public static final double calibrationFactorRed  = atHQ ? calibrationFactorBlue : 0.98;
-        public static final double calibrationOffsetRed  = atHQ ? calibrationOffsetBlue : Units.inchesToMeters(0.0);
     }
 
     public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot

@@ -8,7 +8,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -17,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 
@@ -116,9 +114,6 @@ public class RobotContainer {
         /* Driver Buttons */
 
         SmartDashboard.putData("Disable speed limit", Commands.runOnce(s_Swerve::disableSpeedLimit));
-        SmartDashboard.putData("pose/Align to zero", Commands.runOnce(() -> { PoseSubsystem.setTargetAngle(new Rotation2d()); }).withName("Align to zero"));
-        SmartDashboard.putData("pose/Align to 90", Commands.runOnce(() -> { PoseSubsystem.setTargetAngle(new Rotation2d(Math.PI / 2.0)); }).withName("Align to 90"));
-        SmartDashboard.putData("pose/Clear target angle", Commands.runOnce(() -> { PoseSubsystem.setTargetAngle(null); }).withName("Clear target angle"));
     }
 
     /**

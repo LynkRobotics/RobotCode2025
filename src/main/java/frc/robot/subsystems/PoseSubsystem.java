@@ -13,13 +13,9 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import dev.doglog.DogLog;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -37,8 +33,6 @@ public class PoseSubsystem extends SubsystemBase {
     private final SwerveDrivePoseEstimator poseEstimator;
     private final Field2d field;
     private final Pigeon2 gyro;
-    private static Rotation2d targetAngle = null;
-    private static Zone zone = Zone.SPEAKER;
 
     private static final TunableOption optUpdatePoseWithVisionAuto = new TunableOption("pose/Update with vision in Auto", false);
 
@@ -154,192 +148,6 @@ public class PoseSubsystem extends SubsystemBase {
         }
     }
 
-    public Translation2d ampLocation() {
-        return (Robot.isRed() ? Pose.redAmpLocation : Pose.blueAmpLocation);
-    }
-
-    public Translation2d speakerLocation() {
-        return (Robot.isRed() ? Pose.redSpeakerLocation : Pose.blueSpeakerLocation);
-    }
-
-    public Translation2d shuttleLocation() {
-        return (Robot.isRed() ? Pose.redShuttleLocation : Pose.blueShuttleLocation);
-    }
-
-    public Translation2d farShuttleLocation() {
-        return (Robot.isRed() ? Pose.redFarShuttleLocation : Pose.blueFarShuttleLocation);
-    }
-
-    public double distanceToSpeaker() {
-        double distance = getPose().getTranslation().getDistance(PoseSubsystem.getInstance().speakerLocation()); // distance from center of robot to speaker 
-        distance += Constants.Vision.centerToReferenceOffset; // distance from center of robot to reference point
-        return distance;
-    }
-
-    public double distanceToShuttle() {
-        double distance = getPose().getTranslation().getDistance(PoseSubsystem.getInstance().shuttleLocation()); // distance from center of robot to shuttle location
-        distance += Constants.Vision.centerToReferenceOffset; // distance from center of robot to reference point
-        return distance;
-    }
-
-    public double distanceToFarShuttle() {
-        double distance = getPose().getTranslation().getDistance(PoseSubsystem.getInstance().farShuttleLocation()); // distance from center of robot to far shuttle location
-        distance += Constants.Vision.centerToReferenceOffset; // distance from center of robot to reference point
-        return distance;
-    }
-
-    public Rotation2d dumpShotError() {
-        Rotation2d robotAngle = getPose().getRotation();
-        if (Robot.isRed()){
-            return Pose.redDumpAngle.minus(robotAngle);
-        } else {
-            return Pose.blueDumpAngle.minus(robotAngle);
-        }
-    }
-
-    public boolean dumpShotAligned() {
-        if (Math.abs(dumpShotError().getDegrees()) < Pose.maxDumpError) {
-            if (Math.abs(Pose.rotationPID.getVelocityError()) < Constants.Shooter.dumpShotVelocityErrorMax) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    public Rotation2d slideShotError() {
-        Rotation2d robotAngle = getPose().getRotation();
-        if (Robot.isRed()){
-            return Pose.redSlideAngle.minus(robotAngle);
-        } else {
-            return Pose.blueSlideAngle.minus(robotAngle);
-        }
-    }
-
-    public boolean slideShotAligned() {
-        if (Math.abs(slideShotError().getDegrees()) < Pose.maxSlideError) {
-            if (Math.abs(Pose.rotationPID.getVelocityError()) < Constants.Shooter.slideShotVelocityErrorMax) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    public Rotation2d shuttleShotError() {
-        Rotation2d robotAngle = getPose().getRotation();
-        Rotation2d targetAngle = angleToShuttle();
-        return targetAngle.minus(robotAngle);
-    }
-
-    public boolean shuttleShotAligned() {
-        if (Math.abs(shuttleShotError().getDegrees()) < Pose.maxShuttleError) {
-            if (Math.abs(Pose.rotationPID.getVelocityError()) < Constants.Shooter.shuttleShotVelocityErrorMax) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    public Rotation2d farShuttleShotError() {
-        Rotation2d robotAngle = getPose().getRotation();
-        Rotation2d targetAngle = angleToFarShuttle();
-        return targetAngle.minus(robotAngle);
-    }
-
-    public boolean farShuttleShotAligned() {
-        if (Math.abs(farShuttleShotError().getDegrees()) < Pose.maxShuttleError) {
-            if (Math.abs(Pose.rotationPID.getVelocityError()) < Constants.Shooter.shuttleShotVelocityErrorMax) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    public static void angleErrorReset() {
-        angleErrorReset(Pose.rotationPID);
-    }
-
-    public static void angleErrorReset(PIDController pid) {
-        pid.reset();
-    }
-
-    private Translation2d speakerOffset() {
-        return getPose().getTranslation().minus(speakerLocation());
-    }
-
-    public Rotation2d angleToSpeaker() {
-        return speakerOffset().getAngle();
-    }
-
-    public Rotation2d angleToAmp() {
-        return ampOffset().getAngle();
-    }
-
-    private Translation2d ampOffset() {
-        return getPose().getTranslation().minus(ampLocation());
-    }
-
-    private Translation2d shuttleOffset() {
-        return getPose().getTranslation().minus(shuttleLocation());
-    }
-
-    public Rotation2d angleToShuttle() {
-        return shuttleOffset().getAngle();
-    }
-
-    private Translation2d farShuttleOffset() {
-        return getPose().getTranslation().minus(farShuttleLocation());
-    }
-
-    public Rotation2d angleToFarShuttle() {
-        return farShuttleOffset().getAngle();
-    }
-
-    public Rotation2d angleError() {
-        Rotation2d speakerAngle = angleToSpeaker();
-        Rotation2d robotAngle = getPose().getRotation();
-
-        return speakerAngle.minus(robotAngle);
-    }
-
-    public static void setTargetAngle(Rotation2d angle) {
-        targetAngle = angle;
-    }
-    
-    public static Rotation2d getTargetAngle() {
-        return targetAngle;
-    }
-
-    public static double angleErrorToSpeed(Rotation2d angleError) {
-        return angleErrorToSpeed(angleError, Pose.rotationPID);
-    }
-
-    public static double angleErrorToSpeed(Rotation2d angleError, PIDController pid) {
-        double angleErrorDeg = angleError.getDegrees();
-        double correction = pid.calculate(angleErrorDeg);
-        double feedForward = Pose.rotationKS * Math.signum(correction);
-        double output = MathUtil.clamp(correction + feedForward, -1.0, 1.0);
-
-        DogLog.log("Pose/Angle Error", angleErrorDeg);
-        DogLog.log("Pose/Angle PID correction", correction);
-        DogLog.log("Pose/Angle feedforward", feedForward);
-        DogLog.log("Pose/Angle output", output);
-        
-        // Invert due to use as joystick controls
-        return -output;
-    }
-
-    public static Zone getZone() {
-        return zone;
-    }
-
     @Override
     public void periodic() {
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
@@ -351,31 +159,11 @@ public class PoseSubsystem extends SubsystemBase {
 
         Pose2d pose = getPose();
         field.setRobotPose(pose);
-        double distance = pose.getTranslation().getX();
-        if (Robot.isRed()) {
-            distance = Constants.Pose.fieldLength - distance;
-        }
-        if (distance > Constants.Pose.zoneSourceStart) {
-            if (distance > Constants.Pose.zoneMiddleEnd || zone != Zone.MIDDLE) {
-                zone = Zone.FAR;
-            }
-        } else if (distance < Constants.Pose.zoneSpeakerEnd) {
-            if (distance < Constants.Pose.zoneMiddleStart || zone != Zone.MIDDLE) {
-                zone = Zone.SPEAKER;
-            }
-        } else {
-            zone = Zone.MIDDLE;
-        }
-        DogLog.log("Pose/Zone", zone);
-        SmartDashboard.putString("pose/Zone", zone.toString());
 
         SmartDashboard.putNumber("pose/Gyro", getHeading().getDegrees());
         SmartDashboard.putString("pose/Pose", prettyPose(pose));
 
         DogLog.log("Pose/Pose", pose);
-        DogLog.log("Pose/Distance to speaker", Units.metersToInches(distanceToSpeaker()));
-        DogLog.log("Pose/Distance to shuttle", Units.metersToInches(distanceToShuttle()));
-        DogLog.log("Pose/Distance to far shuttle", Units.metersToInches(distanceToFarShuttle()));
         DogLog.log("Pose/Gyro/Heading", getHeading().getDegrees());
         DogLog.log("Pose/Gyro/Raw Yaw", getGyroYaw());
     }
