@@ -204,7 +204,7 @@ public final class Constants {
         public static final int leftID = 17;
         public static final int rightID = 4;
         /* CANBus */
-        public static final String CanBus = "rio";
+        public static final String canBus = "rio";
         /* Motor Config Values */
         public static final double peakForwardVoltage = 1.5; // TODO Raise peak voltage
         public static final double peakReverseVoltage = -1.5; // TODO Raise peak voltage
@@ -227,6 +227,22 @@ public final class Constants {
         public static final double kG = 0.0; // do not factory in gravity
         public static final double cruiseVelocity = 10.0; // RPS
         public static final double acceleration = cruiseVelocity * 0.5; // Accelerate in 0.5 seconds
+    }
+
+    public static final class EndAffector {
+        /* IDs */
+        public static final int motorID = 20;
+        /* CANbus */
+        public static final String canBus = "rio";
+        /* Motor Config Values */
+        public static final double peakForwardVoltage = 12.0; 
+        public static final double peakReverseVoltage = -12.0; 
+        public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
+        public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
+        /* Motor Speed Value */
+        public static final double intakeSpeed = 0.80;
+        public static final double outtakeSpeed = -1.00;
+        public static final double stopSpeed = 0.00;
     }
 
     public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot

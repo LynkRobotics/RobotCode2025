@@ -45,8 +45,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     ));
 
     public ElevatorSubsystem() {
-        leftMotor = new TalonFX(Constants.Elevator.leftID, Constants.Elevator.CanBus);
-        rightMotor = new TalonFX(Constants.Elevator.rightID, Constants.Elevator.CanBus);
+        leftMotor = new TalonFX(Constants.Elevator.leftID, Constants.Elevator.canBus);
+        rightMotor = new TalonFX(Constants.Elevator.rightID, Constants.Elevator.canBus);
         applyConfigs();
 
         SmartDashboard.putData("Elevator/Raise", Raise());
