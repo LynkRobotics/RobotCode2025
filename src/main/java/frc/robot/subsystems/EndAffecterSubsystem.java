@@ -35,12 +35,12 @@ public class EndAffecterSubsystem extends SubsystemBase {
     /* Configure the EndAffector Motor */
     var m_endAffectorConfiguration = new TalonFXConfiguration();
     /* Set EndAffector motor to Brake */
-    m_endAffectorConfiguration.MotorOutput.NeutralMode = Constants.EndAffector.motorNeutralValue;
+    m_endAffectorConfiguration.MotorOutput.NeutralMode = Constants.EndAffecter.motorNeutralValue;
     /* Set the motor direction */
-    m_endAffectorConfiguration.MotorOutput.Inverted = Constants.EndAffector.motorOutputInverted;
+    m_endAffectorConfiguration.MotorOutput.Inverted = Constants.EndAffecter.motorOutputInverted;
     /* Config the peak outputs */
-    m_endAffectorConfiguration.Voltage.PeakForwardVoltage = Constants.EndAffector.peakForwardVoltage;
-    m_endAffectorConfiguration.Voltage.PeakReverseVoltage = Constants.EndAffector.peakReverseVoltage;
+    m_endAffectorConfiguration.Voltage.PeakForwardVoltage = Constants.EndAffecter.peakForwardVoltage;
+    m_endAffectorConfiguration.Voltage.PeakReverseVoltage = Constants.EndAffecter.peakReverseVoltage;
     /* Apply Index Motor Configs */
     motor.getConfigurator().apply(m_endAffectorConfiguration);
   }
