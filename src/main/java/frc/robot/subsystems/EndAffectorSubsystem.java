@@ -8,16 +8,24 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.commands.LoggedCommands;
 
 public class EndAffectorSubsystem extends SubsystemBase {
+  /* Devices */
   private final TalonFX motor;
+  private final DigitalInput sensor;
+  /* Control Requests */
   private final DutyCycleOut indexSpeedDutyCycleOut;
+
   public EndAffectorSubsystem() {
+    /* Devices */
     motor = new TalonFX(Constants.EndAffector.motorID, Constants.EndAffector.canBus);
+    sensor = new DigitalInput(Constants.EndAffector.sensorID);
+    /* Control Requests */
     indexSpeedDutyCycleOut = new DutyCycleOut(0).withEnableFOC(true);
 
     applyConfigs();

@@ -232,6 +232,7 @@ public final class Constants {
     public static final class EndAffector {
         /* IDs */
         public static final int motorID = 20;
+        public static final int sensorID = 1; //TODO: ID
         /* CANbus */
         public static final String canBus = "rio";
         /* Motor Config Values */
