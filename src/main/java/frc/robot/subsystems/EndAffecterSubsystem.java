@@ -14,14 +14,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.commands.LoggedCommands;
 
-public class EndAffectorSubsystem extends SubsystemBase {
+public class EndAffecterSubsystem extends SubsystemBase {
   /* Devices */
   private final TalonFX motor;
   private final DigitalInput sensor;
   /* Control Requests */
   private final DutyCycleOut indexSpeedDutyCycleOut;
 
-  public EndAffectorSubsystem() {
+  public EndAffecterSubsystem() {
     /* Devices */
     motor = new TalonFX(Constants.EndAffector.motorID, Constants.EndAffector.canBus);
     sensor = new DigitalInput(Constants.EndAffector.sensorID);
@@ -49,7 +49,7 @@ public class EndAffectorSubsystem extends SubsystemBase {
     return LoggedCommands.runOnce("End Affector Intake", 
     () -> {
       motor.setControl(indexSpeedDutyCycleOut.withOutput(Constants.EndAffector.intakeSpeed)); 
-    });
+    }).until(this::haveGamePiece);
   }
 
   public Command Stop(){
@@ -66,6 +66,9 @@ public class EndAffectorSubsystem extends SubsystemBase {
     });
   }
 
+  public boolean haveGamePiece() {
+    return sensor.get();
+  }
 
   @Override
   public void periodic() {
