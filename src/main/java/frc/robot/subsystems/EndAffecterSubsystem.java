@@ -23,8 +23,8 @@ public class EndAffecterSubsystem extends SubsystemBase {
 
   public EndAffecterSubsystem() {
     /* Devices */
-    motor = new TalonFX(Constants.EndAffector.motorID, Constants.EndAffector.canBus);
-    sensor = new DigitalInput(Constants.EndAffector.sensorID);
+    motor = new TalonFX(Constants.EndAffecter.motorID, Constants.EndAffecter.canBus);
+    sensor = new DigitalInput(Constants.EndAffecter.sensorID);
     /* Control Requests */
     indexSpeedDutyCycleOut = new DutyCycleOut(0).withEnableFOC(true);
 
@@ -48,21 +48,21 @@ public class EndAffecterSubsystem extends SubsystemBase {
   public Command Intake(){
     return LoggedCommands.runOnce("End Affector Intake", 
     () -> {
-      motor.setControl(indexSpeedDutyCycleOut.withOutput(Constants.EndAffector.intakeSpeed)); 
+      motor.setControl(indexSpeedDutyCycleOut.withOutput(Constants.EndAffecter.intakeSpeed)); 
     }).until(this::haveGamePiece);
   }
 
   public Command Stop(){
     return LoggedCommands.runOnce("End Affector Stop", 
     () -> {
-      motor.setControl(indexSpeedDutyCycleOut.withOutput(Constants.EndAffector.stopSpeed));
+      motor.setControl(indexSpeedDutyCycleOut.withOutput(Constants.EndAffecter.stopSpeed));
     });
   }
 
   public Command Outtake(){
     return LoggedCommands.runOnce("End Affector Outtake", 
     () -> {
-      motor.setControl(indexSpeedDutyCycleOut.withOutput(Constants.EndAffector.outtakeSpeed)); 
+      motor.setControl(indexSpeedDutyCycleOut.withOutput(Constants.EndAffecter.outtakeSpeed)); 
     });
   }
 
