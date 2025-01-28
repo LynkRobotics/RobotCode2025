@@ -211,10 +211,15 @@ public final class Constants {
         public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
         public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
 
-        // TODO Set a range of positions
-        public static final double xPosition = 10.0;
         public static final double positionError = 1.0;
         public static final double slowVoltage = 1.0;
+
+        // NOTE Elevator height is measured from the ground to top of the carriage
+        public static final double width = 24.0; // Width of the elevator (only for Mechanism2d visualization)
+        public static final double baseHeight = 12.0 + 0.755; // Height of elevator in inches when it is at zero position
+        public static final double maxHeight = 60.0; // Height that elevator should never exceed
+        public static final double endEffectorHeight = 6.0; // Height of end effector "target" above elevator height
+        public static final double rotPerInch = 1.0; // Rotations to drive elevator one inch
 
         // TODO Tune PID / FF
         public static final double RPSperVolt = 100.0; // RPS increase with every volt

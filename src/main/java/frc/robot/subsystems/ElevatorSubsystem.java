@@ -10,6 +10,9 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,9 +27,9 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final TalonFX rightMotor;
     private final VoltageOut voltageOut = new VoltageOut(0).withEnableFOC(true);
     private final PositionVoltage positionVoltage = new PositionVoltage(0.0).withEnableFOC(true);
+    private final MechanismLigament2d mech2d;
 
     public enum Stop {
-        ZERO,
         INTAKE,
         L1,
         L2,
@@ -34,14 +37,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         L4
     };
 
-    // TODO Define positions
-    private final EnumMap<Stop, Double> elevatorPositions = new EnumMap<>(Map.ofEntries(
-      Map.entry(Stop.ZERO, 0.0),
-      Map.entry(Stop.INTAKE, 10.0),
-      Map.entry(Stop.L1, 20.0),
-      Map.entry(Stop.L2, 30.0),
-      Map.entry(Stop.L3, 40.0),
-      Map.entry(Stop.L4, 50.0)
+    // TODO Refine heights
+    // Elevator heights are defined in terms off inches that the elevator is off the ground
+    private final EnumMap<Stop, Double> elevatorHeights = new EnumMap<>(Map.ofEntries(
+      Map.entry(Stop.INTAKE, 24.0),
+      Map.entry(Stop.L1, 20.0 - Constants.Elevator.endEffectorHeight),
+      Map.entry(Stop.L2, 30.5 - Constants.Elevator.endEffectorHeight),
+      Map.entry(Stop.L3, 45.5 - Constants.Elevator.endEffectorHeight),
+      Map.entry(Stop.L4, 71.5 - Constants.Elevator.endEffectorHeight)
     ));
 
     public ElevatorSubsystem() {
@@ -52,6 +55,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putData("Elevator/Raise", Raise());
         SmartDashboard.putData("Elevator/Lower", Lower());
         SmartDashboard.putData("Elevator/Zero", Zero());
+
+        Mechanism2d mechanism = new Mechanism2d(Constants.Elevator.maxHeight, Constants.Elevator.maxHeight);
+        MechanismRoot2d root = mechanism.getRoot("elevator-root", Constants.Elevator.maxHeight / 2, 0);
+        mech2d = root.append(new MechanismLigament2d("elevator", Constants.Elevator.baseHeight, 90));
+
+        SmartDashboard.putData("Elevator/mechanism", mechanism);
     }
 
     public void setAsZero() {
@@ -85,12 +94,23 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Command Move(Stop stop) {
         return LoggedCommands.runOnce("Move Elevator to " + stop,
             () -> {
-                setPosition(elevatorPositions.get(stop));
+                setHeight(elevatorHeights.get(stop));
             },
             this);
     }
 
-    private void setPosition(double position) {
+    // Set Elevator height to given position, provided in inches
+    private void setHeight(double height) {
+        if (height > Constants.Elevator.maxHeight) {
+            Elastic.sendNotification(new Notification(NotificationLevel.WARNING, "Elevator Range", "Requested elevator height too high"));
+            height = Constants.Elevator.maxHeight;
+        }
+        if (height < Constants.Elevator.baseHeight) {
+            Elastic.sendNotification(new Notification(NotificationLevel.WARNING, "Elevator Range", "Requested elevator height too low"));
+            height = Constants.Elevator.baseHeight;
+        }
+
+        double position = (height - Constants.Elevator.baseHeight) * Constants.Elevator.rotPerInch;
         leftMotor.setControl(positionVoltage.withPosition(position));
     }
 
@@ -132,5 +152,11 @@ public class ElevatorSubsystem extends SubsystemBase {
         DogLog.log("Elevator/leftPosition", leftMotor.getPosition().getValueAsDouble());
         DogLog.log("Elevator/leftVelocity", leftMotor.getVelocity().getValueAsDouble());
         DogLog.log("Elevator/leftVoltage", leftMotor.getMotorVoltage().getValueAsDouble());
+        DogLog.log("Elevator/rightPosition", rightMotor.getPosition().getValueAsDouble());
+        DogLog.log("Elevator/rightVelocity", rightMotor.getVelocity().getValueAsDouble());
+        DogLog.log("Elevator/rightVoltage", rightMotor.getMotorVoltage().getValueAsDouble());
+
+        double height = leftMotor.getPosition().getValueAsDouble() / Constants.Elevator.rotPerInch + Constants.Elevator.baseHeight;
+        mech2d.setLength(height);
     }
 }
