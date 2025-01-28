@@ -13,6 +13,8 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Unit;
+import edu.wpi.first.wpilibj.RobotController;
 import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 
@@ -22,6 +24,18 @@ public final class Constants {
     public static final double driveStickSensitivity = 1.00; 
     public static final double turnStickSensitivity = 1.00;
     public static final double aimingOverride = 0.001;
+
+    
+    public static final String latchSerial = ""; //TODO find
+
+    public static boolean isRocky(){
+        if (RobotController.getSerialNumber() == latchSerial){
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
 
     public static final class Swerve {
         public static final String swerveCanBus = "lynk";
@@ -33,9 +47,13 @@ public final class Constants {
             COTSTalonFXSwerveConstants.SDS.MK4i.KrakenX60(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L2_5);
 
         /* Drivetrain Constants */
-        public static final double trackWidth = Units.inchesToMeters(21.75); 
+        public static final double trackWidth = 
+            isRocky() ? Units.inchesToMeters(21.75) : //ROCKY
+                Units.inchesToMeters(21.75); 
         /* Center to Center distance of left and right modules in meters. */
-        public static final double wheelBase = Units.inchesToMeters(15.75); 
+        public static final double wheelBase = 
+            isRocky() ? Units.inchesToMeters(15.75) : //ROCKY
+                Units.inchesToMeters(15.75); 
         /* Center to Center distance of front and rear module wheels in meters. */
         public static final double wheelCircumference = chosenModule.wheelCircumference * 0.97845; // testing
 
@@ -96,7 +114,7 @@ public final class Constants {
 
         /* Swerve Profiling Values */
         /** Meters per Second */
-        public static final double maxSpeed = 5.21208; //L2.5 therotical max speed, test later.
+        public static final double maxSpeed = isRocky() ? 5.0292 : 5.21208; 
         /* These are theorectial values to start with, tune after
          * Kraken FOC (L1.0): ft/s = 12.4 | m/s = 3.77952
          * Kraken FOC (L1.5): ft/s = 14.2 | m/s = 4.32816
@@ -121,7 +139,9 @@ public final class Constants {
             public static final int angleMotorID = 1;
             public static final int canCoderID = 0;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(33.6);
+            public static final Rotation2d angleOffset = 
+                isRocky() ? Rotation2d.fromDegrees(33.6) : //ROCKY 
+                    Rotation2d.fromDegrees(33.6);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
@@ -132,7 +152,9 @@ public final class Constants {
             public static final int angleMotorID = 19;
             public static final int canCoderID = 1;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-70.0);
+            public static final Rotation2d angleOffset = 
+                isRocky() ? Rotation2d.fromDegrees(-70.0) : //ROCKY  
+                    Rotation2d.fromDegrees(-70.0);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
@@ -143,7 +165,9 @@ public final class Constants {
             public static final int angleMotorID = 9;
             public static final int canCoderID = 2;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(163.4);
+            public static final Rotation2d angleOffset = 
+                isRocky() ? Rotation2d.fromDegrees(163.4) : //ROCKY
+                    Rotation2d.fromDegrees(163.4);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
@@ -154,7 +178,9 @@ public final class Constants {
             public static final int angleMotorID = 11;
             public static final int canCoderID = 3;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-25.3);
+            public static final Rotation2d angleOffset = 
+                isRocky() ? Rotation2d.fromDegrees(-25.3) : //ROCKY 
+                    Rotation2d.fromDegrees(-25.3);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
