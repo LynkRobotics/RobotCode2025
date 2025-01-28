@@ -49,16 +49,16 @@ public class VisionSubsystem extends SubsystemBase {
 
     camera = new PhotonCamera(Constants.Vision.cameraName);
 
-    if (Constants.atHQ) {
-      try {
-        kTagLayout = new AprilTagFieldLayout(Filesystem.getDeployDirectory().toPath().resolve("2024-crescendo-hq.json"));
-      } catch (IOException e) {
-        e.printStackTrace();
-        System.exit(1);
-      }
-    } else {
-      kTagLayout = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField();
-    }
+    // if (Constants.atHQ) {
+      // try {
+        // kTagLayout = new AprilTagFieldLayout(Filesystem.getDeployDirectory().toPath().resolve("2024-crescendo-hq.json"));
+      // } catch (IOException e) {
+        // e.printStackTrace();
+        // System.exit(1);
+      // }
+    // } else {
+      // kTagLayout = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField();
+    // }
 
     photonEstimator = new PhotonPoseEstimator(kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Constants.Vision.robotToCam);
     photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);

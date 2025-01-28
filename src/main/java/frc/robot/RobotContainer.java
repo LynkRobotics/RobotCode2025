@@ -51,11 +51,11 @@ public class RobotContainer {
     @SuppressWarnings ("unused")
     private final ElevatorSubsystem s_Elevator = new ElevatorSubsystem();
 
-    private final SendableChooser<Command> autoChooser;
+    // private final SendableChooser<Command> autoChooser;
 
-    private static void autoNamedCommand(String name, Command command) {
-        NamedCommands.registerCommand(name, LoggedCommands.logWithName(name + " (auto)", command));
-    }
+    // private static void autoNamedCommand(String name, Command command) {
+        // NamedCommands.registerCommand(name, LoggedCommands.logWithName(name + " (auto)", command));
+    // }
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -74,13 +74,13 @@ public class RobotContainer {
 
         // Default named commands for PathPlanner
         SmartDashboard.putNumber("auto/Startup delay", 0.0);
-        autoNamedCommand("Startup delay", Commands.defer(() -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()));
-        autoNamedCommand("Stop", Commands.runOnce(s_Swerve::stopSwerve));
+        // autoNamedCommand("Startup delay", Commands.defer(() -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()));
+        // autoNamedCommand("Stop", Commands.runOnce(s_Swerve::stopSwerve));
 
         // Build an autoChooser (defaults to none)
-        autoChooser = AutoBuilder.buildAutoChooser();
-        SmartDashboard.putData("auto/Auto Chooser", autoChooser);
-        buildAutos(autoChooser);
+        // autoChooser = AutoBuilder.buildAutoChooser();
+        // SmartDashboard.putData("auto/Auto Chooser", autoChooser);
+        // buildAutos(autoChooser);
 
         SmartDashboard.putNumber("TeleOp Speed Governor", 1.0);
 
@@ -124,16 +124,16 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
+        return null;
     }
 
-    private void addAutoCommand(SendableChooser<Command> chooser, Command command) {
-        chooser.addOption(command.getName(), command);
-    }
+    // private void addAutoCommand(SendableChooser<Command> chooser, Command command) {
+        // chooser.addOption(command.getName(), command);
+    // }
 
-    private void buildAutos(SendableChooser<Command> chooser) {
+    // private void buildAutos(SendableChooser<Command> chooser) {
         // TODO add programatically defined Autos as needed
-    }
+    // }
 
     public void teleopInit() {
     }

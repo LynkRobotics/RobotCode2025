@@ -4,6 +4,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -25,11 +26,11 @@ public final class Constants {
     public static final double aimingOverride = 0.001;
 
     
-    public static final String latchSerial = ""; //TODO find
+    public static final String latchSerial = "0327B9A2"; //TODO find
 
     public static boolean isRocky(){
-        if (RobotController.getSerialNumber() == latchSerial){
-            return false;
+        if (RobotController.getSerialNumber().toString().matches(latchSerial)){
+            return false; //The robot knows who it is, because it knows who it isnt
         } else {
             return true;
         }

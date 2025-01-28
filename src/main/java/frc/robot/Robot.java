@@ -64,6 +64,7 @@ public class Robot extends TimedRobot {
     DogLog.log("Misc/FMS Match Time", DriverStation.getMatchTime());
 
     DogLog.log("Misc/RIO Serial Number", RobotController.getSerialNumber());
+    DogLog.log("Misc/Is Rocky?", Constants.isRocky());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
