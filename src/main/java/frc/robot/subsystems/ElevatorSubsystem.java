@@ -90,21 +90,19 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command Raise() {
-        return LoggedCommands.runOnce("Raise Elevator",
+        return LoggedCommands.runOnce("Raise Elevator", 
             () -> {
-                stallCount = 0;
-                leftMotor.setControl(voltageOut.withOutput(Constants.Elevator.slowVoltage));
+                setVoltage(Constants.Elevator.slowVoltage);
             },
             this).ignoringDisable(true);
     }
 
     public Command Lower() {
         return LoggedCommands.runOnce("Lower Elevator",
-            () -> {
-                stallCount = 0;
-                leftMotor.setControl(voltageOut.withOutput(-Constants.Elevator.slowVoltage));
-            },
-            this);
+        () -> {
+            setVoltage(-Constants.Elevator.slowVoltage);
+        },
+        this);
     }
 
     public Command Stop() {
@@ -113,7 +111,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     private void stop() {
         leftMotor.stopMotor();
-        //rightMotor.stopMotor();
+        // rightMotor.stopMotor();
+    }
+
+    private void setVoltage(double voltage) {
+        stallCount = 0;
+        leftMotor.setControl(voltageOut.withOutput(voltage));
     }
 
     public Command Move(Stop stop) {
