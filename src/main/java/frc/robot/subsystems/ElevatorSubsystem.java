@@ -17,9 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.util.Elastic;
-import frc.lib.util.Elastic.Notification;
-import frc.lib.util.Elastic.Notification.NotificationLevel;
+import frc.lib.util.LoggedAlert;
 import frc.robot.Constants;
 import frc.robot.commands.LoggedCommands;
 
@@ -131,11 +129,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     // Set Elevator height to given position, provided in inches
     private void setHeight(double height) {
         if (height > Constants.Elevator.maxHeight) {
-            Elastic.sendNotification(new Notification(NotificationLevel.WARNING, "Elevator Range", "Requested elevator height too high"));
+            LoggedAlert.Warning("Elevator", "Elevator Range", "Requested elevator height too high");
             height = Constants.Elevator.maxHeight;
         }
         if (height < Constants.Elevator.baseHeight) {
-            Elastic.sendNotification(new Notification(NotificationLevel.WARNING, "Elevator Range", "Requested elevator height too low"));
+            LoggedAlert.Warning("Elevator", "Elevator Range", "Requested elevator height too low");
             height = Constants.Elevator.baseHeight;
         }
 
@@ -189,7 +187,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             if (position == lastPosition) {
                 ++stallCount;
                 if (isStalled()) {
-                    Elastic.sendNotification(new Notification(NotificationLevel.WARNING, "Elevator Stalled", "Elevator stopped due to stall"));
+                    LoggedAlert.Warning("Elevator", "Elevator Stalled", "Elevator stopped due to stall");
                     stop();
                 }
             } else {
@@ -199,7 +197,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         lastPosition = position;
 
         if (Math.abs(followDifference) >= positionDiffMax) {
-            Elastic.sendNotification(new Notification(NotificationLevel.ERROR, "Elevator Unequal", "Elevator motor position difference of " + String.format("%01.2f", followDifference) + " exceeds limit"));
+            LoggedAlert.Error("Elevator", "Elevator Unequal", "Elevator motor position difference of " + String.format("%01.2f", followDifference) + " exceeds limit");
             stop();
         }
 
