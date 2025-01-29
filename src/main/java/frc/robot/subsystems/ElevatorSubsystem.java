@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.Elastic;
 import frc.lib.util.Elastic.Notification;
@@ -62,6 +63,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putData("Elevator/Lower", Lower());
         SmartDashboard.putData("Elevator/Stop", Stop());
         SmartDashboard.putData("Elevator/Zero", Zero());
+        SmartDashboard.putData("Elevator/SetZero", SetZero());
 
         Mechanism2d mechanism = new Mechanism2d(Constants.Elevator.maxHeight, Constants.Elevator.maxHeight);
         MechanismRoot2d root = mechanism.getRoot("elevator-root", Constants.Elevator.maxHeight / 2, 0);
@@ -75,13 +77,16 @@ public class ElevatorSubsystem extends SubsystemBase {
         rightMotor.setPosition(0);
     }
 
+    public Command SetZero() {
+        return LoggedCommands.runOnce("Set Elevator Zero", this::setAsZero);
+    }
+
     public Command Zero() {
-        return LoggedCommands.runOnce("Zero Elevator",
-            () -> {
-                // TODO Move until stall
-                setAsZero();
-            },
-            this).ignoringDisable(true);
+        return LoggedCommands.sequence("Zero Elevator",
+            Commands.deadline(
+                LoggedCommands.waitUntil("Wait for stall", this::isStalled),
+                Lower()),
+            SetZero());
     }
 
     public Command Raise() {
