@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
@@ -18,6 +19,7 @@ import frc.robot.commands.LoggedCommands;
 public class EndAffectorSubsystem extends SubsystemBase {
   /* Devices */
   private final TalonFX motor;
+  private final CANdi canDI; //TODO come up with better name?
   private final DigitalInput sensor;
   /* Control Requests */
   private final DutyCycleOut indexSpeedDutyCycleOut;
@@ -26,6 +28,8 @@ public class EndAffectorSubsystem extends SubsystemBase {
     /* Devices */
     motor = new TalonFX(Constants.EndAffector.motorID, Constants.EndAffector.canBus);
     sensor = new DigitalInput(Constants.EndAffector.sensorID);
+    canDI = new CANdi(Constants.EndAffector.canDiID, Constants.EndAffector.canBus);
+
     /* Control Requests */
     indexSpeedDutyCycleOut = new DutyCycleOut(0).withEnableFOC(true);
 
@@ -74,13 +78,23 @@ public class EndAffectorSubsystem extends SubsystemBase {
     });
   }
 
+  public boolean getSensorOne() {
+    return canDI.getS1Closed().getValue();
+  }
+
+  public boolean getSensorTwo() {
+    return canDI.getS2Closed().getValue();
+  }
 
   public boolean haveGamePiece() {
-    return sensor.get();
+    return getSensorOne() && !getSensorTwo(); //In theory if the first sensor is engaged (the furthest one), and the second one isn't, that should mean that the coral is in the correct place
+    //return sensor.get();
   }
 
   @Override
   public void periodic() {
     DogLog.log("End Affector/Have Game Piece?", haveGamePiece());
+    DogLog.log("End Affector/Sensor One", getSensorOne());
+    DogLog.log("End Affector/Sensor Two", getSensorTwo());
   }
 }
