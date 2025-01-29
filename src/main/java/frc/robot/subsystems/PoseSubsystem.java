@@ -19,11 +19,16 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.Elastic;
+import frc.lib.util.Elastic.Notification;
+import frc.lib.util.Elastic.Notification.NotificationLevel;
 import frc.lib.util.TunableOption;
 import frc.robot.Constants;
 import frc.robot.Constants.Pose;
 import frc.robot.Robot;
+import frc.robot.commands.LoggedCommands;
 
 public class PoseSubsystem extends SubsystemBase {
     private static PoseSubsystem instance;
@@ -113,9 +118,12 @@ public class PoseSubsystem extends SubsystemBase {
         return new Rotation2d(gyro.getYaw().getValue());
     }
 
-    public void zeroGyro() {
-        gyro.setYaw(0);
-        DogLog.log("Pose/Gyro/Status", "Zeroed Gyro Yaw");
+    public Command zeroGyro() {
+        return LoggedCommands.runOnce("Zeroed Gyro",
+            () -> {
+                gyro.setYaw(0);
+            },
+            this);
     }
 
     public Pose2d getPose() {
@@ -135,17 +143,24 @@ public class PoseSubsystem extends SubsystemBase {
         poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d(getPose().getTranslation(), heading));
     }
 
-    public void zeroHeading() {
-        setHeading(new Rotation2d());
-        DogLog.log("Pose/Gyro/Status", "Zeroed Gyro Heading");
+    public Command zeroHeading() {
+        return LoggedCommands.runOnce("Zeroed Heading",
+            () -> {
+                setHeading(new Rotation2d());
+            },
+            this);
     }
 
-    public void resetHeading() {
-        if (Robot.isRed()) {
-            setHeading(new Rotation2d(Math.PI));
-        } else {
-            setHeading(new Rotation2d());
-        }
+    public Command resetHeading() {
+        return LoggedCommands.runOnce("Resetting Heading",
+            () -> {
+                if (Robot.isRed()) {
+                    setHeading(new Rotation2d(Math.PI));
+                } else {
+                    setHeading(new Rotation2d());
+                }
+            },
+            this);
     }
 
     @Override
