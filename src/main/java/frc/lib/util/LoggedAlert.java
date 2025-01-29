@@ -27,7 +27,7 @@ public class LoggedAlert {
      */
     public static void Warning(String subsystem, String title, String msg){
         Elastic.sendNotification(new Notification(NotificationLevel.WARNING, title, msg));
-        DogLog.logFault(subsystem + ":" + title + msg, AlertType.kWarning);
+        DogLog.logFault(subsystem + "/" + title + msg, AlertType.kWarning);
     }
 
     /**
