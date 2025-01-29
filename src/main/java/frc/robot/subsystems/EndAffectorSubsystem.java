@@ -14,17 +14,17 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.commands.LoggedCommands;
 
-public class EndAffecterSubsystem extends SubsystemBase {
+public class EndAffectorSubsystem extends SubsystemBase {
   /* Devices */
   private final TalonFX motor;
   private final DigitalInput sensor;
   /* Control Requests */
   private final DutyCycleOut indexSpeedDutyCycleOut;
 
-  public EndAffecterSubsystem() {
+  public EndAffectorSubsystem() {
     /* Devices */
-    motor = new TalonFX(Constants.EndAffecter.motorID, Constants.EndAffecter.canBus);
-    sensor = new DigitalInput(Constants.EndAffecter.sensorID);
+    motor = new TalonFX(Constants.EndAffector.motorID, Constants.EndAffector.canBus);
+    sensor = new DigitalInput(Constants.EndAffector.sensorID);
     /* Control Requests */
     indexSpeedDutyCycleOut = new DutyCycleOut(0).withEnableFOC(true);
 
@@ -35,12 +35,12 @@ public class EndAffecterSubsystem extends SubsystemBase {
     /* Configure the EndAffector Motor */
     var m_endAffectorConfiguration = new TalonFXConfiguration();
     /* Set EndAffector motor to Brake */
-    m_endAffectorConfiguration.MotorOutput.NeutralMode = Constants.EndAffecter.motorNeutralValue;
+    m_endAffectorConfiguration.MotorOutput.NeutralMode = Constants.EndAffector.motorNeutralValue;
     /* Set the motor direction */
-    m_endAffectorConfiguration.MotorOutput.Inverted = Constants.EndAffecter.motorOutputInverted;
+    m_endAffectorConfiguration.MotorOutput.Inverted = Constants.EndAffector.motorOutputInverted;
     /* Config the peak outputs */
-    m_endAffectorConfiguration.Voltage.PeakForwardVoltage = Constants.EndAffecter.peakForwardVoltage;
-    m_endAffectorConfiguration.Voltage.PeakReverseVoltage = Constants.EndAffecter.peakReverseVoltage;
+    m_endAffectorConfiguration.Voltage.PeakForwardVoltage = Constants.EndAffector.peakForwardVoltage;
+    m_endAffectorConfiguration.Voltage.PeakReverseVoltage = Constants.EndAffector.peakReverseVoltage;
     /* Apply Index Motor Configs */
     motor.getConfigurator().apply(m_endAffectorConfiguration);
   }
@@ -48,21 +48,21 @@ public class EndAffecterSubsystem extends SubsystemBase {
   public Command Intake(){
     return LoggedCommands.runOnce("End Affector Intake", 
     () -> {
-      motor.setControl(indexSpeedDutyCycleOut.withOutput(Constants.EndAffecter.intakeSpeed)); 
+      motor.setControl(indexSpeedDutyCycleOut.withOutput(Constants.EndAffector.intakeSpeed)); 
     }).until(this::haveGamePiece);
   }
 
   public Command Stop(){
     return LoggedCommands.runOnce("End Affector Stop", 
     () -> {
-      motor.setControl(indexSpeedDutyCycleOut.withOutput(Constants.EndAffecter.stopSpeed));
+      motor.setControl(indexSpeedDutyCycleOut.withOutput(Constants.EndAffector.stopSpeed));
     });
   }
 
   public Command Outtake(){
     return LoggedCommands.runOnce("End Affector Outtake", 
     () -> {
-      motor.setControl(indexSpeedDutyCycleOut.withOutput(Constants.EndAffecter.outtakeSpeed)); 
+      motor.setControl(indexSpeedDutyCycleOut.withOutput(Constants.EndAffector.outtakeSpeed)); 
     });
   }
 

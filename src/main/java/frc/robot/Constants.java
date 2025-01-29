@@ -229,7 +229,7 @@ public final class Constants {
         public static final double acceleration = cruiseVelocity * 0.5; // Accelerate in 0.5 seconds
     }
 
-    public static final class EndAffecter {
+    public static final class EndAffector {
         /* IDs */
         public static final int motorID = 20;
         public static final int sensorID = 1; //TODO: ID
