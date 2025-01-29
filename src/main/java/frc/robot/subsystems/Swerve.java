@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.SwerveModule;
+import frc.robot.commands.LoggedCommands;
 import frc.robot.Constants;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -12,6 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
@@ -59,12 +61,16 @@ public class Swerve extends SubsystemBase {
         }
     }
 
-    public void alignStraight() {
-        SwerveModuleState aligned = new SwerveModuleState(0.0, new Rotation2d());
-
-        for(SwerveModule mod : mSwerveMods) {
-            mod.setDesiredState(aligned, false);
-        }
+    public Command alignStraight() {
+        return LoggedCommands.runOnce("Align Swerve Modules",
+            () -> {
+                SwerveModuleState aligned = new SwerveModuleState(0.0, new Rotation2d());
+                
+                for(SwerveModule mod : mSwerveMods) {
+                    mod.setDesiredState(aligned, false);
+                }
+            },
+            this);
     }
 
     public SwerveModuleState[] getModuleStates(){
@@ -89,51 +95,71 @@ public class Swerve extends SubsystemBase {
         }
     }
 
-    public void enableSpeedLimit() {
-        speedLimit = true;
-        DogLog.log("Swerve/Status", "Swerve Speed Limit Enabled");
+    public Command enableSpeedLimit() {
+        return LoggedCommands.runOnce("Enabling Swerve Speed Limit",
+            () -> {
+                speedLimit = true;
+            },
+            this);
     }
 
-    public void disableSpeedLimit() {
-        speedLimit = false;
-        DogLog.log("Swerve/Status", "Swerve Speed Limit Disabled");
+    public Command disableSpeedLimit() {
+        return LoggedCommands.runOnce("Disabling Swerve Speed Limit",
+            () -> {
+                speedLimit = false;
+            },
+            this);
     }
 
     public double getSpeedLimitRot() {
         return speedLimit ? Constants.Swerve.speedLimitRot : 1.0;
     }
 
-    public void setMotorsToCoast(){
-        for(SwerveModule mod : mSwerveMods){
-            mod.setCoastMode();  
-        }
-        DogLog.log("Swerve/Status", "Coasted Swerve Motors");
+    public Command setMotorsToCoast() {
+        return LoggedCommands.runOnce("Setting All Swerve Motors To Coast",
+            () -> {
+                for(SwerveModule mod : mSwerveMods){
+                    mod.setCoastMode();  
+                }
+            },
+            this);
     }
 
-    public void setDriveMotorsToCoast(){
-        for(SwerveModule mod : mSwerveMods){
-            mod.setCoastMode();  
-        }
-        DogLog.log("Swerve/Status", "Coasted Swerve Drive Motors");
+    public Command setDriveMotorsToCoast() {
+        return LoggedCommands.runOnce("Setting Drive Swerve Motors To Coast",
+            () -> {
+                for(SwerveModule mod : mSwerveMods){
+                    mod.setCoastMode();  
+                }
+            },
+            this);
     }
 
-    public void setMotorsToBrake(){
-        for(SwerveModule mod : mSwerveMods){
-            mod.setBrakeMode();  
-        }
-        DogLog.log("Swerve/Status", "Braked Swerve Motors");
+    public Command setMotorsToBrake() {
+        return LoggedCommands.runOnce("Setting All Swerve Motors To Brake",
+            () -> {
+                for(SwerveModule mod : mSwerveMods){
+                    mod.setBrakeMode();  
+                }
+            },
+            this);
     }
 
-    public void setDriveMotorsToBrake(){
-        for(SwerveModule mod : mSwerveMods){
-            mod.setBrakeMode();  
-        }
-        DogLog.log("Swerve/Status", "Braked Swerve Drive Motors");
+    public Command setDriveMotorsToBrake() {
+        return LoggedCommands.runOnce("Setting Drive Swerve Motors To Brake",
+            () -> {
+                for(SwerveModule mod : mSwerveMods){
+                    mod.setBrakeMode();  
+                }            },
+            this);
     }
 
-    public void stopSwerve(){
-        drive(new Translation2d(0, 0), 0, false);
-        DogLog.log("Swerve/Status", "Stopped Swerve");
+    public Command stopSwerve() {
+        return LoggedCommands.runOnce("Stopping Swerve",
+            () -> {
+                drive(new Translation2d(0, 0), 0, false);
+            },
+            this);
     }
 
     @Override

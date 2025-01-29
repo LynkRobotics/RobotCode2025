@@ -115,7 +115,7 @@ public class RobotContainer {
     private void configureButtonBindings() {
         /* Driver Buttons */
 
-        SmartDashboard.putData("Disable speed limit", Commands.runOnce(s_Swerve::disableSpeedLimit));
+        SmartDashboard.putData("Disable speed limit", s_Swerve.disableSpeedLimit());
     }
 
     /**
