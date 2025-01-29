@@ -53,7 +53,7 @@ public class EndAffectorSubsystem extends SubsystemBase {
   public Command Intake(){
     return LoggedCommands.runOnce("End Affector Intake", 
     () -> {
-      motor.setControl(indexSpeedDutyCycleOut.withOutput(Constants.EndAffector.intakeSpeed)); 
+      motor.setControl(indexSpeedDutyCycleOut.withOutput(Constants.EndAffector.intakeSpeed));
     }).until(this::haveGamePiece);
   }
 
