@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -51,7 +52,7 @@ public class RobotContainer {
     @SuppressWarnings ("unused")
     private final ElevatorSubsystem s_Elevator = new ElevatorSubsystem();
 
-    private final SendableChooser<Command> autoChooser;
+    // private final SendableChooser<Command> autoChooser;
 
     private static void autoNamedCommand(String name, Command command) {
         NamedCommands.registerCommand(name, LoggedCommands.logWithName(name + " (auto)", command));
@@ -78,9 +79,9 @@ public class RobotContainer {
         autoNamedCommand("Stop", Commands.runOnce(s_Swerve::stopSwerve));
 
         // Build an autoChooser (defaults to none)
-        autoChooser = AutoBuilder.buildAutoChooser();
-        SmartDashboard.putData("auto/Auto Chooser", autoChooser);
-        buildAutos(autoChooser);
+        // autoChooser = AutoBuilder.buildAutoChooser();
+        // SmartDashboard.putData("auto/Auto Chooser", autoChooser);
+        // buildAutos(autoChooser);
 
         SmartDashboard.putNumber("TeleOp Speed Governor", 1.0);
 
@@ -124,7 +125,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
+        return null; // autoChooser.getSelected();
     }
 
     private void addAutoCommand(SendableChooser<Command> chooser, Command command) {

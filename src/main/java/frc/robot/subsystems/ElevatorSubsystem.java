@@ -54,6 +54,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         SmartDashboard.putData("Elevator/Raise", Raise());
         SmartDashboard.putData("Elevator/Lower", Lower());
+        SmartDashboard.putData("Elevator/Stop", Stop());
         SmartDashboard.putData("Elevator/Zero", Zero());
 
         Mechanism2d mechanism = new Mechanism2d(Constants.Elevator.maxHeight, Constants.Elevator.maxHeight);
@@ -64,15 +65,17 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public void setAsZero() {
-
+        leftMotor.setPosition(0);
+        rightMotor.setPosition(0);
     }
 
     public Command Zero() {
         return LoggedCommands.runOnce("Zero Elevator",
             () -> {
-                Elastic.sendNotification(new Notification(NotificationLevel.ERROR, "Not implemented", "Zeroing the elevator has not yet been implemented."));
+                // TODO Move until stall
+                setAsZero();
             },
-            this);
+            this).ignoringDisable(true);
     }
 
     public Command Raise() {
@@ -80,13 +83,21 @@ public class ElevatorSubsystem extends SubsystemBase {
             () -> {
                 leftMotor.setControl(voltageOut.withOutput(Constants.Elevator.slowVoltage));
             },
-            this);
+            this).ignoringDisable(true);
     }
 
     public Command Lower() {
         return LoggedCommands.runOnce("Lower Elevator",
             () -> {
                 leftMotor.setControl(voltageOut.withOutput(-Constants.Elevator.slowVoltage));
+            },
+            this);
+    }
+
+    public Command Stop() {
+        return LoggedCommands.runOnce("Stop Elevator",
+            () -> {
+                leftMotor.stopMotor();
             },
             this);
     }
