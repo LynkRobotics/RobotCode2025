@@ -206,25 +206,26 @@ public final class Constants {
     public static final class Elevator {
         /* IDs */
         /* TODO Verify IDs */
-        public static final int leftID = 17;
-        public static final int rightID = 4;
+        public static final int leftID = 4;
+        public static final int rightID = 17;
         /* CANBus */
         public static final String CanBus = "rio";
         /* Motor Config Values */
-        public static final double peakForwardVoltage = 1.5; // TODO Raise peak voltage
-        public static final double peakReverseVoltage = -1.5; // TODO Raise peak voltage
-        public static final InvertedValue motorOutputInverted = InvertedValue.Clockwise_Positive;
+        public static final double peakForwardVoltage = 1.0; // TODO Raise peak voltage
+        public static final double peakReverseVoltage = -1.0; // TODO Raise peak voltage
+        public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
         public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
 
-        public static final double positionError = 1.0;
+        public static final double positionError = 0.2;
         public static final double slowVoltage = 1.0;
 
         // NOTE Elevator height is measured from the ground to top of the carriage
-        public static final double width = 24.0; // Width of the elevator (only for Mechanism2d visualization)
+        public static final double thickness = 2.0; // Thickness of the elevator (only for Mechanism2d visualization)
+        public static final double setback = 9.5; // Distance from front edge of robot (only for Mechanism2d visualization)
         public static final double baseHeight = 12.0 + 0.755; // Height of elevator in inches when it is at zero position
-        public static final double maxHeight = 60.0; // Height that elevator should never exceed
+        public static final double maxHeight = 72.0 + 0.755; // Height that elevator should never exceed
         public static final double endEffectorHeight = 6.0; // Height of end effector "target" above elevator height
-        public static final double rotPerInch = 1.0; // Rotations to drive elevator one inch
+        public static final double rotPerInch = 0.704; // Rotations to drive elevator one inch
 
         // TODO Tune PID / FF
         public static final double RPSperVolt = 100.0; // RPS increase with every volt
@@ -235,7 +236,7 @@ public final class Constants {
         public static final double kV = 1.0 / RPSperVolt; // output per unit of target velocity (output/rps)
         public static final double kA = 0.0; // output per unit of target acceleration (output/(rps/s))
         public static final double kG = 0.0; // do not factory in gravity
-        public static final double cruiseVelocity = 10.0; // RPS
+        public static final double cruiseVelocity = 5.0; // RPS
         public static final double acceleration = cruiseVelocity * 0.5; // Accelerate in 0.5 seconds
     }
 
