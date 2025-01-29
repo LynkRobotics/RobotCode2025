@@ -10,10 +10,13 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -28,7 +31,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final TalonFX rightMotor;
     private final VoltageOut voltageOut = new VoltageOut(0).withEnableFOC(true);
     private final PositionVoltage positionVoltage = new PositionVoltage(0.0).withEnableFOC(true);
-    private final MechanismLigament2d mech2d;
+    private final MechanismLigament2d mechanism;
 
     private int stallCount = 0;
     private final int stallMax = 3;
@@ -65,11 +68,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putData("Elevator/Zero", Zero());
         SmartDashboard.putData("Elevator/SetZero", SetZero());
 
-        Mechanism2d mechanism = new Mechanism2d(Constants.Elevator.maxHeight, Constants.Elevator.maxHeight);
-        MechanismRoot2d root = mechanism.getRoot("elevator-root", Constants.Elevator.maxHeight / 2, 0);
-        mech2d = root.append(new MechanismLigament2d("elevator", Constants.Elevator.baseHeight, 90));
+        double canvasWidth = Constants.Swerve.wheelBase * 1.5;
+        double canvasHeight = Units.inchesToMeters(Constants.Elevator.maxHeight) * 1.25;
+        Mechanism2d canvas = new Mechanism2d(canvasWidth, canvasHeight, new Color8Bit(Color.kLightGray));
+        MechanismRoot2d origin = canvas.getRoot("elevator-root", canvasWidth / 2.0, 0);
+        MechanismLigament2d offset = origin.append(new MechanismLigament2d("elevator-offset", canvasWidth / 2.0  - Units.inchesToMeters(Constants.Elevator.setback), 0.0, 1.0, new Color8Bit()));
+        mechanism = offset.append(new MechanismLigament2d("elevator", Units.inchesToMeters(Constants.Elevator.baseHeight), 90.0, Units.inchesToMeters(Constants.Elevator.thickness), new Color8Bit(0xBF, 0x57, 0x00)));
 
-        SmartDashboard.putData("Elevator/mechanism", mechanism);
+        SmartDashboard.putData("Elevator/mechanism", canvas);
     }
 
     public void setAsZero() {
@@ -217,6 +223,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("elevator/stalled", isStalled());
         SmartDashboard.putBoolean("elevator/moving", voltage != 0.0);
 
-        mech2d.setLength(height);
+        mechanism.setLength(Units.inchesToMeters(height));
     }
 }
