@@ -208,7 +208,7 @@ public final class Constants {
         /* Motor Config Values */
         public static final double peakForwardVoltage = 1.5; // TODO Raise peak voltage
         public static final double peakReverseVoltage = -1.5; // TODO Raise peak voltage
-        public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
+        public static final InvertedValue motorOutputInverted = InvertedValue.Clockwise_Positive;
         public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
 
         public static final double positionError = 1.0;
