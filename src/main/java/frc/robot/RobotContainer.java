@@ -9,6 +9,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -54,9 +55,9 @@ public class RobotContainer {
 
     // private final SendableChooser<Command> autoChooser;
 
-    private static void autoNamedCommand(String name, Command command) {
-        NamedCommands.registerCommand(name, LoggedCommands.logWithName(name + " (auto)", command));
-    }
+    // private static void autoNamedCommand(String name, Command command) {
+        // NamedCommands.registerCommand(name, LoggedCommands.logWithName(name + " (auto)", command));
+    // }
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -75,8 +76,8 @@ public class RobotContainer {
 
         // Default named commands for PathPlanner
         SmartDashboard.putNumber("auto/Startup delay", 0.0);
-        autoNamedCommand("Startup delay", Commands.defer(() -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()));
-        autoNamedCommand("Stop", Commands.runOnce(s_Swerve::stopSwerve));
+        // autoNamedCommand("Startup delay", Commands.defer(() -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()));
+        // autoNamedCommand("Stop", Commands.runOnce(s_Swerve::stopSwerve));
 
         // Build an autoChooser (defaults to none)
         // autoChooser = AutoBuilder.buildAutoChooser();
@@ -100,6 +101,9 @@ public class RobotContainer {
             .withLogEntryQueueCapacity(1000)
             .withLogExtras(true)
             .withNtPublish(true));
+
+        DogLog.log("Misc/RIO Serial Number", RobotController.getSerialNumber());
+        DogLog.log("Misc/Is Rocky?", Constants.isRocky);
 
         // Configure the button bindings
         configureButtonBindings();
@@ -128,13 +132,13 @@ public class RobotContainer {
         return null; // autoChooser.getSelected();
     }
 
-    private void addAutoCommand(SendableChooser<Command> chooser, Command command) {
-        chooser.addOption(command.getName(), command);
-    }
+    // private void addAutoCommand(SendableChooser<Command> chooser, Command command) {
+        // chooser.addOption(command.getName(), command);
+    // }
 
-    private void buildAutos(SendableChooser<Command> chooser) {
+    // private void buildAutos(SendableChooser<Command> chooser) {
         // TODO add programatically defined Autos as needed
-    }
+    // }
 
     public void teleopInit() {
     }
