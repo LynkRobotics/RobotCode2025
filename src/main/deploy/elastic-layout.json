@@ -319,7 +319,7 @@
       }
     },
     {
-      "name": "Climber",
+      "name": "Elevator",
       "grid_layout": {
         "layouts": [],
         "containers": [
@@ -331,7 +331,7 @@
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/SmartDashboard/climber/LEFT position",
+              "topic": "ff",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
@@ -437,6 +437,58 @@
               "time_displayed": 5.0,
               "color": 4278238420,
               "line_width": 2.0
+            }
+          },
+          {
+            "title": "Lower",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/Lower",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Raise",
+            "x": 1024.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/Raise",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Zero",
+            "x": 1280.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/Zero",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Stop",
+            "x": 1280.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/Stop",
+              "period": 0.06,
+              "show_type": true
             }
           }
         ]
