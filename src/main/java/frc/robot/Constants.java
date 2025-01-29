@@ -241,9 +241,10 @@ public final class Constants {
         public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
         public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
         /* Motor Speed Value */
-        public static final double intakeSpeed = 0.80;
-        public static final double outtakeSpeed = -1.00;
+        public static final double intakeSpeed = 0.50;
+        public static final double outtakeSpeed = 1.00;
         public static final double stopSpeed = 0.00;
+        public static final double reverseSpeed = -1.00;
     }
 
     public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot

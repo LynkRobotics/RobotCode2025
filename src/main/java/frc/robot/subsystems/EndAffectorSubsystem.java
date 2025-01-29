@@ -8,6 +8,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -66,12 +67,20 @@ public class EndAffectorSubsystem extends SubsystemBase {
     });
   }
 
+  public Command Reverse(){
+    return LoggedCommands.runOnce("End Affector Reverse", 
+    () -> {
+      motor.setControl(indexSpeedDutyCycleOut.withOutput(Constants.EndAffector.reverseSpeed)); 
+    });
+  }
+
+
   public boolean haveGamePiece() {
     return sensor.get();
   }
 
   @Override
   public void periodic() {
-    
+    DogLog.log("End Affector/Have Game Piece?", haveGamePiece());
   }
 }
