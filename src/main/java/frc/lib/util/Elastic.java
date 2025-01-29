@@ -12,6 +12,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StringTopic;
+import frc.robot.Constants;
 
 public final class Elastic {
   private static final StringTopic notificationTopic =
@@ -156,7 +157,7 @@ public final class Elastic {
      */
     public Notification(
         NotificationLevel level, String title, String description, double width, double height) {
-      this(level, title, description, 3000, width, height);
+      this(level, title, description, Constants.notificationTime, width, height);
     }
 
     /**

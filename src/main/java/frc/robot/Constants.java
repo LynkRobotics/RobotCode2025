@@ -28,6 +28,9 @@ public final class Constants {
     public static final String latchSerial = "0327B9A2";
     public static final boolean isRocky = !RobotController.getSerialNumber().toString().matches(latchSerial);
 
+    // Elastic Notifications
+    public static final int notificationTime = 6000;
+
     public static final class Swerve {
         public static final String swerveCanBus = "lynk";
 
