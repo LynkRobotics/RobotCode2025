@@ -29,6 +29,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final PositionVoltage positionVoltage = new PositionVoltage(0.0).withEnableFOC(true);
     private final MechanismLigament2d mech2d;
 
+    private int stallCount = 0;
+    private final int stallMax = 3;
+    private double lastPosition = 0.0;
+    
+    private final double positionDiffMax = 0.5;
+
     public enum Stop {
         INTAKE,
         L1,
@@ -81,6 +87,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Command Raise() {
         return LoggedCommands.runOnce("Raise Elevator",
             () -> {
+                stallCount = 0;
                 leftMotor.setControl(voltageOut.withOutput(Constants.Elevator.slowVoltage));
             },
             this).ignoringDisable(true);
@@ -89,17 +96,19 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Command Lower() {
         return LoggedCommands.runOnce("Lower Elevator",
             () -> {
+                stallCount = 0;
                 leftMotor.setControl(voltageOut.withOutput(-Constants.Elevator.slowVoltage));
             },
             this);
     }
 
     public Command Stop() {
-        return LoggedCommands.runOnce("Stop Elevator",
-            () -> {
-                leftMotor.stopMotor();
-            },
-            this);
+        return LoggedCommands.runOnce("Stop Elevator", this::stop, this);
+    }
+
+    private void stop() {
+        leftMotor.stopMotor();
+        //rightMotor.stopMotor();
     }
 
     public Command Move(Stop stop) {
@@ -108,6 +117,10 @@ public class ElevatorSubsystem extends SubsystemBase {
                 setHeight(elevatorHeights.get(stop));
             },
             this);
+    }
+
+    private boolean isStalled() {
+        return stallCount >= stallMax;
     }
 
     // Set Elevator height to given position, provided in inches
@@ -122,6 +135,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
 
         double position = (height - Constants.Elevator.baseHeight) * Constants.Elevator.rotPerInch;
+        stallCount = 0;
         leftMotor.setControl(positionVoltage.withPosition(position));
     }
 
@@ -160,14 +174,41 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        DogLog.log("Elevator/leftPosition", leftMotor.getPosition().getValueAsDouble());
+        double position = leftMotor.getPosition().getValueAsDouble();
+        double height = position / Constants.Elevator.rotPerInch + Constants.Elevator.baseHeight;
+        double followPosition = rightMotor.getPosition().getValueAsDouble();
+        double followDifference = position - followPosition;
+        double voltage = leftMotor.getMotorVoltage().getValueAsDouble();
+
+        if (voltage != 0.0) {
+            if (position == lastPosition) {
+                ++stallCount;
+                if (isStalled()) {
+                    Elastic.sendNotification(new Notification(NotificationLevel.WARNING, "Elevator Stalled", "Elevator stopped due to stall"));
+                    stop();
+                }
+            } else {
+                stallCount = 0;
+            }
+        }
+        lastPosition = position;
+
+        if (Math.abs(followDifference) >= positionDiffMax) {
+            Elastic.sendNotification(new Notification(NotificationLevel.ERROR, "Elevator Unequal", "Elevator motor position difference of " + String.format("%01.2f", followDifference) + " exceeds limit"));
+            stop();
+        }
+
+        DogLog.log("Elevator/leftPosition", position);
         DogLog.log("Elevator/leftVelocity", leftMotor.getVelocity().getValueAsDouble());
-        DogLog.log("Elevator/leftVoltage", leftMotor.getMotorVoltage().getValueAsDouble());
-        DogLog.log("Elevator/rightPosition", rightMotor.getPosition().getValueAsDouble());
+        DogLog.log("Elevator/leftVoltage", voltage);
+        DogLog.log("Elevator/rightPosition", followPosition);
         DogLog.log("Elevator/rightVelocity", rightMotor.getVelocity().getValueAsDouble());
         DogLog.log("Elevator/rightVoltage", rightMotor.getMotorVoltage().getValueAsDouble());
+        DogLog.log("Elevator/stallCount", stallCount);
 
-        double height = leftMotor.getPosition().getValueAsDouble() / Constants.Elevator.rotPerInch + Constants.Elevator.baseHeight;
+        SmartDashboard.putBoolean("elevator/stalled", isStalled());
+        SmartDashboard.putBoolean("elevator/moving", voltage != 0.0);
+
         mech2d.setLength(height);
     }
 }
