@@ -68,28 +68,28 @@ public class PoseSubsystem extends SubsystemBase {
         field = new Field2d();
         SmartDashboard.putData("pose/Field", field);
 
-        RobotConfig config;
-        try {
-            config = RobotConfig.fromGUISettings();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
+        // RobotConfig config;
+        // try {
+            // config = RobotConfig.fromGUISettings();
+        // } catch (Exception e) {
+            // e.printStackTrace();
+            // return;
+        // }
 
-        AutoBuilder.configure(
-            this::getPose,
-            this::setPose,
-            s_Swerve::getSpeeds, 
-            (speeds, feedforwards) -> s_Swerve.driveRobotRelativeAuto(speeds),
+        // AutoBuilder.configure(
+            // this::getPose,
+            // this::setPose,
+            // s_Swerve::getSpeeds, 
+            // (speeds, feedforwards) -> s_Swerve.driveRobotRelativeAuto(speeds),
             // TODO Configure PIDs
-            new PPHolonomicDriveController(
-                new PIDConstants(8.0, 0.0, 0.0), // Translation PID constants
-                new PIDConstants(1.5, 0.0, 0.0)  // Rotation PID constants
-            ),
-            config,
-            Robot::isRed,
-            s_Swerve // Reference to Swerve subsystem to set requirements
-        );
+            // new PPHolonomicDriveController(
+                // new PIDConstants(8.0, 0.0, 0.0), // Translation PID constants
+                // new PIDConstants(1.5, 0.0, 0.0)  // Rotation PID constants
+            // ),
+            // config,
+            // Robot::isRed,
+            // s_Swerve // Reference to Swerve subsystem to set requirements
+        // );
 
         PathPlannerLogging.setLogTargetPoseCallback((targetPose) -> {
             DogLog.log("Pose/Auto Target Pose", targetPose);
