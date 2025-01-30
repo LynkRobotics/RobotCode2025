@@ -9,12 +9,14 @@ import com.pathplanner.lib.auto.NamedCommands;
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -53,11 +55,11 @@ public class RobotContainer {
     @SuppressWarnings ("unused")
     private final EndAffectorSubsystem s_EndAffector = new EndAffectorSubsystem();
 
-    private final SendableChooser<Command> autoChooser;
+    // private final SendableChooser<Command> autoChooser;
 
-    private static void autoNamedCommand(String name, Command command) {
-        NamedCommands.registerCommand(name, LoggedCommands.logWithName(name + " (auto)", command));
-    }
+    // private static void autoNamedCommand(String name, Command command) {
+        // NamedCommands.registerCommand(name, LoggedCommands.logWithName(name + " (auto)", command));
+    // }
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -76,13 +78,13 @@ public class RobotContainer {
 
         // Default named commands for PathPlanner
         SmartDashboard.putNumber("auto/Startup delay", 0.0);
-        autoNamedCommand("Startup delay", Commands.defer(() -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()));
-        autoNamedCommand("Stop", Commands.runOnce(s_Swerve::stopSwerve));
+        // autoNamedCommand("Startup delay", Commands.defer(() -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()));
+        // autoNamedCommand("Stop", Commands.runOnce(s_Swerve::stopSwerve));
 
         // Build an autoChooser (defaults to none)
-        autoChooser = AutoBuilder.buildAutoChooser();
-        SmartDashboard.putData("auto/Auto Chooser", autoChooser);
-        buildAutos(autoChooser);
+        // autoChooser = AutoBuilder.buildAutoChooser();
+        // SmartDashboard.putData("auto/Auto Chooser", autoChooser);
+        // buildAutos(autoChooser);
 
         SmartDashboard.putNumber("TeleOp Speed Governor", 1.0);
 
@@ -101,6 +103,9 @@ public class RobotContainer {
             .withLogEntryQueueCapacity(1000)
             .withLogExtras(true)
             .withNtPublish(true));
+
+        DogLog.log("Misc/RIO Serial Number", RobotController.getSerialNumber());
+        DogLog.log("Misc/Is Rocky?", Constants.isRocky);
 
         // Configure the button bindings
         configureButtonBindings();
@@ -126,16 +131,16 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
+        return null; // autoChooser.getSelected();
     }
 
-    private void addAutoCommand(SendableChooser<Command> chooser, Command command) {
-        chooser.addOption(command.getName(), command);
-    }
+    // private void addAutoCommand(SendableChooser<Command> chooser, Command command) {
+        // chooser.addOption(command.getName(), command);
+    // }
 
-    private void buildAutos(SendableChooser<Command> chooser) {
+    // private void buildAutos(SendableChooser<Command> chooser) {
         // TODO add programatically defined Autos as needed
-    }
+    // }
 
     public void teleopInit() {
     }

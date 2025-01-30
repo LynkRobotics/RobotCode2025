@@ -10,8 +10,15 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.Elastic;
 import frc.lib.util.Elastic.Notification;
@@ -24,9 +31,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final TalonFX rightMotor;
     private final VoltageOut voltageOut = new VoltageOut(0).withEnableFOC(true);
     private final PositionVoltage positionVoltage = new PositionVoltage(0.0).withEnableFOC(true);
+    private final MechanismLigament2d mechanism;
+
+    private int stallCount = 0;
+    private final int stallMax = 3;
+    private double lastPosition = 0.0;
+    
+    private final double positionDiffMax = 0.5;
 
     public enum Stop {
-        ZERO,
         INTAKE,
         L1,
         L2,
@@ -34,14 +47,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         L4
     };
 
-    // TODO Define positions
-    private final EnumMap<Stop, Double> elevatorPositions = new EnumMap<>(Map.ofEntries(
-      Map.entry(Stop.ZERO, 0.0),
-      Map.entry(Stop.INTAKE, 10.0),
-      Map.entry(Stop.L1, 20.0),
-      Map.entry(Stop.L2, 30.0),
-      Map.entry(Stop.L3, 40.0),
-      Map.entry(Stop.L4, 50.0)
+    // TODO Refine heights
+    // Elevator heights are defined in terms off inches that the elevator is off the ground
+    private final EnumMap<Stop, Double> elevatorHeights = new EnumMap<>(Map.ofEntries(
+      Map.entry(Stop.INTAKE, 24.0),
+      Map.entry(Stop.L1, 20.0 - Constants.Elevator.endEffectorHeight),
+      Map.entry(Stop.L2, 30.5 - Constants.Elevator.endEffectorHeight),
+      Map.entry(Stop.L3, 45.5 - Constants.Elevator.endEffectorHeight),
+      Map.entry(Stop.L4, 71.5 - Constants.Elevator.endEffectorHeight)
     ));
 
     public ElevatorSubsystem() {
@@ -51,46 +64,92 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         SmartDashboard.putData("Elevator/Raise", Raise());
         SmartDashboard.putData("Elevator/Lower", Lower());
+        SmartDashboard.putData("Elevator/Stop", Stop());
         SmartDashboard.putData("Elevator/Zero", Zero());
+        SmartDashboard.putData("Elevator/SetZero", SetZero());
+
+        double canvasWidth = Constants.Swerve.wheelBase * 1.5;
+        double canvasHeight = Units.inchesToMeters(Constants.Elevator.maxHeight) * 1.25;
+        Mechanism2d canvas = new Mechanism2d(canvasWidth, canvasHeight, new Color8Bit(Color.kLightGray));
+        MechanismRoot2d origin = canvas.getRoot("elevator-root", canvasWidth / 2.0, 0);
+        MechanismLigament2d offset = origin.append(new MechanismLigament2d("elevator-offset", canvasWidth / 2.0  - Units.inchesToMeters(Constants.Elevator.setback), 0.0, 1.0, new Color8Bit()));
+        mechanism = offset.append(new MechanismLigament2d("elevator", Units.inchesToMeters(Constants.Elevator.baseHeight), 90.0, Units.inchesToMeters(Constants.Elevator.thickness), new Color8Bit(0xBF, 0x57, 0x00)));
+
+        SmartDashboard.putData("Elevator/mechanism", canvas);
     }
 
     public void setAsZero() {
+        leftMotor.setPosition(0);
+        rightMotor.setPosition(0);
+    }
 
+    public Command SetZero() {
+        return LoggedCommands.runOnce("Set Elevator Zero", this::setAsZero);
     }
 
     public Command Zero() {
-        return LoggedCommands.runOnce("Zero Elevator",
-            () -> {
-                Elastic.sendNotification(new Notification(NotificationLevel.ERROR, "Not implemented", "Zeroing the elevator has not yet been implemented."));
-            },
-            this);
+        return LoggedCommands.sequence("Zero Elevator",
+            Commands.deadline(
+                LoggedCommands.waitUntil("Wait for stall", this::isStalled),
+                Lower()),
+            SetZero());
     }
 
     public Command Raise() {
-        return LoggedCommands.runOnce("Raise Elevator",
+        return LoggedCommands.runOnce("Raise Elevator", 
             () -> {
-                leftMotor.setControl(voltageOut.withOutput(Constants.Elevator.slowVoltage));
+                setVoltage(Constants.Elevator.slowVoltage);
             },
-            this);
+            this).ignoringDisable(true);
     }
 
     public Command Lower() {
         return LoggedCommands.runOnce("Lower Elevator",
-            () -> {
-                leftMotor.setControl(voltageOut.withOutput(-Constants.Elevator.slowVoltage));
-            },
-            this);
+        () -> {
+            setVoltage(-Constants.Elevator.slowVoltage);
+        },
+        this);
+    }
+
+    public Command Stop() {
+        return LoggedCommands.runOnce("Stop Elevator", this::stop, this);
+    }
+
+    private void stop() {
+        leftMotor.stopMotor();
+        // rightMotor.stopMotor();
+    }
+
+    private void setVoltage(double voltage) {
+        stallCount = 0;
+        leftMotor.setControl(voltageOut.withOutput(voltage));
     }
 
     public Command Move(Stop stop) {
         return LoggedCommands.runOnce("Move Elevator to " + stop,
             () -> {
-                setPosition(elevatorPositions.get(stop));
+                setHeight(elevatorHeights.get(stop));
             },
             this);
     }
 
-    private void setPosition(double position) {
+    private boolean isStalled() {
+        return stallCount >= stallMax;
+    }
+
+    // Set Elevator height to given position, provided in inches
+    private void setHeight(double height) {
+        if (height > Constants.Elevator.maxHeight) {
+            Elastic.sendNotification(new Notification(NotificationLevel.WARNING, "Elevator Range", "Requested elevator height too high"));
+            height = Constants.Elevator.maxHeight;
+        }
+        if (height < Constants.Elevator.baseHeight) {
+            Elastic.sendNotification(new Notification(NotificationLevel.WARNING, "Elevator Range", "Requested elevator height too low"));
+            height = Constants.Elevator.baseHeight;
+        }
+
+        double position = (height - Constants.Elevator.baseHeight) * Constants.Elevator.rotPerInch;
+        stallCount = 0;
         leftMotor.setControl(positionVoltage.withPosition(position));
     }
 
@@ -129,8 +188,41 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        DogLog.log("Elevator/leftPosition", leftMotor.getPosition().getValueAsDouble());
+        double position = leftMotor.getPosition().getValueAsDouble();
+        double height = position / Constants.Elevator.rotPerInch + Constants.Elevator.baseHeight;
+        double followPosition = rightMotor.getPosition().getValueAsDouble();
+        double followDifference = position - followPosition;
+        double voltage = leftMotor.getMotorVoltage().getValueAsDouble();
+
+        if (voltage != 0.0) {
+            if (position == lastPosition) {
+                ++stallCount;
+                if (isStalled()) {
+                    Elastic.sendNotification(new Notification(NotificationLevel.WARNING, "Elevator Stalled", "Elevator stopped due to stall"));
+                    stop();
+                }
+            } else {
+                stallCount = 0;
+            }
+        }
+        lastPosition = position;
+
+        if (Math.abs(followDifference) >= positionDiffMax) {
+            Elastic.sendNotification(new Notification(NotificationLevel.ERROR, "Elevator Unequal", "Elevator motor position difference of " + String.format("%01.2f", followDifference) + " exceeds limit"));
+            stop();
+        }
+
+        DogLog.log("Elevator/leftPosition", position);
         DogLog.log("Elevator/leftVelocity", leftMotor.getVelocity().getValueAsDouble());
-        DogLog.log("Elevator/leftVoltage", leftMotor.getMotorVoltage().getValueAsDouble());
+        DogLog.log("Elevator/leftVoltage", voltage);
+        DogLog.log("Elevator/rightPosition", followPosition);
+        DogLog.log("Elevator/rightVelocity", rightMotor.getVelocity().getValueAsDouble());
+        DogLog.log("Elevator/rightVoltage", rightMotor.getMotorVoltage().getValueAsDouble());
+        DogLog.log("Elevator/stallCount", stallCount);
+
+        SmartDashboard.putBoolean("elevator/stalled", isStalled());
+        SmartDashboard.putBoolean("elevator/moving", voltage != 0.0);
+
+        mechanism.setLength(Units.inchesToMeters(height));
     }
 }
