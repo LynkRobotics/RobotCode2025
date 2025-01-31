@@ -10,7 +10,6 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -20,7 +19,6 @@ public class Swerve extends SubsystemBase {
     public SwerveModule[] mSwerveMods;
 
     public Swerve() {
-        Timer.delay(5); //Delaying the initalization of the swerve module should prevent a race condition with the CANcoders initializing, and causing just general funkiness
         mSwerveMods = new SwerveModule[] {
             new SwerveModule(0, Constants.Swerve.Mod0.constants),
             new SwerveModule(1, Constants.Swerve.Mod1.constants),

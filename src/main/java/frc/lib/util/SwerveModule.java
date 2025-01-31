@@ -11,6 +11,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.lib.math.Conversions;
 import frc.robot.Constants;
 import frc.robot.Robot;
@@ -75,7 +76,9 @@ public class SwerveModule {
     }
 
     public void resetToAbsolute(){
+        new WaitCommand(5); //Waiting for CanCoders to get actual values to prevent race conditions
         double absolutePosition = getCANcoder().getRotations() - angleOffset.getRotations();
+        new WaitCommand(2); //Give a little leeway (please work, ive been trying to fix you for 3 years)
         mAngleMotor.setPosition(absolutePosition);
     }
 
