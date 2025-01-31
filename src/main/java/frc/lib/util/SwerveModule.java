@@ -7,10 +7,12 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.lib.math.Conversions;
 import frc.robot.Constants;
@@ -76,10 +78,19 @@ public class SwerveModule {
     }
 
     public void resetToAbsolute(){
-        new WaitCommand(5); //Waiting for CanCoders to get actual values to prevent race conditions
-        double absolutePosition = getCANcoder().getRotations() - angleOffset.getRotations();
-        new WaitCommand(2); //Give a little leeway (please work, ive been trying to fix you for 3 years)
-        mAngleMotor.setPosition(absolutePosition);
+        /*
+         * Theory is that the CANcoder gets initialized and "freaks out" giving bad abs values when this function is called in the
+         * initialization of the swerve subsystem, to maybe prevent this we give a little time to let the CANcoders "settle" and give
+         * good numbers preventing us from having to restart robot code every single time
+         * PLEASE WORK, IVE BEEN TRYING TO FIX YOU FOR 3 YEARS
+         */
+        DogLog.log("Debug/Swerve", getCANcoder().getRotations() - angleOffset.getRotations()); //Initialization Value
+        Timer.delay(5); //Waiting for CanCoders to get actual values to prevent race conditions
+        double absolutePosition = getCANcoder().getRotations() - angleOffset.getRotations();  //Getting the cancoder values
+        DogLog.log("Debug/Swerve", absolutePosition); //Logging the values directly after
+        Timer.delay(2); //Give a little leeway 
+        mAngleMotor.setPosition(absolutePosition); //Set angle motor to CANcoder value
+        DogLog.log("Debug/Swerve", mAngleMotor.getPosition().getValueAsDouble()); //Logging that value
     }
 
     public void setCoastMode(){
