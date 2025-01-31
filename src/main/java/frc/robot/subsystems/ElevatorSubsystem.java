@@ -34,6 +34,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private int stallCount = 0;
     private final int stallMax = 3;
     private double lastPosition = 0.0;
+    private double desiredPosition = -1.0;
     
     private final double positionDiffMax = 0.5;
 
@@ -63,6 +64,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putData("Elevator/Raise", Raise());
         SmartDashboard.putData("Elevator/Lower", Lower());
         SmartDashboard.putData("Elevator/Stop", Stop());
+        SmartDashboard.putNumber("Elevator/Direct Voltage", Constants.Elevator.slowVoltage);
+        SmartDashboard.putData("Elevator/Set Voltage", LoggedCommands.runOnce("Set Voltage", () -> { setVoltage(SmartDashboard.getNumber("Elevator/Direct Voltage", 0.0));}));
+        SmartDashboard.putNumber("Elevator/Direct Position", 0.0);
+        SmartDashboard.putData("Elevator/Set Position", LoggedCommands.runOnce("Set Position", () -> { setPosition(SmartDashboard.getNumber("Elevator/Direct Position", 0.0));}));
+        SmartDashboard.putNumber("Elevator/Direct Height", 0.0);
+        SmartDashboard.putData("Elevator/Set Height", LoggedCommands.runOnce("Set Height", () -> { setHeight(SmartDashboard.getNumber("Elevator/Direct Height", 12.0));}));
         SmartDashboard.putData("Elevator/Zero", Zero());
         SmartDashboard.putData("Elevator/SetZero", SetZero());
 
@@ -120,6 +127,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     private void setVoltage(double voltage) {
         stallCount = 0;
+        desiredPosition = -1.0;
         leftMotor.setControl(voltageOut.withOutput(voltage));
     }
 
@@ -147,8 +155,17 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
 
         double position = (height - Constants.Elevator.baseHeight) * Constants.Elevator.rotPerInch;
+        setPosition(position);
+    }
+
+    private void setPosition(double position) {
         stallCount = 0;
+        desiredPosition = position;
         leftMotor.setControl(positionVoltage.withPosition(position));
+    }
+    
+    private boolean inRange(double position) {
+        return desiredPosition >= 0.0 && Math.abs(desiredPosition - position) <= Constants.Elevator.positionError;
     }
 
     private void applyConfigs() {
@@ -193,7 +210,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         double voltage = leftMotor.getMotorVoltage().getValueAsDouble();
 
         if (voltage != 0.0) {
-            if (position == lastPosition) {
+            if (!inRange(position) && position == lastPosition) {
                 ++stallCount;
                 if (isStalled()) {
                     LoggedAlert.Warning("Elevator", "Elevator Stalled", "Elevator stopped due to stall");
@@ -210,6 +227,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             stop();
         }
 
+        DogLog.log("Elevator/height", height);
         DogLog.log("Elevator/leftPosition", position);
         DogLog.log("Elevator/leftVelocity", leftMotor.getVelocity().getValueAsDouble());
         DogLog.log("Elevator/leftVoltage", voltage);
