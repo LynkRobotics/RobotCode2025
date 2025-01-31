@@ -4,6 +4,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.lib.util.Elastic.Notification;
 import frc.lib.util.Elastic.Notification.NotificationLevel;
+import frc.robot.Constants;
 
 public class LoggedAlert {
     /**
@@ -13,8 +14,8 @@ public class LoggedAlert {
      * @param title the title of the logged error notification
      * @param msg the message of the logged error notification
      */
-    public static void Error(String subsystem, String title, String msg){
-        Elastic.sendNotification(new Notification(NotificationLevel.ERROR, title, msg));
+    public static void Error(String subsystem, String title, String msg) {
+        Elastic.sendNotification(new Notification(NotificationLevel.ERROR, title, msg, Constants.errorTime));
         DogLog.logFault(subsystem + ": " + msg, AlertType.kError);
     }
 
@@ -25,8 +26,8 @@ public class LoggedAlert {
      * @param title the title of the logged warning notification
      * @param msg the message of the logged warning notification
      */
-    public static void Warning(String subsystem, String title, String msg){
-        Elastic.sendNotification(new Notification(NotificationLevel.WARNING, title, msg));
+    public static void Warning(String subsystem, String title, String msg) {
+        Elastic.sendNotification(new Notification(NotificationLevel.WARNING, title, msg, Constants.warningTime));
         DogLog.logFault(subsystem + ": " + msg, AlertType.kWarning);
     }
 
@@ -37,7 +38,7 @@ public class LoggedAlert {
      * @param title the title of the logged info notification
      * @param msg the message of the logged info notification
      */
-    public static void Info(String subsystem, String title, String msg){
+    public static void Info(String subsystem, String title, String msg) {
         Elastic.sendNotification(new Notification(NotificationLevel.INFO, title, msg));
         DogLog.logFault(subsystem + ": " + msg, AlertType.kInfo);
     }
