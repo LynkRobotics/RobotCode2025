@@ -84,13 +84,9 @@ public class SwerveModule {
          * good numbers preventing us from having to restart robot code every single time
          * PLEASE WORK, IVE BEEN TRYING TO FIX YOU FOR 3 YEARS
          */
-        DogLog.log("Debug/Swerve", getCANcoder().getRotations() - angleOffset.getRotations()); //Initialization Value
-        Timer.delay(5); //Waiting for CanCoders to get actual values to prevent race conditions
+        Timer.delay(0.1); //Waiting for CanCoders to get actual values to prevent race conditions
         double absolutePosition = getCANcoder().getRotations() - angleOffset.getRotations();  //Getting the cancoder values
-        DogLog.log("Debug/Swerve", absolutePosition); //Logging the values directly after
-        Timer.delay(2); //Give a little leeway 
         mAngleMotor.setPosition(absolutePosition); //Set angle motor to CANcoder value
-        DogLog.log("Debug/Swerve", mAngleMotor.getPosition().getValueAsDouble()); //Logging that value
     }
 
     public void setCoastMode(){
