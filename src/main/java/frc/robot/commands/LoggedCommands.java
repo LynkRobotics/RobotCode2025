@@ -46,8 +46,9 @@ public class LoggedCommands {
   }
 
   public static Command logWithName(String name, Command command) {
-    command.setName(name);
-    return loggedCommand(command);
+    Command newCommand = loggedCommand(command);
+    newCommand.setName(name);
+    return newCommand;
   }
 
   /* The following map to the static utilities from the standard Commands class */

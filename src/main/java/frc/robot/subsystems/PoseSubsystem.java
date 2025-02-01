@@ -53,13 +53,13 @@ public class PoseSubsystem extends SubsystemBase {
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);        
 
-        Pose.rotationPID.enableContinuousInput(-180.0, 180.0);
-        Pose.rotationPID.setIZone(Pose.rotationIZone); // Only use Integral term within this range
-        Pose.rotationPID.reset();
+        // Pose.rotationPID.enableContinuousInput(-180.0, 180.0);
+        // Pose.rotationPID.setIZone(Pose.rotationIZone); // Only use Integral term within this range
+        // Pose.rotationPID.reset();
 
-        Pose.maintainPID.enableContinuousInput(-180.0, 180.0);
-        Pose.maintainPID.setIZone(Pose.rotationIZone); // Only use Integral term within this range
-        Pose.maintainPID.reset();
+        // Pose.maintainPID.enableContinuousInput(-180.0, 180.0);
+        // Pose.maintainPID.setIZone(Pose.rotationIZone); // Only use Integral term within this range
+        // Pose.maintainPID.reset();
 
         poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d());
 

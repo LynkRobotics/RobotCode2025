@@ -89,7 +89,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command SetZero() {
-        return LoggedCommands.runOnce("Set Elevator Zero", this::setAsZero);
+        return LoggedCommands.runOnce("Set Elevator Zero", this::setAsZero).ignoringDisable(true);
     }
 
     public Command Zero() {
@@ -105,7 +105,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             () -> {
                 setVoltage(Constants.Elevator.slowVoltage);
             },
-            this).ignoringDisable(true);
+            this);
     }
 
     public Command Lower() {

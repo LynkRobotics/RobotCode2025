@@ -44,12 +44,14 @@ public class RobotContainer {
     // private final Trigger button = driver.button();
 
     /* Subsystems */
-    private final Swerve s_Swerve = new Swerve();
+    // private final Swerve s_Swerve = new Swerve();
+    private final Swerve s_Swerve;
     @SuppressWarnings ("unused")
     private final LEDSubsystem s_Led = new LEDSubsystem();
     private final VisionSubsystem s_Vision = new VisionSubsystem();
     @SuppressWarnings ("unused")
-    private final PoseSubsystem s_Pose = new PoseSubsystem(s_Swerve, s_Vision);
+    // private final PoseSubsystem s_Pose = new PoseSubsystem(s_Swerve, s_Vision);
+    private final PoseSubsystem s_Pose;
     @SuppressWarnings ("unused")
     private final ElevatorSubsystem s_Elevator = new ElevatorSubsystem();
 
@@ -63,6 +65,21 @@ public class RobotContainer {
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
+        DogLog.setOptions(
+            new DogLogOptions()
+            .withCaptureConsole(true)
+            .withCaptureDs(true)
+            .withCaptureNt(true)
+            .withLogEntryQueueCapacity(1000)
+            .withLogExtras(true)
+            .withNtPublish(true));
+
+        DogLog.log("Misc/RIO Serial Number", RobotController.getSerialNumber());
+        DogLog.log("Misc/Is Rocky?", Constants.isRocky);
+
+        s_Swerve = new Swerve();
+        s_Pose = new PoseSubsystem(s_Swerve, s_Vision);
+
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
                 s_Swerve,
@@ -89,21 +106,9 @@ public class RobotContainer {
         SmartDashboard.putData(LoggedCommands.runOnce("Zero Gyro", s_Pose::zeroGyro, s_Swerve));
         SmartDashboard.putData(LoggedCommands.runOnce("Reset heading", s_Pose::resetHeading, s_Swerve));
 
-        SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/SetSwerveCoast", s_Swerve::setMotorsToCoast, s_Swerve).ignoringDisable(true));
-        SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/SetSwerveBrake", s_Swerve::setMotorsToBrake, s_Swerve).ignoringDisable(true));
-        SmartDashboard.putData(LoggedCommands.run("autoSetup/SetSwerveAligned", s_Swerve::alignStraight, s_Swerve).ignoringDisable(true));
-
-        DogLog.setOptions(
-            new DogLogOptions()
-            .withCaptureConsole(true)
-            .withCaptureDs(true)
-            .withCaptureNt(true)
-            .withLogEntryQueueCapacity(1000)
-            .withLogExtras(true)
-            .withNtPublish(true));
-
-        DogLog.log("Misc/RIO Serial Number", RobotController.getSerialNumber());
-        DogLog.log("Misc/Is Rocky?", Constants.isRocky);
+        SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Coast", s_Swerve::setMotorsToCoast, s_Swerve).ignoringDisable(true));
+        SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Brake", s_Swerve::setMotorsToBrake, s_Swerve).ignoringDisable(true));
+        SmartDashboard.putData(LoggedCommands.run("autoSetup/Set Swerve Aligned", s_Swerve::alignStraight, s_Swerve).ignoringDisable(true));
 
         // Configure the button bindings
         configureButtonBindings();

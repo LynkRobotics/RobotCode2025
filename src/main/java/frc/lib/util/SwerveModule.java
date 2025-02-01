@@ -13,11 +13,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.lib.math.Conversions;
 import frc.robot.Constants;
 import frc.robot.Robot;
-import frc.robot.Constants.Swerve;
 
 public class SwerveModule {
     public int moduleNumber;
@@ -39,15 +37,20 @@ public class SwerveModule {
     public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants){
         this.moduleNumber = moduleNumber;
         this.angleOffset = moduleConstants.angleOffset;
-        
+
         /* Angle Encoder Config */
         angleEncoder = new CANcoder(moduleConstants.cancoderID, moduleConstants.canBusID);
+        DogLog.log("Debug/Swerve", "Module " + moduleNumber + " before applying config: " + String.format("%1.3f", getCANcoder().getDegrees()) + " [ target " + String.format("%1.3f", angleOffset.getDegrees()) + " ]");
         angleEncoder.getConfigurator().apply(Robot.ctreConfigs.swerveCANcoderConfig);
+        DogLog.log("Debug/Swerve", "Module " + moduleNumber + " immediately after config: " + String.format("%1.3f", getCANcoder().getDegrees()) + " [ target " + String.format("%1.3f", angleOffset.getDegrees()) + " ]");
 
         /* Angle Motor Config */
         mAngleMotor = new TalonFX(moduleConstants.angleMotorID, moduleConstants.canBusID);
         mAngleMotor.getConfigurator().apply(Robot.ctreConfigs.swerveAngleFXConfig);
         resetToAbsolute();
+        DogLog.log("Debug/Swerve", "Module " + moduleNumber + " after config: " + String.format("%1.3f", getCANcoder().getDegrees()) + " [ target " + String.format("%1.3f", angleOffset.getDegrees()) + " ]");
+        // Timer.delay(1.0);
+        // DogLog.log("Debug/Swerve", "Module " + moduleNumber + " long after config: " + String.format("%1.3f", getCANcoder().getDegrees()) + " [ target " + String.format("%1.3f", angleOffset.getDegrees()) + " ]");
 
         /* Drive Motor Config */
         mDriveMotor = new TalonFX(moduleConstants.driveMotorID, moduleConstants.canBusID);
@@ -71,6 +74,14 @@ public class SwerveModule {
             driveVelocity.FeedForward = driveFeedForward.calculate(desiredState.speedMetersPerSecond);
             mDriveMotor.setControl(driveVelocity);
         }
+    }
+
+    public double alignmentError() {
+        return getCANcoder().minus(angleOffset).getDegrees();
+    }
+
+    public boolean isAligned() {
+        return Math.abs(alignmentError()) <= Constants.Swerve.maxAngleError;
     }
 
     public Rotation2d getCANcoder(){
