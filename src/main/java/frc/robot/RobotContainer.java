@@ -18,8 +18,10 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.ElevatorSubsystem.Stop;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -42,6 +44,10 @@ public class RobotContainer {
 
     /* Driver Buttons */
     // private final Trigger button = driver.button();
+    private final Trigger L4 = driver.y();
+    private final Trigger L3 = driver.x();
+    private final Trigger L2 = driver.b();
+    private final Trigger L1 = driver.a();
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
@@ -71,6 +77,11 @@ public class RobotContainer {
                 () -> -rotation.get() * Constants.turnStickSensitivity,
                 s_Swerve::getSpeedLimitRot
             ));
+
+        L4.whileTrue(s_Elevator.Move(Stop.L4));
+        L3.whileTrue(s_Elevator.Move(Stop.L3));
+        L2.whileTrue(s_Elevator.Move(Stop.L2));
+        L1.whileTrue(s_Elevator.Move(Stop.L1));
 
         SmartDashboard.putData("Command scheduler", CommandScheduler.getInstance());
 
