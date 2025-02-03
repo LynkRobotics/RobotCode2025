@@ -4,7 +4,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -171,8 +170,14 @@ public final class Constants {
         }
     }
 
-    public class Pose {
+    public static final class Pose {
         public static final int pigeonID = 1;
+
+        public static final double fieldWidth = Units.inchesToMeters(26*12 + 5);
+        public static final double fieldLength = Units.inchesToMeters(57*12 + 6.875);
+
+        // Locations from the Blue Alliance perspective
+        public static final Translation2d reefCenter = new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.5));
     }
 
     public static final class Vision {

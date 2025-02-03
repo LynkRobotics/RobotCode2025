@@ -16,6 +16,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -148,6 +149,22 @@ public class PoseSubsystem extends SubsystemBase {
         }
     }
 
+    public static Translation2d otherAlliance(Translation2d position) {
+        // Rotationally symmetric this year
+        return new Translation2d(Constants.Pose.fieldLength - position.getX(), Constants.Pose.fieldWidth - position.getY());
+    }
+
+    public static Translation2d flipIfRed(Translation2d position) {
+        return Robot.isRed() ? otherAlliance(position) : position;
+    }
+
+    public static Rotation2d reefBearing(Translation2d position) {
+        Translation2d reefCenter = flipIfRed(Constants.Pose.reefCenter);
+        Translation2d relativePosition = position.minus(reefCenter);
+
+        return relativePosition.getAngle();
+    }
+
     @Override
     public void periodic() {
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
@@ -160,8 +177,9 @@ public class PoseSubsystem extends SubsystemBase {
         Pose2d pose = getPose();
         field.setRobotPose(pose);
 
-        SmartDashboard.putNumber("pose/Gyro", getHeading().getDegrees());
-        SmartDashboard.putString("pose/Pose", prettyPose(pose));
+        SmartDashboard.putNumber("Pose/Gyro", getHeading().getDegrees());
+        SmartDashboard.putString("Pose/Pose", prettyPose(pose));
+        SmartDashboard.putNumber("Pose/Reef Bearing", reefBearing(pose.getTranslation()).getDegrees());
 
         DogLog.log("Pose/Pose", pose);
         DogLog.log("Pose/Gyro/Heading", getHeading().getDegrees());
