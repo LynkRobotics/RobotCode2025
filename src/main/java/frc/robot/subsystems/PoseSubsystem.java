@@ -4,9 +4,6 @@
 
 package frc.robot.subsystems;
 
-import java.net.http.HttpClient.Redirect;
-import java.text.BreakIterator;
-
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -189,6 +186,22 @@ public class PoseSubsystem extends SubsystemBase {
             return ReefFace.KL;
         } else { // bearingAngle > -150
             return ReefFace.IJ;
+        }
+    }
+
+    public static Rotation2d facePerpendicular(ReefFace face) {
+        if (face == ReefFace.CD) {
+            return Rotation2d.fromDegrees(60);
+        } else if (face == ReefFace.EF) {
+            return Rotation2d.fromDegrees(120);
+        } else if (face == ReefFace.GH) {
+            return Rotation2d.k180deg;
+        } else if (face == ReefFace.IJ) {
+            return Rotation2d.fromDegrees(-120);
+        } else if (face == ReefFace.KL) {
+            return Rotation2d.fromDegrees(-60);
+        } else { // face == ReefFace.AB
+            return Rotation2d.kZero;
         }
     }
 
