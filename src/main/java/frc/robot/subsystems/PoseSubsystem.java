@@ -14,6 +14,7 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -37,7 +38,7 @@ public class PoseSubsystem extends SubsystemBase {
     private final Field2d field;
     private final Pigeon2 gyro;
 
-    private static final TunableOption optUpdatePoseWithVisionAuto = new TunableOption("pose/Update with vision in Auto", false);
+    private static final TunableOption optUpdatePoseWithVisionAuto = new TunableOption("Pose/Update with vision in Auto", true);
 
     public enum Zone {
         SPEAKER,
@@ -56,18 +57,14 @@ public class PoseSubsystem extends SubsystemBase {
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);        
 
-        // Pose.rotationPID.enableContinuousInput(-180.0, 180.0);
-        // Pose.rotationPID.setIZone(Pose.rotationIZone); // Only use Integral term within this range
-        // Pose.rotationPID.reset();
-
-        // Pose.maintainPID.enableContinuousInput(-180.0, 180.0);
-        // Pose.maintainPID.setIZone(Pose.rotationIZone); // Only use Integral term within this range
-        // Pose.maintainPID.reset();
+        Pose.rotationPID.enableContinuousInput(-180.0, 180.0);
+        Pose.rotationPID.setIZone(Pose.rotationIZone); // Only use Integral term within this range
+        Pose.rotationPID.reset();
 
         poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d());
 
         field = new Field2d();
-        SmartDashboard.putData("pose/Field", field);
+        SmartDashboard.putData("Pose/Field", field);
 
         // RobotConfig config;
         // try {
@@ -119,6 +116,32 @@ public class PoseSubsystem extends SubsystemBase {
     public void zeroGyro() {
         gyro.setYaw(0);
         DogLog.log("Pose/Gyro/Status", "Zeroed Gyro Yaw");
+    }
+
+    public static void angleErrorReset() {
+        angleErrorReset(Pose.rotationPID);
+    }
+
+    public static void angleErrorReset(PIDController pid) {
+        pid.reset();
+    }
+    public static double angleErrorToSpeed(Rotation2d angleError) {
+        return angleErrorToSpeed(angleError, Pose.rotationPID);
+    }
+
+    public static double angleErrorToSpeed(Rotation2d angleError, PIDController pid) {
+        double angleErrorDeg = angleError.getDegrees();
+        double correction = pid.calculate(angleErrorDeg);
+        double feedForward = Pose.rotationKS * Math.signum(correction);
+        double output = MathUtil.clamp(correction + feedForward, -1.0, 1.0);
+
+        DogLog.log("Pose/Angle Error", angleErrorDeg);
+        DogLog.log("Pose/Angle PID correction", correction);
+        DogLog.log("Pose/Angle feedforward", feedForward);
+        DogLog.log("Pose/Angle output", output);
+        
+        // Invert due to use as joystick controls
+        return -output;
     }
 
     public Pose2d getPose() {
@@ -212,6 +235,10 @@ public class PoseSubsystem extends SubsystemBase {
         return distance <= Constants.Pose.reefElevatorZoneRadius;
     }
 
+    public static boolean inWing(Translation2d position) {
+        return flipIfRed(position).getX() <= Constants.Pose.wingLength;
+    }
+
     @Override
     public void periodic() {
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
@@ -226,9 +253,12 @@ public class PoseSubsystem extends SubsystemBase {
 
         SmartDashboard.putNumber("Pose/Gyro", getHeading().getDegrees());
         SmartDashboard.putString("Pose/Pose", prettyPose(pose));
-        SmartDashboard.putNumber("Pose/Reef Bearing", reefBearing(pose.getTranslation()).getDegrees());
-        SmartDashboard.putString("Pose/Nearest Face", nearestFace(pose.getTranslation()).toString());
-        SmartDashboard.putBoolean("Pose/Reef Elevator Zone", inReefElevatorZone(pose.getTranslation()));
+
+        Translation2d position = pose.getTranslation();
+        SmartDashboard.putNumber("Pose/Reef Bearing", reefBearing(position).getDegrees());
+        SmartDashboard.putString("Pose/Nearest Face", nearestFace(position).toString());
+        SmartDashboard.putBoolean("Pose/Reef Elevator Zone", inReefElevatorZone(position));
+        SmartDashboard.putBoolean("Pose/In Wing", inReefElevatorZone(position));
 
         DogLog.log("Pose/Pose", pose);
         DogLog.log("Pose/Gyro/Heading", getHeading().getDegrees());

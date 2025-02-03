@@ -4,6 +4,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -173,6 +174,10 @@ public final class Constants {
     public static final class Pose {
         public static final int pigeonID = 1;
 
+        public static final PIDController rotationPID = new PIDController(0.0070, 0.000, 0.0); // kI was 0.050 for NCCMP 2024
+        public static final double rotationKS = 0.015;
+        public static final double rotationIZone = 2.5; // degrees
+        
         public static final double fieldWidth = Units.inchesToMeters(26*12 + 5);
         public static final double fieldLength = Units.inchesToMeters(57*12 + 6.875);
 
@@ -186,6 +191,7 @@ public final class Constants {
         }
 
         public static final double reefElevatorZoneRadius = Units.inchesToMeters(48.0);
+        public static final double wingLength = Units.inchesToMeters(280);
 
         // Locations from the Blue Alliance perspective
         public static final Translation2d reefCenter = new Translation2d(Units.inchesToMeters(176.75), fieldWidth / 2.0);
