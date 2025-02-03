@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems;
 
+import java.net.http.HttpClient.Redirect;
+import java.text.BreakIterator;
+
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -13,6 +16,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.TunableOption;
 import frc.robot.Constants;
 import frc.robot.Constants.Pose;
+import frc.robot.Constants.Pose.ReefFace;
 import frc.robot.Robot;
 
 public class PoseSubsystem extends SubsystemBase {
@@ -165,6 +170,28 @@ public class PoseSubsystem extends SubsystemBase {
         return relativePosition.getAngle();
     }
 
+    public static ReefFace nearestFace(Translation2d position) {
+        Rotation2d reefBearing = reefBearing(position);
+        if (Robot.isRed()) {
+            reefBearing.plus(Rotation2d.k180deg);
+        }
+        double bearingAngle = MathUtil.inputModulus(reefBearing.getDegrees(), -180, 180);
+
+        if (bearingAngle > 150 || bearingAngle < -150) {
+            return ReefFace.GH;
+        } else if (bearingAngle > 90) {
+            return ReefFace.EF;
+        } else if (bearingAngle > 30) {
+            return ReefFace.CD;
+        } else if (bearingAngle > -30) {
+            return ReefFace.AB;
+        } else if (bearingAngle > -90) {
+            return ReefFace.KL;
+        } else { // bearingAngle > -150
+            return ReefFace.IJ;
+        }
+    }
+
     @Override
     public void periodic() {
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
@@ -180,6 +207,7 @@ public class PoseSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Pose/Gyro", getHeading().getDegrees());
         SmartDashboard.putString("Pose/Pose", prettyPose(pose));
         SmartDashboard.putNumber("Pose/Reef Bearing", reefBearing(pose.getTranslation()).getDegrees());
+        SmartDashboard.putString("Pose/Nearest Face", nearestFace(pose.getTranslation()).toString());
 
         DogLog.log("Pose/Pose", pose);
         DogLog.log("Pose/Gyro/Heading", getHeading().getDegrees());
