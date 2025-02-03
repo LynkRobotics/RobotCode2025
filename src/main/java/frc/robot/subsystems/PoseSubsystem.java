@@ -205,6 +205,13 @@ public class PoseSubsystem extends SubsystemBase {
         }
     }
 
+    public static boolean inReefElevatorZone(Translation2d position) {
+        Translation2d reefCenter = flipIfRed(Constants.Pose.reefCenter);
+        double distance = position.getDistance(reefCenter);
+
+        return distance <= Constants.Pose.reefElevatorZoneRadius;
+    }
+
     @Override
     public void periodic() {
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
@@ -221,6 +228,7 @@ public class PoseSubsystem extends SubsystemBase {
         SmartDashboard.putString("Pose/Pose", prettyPose(pose));
         SmartDashboard.putNumber("Pose/Reef Bearing", reefBearing(pose.getTranslation()).getDegrees());
         SmartDashboard.putString("Pose/Nearest Face", nearestFace(pose.getTranslation()).toString());
+        SmartDashboard.putBoolean("Pose/Reef Elevator Zone", inReefElevatorZone(pose.getTranslation()));
 
         DogLog.log("Pose/Pose", pose);
         DogLog.log("Pose/Gyro/Heading", getHeading().getDegrees());

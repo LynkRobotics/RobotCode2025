@@ -185,6 +185,8 @@ public final class Constants {
             KL
         }
 
+        public static final double reefElevatorZoneRadius = Units.inchesToMeters(48.0);
+
         // Locations from the Blue Alliance perspective
         public static final Translation2d reefCenter = new Translation2d(Units.inchesToMeters(176.75), fieldWidth / 2.0);
     }
