@@ -132,7 +132,7 @@ public class RobotContainer {
         final Trigger L2 = driver.b();
         final Trigger L1 = driver.a();
 
-        moveElevator.onTrue(s_Elevator.GoToNext());
+        moveElevator.whileTrue(s_Elevator.GoToNext());
         L4.onTrue(LoggedCommands.runOnce("Set stop to L4", () -> { s_Elevator.setNextStop(Stop.L4); }));
         L3.onTrue(LoggedCommands.runOnce("Set stop to L3", () -> { s_Elevator.setNextStop(Stop.L3); }));
         L2.onTrue(LoggedCommands.runOnce("Set stop to L2", () -> { s_Elevator.setNextStop(Stop.L2); }));

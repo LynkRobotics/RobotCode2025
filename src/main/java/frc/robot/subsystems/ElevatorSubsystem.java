@@ -235,6 +235,13 @@ public class ElevatorSubsystem extends SubsystemBase {
         rightMotor.setControl(new Follower(Constants.Elevator.leftID, true));
     }
 
+    public void initDefaultCommand() {
+        setDefaultCommand(
+            LoggedCommands.sequence("Zero and Idle",
+                FastZero(),
+                LoggedCommands.idle("Elevator holding at zero", this)));
+    }
+
     @Override
     public void periodic() {
         double position = leftMotor.getPosition().getValueAsDouble();
