@@ -64,7 +64,7 @@ public class PoseSubsystem extends SubsystemBase {
         poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d());
 
         field = new Field2d();
-        SmartDashboard.putData("pose/Field", field);
+        SmartDashboard.putData("Pose/Field", field);
 
         // RobotConfig config;
         // try {
