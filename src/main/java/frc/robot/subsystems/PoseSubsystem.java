@@ -113,6 +113,14 @@ public class PoseSubsystem extends SubsystemBase {
         return new Rotation2d(gyro.getYaw().getValue());
     }
 
+    public Rotation2d getGyroRoll() {
+        return new Rotation2d(gyro.getRoll().getValue());
+    }
+
+    public Rotation2d getGyroPitch() {
+        return new Rotation2d(gyro.getPitch().getValue());
+    }
+
     public void zeroGyro() {
         gyro.setYaw(0);
         DogLog.log("Pose/Gyro/Status", "Zeroed Gyro Yaw");
@@ -251,8 +259,20 @@ public class PoseSubsystem extends SubsystemBase {
         Pose2d pose = getPose();
         field.setRobotPose(pose);
 
-        SmartDashboard.putNumber("Pose/Gyro", getHeading().getDegrees());
         SmartDashboard.putString("Pose/Pose", prettyPose(pose));
+        SmartDashboard.putNumber("Pose/Gyro Yaw", getHeading().getDegrees());
+
+        double roll = getGyroRoll().getDegrees();
+        double pitch = getGyroPitch().getDegrees();
+        SmartDashboard.putNumber("Pose/Gyro Roll", -roll);
+        SmartDashboard.putNumber("Pose/Gyro Pitch", -pitch);
+        if (Math.abs(roll) > Pose.tiltError || Math.abs(pitch) > Pose.tiltError) {
+            SmartDashboard.putString("Pose/Tilt State", "#D61E1E");
+        } else if (Math.abs(roll) > Pose.tiltWarning || Math.abs(pitch) > Pose.tiltWarning) {
+            SmartDashboard.putString("Pose/Tilt State", "#D6BE1E");
+        } else {
+            SmartDashboard.putString("Pose/Tilt State", "#266336");
+        }
 
         Translation2d position = pose.getTranslation();
         SmartDashboard.putNumber("Pose/Reef Bearing", reefBearing(position).getDegrees());

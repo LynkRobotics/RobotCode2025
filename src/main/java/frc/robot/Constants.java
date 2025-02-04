@@ -177,7 +177,10 @@ public final class Constants {
         public static final PIDController rotationPID = new PIDController(0.0070, 0.000, 0.0); // kI was 0.050 for NCCMP 2024
         public static final double rotationKS = 0.015;
         public static final double rotationIZone = 2.5; // degrees
-        
+
+        public static final double tiltWarning = 5.0;
+        public static final double tiltError = 10.0;
+
         public static final double fieldWidth = Units.inchesToMeters(26*12 + 5);
         public static final double fieldLength = Units.inchesToMeters(57*12 + 6.875);
 
