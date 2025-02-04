@@ -52,7 +52,7 @@ public class VisionSubsystem extends SubsystemBase {
     photonEstimator = new PhotonPoseEstimator(kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Constants.Vision.robotToCam);
     photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
-    SmartDashboard.putData("vision/Field", field);
+    SmartDashboard.putData("Vision/Field", field);
   }
   public static VisionSubsystem getInstance() {
     return instance;
@@ -74,7 +74,7 @@ public class VisionSubsystem extends SubsystemBase {
     latestTimestamp = visionEst.timestampSeconds;
     newResult = Math.abs(latestTimestamp - lastEstTimestamp) > 1e-5;
     if (updateDashboard) {
-      SmartDashboard.putBoolean("vision/New result", newResult);
+      SmartDashboard.putBoolean("Vision/New result", newResult);
     }
     if (!newResult) {
       return false;

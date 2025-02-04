@@ -92,13 +92,13 @@ public class RobotContainer {
         SmartDashboard.putData("Command scheduler", CommandScheduler.getInstance());
 
         // Default named commands for PathPlanner
-        SmartDashboard.putNumber("auto/Startup delay", 0.0);
-        // autoNamedCommand("Startup delay", Commands.defer(() -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()));
+        SmartDashboard.putNumber("Auto/Startup delay", 0.0);
+        // autoNamedCommand("Startup delay", Commands.defer(() -> Commands.waitSeconds(SmartDashboard.getNumber("Auto/Startup delay", 0.0)), Set.of()));
         // autoNamedCommand("Stop", Commands.runOnce(s_Swerve::stopSwerve));
 
         // Build an autoChooser (defaults to none)
         // autoChooser = AutoBuilder.buildAutoChooser();
-        // SmartDashboard.putData("auto/Auto Chooser", autoChooser);
+        // SmartDashboard.putData("Auto/Auto Chooser", autoChooser);
         // buildAutos(autoChooser);
 
         SmartDashboard.putNumber("TeleOp Speed Governor", 1.0);
@@ -106,9 +106,9 @@ public class RobotContainer {
         SmartDashboard.putData(LoggedCommands.runOnce("Zero Gyro", s_Pose::zeroGyro, s_Swerve));
         SmartDashboard.putData(LoggedCommands.runOnce("Reset heading", s_Pose::resetHeading, s_Swerve));
 
-        SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Coast", s_Swerve::setMotorsToCoast, s_Swerve).ignoringDisable(true));
-        SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Brake", s_Swerve::setMotorsToBrake, s_Swerve).ignoringDisable(true));
-        SmartDashboard.putData(LoggedCommands.run("autoSetup/Set Swerve Aligned", s_Swerve::alignStraight, s_Swerve).ignoringDisable(true));
+        SmartDashboard.putData(LoggedCommands.runOnce("AutoSetup/Set Swerve Coast", s_Swerve::setMotorsToCoast, s_Swerve).ignoringDisable(true));
+        SmartDashboard.putData(LoggedCommands.runOnce("AutoSetup/Set Swerve Brake", s_Swerve::setMotorsToBrake, s_Swerve).ignoringDisable(true));
+        SmartDashboard.putData(LoggedCommands.run("AutoSetup/Set Swerve Aligned", s_Swerve::alignStraight, s_Swerve).ignoringDisable(true));
 
         // Configure the button bindings
         configureButtonBindings();
