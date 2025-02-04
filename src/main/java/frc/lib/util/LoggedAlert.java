@@ -17,6 +17,7 @@ public class LoggedAlert {
     public static void Error(String subsystem, String title, String msg) {
         Elastic.sendNotification(new Notification(NotificationLevel.ERROR, title, msg, Constants.errorTime));
         DogLog.logFault(subsystem + ": " + msg, AlertType.kError);
+        DogLog.log(subsystem + "/" + "faults", msg);
     }
 
     /**
@@ -29,6 +30,7 @@ public class LoggedAlert {
     public static void Warning(String subsystem, String title, String msg) {
         Elastic.sendNotification(new Notification(NotificationLevel.WARNING, title, msg, Constants.warningTime));
         DogLog.logFault(subsystem + ": " + msg, AlertType.kWarning);
+        DogLog.log(subsystem + "/" + "faults", msg);
     }
 
     /**
@@ -41,5 +43,6 @@ public class LoggedAlert {
     public static void Info(String subsystem, String title, String msg) {
         Elastic.sendNotification(new Notification(NotificationLevel.INFO, title, msg));
         DogLog.logFault(subsystem + ": " + msg, AlertType.kInfo);
+        DogLog.log(subsystem + "/" + "faults", msg);
     }
 }
