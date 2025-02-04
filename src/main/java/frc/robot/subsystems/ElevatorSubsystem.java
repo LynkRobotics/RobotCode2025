@@ -236,8 +236,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         DogLog.log("Elevator/rightVoltage", rightMotor.getMotorVoltage().getValueAsDouble());
         DogLog.log("Elevator/stallCount", stallCount);
 
-        SmartDashboard.putBoolean("elevator/stalled", isStalled());
-        SmartDashboard.putBoolean("elevator/moving", voltage != 0.0);
+        SmartDashboard.putBoolean("Elevator/stalled", isStalled());
+        SmartDashboard.putBoolean("Elevator/moving", voltage != 0.0);
 
         mechanism.setLength(Units.inchesToMeters(height));
     }

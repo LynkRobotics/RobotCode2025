@@ -160,8 +160,8 @@ public class PoseSubsystem extends SubsystemBase {
         Pose2d pose = getPose();
         field.setRobotPose(pose);
 
-        SmartDashboard.putNumber("pose/Gyro", getHeading().getDegrees());
-        SmartDashboard.putString("pose/Pose", prettyPose(pose));
+        SmartDashboard.putNumber("Pose/Gyro", getHeading().getDegrees());
+        SmartDashboard.putString("Pose/Pose", prettyPose(pose));
 
         DogLog.log("Pose/Pose", pose);
         DogLog.log("Pose/Gyro/Heading", getHeading().getDegrees());

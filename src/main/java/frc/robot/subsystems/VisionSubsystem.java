@@ -103,12 +103,12 @@ public class VisionSubsystem extends SubsystemBase {
     DogLog.log("Vision/Pose", lastPose);
 
     if (optUpdateVisionDashboard.get()) {
-      SmartDashboard.putString("vision/Result", result.toString());
-      SmartDashboard.putBoolean("vision/Have target(s)", haveTarget);
-      SmartDashboard.putBoolean("vision/Have speaker target", haveSpeakerTarget);
-      SmartDashboard.putBoolean("vision/Have amp target", haveAmpTarget);
-      SmartDashboard.putBoolean("vision/Have source target", haveSourceTarget);
-      SmartDashboard.putString("vision/Last pose", String.format("%01.2f, %01.2f @ %01.1f", lastPose.getX(), lastPose.getY(), lastPose.getRotation().getDegrees()));
+      SmartDashboard.putString("Vision/Result", result.toString());
+      SmartDashboard.putBoolean("Vision/Have target(s)", haveTarget);
+      SmartDashboard.putBoolean("Vision/Have speaker target", haveSpeakerTarget);
+      SmartDashboard.putBoolean("Vision/Have amp target", haveAmpTarget);
+      SmartDashboard.putBoolean("Vision/Have source target", haveSourceTarget);
+      SmartDashboard.putString("Vision/Last pose", String.format("%01.2f, %01.2f @ %01.1f", lastPose.getX(), lastPose.getY(), lastPose.getRotation().getDegrees()));
     }
   }
 }
