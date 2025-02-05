@@ -1,7 +1,7 @@
 package frc.robot.commands;
 
 import frc.robot.Constants;
-import frc.robot.Options;
+import static frc.robot.Options.*;
 import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.Robot;
 
@@ -61,7 +61,7 @@ public class TeleopSwerve extends LoggedCommandBase {
 
         // Automatically aim at reef when applicable
         // TODO Add manual override ability to disable automatic reef aiming
-        if (Options.optAutoReefAiming.get() && Math.abs(rotationVal) < Constants.aimingOverride) {
+        if (optAutoReefAiming.get() && Math.abs(rotationVal) < Constants.aimingOverride) {
             Pose2d pose = s_Pose.getPose();
 
             // TODO Add override when working with algae

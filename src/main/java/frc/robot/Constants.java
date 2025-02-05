@@ -202,9 +202,15 @@ public final class Constants {
 
     public static final class Vision {
         public static final String cameraName = "AprilTagCam";
-        public static final Transform3d robotToCam = new Transform3d(
-            new Translation3d(-0.148, 0.005, 0.325),
-            new Rotation3d(Units.degreesToRadians(1.2), Units.degreesToRadians(-30.7), Math.PI)); // As measured by PhotonVision
+        public static final Transform3d robotToCam =
+            isRocky ?                
+                new Transform3d(
+                    new Translation3d(Units.inchesToMeters(30.0/2.0 - 6.958), 0.0, Units.inchesToMeters(6.55)),
+                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(-30.7), 0.0))
+            :
+                new Transform3d(
+                    new Translation3d(-0.148, 0.005, 0.325),
+                    new Rotation3d(Units.degreesToRadians(1.2), Units.degreesToRadians(-30.7), Math.PI)); // As measured by PhotonVision
         public static final double centerToReferenceOffset = -Units.inchesToMeters(27.0/2.0 + 3.0); // Reference point is outside of bumper
     }
 
