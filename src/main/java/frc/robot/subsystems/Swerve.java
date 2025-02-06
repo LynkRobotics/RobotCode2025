@@ -76,6 +76,7 @@ public class Swerve extends SubsystemBase {
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
 
         for(SwerveModule mod : mSwerveMods) {
+            DogLog.log("Swerve/Desired Module States", swerveModuleStates);
             mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
         }
     }
@@ -172,6 +173,6 @@ public class Swerve extends SubsystemBase {
             aligned = aligned && mod.isAligned();
         }
         SmartDashboard.putBoolean("Swerve/Modules Aligned", aligned);
-        DogLog.log("Swerve/Module States", getModuleStates());        
+        DogLog.log("Swerve/Actual Module States", getModuleStates());        
     }
 }
