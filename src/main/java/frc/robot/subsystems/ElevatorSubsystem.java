@@ -153,7 +153,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Command GoToNext() {
         return LoggedCommands.sequence("Move Elevator to stop",
-            Commands.runOnce(() -> { DogLog.log("Robot/Status", "Next stop: " + nextStop); }),
+            LoggedCommands.log(() -> "Next stop: " + nextStop),
             Commands.runOnce(() -> { setHeight(elevatorHeights.get(nextStop)); }, this));
     }
 
