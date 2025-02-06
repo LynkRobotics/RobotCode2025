@@ -39,7 +39,7 @@ public final class Constants {
         public static final double speedLimitRot = 0.50;
 
         public static final COTSTalonFXSwerveConstants chosenModule =  
-            COTSTalonFXSwerveConstants.SDS.MK4i.KrakenX60(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L2_5);
+            COTSTalonFXSwerveConstants.SDS.MK4i.KrakenX60(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L2);
 
         /* Drivetrain Constants */
         public static final double trackWidth = Units.inchesToMeters(isRocky ? 21.75 : 21.75);
