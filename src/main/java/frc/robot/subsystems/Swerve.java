@@ -75,8 +75,8 @@ public class Swerve extends SubsystemBase {
         SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(desiredChassisSpeeds); 
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
 
+        DogLog.log("Swerve/Desired Module States", swerveModuleStates);
         for(SwerveModule mod : mSwerveMods) {
-            DogLog.log("Swerve/Desired Module States", swerveModuleStates);
             mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
         }
     }
