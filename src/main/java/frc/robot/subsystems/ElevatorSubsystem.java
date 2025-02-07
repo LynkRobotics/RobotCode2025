@@ -52,11 +52,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     // TODO Refine heights
     // Elevator heights are defined in terms off inches that the elevator is off the ground
     private final EnumMap<Stop, Double> elevatorHeights = new EnumMap<>(Map.ofEntries(
-      Map.entry(Stop.NEAR_ZERO, Constants.Elevator.baseHeight + 1.5),
-      Map.entry(Stop.L1, 20.0 - Constants.Elevator.endEffectorHeight),
-      Map.entry(Stop.L2, 30.5 - Constants.Elevator.endEffectorHeight),
-      Map.entry(Stop.L3, 45.5 - Constants.Elevator.endEffectorHeight),
-      Map.entry(Stop.L4, 71.5 - Constants.Elevator.endEffectorHeight)
+      Map.entry(Stop.NEAR_ZERO, Constants.Elevator.baseHeight + 2.5),
+      Map.entry(Stop.L1, 26.0 - Constants.Elevator.endEffectorHeight),
+      Map.entry(Stop.L2, 35.5 - Constants.Elevator.endEffectorHeight),
+      Map.entry(Stop.L3, 52.5 - Constants.Elevator.endEffectorHeight),
+      Map.entry(Stop.L4, 77.0 - Constants.Elevator.endEffectorHeight)
     ));
 
     public ElevatorSubsystem() {
@@ -264,8 +264,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         lastPosition = position;
 
         if (Math.abs(followDifference) >= positionDiffMax) {
-            LoggedAlert.Error("Elevator", "Elevator Unequal", "Elevator motor position difference of " + String.format("%01.2f", followDifference) + " exceeds limit");
-            stop();
+            LoggedAlert.Warning("Elevator", "Elevator Unequal", "Elevator motor position difference of " + String.format("%01.2f", followDifference) + " exceeds limit");
+            // stop();
         }
 
         DogLog.log("Elevator/height", height);
