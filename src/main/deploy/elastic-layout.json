@@ -29,7 +29,7 @@
             "properties": {
               "topic": "/SmartDashboard/vision/Field",
               "period": 0.06,
-              "field_game": "Crescendo",
+              "field_game": "Reefscape",
               "robot_width": 0.85,
               "robot_length": 0.85,
               "show_other_objects": true,
@@ -56,19 +56,6 @@
             }
           },
           {
-            "title": "Zero Gyro",
-            "x": 0.0,
-            "y": 448.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Command",
-            "properties": {
-              "topic": "/SmartDashboard/Zero Gyro",
-              "period": 0.06,
-              "show_type": true
-            }
-          },
-          {
             "title": "photonvision_Port_1182_Output_MJPEG_Server",
             "x": 544.0,
             "y": 0.0,
@@ -81,32 +68,6 @@
             }
           },
           {
-            "title": "Zero heading",
-            "x": 256.0,
-            "y": 448.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Command",
-            "properties": {
-              "topic": "/SmartDashboard/Zero heading",
-              "period": 0.06,
-              "show_type": true
-            }
-          },
-          {
-            "title": "Auto Chooser",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 512.0,
-            "height": 128.0,
-            "type": "ComboBox Chooser",
-            "properties": {
-              "topic": "/SmartDashboard/auto/Auto Chooser",
-              "period": 0.06,
-              "sort_options": false
-            }
-          },
-          {
             "title": "Integrated Pose",
             "x": 1088.0,
             "y": 384.0,
@@ -116,7 +77,7 @@
             "properties": {
               "topic": "/SmartDashboard/pose/Field",
               "period": 0.06,
-              "field_game": "Crescendo",
+              "field_game": "Reefscape",
               "robot_width": 0.85,
               "robot_length": 0.85,
               "show_other_objects": true,
@@ -127,17 +88,105 @@
             }
           },
           {
-            "title": "Gyro",
-            "x": 192.0,
-            "y": 576.0,
-            "width": 192.0,
-            "height": 128.0,
-            "type": "Text Display",
+            "title": "Gyro Yaw",
+            "x": 128.0,
+            "y": 128.0,
+            "width": 288.0,
+            "height": 224.0,
+            "type": "Radial Gauge",
             "properties": {
-              "topic": "/SmartDashboard/pose/Gyro",
+              "topic": "/SmartDashboard/Pose/Gyro Yaw",
               "period": 0.06,
               "data_type": "double",
-              "show_submit_button": false
+              "start_angle": -180.0,
+              "end_angle": 180.0,
+              "min_value": -180.0,
+              "max_value": 180.0,
+              "number_of_labels": 8,
+              "wrap_value": true,
+              "show_pointer": true,
+              "show_ticks": false
+            }
+          },
+          {
+            "title": "Gyro Pitch (B/F)",
+            "x": 0.0,
+            "y": 352.0,
+            "width": 224.0,
+            "height": 224.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/SmartDashboard/Pose/Gyro Pitch",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": -80.0,
+              "end_angle": 80.0,
+              "min_value": -15.0,
+              "max_value": 15.0,
+              "number_of_labels": 2,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": false
+            }
+          },
+          {
+            "title": "Gyro Roll (L/R)",
+            "x": 320.0,
+            "y": 352.0,
+            "width": 224.0,
+            "height": 224.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/SmartDashboard/Pose/Gyro Roll",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": -80.0,
+              "end_angle": 80.0,
+              "min_value": -15.0,
+              "max_value": 15.0,
+              "number_of_labels": 2,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": false
+            }
+          },
+          {
+            "title": "Zero Gyro",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Zero Gyro",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Reset heading",
+            "x": 288.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Reset heading",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Tilt Warning",
+            "x": 0.0,
+            "y": 576.0,
+            "width": 544.0,
+            "height": 128.0,
+            "type": "Single Color View",
+            "properties": {
+              "topic": "/SmartDashboard/Pose/Tilt State",
+              "period": 0.06,
+              "data_type": "string"
             }
           }
         ]
@@ -202,6 +251,23 @@
               "data_type": "double[]",
               "show_submit_button": false
             }
+          },
+          {
+            "title": "Swerve Module Alignment",
+            "x": 0.0,
+            "y": 256.0,
+            "width": 224.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve/Modules Aligned",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
           }
         ]
       }
@@ -214,7 +280,7 @@
             "title": "CANCoder Abs. Value",
             "x": 0.0,
             "y": 0.0,
-            "width": 448.0,
+            "width": 256.0,
             "height": 320.0,
             "type": "List Layout",
             "properties": {
@@ -265,8 +331,8 @@
               },
               {
                 "title": "3 CANcoder",
-                "x": 0.0,
-                "y": 0.0,
+                "x": 32.0,
+                "y": 224.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Text Display",
@@ -278,41 +344,225 @@
                 }
               }
             ]
+          },
+          {
+            "title": "Module Alignment",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 160.0,
+            "height": 320.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "FL Aligned",
+                "x": 256.0,
+                "y": 128.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/SmartDashboard/Swerve/Mod/0 Aligned",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "FR Aligned",
+                "x": 256.0,
+                "y": 192.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/SmartDashboard/Swerve/Mod/1 Aligned",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "BL Aligned",
+                "x": 320.0,
+                "y": 192.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/SmartDashboard/Swerve/Mod/2 Aligned",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "BR Aligned",
+                "x": 288.0,
+                "y": 256.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/SmartDashboard/Swerve/Mod/3 Aligned",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              }
+            ]
           }
         ],
         "containers": [
           {
-            "title": "Field",
-            "x": 448.0,
+            "title": "Swerve Drive",
+            "x": 864.0,
             "y": 0.0,
-            "width": 1152.0,
-            "height": 576.0,
-            "type": "Field",
+            "width": 544.0,
+            "height": 384.0,
+            "type": "SwerveDrive",
             "properties": {
-              "topic": "/SmartDashboard/swerve/Field",
+              "topic": "/SmartDashboard/Swerve Drive",
               "period": 0.06,
-              "field_game": "Crescendo",
-              "robot_width": 0.85,
-              "robot_length": 0.85,
-              "show_other_objects": true,
-              "show_trajectories": true,
-              "field_rotation": 0.0,
-              "robot_color": 4294198070,
-              "trajectory_color": 4294967295
+              "show_robot_rotation": true,
+              "rotation_unit": "Radians"
             }
           },
           {
-            "title": "Pose",
-            "x": 0.0,
-            "y": 576.0,
-            "width": 960.0,
-            "height": 128.0,
-            "type": "Text Display",
+            "title": "Front Right Alignment",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 224.0,
+            "height": 224.0,
+            "type": "Radial Gauge",
             "properties": {
-              "topic": "/SmartDashboard/swerve/Pose",
+              "topic": "/SmartDashboard/Swerve/Mod/1 Alignment Error",
               "period": 0.06,
-              "data_type": "string",
-              "show_submit_button": false
+              "data_type": "double",
+              "start_angle": -90.0,
+              "end_angle": 90.0,
+              "min_value": -10.0,
+              "max_value": 10.0,
+              "number_of_labels": 4,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": false
+            }
+          },
+          {
+            "title": "Front Left Alignment",
+            "x": 416.0,
+            "y": 0.0,
+            "width": 224.0,
+            "height": 224.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve/Mod/0 Alignment Error",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": -90.0,
+              "end_angle": 90.0,
+              "min_value": -10.0,
+              "max_value": 10.0,
+              "number_of_labels": 4,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": false
+            }
+          },
+          {
+            "title": "Back Right",
+            "x": 416.0,
+            "y": 224.0,
+            "width": 224.0,
+            "height": 224.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve/Mod/2 Alignment Error",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": -90.0,
+              "end_angle": 90.0,
+              "min_value": -10.0,
+              "max_value": 10.0,
+              "number_of_labels": 4,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": false
+            }
+          },
+          {
+            "title": "Back Right Alignment",
+            "x": 640.0,
+            "y": 224.0,
+            "width": 224.0,
+            "height": 224.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve/Mod/3 Alignment Error",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": -90.0,
+              "end_angle": 90.0,
+              "min_value": -10.0,
+              "max_value": 10.0,
+              "number_of_labels": 4,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": false
+            }
+          },
+          {
+            "title": "Set Swerve Coast",
+            "x": 1408.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/autoSetup/Set Swerve Coast",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Set Swerve Brake",
+            "x": 1408.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/autoSetup/Set Swerve Brake",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Set Swerve Aligned",
+            "x": 1408.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/autoSetup/Set Swerve Aligned",
+              "period": 0.06,
+              "show_type": true
             }
           }
         ]
@@ -324,125 +574,9 @@
         "layouts": [],
         "containers": [
           {
-            "title": "LEFT position",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "ff",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "LEFT velocity",
-            "x": 0.0,
-            "y": 128.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/climber/LEFT velocity",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "LEFT voltage",
-            "x": 768.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/climber/LEFT voltage",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "RIGHT position",
-            "x": 0.0,
-            "y": 256.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/climber/RIGHT position",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "RIGHT velocity",
-            "x": 0.0,
-            "y": 384.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/climber/RIGHT velocity",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "RIGHT voltage",
-            "x": 768.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/climber/RIGHT voltage",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "LEFT velocity",
-            "x": 128.0,
-            "y": 0.0,
-            "width": 640.0,
-            "height": 256.0,
-            "type": "Graph",
-            "properties": {
-              "topic": "/SmartDashboard/climber/LEFT velocity",
-              "period": 0.033,
-              "data_type": "double",
-              "time_displayed": 5.0,
-              "color": 4278238420,
-              "line_width": 2.0
-            }
-          },
-          {
-            "title": "RIGHT velocity",
-            "x": 128.0,
-            "y": 256.0,
-            "width": 640.0,
-            "height": 256.0,
-            "type": "Graph",
-            "properties": {
-              "topic": "/SmartDashboard/climber/RIGHT velocity",
-              "period": 0.033,
-              "data_type": "double",
-              "time_displayed": 5.0,
-              "color": 4278238420,
-              "line_width": 2.0
-            }
-          },
-          {
             "title": "Lower",
-            "x": 1024.0,
-            "y": 0.0,
+            "x": 0.0,
+            "y": 160.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Command",
@@ -454,8 +588,8 @@
           },
           {
             "title": "Raise",
-            "x": 1024.0,
-            "y": 128.0,
+            "x": 0.0,
+            "y": 0.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Command",
@@ -467,8 +601,8 @@
           },
           {
             "title": "Zero",
-            "x": 1280.0,
-            "y": 128.0,
+            "x": 448.0,
+            "y": 160.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Command",
@@ -480,8 +614,8 @@
           },
           {
             "title": "Stop",
-            "x": 1280.0,
-            "y": 0.0,
+            "x": 672.0,
+            "y": 416.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Command",
@@ -489,6 +623,134 @@
               "topic": "/SmartDashboard/Elevator/Stop",
               "period": 0.06,
               "show_type": true
+            }
+          },
+          {
+            "title": "moving",
+            "x": 288.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/elevator/moving",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "stalled",
+            "x": 288.0,
+            "y": 160.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/elevator/stalled",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "SetZero",
+            "x": 736.0,
+            "y": 160.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/SetZero",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Set Voltage",
+            "x": 160.0,
+            "y": 288.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/Set Voltage",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Direct Voltage",
+            "x": 32.0,
+            "y": 288.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/Direct Voltage",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Set Position",
+            "x": 672.0,
+            "y": 288.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/Set Position",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Direct Position",
+            "x": 544.0,
+            "y": 288.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/Direct Position",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Set Height",
+            "x": 416.0,
+            "y": 416.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/Set Height",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Direct Height",
+            "x": 288.0,
+            "y": 416.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/Direct Height",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
             }
           }
         ]

@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import frc.robot.SwerveModule;
+import frc.lib.util.SwerveModule;
 import frc.robot.Constants;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -10,23 +10,44 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
     private boolean speedLimit = false;
+    private PoseSubsystem s_Pose = null;
 
     public SwerveModule[] mSwerveMods;
 
     public Swerve() {
-        Timer.delay(5); //Delaying the initalization of the swerve module should prevent a race condition with the CANcoders initializing, and causing just general funkiness
         mSwerveMods = new SwerveModule[] {
             new SwerveModule(0, Constants.Swerve.Mod0.constants),
             new SwerveModule(1, Constants.Swerve.Mod1.constants),
             new SwerveModule(2, Constants.Swerve.Mod2.constants),
             new SwerveModule(3, Constants.Swerve.Mod3.constants)
         };
+
+        SmartDashboard.putData("Swerve Drive", new Sendable() {
+            @Override
+            public void initSendable(SendableBuilder builder) {
+                builder.setSmartDashboardType("SwerveDrive");
+
+                builder.addDoubleProperty("Front Left Angle", () -> mSwerveMods[0].getPosition().angle.getRadians(), null);
+                builder.addDoubleProperty("Front Left Velocity", () -> mSwerveMods[0].getState().speedMetersPerSecond, null);
+
+                builder.addDoubleProperty("Front Right Angle", () -> mSwerveMods[1].getPosition().angle.getRadians(), null);
+                builder.addDoubleProperty("Front Right Velocity", () -> mSwerveMods[1].getState().speedMetersPerSecond, null);
+
+                builder.addDoubleProperty("Back Left Angle", () -> mSwerveMods[2].getPosition().angle.getRadians(), null);
+                builder.addDoubleProperty("Back Left Velocity", () -> mSwerveMods[2].getState().speedMetersPerSecond, null);
+
+                builder.addDoubleProperty("Back Right Angle", () -> mSwerveMods[3].getPosition().angle.getRadians(), null);
+                builder.addDoubleProperty("Back Right Velocity", () -> mSwerveMods[3].getState().speedMetersPerSecond, null);
+
+                builder.addDoubleProperty("Robot Angle", () -> s_Pose != null ? s_Pose.getGyroYaw().getRadians() : 0.0, null);            }
+        });
     }
 
     public void drive(Translation2d translation, double rotation, boolean isOpenLoop) {
@@ -54,6 +75,7 @@ public class Swerve extends SubsystemBase {
         SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(desiredChassisSpeeds); 
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
 
+        DogLog.log("Swerve/Desired Module States", swerveModuleStates);
         for(SwerveModule mod : mSwerveMods) {
             mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
         }
@@ -138,15 +160,19 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic() {
-        for(SwerveModule mod : mSwerveMods){
-            SmartDashboard.putNumber("Swerve/Mod/" + mod.moduleNumber + " CANcoder", mod.getCANcoder().getDegrees());
-            DogLog.log("Swerve/Mod/" + mod.moduleNumber + " CANcoder", mod.getCANcoder().getDegrees());
-            SmartDashboard.putNumber("Swerve/Mod/" + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
-            DogLog.log("Swerve/Mod/" + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
-            SmartDashboard.putNumber("Swerve/Mod/" + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
-            DogLog.log("Swerve/Mod/" + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
+        if (s_Pose == null) {
+            s_Pose = PoseSubsystem.getInstance();
         }
 
-        DogLog.log("Swerve/Module States", getModuleStates());        
+        boolean aligned = true;
+        for(SwerveModule mod : mSwerveMods) {
+            DogLog.log("Swerve/Mod/" + mod.moduleNumber + " CANcoder", mod.getCANcoder().getDegrees());
+            SmartDashboard.putNumber("Swerve/Mod/" + mod.moduleNumber + " CANcoder", mod.getCANcoder().getDegrees());
+            SmartDashboard.putNumber("Swerve/Mod/" + mod.moduleNumber + " Alignment Error", mod.alignmentError());
+            SmartDashboard.putBoolean("Swerve/Mod/" + mod.moduleNumber + " Aligned", mod.isAligned());
+            aligned = aligned && mod.isAligned();
+        }
+        SmartDashboard.putBoolean("Swerve/Modules Aligned", aligned);
+        DogLog.log("Swerve/Actual Module States", getModuleStates());        
     }
 }
