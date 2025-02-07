@@ -193,7 +193,7 @@ public class PoseSubsystem extends SubsystemBase {
 
     public static Rotation2d reefBearing(Translation2d position) {
         Translation2d reefCenter = flipIfRed(Constants.Pose.reefCenter);
-        Translation2d relativePosition = position.minus(reefCenter);
+        Translation2d relativePosition = reefCenter.minus(position);
 
         return relativePosition.getAngle();
     }

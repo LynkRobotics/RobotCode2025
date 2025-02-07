@@ -24,7 +24,7 @@ public class TeleopSwerve extends LoggedCommandBase {
     private PoseSubsystem s_Pose = null;
     private boolean autoAiming = false;
     private Rotation2d lastAngle = null;
-    private static final TunableOption optAutoReefAiming = new TunableOption("Automatically Aim at Reef", false); // TODO True by default
+    private static final TunableOption optAutoReefAiming = new TunableOption("Automatically Aim at Reef", true);
 
     public TeleopSwerve(Swerve s_Swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, DoubleSupplier speedLimitRotSupplier) {
         super();
@@ -75,7 +75,7 @@ public class TeleopSwerve extends LoggedCommandBase {
                     PoseSubsystem.angleErrorReset();
                     autoAiming = true;
                 } else {
-                    Rotation2d angleError = lastAngle.minus(bearing);
+                    Rotation2d angleError = bearing.minus(lastAngle);
                     rotationVal = PoseSubsystem.angleErrorToSpeed(angleError);
                 }
                 lastAngle = rotation;
