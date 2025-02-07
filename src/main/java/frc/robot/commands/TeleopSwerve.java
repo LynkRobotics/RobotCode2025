@@ -1,7 +1,7 @@
 package frc.robot.commands;
 
+import frc.lib.util.TunableOption;
 import frc.robot.Constants;
-import static frc.robot.Options.*;
 import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.Robot;
 
@@ -24,6 +24,7 @@ public class TeleopSwerve extends LoggedCommandBase {
     private PoseSubsystem s_Pose = null;
     private boolean autoAiming = false;
     private Rotation2d lastAngle = null;
+    private static final TunableOption optAutoReefAiming = new TunableOption("Automatically Aim at Reef", false); // TODO True by default
 
     public TeleopSwerve(Swerve s_Swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, DoubleSupplier speedLimitRotSupplier) {
         super();
