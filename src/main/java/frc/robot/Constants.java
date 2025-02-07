@@ -171,15 +171,46 @@ public final class Constants {
         }
     }
 
-    public class Pose {
+    public static final class Pose {
         public static final int pigeonID = 1;
+
+        public static final PIDController rotationPID = new PIDController(0.0070, 0.000, 0.0); // kI was 0.050 for NCCMP 2024
+        public static final double rotationKS = 0.015;
+        public static final double rotationIZone = 2.5; // degrees
+
+        public static final double tiltWarning = 5.0;
+        public static final double tiltError = 10.0;
+
+        public static final double fieldWidth = Units.inchesToMeters(26*12 + 5);
+        public static final double fieldLength = Units.inchesToMeters(57*12 + 6.875);
+
+        public static enum ReefFace {
+            AB,
+            CD,
+            EF,
+            GH,
+            IJ,
+            KL
+        }
+
+        public static final double reefElevatorZoneRadius = Units.inchesToMeters(48.0);
+        public static final double wingLength = Units.inchesToMeters(280);
+
+        // Locations from the Blue Alliance perspective
+        public static final Translation2d reefCenter = new Translation2d(Units.inchesToMeters(176.75), fieldWidth / 2.0);
     }
 
     public static final class Vision {
         public static final String cameraName = "AprilTagCam";
-        public static final Transform3d robotToCam = new Transform3d(
-            new Translation3d(-0.148, 0.005, 0.325),
-            new Rotation3d(Units.degreesToRadians(1.2), Units.degreesToRadians(-30.7), Math.PI)); // As measured by PhotonVision
+        public static final Transform3d robotToCam =
+            isRocky ?                
+                new Transform3d(
+                    new Translation3d(Units.inchesToMeters(30.0/2.0 - 6.958), 0.0, Units.inchesToMeters(6.55)),
+                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(-30.7), 0.0))
+            :
+                new Transform3d(
+                    new Translation3d(-0.148, 0.005, 0.325),
+                    new Rotation3d(Units.degreesToRadians(1.2), Units.degreesToRadians(-30.7), Math.PI)); // As measured by PhotonVision
         public static final double centerToReferenceOffset = -Units.inchesToMeters(27.0/2.0 + 3.0); // Reference point is outside of bumper
     }
 

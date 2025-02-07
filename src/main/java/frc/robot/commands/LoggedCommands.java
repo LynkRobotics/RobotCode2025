@@ -17,13 +17,14 @@ import edu.wpi.first.wpilibj2.command.WrapperCommand;
 
 // Provide a Commands-like interface, but producing LoggedCommands
 public class LoggedCommands {
+  public static final String key = "Robot/Status";
 
   public static void logInit(Command command) {
-    DogLog.log("Robot/Status", "Running " + command.getName());
+    DogLog.log(key, "Running " + command.getName());
   }
 
   public static void logFinish(Command command, boolean interrupted) {
-    DogLog.log("Robot/Status", "Finished " + command.getName() + (interrupted ? " (interrupted)" : ""));
+    DogLog.log(key, "Finished " + command.getName() + (interrupted ? " (interrupted)" : ""));
   }
 
   public static Command loggedCommand(Command command) {
@@ -49,6 +50,21 @@ public class LoggedCommands {
     Command newCommand = loggedCommand(command);
     newCommand.setName(name);
     return newCommand;
+  }
+
+  /* Custom convenience commands */
+
+  // Use DogLog to log a message to the same key as the logged commands
+  // Note that the command itself is *not* logged, since the message itself serves as the log entry 
+  public static Command log(String message) {
+    return Commands.runOnce(() -> { DogLog.log(key, message); });
+  }
+
+  // Use DogLog to log a message to the same key as the logged commands
+  // In this variant, the message is constructed at the time of invocation by the provided Supplier
+  // Note that the command itself is *not* logged, since the message itself serves as the log entry 
+  public static Command log(Supplier<String> supplier) {
+    return Commands.runOnce(() -> { DogLog.log(key, supplier.get()); });
   }
 
   /* The following map to the static utilities from the standard Commands class */

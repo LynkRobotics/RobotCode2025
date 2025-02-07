@@ -13,9 +13,12 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -23,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.TunableOption;
 import frc.robot.Constants;
 import frc.robot.Constants.Pose;
+import frc.robot.Constants.Pose.ReefFace;
 import frc.robot.Robot;
 
 public class PoseSubsystem extends SubsystemBase {
@@ -34,7 +38,7 @@ public class PoseSubsystem extends SubsystemBase {
     private final Field2d field;
     private final Pigeon2 gyro;
 
-    private static final TunableOption optUpdatePoseWithVisionAuto = new TunableOption("pose/Update with vision in Auto", false);
+    private static final TunableOption optUpdatePoseWithVisionAuto = new TunableOption("Pose/Update with vision in Auto", true);
 
     public enum Zone {
         SPEAKER,
@@ -53,18 +57,14 @@ public class PoseSubsystem extends SubsystemBase {
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);        
 
-        // Pose.rotationPID.enableContinuousInput(-180.0, 180.0);
-        // Pose.rotationPID.setIZone(Pose.rotationIZone); // Only use Integral term within this range
-        // Pose.rotationPID.reset();
-
-        // Pose.maintainPID.enableContinuousInput(-180.0, 180.0);
-        // Pose.maintainPID.setIZone(Pose.rotationIZone); // Only use Integral term within this range
-        // Pose.maintainPID.reset();
+        Pose.rotationPID.enableContinuousInput(-180.0, 180.0);
+        Pose.rotationPID.setIZone(Pose.rotationIZone); // Only use Integral term within this range
+        Pose.rotationPID.reset();
 
         poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d());
 
         field = new Field2d();
-        SmartDashboard.putData("pose/Field", field);
+        SmartDashboard.putData("Pose/Field", field);
 
         // RobotConfig config;
         // try {
@@ -113,9 +113,43 @@ public class PoseSubsystem extends SubsystemBase {
         return new Rotation2d(gyro.getYaw().getValue());
     }
 
+    public Rotation2d getGyroRoll() {
+        return new Rotation2d(gyro.getRoll().getValue());
+    }
+
+    public Rotation2d getGyroPitch() {
+        return new Rotation2d(gyro.getPitch().getValue());
+    }
+
     public void zeroGyro() {
         gyro.setYaw(0);
         DogLog.log("Pose/Gyro/Status", "Zeroed Gyro Yaw");
+    }
+
+    public static void angleErrorReset() {
+        angleErrorReset(Pose.rotationPID);
+    }
+
+    public static void angleErrorReset(PIDController pid) {
+        pid.reset();
+    }
+    public static double angleErrorToSpeed(Rotation2d angleError) {
+        return angleErrorToSpeed(angleError, Pose.rotationPID);
+    }
+
+    public static double angleErrorToSpeed(Rotation2d angleError, PIDController pid) {
+        double angleErrorDeg = angleError.getDegrees();
+        double correction = pid.calculate(angleErrorDeg);
+        double feedForward = Pose.rotationKS * Math.signum(correction);
+        double output = MathUtil.clamp(correction + feedForward, -1.0, 1.0);
+
+        DogLog.log("Pose/Angle Error", angleErrorDeg);
+        DogLog.log("Pose/Angle PID correction", correction);
+        DogLog.log("Pose/Angle feedforward", feedForward);
+        DogLog.log("Pose/Angle output", output);
+        
+        // Invert due to use as joystick controls
+        return -output;
     }
 
     public Pose2d getPose() {
@@ -148,6 +182,71 @@ public class PoseSubsystem extends SubsystemBase {
         }
     }
 
+    public static Translation2d otherAlliance(Translation2d position) {
+        // Rotationally symmetric this year
+        return new Translation2d(Constants.Pose.fieldLength - position.getX(), Constants.Pose.fieldWidth - position.getY());
+    }
+
+    public static Translation2d flipIfRed(Translation2d position) {
+        return Robot.isRed() ? otherAlliance(position) : position;
+    }
+
+    public static Rotation2d reefBearing(Translation2d position) {
+        Translation2d reefCenter = flipIfRed(Constants.Pose.reefCenter);
+        Translation2d relativePosition = position.minus(reefCenter);
+
+        return relativePosition.getAngle();
+    }
+
+    public static ReefFace nearestFace(Translation2d position) {
+        Rotation2d reefBearing = reefBearing(position);
+        if (Robot.isRed()) {
+            reefBearing.plus(Rotation2d.k180deg);
+        }
+        double bearingAngle = MathUtil.inputModulus(reefBearing.getDegrees(), -180, 180);
+
+        if (bearingAngle > 150 || bearingAngle < -150) {
+            return ReefFace.GH;
+        } else if (bearingAngle > 90) {
+            return ReefFace.EF;
+        } else if (bearingAngle > 30) {
+            return ReefFace.CD;
+        } else if (bearingAngle > -30) {
+            return ReefFace.AB;
+        } else if (bearingAngle > -90) {
+            return ReefFace.KL;
+        } else { // bearingAngle > -150
+            return ReefFace.IJ;
+        }
+    }
+
+    public static Rotation2d facePerpendicular(ReefFace face) {
+        if (face == ReefFace.CD) {
+            return Rotation2d.fromDegrees(60);
+        } else if (face == ReefFace.EF) {
+            return Rotation2d.fromDegrees(120);
+        } else if (face == ReefFace.GH) {
+            return Rotation2d.k180deg;
+        } else if (face == ReefFace.IJ) {
+            return Rotation2d.fromDegrees(-120);
+        } else if (face == ReefFace.KL) {
+            return Rotation2d.fromDegrees(-60);
+        } else { // face == ReefFace.AB
+            return Rotation2d.kZero;
+        }
+    }
+
+    public static boolean inReefElevatorZone(Translation2d position) {
+        Translation2d reefCenter = flipIfRed(Constants.Pose.reefCenter);
+        double distance = position.getDistance(reefCenter);
+
+        return distance <= Constants.Pose.reefElevatorZoneRadius;
+    }
+
+    public static boolean inWing(Translation2d position) {
+        return flipIfRed(position).getX() <= Constants.Pose.wingLength;
+    }
+
     @Override
     public void periodic() {
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
@@ -160,8 +259,26 @@ public class PoseSubsystem extends SubsystemBase {
         Pose2d pose = getPose();
         field.setRobotPose(pose);
 
-        SmartDashboard.putNumber("pose/Gyro", getHeading().getDegrees());
-        SmartDashboard.putString("pose/Pose", prettyPose(pose));
+        SmartDashboard.putString("Pose/Pose", prettyPose(pose));
+        SmartDashboard.putNumber("Pose/Gyro Yaw", getHeading().getDegrees());
+
+        double roll = getGyroRoll().getDegrees();
+        double pitch = getGyroPitch().getDegrees();
+        SmartDashboard.putNumber("Pose/Gyro Roll", -roll);
+        SmartDashboard.putNumber("Pose/Gyro Pitch", -pitch);
+        if (Math.abs(roll) > Pose.tiltError || Math.abs(pitch) > Pose.tiltError) {
+            SmartDashboard.putString("Pose/Tilt State", "#D61E1E");
+        } else if (Math.abs(roll) > Pose.tiltWarning || Math.abs(pitch) > Pose.tiltWarning) {
+            SmartDashboard.putString("Pose/Tilt State", "#D6BE1E");
+        } else {
+            SmartDashboard.putString("Pose/Tilt State", "#266336");
+        }
+
+        Translation2d position = pose.getTranslation();
+        SmartDashboard.putNumber("Pose/Reef Bearing", reefBearing(position).getDegrees());
+        SmartDashboard.putString("Pose/Nearest Face", nearestFace(position).toString());
+        SmartDashboard.putBoolean("Pose/Reef Elevator Zone", inReefElevatorZone(position));
+        SmartDashboard.putBoolean("Pose/In Wing", inReefElevatorZone(position));
 
         DogLog.log("Pose/Pose", pose);
         DogLog.log("Pose/Gyro/Heading", getHeading().getDegrees());
