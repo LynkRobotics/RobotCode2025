@@ -18,8 +18,10 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.ElevatorSubsystem.Stop;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -44,12 +46,14 @@ public class RobotContainer {
     // private final Trigger button = driver.button();
 
     /* Subsystems */
-    private final Swerve s_Swerve = new Swerve();
+    // private final Swerve s_Swerve = new Swerve();
+    private final Swerve s_Swerve;
     @SuppressWarnings ("unused")
     private final LEDSubsystem s_Led = new LEDSubsystem();
     private final VisionSubsystem s_Vision = new VisionSubsystem();
     @SuppressWarnings ("unused")
-    private final PoseSubsystem s_Pose = new PoseSubsystem(s_Swerve, s_Vision);
+    // private final PoseSubsystem s_Pose = new PoseSubsystem(s_Swerve, s_Vision);
+    private final PoseSubsystem s_Pose;
     @SuppressWarnings ("unused")
     private final ElevatorSubsystem s_Elevator = new ElevatorSubsystem();
     @SuppressWarnings ("unused")
@@ -65,6 +69,21 @@ public class RobotContainer {
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
+        DogLog.setOptions(
+            new DogLogOptions()
+            .withCaptureConsole(true)
+            .withCaptureDs(true)
+            .withCaptureNt(true)
+            .withLogEntryQueueCapacity(1000)
+            .withLogExtras(true)
+            .withNtPublish(true));
+
+        DogLog.log("Misc/RIO Serial Number", RobotController.getSerialNumber());
+        DogLog.log("Misc/Is Rocky?", Constants.isRocky);
+
+        s_Swerve = new Swerve();
+        s_Pose = new PoseSubsystem(s_Swerve, s_Vision);
+
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
                 s_Swerve,
@@ -91,21 +110,9 @@ public class RobotContainer {
         SmartDashboard.putData(LoggedCommands.runOnce("Zero Gyro", s_Pose::zeroGyro, s_Swerve));
         SmartDashboard.putData(LoggedCommands.runOnce("Reset heading", s_Pose::resetHeading, s_Swerve));
 
-        SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/SetSwerveCoast", s_Swerve::setMotorsToCoast, s_Swerve).ignoringDisable(true));
-        SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/SetSwerveBrake", s_Swerve::setMotorsToBrake, s_Swerve).ignoringDisable(true));
-        SmartDashboard.putData(LoggedCommands.run("autoSetup/SetSwerveAligned", s_Swerve::alignStraight, s_Swerve).ignoringDisable(true));
-
-        DogLog.setOptions(
-            new DogLogOptions()
-            .withCaptureConsole(true)
-            .withCaptureDs(true)
-            .withCaptureNt(true)
-            .withLogEntryQueueCapacity(1000)
-            .withLogExtras(true)
-            .withNtPublish(true));
-
-        DogLog.log("Misc/RIO Serial Number", RobotController.getSerialNumber());
-        DogLog.log("Misc/Is Rocky?", Constants.isRocky);
+        SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Coast", s_Swerve::setMotorsToCoast, s_Swerve).ignoringDisable(true));
+        SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Brake", s_Swerve::setMotorsToBrake, s_Swerve).ignoringDisable(true));
+        SmartDashboard.putData(LoggedCommands.run("autoSetup/Set Swerve Aligned", s_Swerve::alignStraight, s_Swerve).ignoringDisable(true));
 
         // Configure the button bindings
         configureButtonBindings();
@@ -121,6 +128,17 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         /* Driver Buttons */
+        final Trigger moveElevator = driver.leftBumper();
+        final Trigger L4 = driver.y();
+        final Trigger L3 = driver.x();
+        final Trigger L2 = driver.b();
+        final Trigger L1 = driver.a();
+
+        moveElevator.whileTrue(s_Elevator.GoToNext());
+        L4.onTrue(LoggedCommands.runOnce("Set stop to L4", () -> { s_Elevator.setNextStop(Stop.L4); }));
+        L3.onTrue(LoggedCommands.runOnce("Set stop to L3", () -> { s_Elevator.setNextStop(Stop.L3); }));
+        L2.onTrue(LoggedCommands.runOnce("Set stop to L2", () -> { s_Elevator.setNextStop(Stop.L2); }));
+        L1.onTrue(LoggedCommands.runOnce("Set stop to L1", () -> { s_Elevator.setNextStop(Stop.L1); }));
 
         SmartDashboard.putData("Disable speed limit", Commands.runOnce(s_Swerve::disableSpeedLimit));
     }

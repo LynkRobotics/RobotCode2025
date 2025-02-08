@@ -28,6 +28,10 @@ public final class Constants {
     public static final String latchSerial = "0327B9A2";
     public static final boolean isRocky = !RobotController.getSerialNumber().toString().matches(latchSerial);
 
+    // Elastic Notifications
+    public static final int warningTime = 4000;
+    public static final int errorTime = 7000;
+
     public static final class Swerve {
         public static final String swerveCanBus = "lynk";
 
@@ -35,7 +39,7 @@ public final class Constants {
         public static final double speedLimitRot = 0.50;
 
         public static final COTSTalonFXSwerveConstants chosenModule =  
-            COTSTalonFXSwerveConstants.SDS.MK4i.KrakenX60(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L2_5);
+            COTSTalonFXSwerveConstants.SDS.MK4i.KrakenX60(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L2);
 
         /* Drivetrain Constants */
         public static final double trackWidth = Units.inchesToMeters(isRocky ? 21.75 : 21.75);
@@ -120,13 +124,15 @@ public final class Constants {
         public static final NeutralModeValue driveNeutralMode = NeutralModeValue.Brake;
 
         /* Module Specific Constants */
+        public static final double maxAngleError = 2.0; // Degrees before we alert that the module is not aligned
+
         /* Front Left Module - Module 0 */
         public static final class Mod0 { 
             public static final int driveMotorID = 0;
             public static final int angleMotorID = 1;
             public static final int canCoderID = 0;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? 38.9 : 33.6);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? -137.63 : 33.9);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
@@ -137,7 +143,7 @@ public final class Constants {
             public static final int angleMotorID = 19;
             public static final int canCoderID = 1;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? -31.46 : -70.0);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? 147.91 : -72.2);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
@@ -148,7 +154,7 @@ public final class Constants {
             public static final int angleMotorID = 9;
             public static final int canCoderID = 2;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? -125.76 : 163.4);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? 61.61 : 162.6);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
@@ -159,47 +165,52 @@ public final class Constants {
             public static final int angleMotorID = 11;
             public static final int canCoderID = 3;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? 73.3 : -25.3);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? -106.78 : -25.4);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
     }
 
-    public class Pose {
+    public static final class Pose {
         public static final int pigeonID = 1;
 
-        public static final Rotation2d blueDumpAngle = new Rotation2d(Units.degreesToRadians(-38.0));
-        public static final Rotation2d redDumpAngle = new Rotation2d(Units.degreesToRadians(-142.0));
-        public static final double maxDumpError = 1.5; // degrees
-        public static final Rotation2d blueSlideAngle = new Rotation2d(Units.degreesToRadians(0.0));
-        public static final Rotation2d redSlideAngle = new Rotation2d(Units.degreesToRadians(180.0));
-        public static final double maxSlideError = 2.0; // degrees
-        public static final double maxShuttleError = 1.5; // degrees
-        public static final PIDController rotationPID = new PIDController(0.0070, 0.000, 0.0); // kI was 0.050 for NCCMP
-        public static final PIDController maintainPID = new PIDController(0.0040, 0.000, 0.0);
-        public static final double rotationKS = 0.015;
-        public static final double rotationIZone = 2.5; // degrees
+        public static final PIDController rotationPID = new PIDController(0.003, 0.0, 0.0); // kI was 0.050 for NCCMP 2024
+        public static final double rotationKS = 0.02;
+        public static final double rotationIZone = 2.0; // degrees
 
-        public static final Translation2d blueSpeakerLocation = new Translation2d(0.0, 5.548);
-        public static final Translation2d redSpeakerLocation = new Translation2d(16.579, 5.548);
-        public static final Translation2d blueShuttleLocation = new Translation2d(1.25, 6.7);
-        public static final Translation2d redShuttleLocation = new Translation2d(15.25, 6.7);
-        public static final Translation2d blueFarShuttleLocation = new Translation2d(7.5, 7.0);
-        public static final Translation2d redFarShuttleLocation = new Translation2d(9.1, 7.0);
-        public static final Translation2d blueAmpLocation = new Translation2d(1.84, 8.2);
-        public static final Translation2d redAmpLocation = new Translation2d(14.7, 8.2);
-        public static final double fieldLength = 16.54;
-        public static final double zoneMiddleStart = 5.3;
-        public static final double zoneSpeakerEnd = 5.8;
-        public static final double zoneSourceStart = 11.5;
-        public static final double zoneMiddleEnd = 12.5;
+        public static final double tiltWarning = 5.0;
+        public static final double tiltError = 10.0;
+
+        public static final double fieldWidth = Units.inchesToMeters(26*12 + 5);
+        public static final double fieldLength = Units.inchesToMeters(57*12 + 6.875);
+
+        public static enum ReefFace {
+            AB,
+            CD,
+            EF,
+            GH,
+            IJ,
+            KL
+        }
+
+        public static final double reefElevatorZoneRadius = Units.inchesToMeters(48.0);
+        public static final double wingLength = Units.inchesToMeters(280);
+
+        // Locations from the Blue Alliance perspective
+        public static final Translation2d reefCenter = new Translation2d(Units.inchesToMeters(176.75), fieldWidth / 2.0);
     }
 
     public static final class Vision {
         public static final String cameraName = "AprilTagCam";
-        public static final Transform3d robotToCam = new Transform3d(
-            new Translation3d(-0.148, 0.005, 0.325),
-            new Rotation3d(Units.degreesToRadians(1.2), Units.degreesToRadians(-30.7), Math.PI)); // As measured by PhotonVision
+        public static final Transform3d robotToCam =
+            isRocky ?                
+                new Transform3d(
+                    new Translation3d(Units.inchesToMeters(30.0/2.0 - 6.958), 0.0, Units.inchesToMeters(6.55)),
+                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(-30.7), 0.0))
+            :
+                new Transform3d(
+                    new Translation3d(-0.148, 0.005, 0.325),
+                    new Rotation3d(Units.degreesToRadians(1.2), Units.degreesToRadians(-30.7), Math.PI)); // As measured by PhotonVision
         public static final double centerToReferenceOffset = -Units.inchesToMeters(27.0/2.0 + 3.0); // Reference point is outside of bumper
     }
 
@@ -211,8 +222,8 @@ public final class Constants {
         /* CANBus */
         public static final String canBus = "rio";
         /* Motor Config Values */
-        public static final double peakForwardVoltage = 1.0; // TODO Raise peak voltage
-        public static final double peakReverseVoltage = -1.0; // TODO Raise peak voltage
+        public static final double peakForwardVoltage = 12;
+        public static final double peakReverseVoltage = -12;
         public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
         public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
 
@@ -229,16 +240,16 @@ public final class Constants {
         public static final double rotPerInch = 0.704; // Rotations to drive elevator one inch
 
         // TODO Tune PID / FF
-        public static final double RPSperVolt = 100.0; // RPS increase with every volt
-        public static final double kP = 0.0; // output per unit of error in position (output/rotation)
+        public static final double RPSperVolt = 7.9; // RPS increase with every volt
+        public static final double kP = 0.8; // output per unit of error in position (output/rotation)
         public static final double kI = 0.0; // output per unit of integrated error in position (output/(rotation*s))
         public static final double kD = 0.0; // output per unit of error in velocity (output/rps)
         public static final double kS = 0.0; // output to overcome static friction (output)
         public static final double kV = 1.0 / RPSperVolt; // output per unit of target velocity (output/rps)
         public static final double kA = 0.0; // output per unit of target acceleration (output/(rps/s))
-        public static final double kG = 0.0; // do not factory in gravity
-        public static final double cruiseVelocity = 5.0; // RPS
-        public static final double acceleration = cruiseVelocity * 0.5; // Accelerate in 0.5 seconds
+        public static final double kG = 0.4; // output to overcome gravity
+        public static final double cruiseVelocity = 20.0; // RPS
+        public static final double acceleration = cruiseVelocity * 0.25; // Accelerate in 0.25 seconds
     }
 
     public static final class EndAffector {
