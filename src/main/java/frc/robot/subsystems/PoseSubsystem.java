@@ -7,7 +7,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -66,28 +65,20 @@ public class PoseSubsystem extends SubsystemBase {
         field = new Field2d();
         SmartDashboard.putData("Pose/Field", field);
 
-        // RobotConfig config;
-        // try {
-            // config = RobotConfig.fromGUISettings();
-        // } catch (Exception e) {
-            // e.printStackTrace();
-            // return;
-        // }
-
-        // AutoBuilder.configure(
-            // this::getPose,
-            // this::setPose,
-            // s_Swerve::getSpeeds, 
-            // (speeds, feedforwards) -> s_Swerve.driveRobotRelativeAuto(speeds),
+        AutoBuilder.configure(
+            this::getPose,
+            this::setPose,
+            s_Swerve::getSpeeds, 
+            (speeds, feedforwards) -> s_Swerve.driveRobotRelativeAuto(speeds),
             // TODO Configure PIDs
-            // new PPHolonomicDriveController(
-                // new PIDConstants(8.0, 0.0, 0.0), // Translation PID constants
-                // new PIDConstants(1.5, 0.0, 0.0)  // Rotation PID constants
-            // ),
-            // config,
-            // Robot::isRed,
-            // s_Swerve // Reference to Swerve subsystem to set requirements
-        // );
+            new PPHolonomicDriveController(
+                new PIDConstants(8.0, 0.0, 0.0), // Translation PID constants
+                new PIDConstants(1.5, 0.0, 0.0)  // Rotation PID constants
+            ),
+            Constants.PathPlanner.robotConfig,
+            Robot::isRed,
+            s_Swerve // Reference to Swerve subsystem to set requirements
+        );
 
         PathPlannerLogging.setLogTargetPoseCallback((targetPose) -> {
             DogLog.log("Pose/Auto Target Pose", targetPose);
@@ -236,11 +227,13 @@ public class PoseSubsystem extends SubsystemBase {
         }
     }
 
-    public static boolean inReefElevatorZone(Translation2d position) {
+    public static double reefDistance(Translation2d position) {
         Translation2d reefCenter = flipIfRed(Constants.Pose.reefCenter);
-        double distance = position.getDistance(reefCenter);
+        return position.getDistance(reefCenter);
+    }
 
-        return distance <= Constants.Pose.reefElevatorZoneRadius;
+    public static boolean inReefElevatorZone(Translation2d position) {
+        return reefDistance(position) <= Constants.Pose.reefElevatorZoneRadius;
     }
 
     public static boolean inWing(Translation2d position) {
@@ -277,6 +270,7 @@ public class PoseSubsystem extends SubsystemBase {
         Translation2d position = pose.getTranslation();
         SmartDashboard.putNumber("Pose/Reef Bearing", reefBearing(position).getDegrees());
         SmartDashboard.putString("Pose/Nearest Face", nearestFace(position).toString());
+        SmartDashboard.putNumber("Pose/Reef Center Distance", reefDistance(position));
         SmartDashboard.putBoolean("Pose/Reef Elevator Zone", inReefElevatorZone(position));
         SmartDashboard.putBoolean("Pose/In Wing", inReefElevatorZone(position));
 

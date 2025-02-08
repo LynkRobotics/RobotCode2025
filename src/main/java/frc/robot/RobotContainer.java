@@ -5,9 +5,12 @@ import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
@@ -16,9 +19,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.LoggedAlert;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.ElevatorSubsystem.Stop;
@@ -57,11 +60,11 @@ public class RobotContainer {
     @SuppressWarnings ("unused")
     private final ElevatorSubsystem s_Elevator = new ElevatorSubsystem();
 
-    // private final SendableChooser<Command> autoChooser;
+    private final SendableChooser<Command> autoChooser;
 
-    // private static void autoNamedCommand(String name, Command command) {
-        // NamedCommands.registerCommand(name, LoggedCommands.logWithName(name + " (auto)", command));
-    // }
+    private static void autoNamedCommand(String name, Command command) {
+        NamedCommands.registerCommand(name, LoggedCommands.logWithName(name + " (auto)", command));
+    }
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -95,12 +98,12 @@ public class RobotContainer {
 
         // Default named commands for PathPlanner
         SmartDashboard.putNumber("auto/Startup delay", 0.0);
-        // autoNamedCommand("Startup delay", Commands.defer(() -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()));
-        // autoNamedCommand("Stop", Commands.runOnce(s_Swerve::stopSwerve));
+        autoNamedCommand("Startup delay", Commands.defer(() -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()));
+        autoNamedCommand("Stop", Commands.runOnce(s_Swerve::stopSwerve));
 
         // Build an autoChooser (defaults to none)
-        // autoChooser = AutoBuilder.buildAutoChooser();
-        // SmartDashboard.putData("auto/Auto Chooser", autoChooser);
+        autoChooser = AutoBuilder.buildAutoChooser();
+        SmartDashboard.putData("auto/Auto Chooser", autoChooser);
         // buildAutos(autoChooser);
 
         SmartDashboard.putNumber("TeleOp Speed Governor", 1.0);
@@ -131,12 +134,21 @@ public class RobotContainer {
         final Trigger L3 = driver.x();
         final Trigger L2 = driver.b();
         final Trigger L1 = driver.a();
+        final Trigger alignLeft = driver.povLeft();
 
         moveElevator.whileTrue(s_Elevator.GoToNext());
         L4.onTrue(LoggedCommands.runOnce("Set stop to L4", () -> { s_Elevator.setNextStop(Stop.L4); }));
         L3.onTrue(LoggedCommands.runOnce("Set stop to L3", () -> { s_Elevator.setNextStop(Stop.L3); }));
         L2.onTrue(LoggedCommands.runOnce("Set stop to L2", () -> { s_Elevator.setNextStop(Stop.L2); }));
         L1.onTrue(LoggedCommands.runOnce("Set stop to L1", () -> { s_Elevator.setNextStop(Stop.L1); }));
+
+        try {
+            PathPlannerPath path = PathPlannerPath.fromPathFile("Approach E");
+            PathConstraints constraints = new PathConstraints(2.0, 1.0, Units.degreesToRadians(360.0), Units.degreesToRadians(720.0));
+            alignLeft.whileTrue(LoggedCommands.logWithName("Auto Align Left", AutoBuilder.pathfindThenFollowPath(path, constraints)));
+        } catch (Exception exception) {
+            LoggedAlert.Error("PathPlanner", "Left Approach Bind Failure", exception.getMessage());
+        }
 
         SmartDashboard.putData("Disable speed limit", Commands.runOnce(s_Swerve::disableSpeedLimit));
     }
@@ -147,7 +159,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return null; // autoChooser.getSelected();
+        return autoChooser.getSelected();
     }
 
     // private void addAutoCommand(SendableChooser<Command> chooser, Command command) {

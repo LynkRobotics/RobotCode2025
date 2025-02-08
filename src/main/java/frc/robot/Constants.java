@@ -3,6 +3,8 @@ package frc.robot;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.RobotConfig;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -11,8 +13,12 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
@@ -105,7 +111,7 @@ public final class Constants {
 
         /* Swerve Profiling Values */
         /** Meters per Second */
-        public static final double maxSpeed = isRocky ? 5.0292 : 5.21208; 
+        public static final double maxSpeed = isRocky ? 4.572 : 5.21208; 
         /* These are theorectial values to start with, tune after
          * Kraken FOC (L1.0): ft/s = 12.4 | m/s = 3.77952
          * Kraken FOC (L1.5): ft/s = 14.2 | m/s = 4.32816
@@ -132,7 +138,7 @@ public final class Constants {
             public static final int angleMotorID = 1;
             public static final int canCoderID = 0;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? -137.63 : 33.9);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? -137.63 : 33.9 + 180.0);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
@@ -143,7 +149,7 @@ public final class Constants {
             public static final int angleMotorID = 19;
             public static final int canCoderID = 1;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? 147.91 : -72.2);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? 147.91 : -72.2 + 180.0);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
@@ -154,7 +160,7 @@ public final class Constants {
             public static final int angleMotorID = 9;
             public static final int canCoderID = 2;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? 61.61 : 162.6);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? 61.61 : 162.6 + 180.0);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
@@ -165,7 +171,7 @@ public final class Constants {
             public static final int angleMotorID = 11;
             public static final int canCoderID = 3;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? -106.78 : -25.4);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? -106.78 : -25.4 + 180.0);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
@@ -193,7 +199,7 @@ public final class Constants {
             KL
         }
 
-        public static final double reefElevatorZoneRadius = Units.inchesToMeters(48.0);
+        public static final double reefElevatorZoneRadius = Units.inchesToMeters(65.0);
         public static final double wingLength = Units.inchesToMeters(280);
 
         // Locations from the Blue Alliance perspective
@@ -206,11 +212,11 @@ public final class Constants {
             isRocky ?                
                 new Transform3d(
                     new Translation3d(Units.inchesToMeters(30.0/2.0 - 6.958), 0.0, Units.inchesToMeters(6.55)),
-                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(-30.7), 0.0))
+                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(-20.0), 0.0))
             :
                 new Transform3d(
-                    new Translation3d(-0.192, 0.0, 0.325),
-                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(0.0), Math.PI));
+                    new Translation3d(0.192, 0.0, 0.325),
+                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(0.0), 0.0));
     }
 
     public static final class Elevator {
@@ -264,5 +270,23 @@ public final class Constants {
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
             new TrapezoidProfile.Constraints(
                 kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+    }
+
+    public static final class PathPlanner {
+        public static final RobotConfig robotConfig = new RobotConfig(
+            Mass.ofRelativeUnits(isRocky ? 135.0 : 132.0, Pounds),
+            MomentOfInertia.ofRelativeUnits(isRocky ? 8.224 : 7.267, KilogramSquareMeters),
+            new ModuleConfig(
+                Swerve.wheelCircumference / 2.0,
+                Swerve.maxSpeed,
+                1.2,
+                DCMotor.getKrakenX60Foc(1),
+                Swerve.chosenModule.driveGearRatio,
+                Swerve.driveCurrentLimit,
+                1),
+            new Translation2d(Swerve.wheelBase / 2.0, Swerve.trackWidth / 2.0),
+            new Translation2d(Swerve.wheelBase / 2.0, -Swerve.trackWidth / 2.0),
+            new Translation2d(-Swerve.wheelBase / 2.0, Swerve.trackWidth / 2.0),
+            new Translation2d(-Swerve.wheelBase / 2.0, -Swerve.trackWidth / 2.0));
     }
 }
