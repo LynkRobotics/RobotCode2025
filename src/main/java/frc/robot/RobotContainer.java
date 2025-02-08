@@ -59,6 +59,8 @@ public class RobotContainer {
     private final PoseSubsystem s_Pose;
     @SuppressWarnings ("unused")
     private final ElevatorSubsystem s_Elevator = new ElevatorSubsystem();
+    @SuppressWarnings ("unused")
+    private final EndAffectorSubsystem s_EndAffector = new EndAffectorSubsystem();
 
     private final SendableChooser<Command> autoChooser;
 
