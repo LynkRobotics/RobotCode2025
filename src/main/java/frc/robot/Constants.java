@@ -209,14 +209,12 @@ public final class Constants {
                     new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(-30.7), 0.0))
             :
                 new Transform3d(
-                    new Translation3d(-0.148, 0.005, 0.325),
-                    new Rotation3d(Units.degreesToRadians(1.2), Units.degreesToRadians(-30.7), Math.PI)); // As measured by PhotonVision
-        public static final double centerToReferenceOffset = -Units.inchesToMeters(27.0/2.0 + 3.0); // Reference point is outside of bumper
+                    new Translation3d(-0.192, 0.0, 0.325),
+                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(0.0), Math.PI));
     }
 
     public static final class Elevator {
         /* IDs */
-        /* TODO Verify IDs */
         public static final int leftID = 4;
         public static final int rightID = 17;
         /* CANBus */
