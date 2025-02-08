@@ -56,7 +56,7 @@ public class ElevatorSubsystem extends SubsystemBase {
       Map.entry(Stop.L1, 26.0 - Constants.Elevator.endEffectorHeight),
       Map.entry(Stop.L2, 35.5 - Constants.Elevator.endEffectorHeight),
       Map.entry(Stop.L3, 52.5 - Constants.Elevator.endEffectorHeight),
-      Map.entry(Stop.L4, 77.0 - Constants.Elevator.endEffectorHeight)
+      Map.entry(Stop.L4, 77.5 - Constants.Elevator.endEffectorHeight)
     ));
 
     public ElevatorSubsystem() {
@@ -85,6 +85,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         mechanism = offset.append(new MechanismLigament2d("elevator", Units.inchesToMeters(Constants.Elevator.baseHeight), 90.0, Units.inchesToMeters(Constants.Elevator.thickness), new Color8Bit(0xBF, 0x57, 0x00)));
 
         SmartDashboard.putData("Elevator/mechanism", canvas);
+        initDefaultCommand();
     }
 
     public void setAsZero() {
