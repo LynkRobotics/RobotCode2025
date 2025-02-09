@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 import frc.robot.Constants;
 import frc.robot.commands.LoggedCommands;
+import frc.robot.subsystems.RobotState.CoralState;
+import frc.robot.subsystems.RobotState.GamePiece;
 
 public class ElevatorSubsystem extends SubsystemBase {
     private final TalonFX leftMotor;
@@ -278,6 +280,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         double followDifference = position - followPosition;
         double voltage = leftMotor.getMotorVoltage().getValueAsDouble();
 
+        // Detect motor stalls
         if (voltage != 0.0) {
             if (!inRange(position) && position == lastPosition) {
                 ++stallCount;
@@ -293,6 +296,11 @@ public class ElevatorSubsystem extends SubsystemBase {
             }
         }
         lastPosition = position;
+
+        // Automatically move to L1 when Coral is ready
+        if (RobotState.getActiveGamePiece() == GamePiece.CORAL && RobotState.getCoralState() == CoralState.READY && RobotState.getElevatorAtZero()) {
+            Move(Stop.L1).schedule();
+        }
 
         if (Math.abs(followDifference) >= positionDiffMax) {
             // This seems to be a semi-normal experience, perhaps due to latency in reporting motor position at faster speeds
