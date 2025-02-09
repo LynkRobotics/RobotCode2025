@@ -40,6 +40,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double lastPosition = 0.0;
     private double desiredPosition = -1.0;
     private boolean zeroing = false;
+    private boolean movingToSafety = false;
     
     private final double positionDiffMax = 0.5;
 
@@ -216,8 +217,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         return desiredPosition >= 0.0 && Math.abs(desiredPosition - position) <= Constants.Elevator.positionError;
     }
 
+    private Stop safetyStop() {
+        return !RobotState.getFinalSensor() ? Stop.L1 : Stop.SAFE;
+    }
+
     private boolean isSafe(double height) {
-        return height < (elevatorHeights.get(Stop.SAFE) + Constants.Elevator.safetyMargin);
+        return height < (elevatorHeights.get(safetyStop()) + Constants.Elevator.safetyMargin);
     }
 
     private boolean isSafe() {
@@ -273,14 +278,20 @@ public class ElevatorSubsystem extends SubsystemBase {
         rightMotor.setControl(new Follower(Constants.Elevator.leftID, true));
     }
 
-    public void initDefaultCommand() {
-        setDefaultCommand(
-            LoggedCommands.either("Elevator Default", 
+    public Command MoveToSafety() {
+        return LoggedCommands.sequence("Move Elevator to Safety", 
+            Commands.runOnce(() -> movingToSafety = true),
+            Commands.either(
                 Move(Stop.L1),
                 LoggedCommands.sequence("Zero and Idle",
                     FastZero(),
                     LoggedCommands.idle("Elevator holding at zero", this)),
-                () -> RobotState.getActiveGamePiece() == GamePiece.CORAL && RobotState.getCoralState() == CoralState.READY));
+                () -> RobotState.getActiveGamePiece() == GamePiece.CORAL && RobotState.getCoralState() == CoralState.READY))
+            .handleInterrupt(() -> movingToSafety = false);
+    }
+    
+    public void initDefaultCommand() {
+        setDefaultCommand(MoveToSafety());
     }
 
     @Override
@@ -291,12 +302,18 @@ public class ElevatorSubsystem extends SubsystemBase {
         double followDifference = position - followPosition;
         double voltage = leftMotor.getMotorVoltage().getValueAsDouble();
 
-        // Detect motor stalls
+        // Handle exceptions in cases other than elevator at rest
         if (voltage != 0.0) {
             if (RobotState.elevatorPathBlocked()) {
+                // Stop elevator when moving and blockage detected
                 LoggedAlert.Error("Elevator", "Blocked", "Elevator stopped due to blockage");
                 stop();
+            } else if (!isSafe() && !movingToSafety && !RobotState.raisedElevatorAllowable()) {
+                // Elevator is unsafe, not allowed to raised, and not already moving to safety
+                LoggedAlert.Warning("Elevator", "Safety", "Cancelling current command to return to safe position");
+                getCurrentCommand().cancel();
             } else if (!inRange(position) && position == lastPosition) {
+                // Motor not moving -- detect stalls
                 ++stallCount;
                 if (isStalled()) {
                     DogLog.log("Elevator/Status", "Stall detected");
@@ -315,6 +332,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         if (RobotState.getActiveGamePiece() == GamePiece.CORAL && RobotState.getCoralState() == CoralState.READY && RobotState.getElevatorAtZero()) {
             getCurrentCommand().cancel();
         }
+        // TODO Lower Elevator if we don't have Coral?
 
         if (Math.abs(followDifference) >= positionDiffMax) {
             // This seems to be a semi-normal experience, perhaps due to latency in reporting motor position at faster speeds

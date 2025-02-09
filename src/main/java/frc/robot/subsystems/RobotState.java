@@ -102,7 +102,7 @@ public class RobotState extends SubsystemBase {
         setActiveGamePiece(activePiece == GamePiece.CORAL ? GamePiece.ALGAE : GamePiece.CORAL);
     }
 
-    public boolean raisedElevatorAllowable() {
+    public static boolean raisedElevatorAllowable() {
         if (pose == null) pose = PoseSubsystem.getInstance();
         if (pose == null) return false;
         return pose.inReefElevatorZone() && pose.isUpright();
