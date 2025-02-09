@@ -180,6 +180,19 @@
               "period": 0.06,
               "data_type": "string"
             }
+          },
+          {
+            "title": "Active Game Piece",
+            "x": 544.0,
+            "y": 544.0,
+            "width": 288.0,
+            "height": 160.0,
+            "type": "Single Color View",
+            "properties": {
+              "topic": "/SmartDashboard/State/Active Game Piece",
+              "period": 0.06,
+              "data_type": "string"
+            }
           }
         ]
       }
@@ -213,34 +226,6 @@
               "topic": "/SmartDashboard/auto/Startup delay",
               "period": 0.06,
               "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "currentPose",
-            "x": 704.0,
-            "y": 0.0,
-            "width": 512.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/PathPlanner/currentPose",
-              "period": 0.06,
-              "data_type": "double[]",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "targetPose",
-            "x": 704.0,
-            "y": 128.0,
-            "width": 512.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/PathPlanner/targetPose",
-              "period": 0.06,
-              "data_type": "double[]",
               "show_submit_button": false
             }
           },
@@ -858,6 +843,20 @@
               "topic": "/SmartDashboard/Pose/Nearest Face",
               "period": 0.06,
               "data_type": "string",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Reef Center Distance",
+            "x": 672.0,
+            "y": 320.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Pose/Reef Center Distance",
+              "period": 0.06,
+              "data_type": "double",
               "show_submit_button": false
             }
           }
