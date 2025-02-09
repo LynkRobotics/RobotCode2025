@@ -17,9 +17,9 @@ import frc.robot.commands.LoggedCommands;
 
 public class RobotState extends SubsystemBase {
     private static RobotState instance;
-    private final PoseSubsystem pose;
-    private final CANdi candi;
-    private final DigitalInput indexSensor;
+    private static PoseSubsystem pose;
+    private static final CANdi candi;
+    private static final DigitalInput indexSensor;
     private static GamePiece activePiece = GamePiece.CORAL;
     private static boolean elevatorAtZero = false;
     private static CoralState coralState = CoralState.REJECTING;
@@ -39,16 +39,15 @@ public class RobotState extends SubsystemBase {
         READY,
         SCORING
     }
-  
-    public RobotState(PoseSubsystem pose) {
-        this.pose = pose;
 
+    static {
         indexSensor = new DigitalInput(Constants.indexSensorID);
         candi = new CANdi(Constants.candiID, Constants.candiBus);
 
-        // setDefaultCommand( Commands.none() );
         applyConfigs();
-
+    }
+    
+    public RobotState() {
         if (instance == null) {
             instance = this;
         } else {
@@ -61,7 +60,7 @@ public class RobotState extends SubsystemBase {
         return instance;
     }
 
-    public void applyConfigs() {
+    public static void applyConfigs() {
         var CANdiConfig = new CANdiConfiguration();
 
         CANdiConfig.DigitalInputs.S1CloseState = S1CloseStateValue.CloseWhenNotLow;
@@ -70,23 +69,23 @@ public class RobotState extends SubsystemBase {
         candi.getConfigurator().apply(CANdiConfig);
     }
 
-    public boolean getIntakeSensor() {
+    public static boolean getIntakeSensor() {
         return indexSensor.get();
     }
 
-    public boolean getFinalSensor() {
+    public static boolean getFinalSensor() {
         return candi.getS1Closed().getValue();
     }
     
-    public boolean getFlipperSensor() {
+    public static boolean getFlipperSensor() {
         return candi.getS2Closed().getValue();
     }
 
-    public boolean haveCoral() {
+    public static boolean haveCoral() {
         return !getIntakeSensor() || !getFlipperSensor() || !getFinalSensor();
     }
 
-    public boolean elevatorPathBlocked() {
+    public static boolean elevatorPathBlocked() {
         return (!getIntakeSensor() || !getFlipperSensor()) && !optOverrideElevatorPathBlocked.get();
     }
     
@@ -104,6 +103,8 @@ public class RobotState extends SubsystemBase {
     }
 
     public boolean raisedElevatorAllowable() {
+        if (pose == null) pose = PoseSubsystem.getInstance();
+        if (pose == null) return false;
         return pose.inReefElevatorZone() && pose.isUpright();
     }
 

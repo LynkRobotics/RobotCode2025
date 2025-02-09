@@ -86,7 +86,7 @@ public class RobotContainer {
         s_Swerve = new Swerve();
         s_Vision = new VisionSubsystem();
         s_Pose = new PoseSubsystem(s_Swerve, s_Vision);
-        s_RobotState = new RobotState(s_Pose);
+        s_RobotState = new RobotState();
         s_Elevator = new ElevatorSubsystem();
         s_EndEffector = new EndEffectorSubsystem();
         s_Led = new LEDSubsystem();
