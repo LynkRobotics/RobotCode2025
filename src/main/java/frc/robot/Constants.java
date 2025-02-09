@@ -30,6 +30,10 @@ public final class Constants {
     public static final double turnStickSensitivity = 1.00;
     public static final double aimingOverride = 0.001;
 
+    public static final int indexSensorID = 7;
+    public static final int candiID = 0;
+    public static final String candiBus = "rio";
+
     // The robot knows who it is, because it knows who it isn't
     public static final String latchSerial = "0327B9A2";
     public static final boolean isRocky = !RobotController.getSerialNumber().toString().matches(latchSerial);
@@ -231,8 +235,10 @@ public final class Constants {
         public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
         public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
 
-        public static final double positionError = 0.2;
-        public static final double slowVoltage = 1.0;
+        public static final double safetyMargin = 1.5;  // How many inches away from safe mark to still be considered safe
+        public static final double positionError = 0.2; // Allowable rotation error to be considered in position
+        public static final double stopError = 0.5;     // Allowable inches of error to be considered at a stop
+        public static final double slowVoltage = 1.0;   // Volts to move slowly to zero
 
         // NOTE Elevator height is measured from the ground to top of the carriage
         public static final double thickness = 2.0; // Thickness of the elevator (only for Mechanism2d visualization)
@@ -256,11 +262,9 @@ public final class Constants {
         public static final double acceleration = cruiseVelocity * 0.25; // Accelerate in 0.25 seconds
     }
 
-    public static final class EndAffector {
+    public static final class EndEffector {
         /* IDs */
         public static final int motorID = 20;
-        public static final int sensorID = 1; //TODO: ID
-        public static final int canDiID = 0; //TODO: ID
         /* CANbus */
         public static final String canBus = "rio";
         /* Motor Config Values */
@@ -268,11 +272,25 @@ public final class Constants {
         public static final double peakReverseVoltage = -12.0; 
         public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
         public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
-        /* Motor Speed Value */
-        public static final double intakeSpeed = 0.50;
-        public static final double outtakeSpeed = 1.00;
-        public static final double stopSpeed = 0.00;
-        public static final double reverseSpeed = -1.00;
+        /* Motor Control Values */
+        public static final double feedVoltage = -2.00;
+        public static final double advanceVoltage = -0.85;
+        public static final double scoreVoltage = -3.00;
+    }
+
+    public static final class Index {
+        /* IDs */
+        public static final int motorID = 13;
+        /* CANbus */
+        public static final String canBus = "rio";
+        /* Motor Config Values */
+        public static final double peakForwardVoltage = 12.0; 
+        public static final double peakReverseVoltage = -12.0; 
+        public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
+        public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
+        /* Motor Control Values */
+        public static final double intakeVoltage = -1.50;
+        public static final double rejectVoltage = 0.50;
     }
 
     public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot

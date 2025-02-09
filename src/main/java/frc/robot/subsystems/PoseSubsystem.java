@@ -236,8 +236,18 @@ public class PoseSubsystem extends SubsystemBase {
         return reefDistance(position) <= Constants.Pose.reefElevatorZoneRadius;
     }
 
+    public boolean inReefElevatorZone() {
+        return inReefElevatorZone(getPose().getTranslation());
+    }
+
     public static boolean inWing(Translation2d position) {
         return flipIfRed(position).getX() <= Constants.Pose.wingLength;
+    }
+
+    public boolean isUpright() {
+        double roll = getGyroRoll().getDegrees();
+        double pitch = getGyroPitch().getDegrees();
+        return (Math.abs(roll) < Pose.tiltError && Math.abs(pitch) < Pose.tiltError);
     }
 
     @Override
@@ -272,7 +282,7 @@ public class PoseSubsystem extends SubsystemBase {
         SmartDashboard.putString("Pose/Nearest Face", nearestFace(position).toString());
         SmartDashboard.putNumber("Pose/Reef Center Distance", reefDistance(position));
         SmartDashboard.putBoolean("Pose/Reef Elevator Zone", inReefElevatorZone(position));
-        SmartDashboard.putBoolean("Pose/In Wing", inReefElevatorZone(position));
+        SmartDashboard.putBoolean("Pose/In Wing", inWing(position));
 
         DogLog.log("Pose/Pose", pose);
         DogLog.log("Pose/Gyro/Heading", getHeading().getDegrees());

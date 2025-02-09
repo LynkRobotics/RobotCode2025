@@ -24,7 +24,7 @@ public class TeleopSwerve extends LoggedCommandBase {
     private PoseSubsystem s_Pose = null;
     private boolean autoAiming = false;
     private Rotation2d lastAngle = null;
-    private static final TunableOption optAutoReefAiming = new TunableOption("Automatically Aim at Reef", true);
+    private static final TunableOption optAutoReefAiming = new TunableOption("Automatically Aim at Reef", false);
 
     public TeleopSwerve(Swerve s_Swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, DoubleSupplier speedLimitRotSupplier) {
         super();

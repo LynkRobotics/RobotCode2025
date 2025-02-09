@@ -25,6 +25,7 @@ import frc.lib.util.LoggedAlert;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.ElevatorSubsystem.Stop;
+import frc.robot.subsystems.RobotState.GamePiece;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -37,7 +38,6 @@ import frc.robot.subsystems.ElevatorSubsystem.Stop;
  */
 public class RobotContainer {
     /* Controllers */
-    //private final Joystick driver = new Joystick(0);
     private final CommandXboxController driver = new CommandXboxController(0);
 
     /* Drive Controls */
@@ -45,23 +45,21 @@ public class RobotContainer {
     private final Supplier<Double> strafe = driver::getLeftX;
     private final Supplier<Double> rotation = driver::getRightX;
 
-    /* Driver Buttons */
-    // private final Trigger button = driver.button();
-
     /* Subsystems */
-    // private final Swerve s_Swerve = new Swerve();
+    @SuppressWarnings ("unused")
+    private final RobotState s_RobotState;
     private final Swerve s_Swerve;
     @SuppressWarnings ("unused")
-    private final LEDSubsystem s_Led = new LEDSubsystem();
-    private final VisionSubsystem s_Vision = new VisionSubsystem();
-    @SuppressWarnings ("unused")
-    // private final PoseSubsystem s_Pose = new PoseSubsystem(s_Swerve, s_Vision);
+    private final LEDSubsystem s_Led;
+    private final VisionSubsystem s_Vision;
     private final PoseSubsystem s_Pose;
+    private final ElevatorSubsystem s_Elevator;
     @SuppressWarnings ("unused")
-    private final ElevatorSubsystem s_Elevator = new ElevatorSubsystem();
+    private final EndEffectorSubsystem s_EndEffector;
     @SuppressWarnings ("unused")
-    private final EndAffectorSubsystem s_EndAffector = new EndAffectorSubsystem();
+    private final IndexSubsystem s_Index;
 
+    /* Autonomous Control */
     private final SendableChooser<Command> autoChooser;
 
     private static void autoNamedCommand(String name, Command command) {
@@ -84,8 +82,15 @@ public class RobotContainer {
         DogLog.log("Misc/RIO Serial Number", RobotController.getSerialNumber());
         DogLog.log("Misc/Is Rocky?", Constants.isRocky);
 
+        // Initial Subsystems
         s_Swerve = new Swerve();
+        s_Vision = new VisionSubsystem();
         s_Pose = new PoseSubsystem(s_Swerve, s_Vision);
+        s_RobotState = new RobotState(s_Pose);
+        s_Elevator = new ElevatorSubsystem();
+        s_EndEffector = new EndEffectorSubsystem();
+        s_Led = new LEDSubsystem();
+        s_Index = new IndexSubsystem();
 
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
@@ -132,17 +137,30 @@ public class RobotContainer {
     private void configureButtonBindings() {
         /* Driver Buttons */
         final Trigger moveElevator = driver.leftBumper();
+        final Trigger score = driver.rightBumper();
         final Trigger L4 = driver.y();
         final Trigger L3 = driver.x();
         final Trigger L2 = driver.b();
         final Trigger L1 = driver.a();
         final Trigger alignLeft = driver.povLeft();
+        final Trigger toggleGamePiece = driver.back();
 
         moveElevator.whileTrue(s_Elevator.GoToNext());
-        L4.onTrue(LoggedCommands.runOnce("Set stop to L4", () -> { s_Elevator.setNextStop(Stop.L4); }));
-        L3.onTrue(LoggedCommands.runOnce("Set stop to L3", () -> { s_Elevator.setNextStop(Stop.L3); }));
-        L2.onTrue(LoggedCommands.runOnce("Set stop to L2", () -> { s_Elevator.setNextStop(Stop.L2); }));
-        L1.onTrue(LoggedCommands.runOnce("Set stop to L1", () -> { s_Elevator.setNextStop(Stop.L1); }));
+        score.onTrue(RobotState.ScoreGamePiece());
+        L4.onTrue(LoggedCommands.runOnce("Set stop to L4", () -> s_Elevator.setNextStop(Stop.L4)));
+        L3.onTrue(
+            Commands.either(
+                LoggedCommands.runOnce("Set stop to L3 Algae", () -> s_Elevator.setNextStop(Stop.L3_ALGAE)),
+                LoggedCommands.runOnce("Set stop to L3", () -> s_Elevator.setNextStop(Stop.L3)),
+                () -> RobotState.getActiveGamePiece() == GamePiece.ALGAE));
+        L2.onTrue(
+            Commands.either(
+                LoggedCommands.runOnce("Set stop to L2 Algae", () -> s_Elevator.setNextStop(Stop.L2_ALGAE)),
+                LoggedCommands.runOnce("Set stop to L2", () -> s_Elevator.setNextStop(Stop.L2)),
+                () -> RobotState.getActiveGamePiece() == GamePiece.ALGAE));
+        L1.onTrue(LoggedCommands.runOnce("Set stop to L1", () -> s_Elevator.setNextStop(Stop.L1)));
+
+        toggleGamePiece.onTrue(RobotState.ToggleGamePiece());
 
         try {
             PathPlannerPath path = PathPlannerPath.fromPathFile("Approach E");

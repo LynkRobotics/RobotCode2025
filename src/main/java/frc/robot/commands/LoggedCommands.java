@@ -47,9 +47,8 @@ public class LoggedCommands {
   }
 
   public static Command logWithName(String name, Command command) {
-    Command newCommand = loggedCommand(command);
-    newCommand.setName(name);
-    return newCommand;
+    command.setName(name);
+    return loggedCommand(command);
   }
 
   /* Custom convenience commands */

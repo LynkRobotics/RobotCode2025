@@ -31,31 +31,36 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final PositionVoltage positionVoltage = new PositionVoltage(0.0).withEnableFOC(true);
     private final MechanismLigament2d mechanism;
 
-    private Stop nextStop = Stop.NEAR_ZERO;
+    private Stop nextStop = Stop.SAFE;
 
     private int stallCount = 0;
     private final int stallMax = 3;
     private double lastPosition = 0.0;
     private double desiredPosition = -1.0;
+    private boolean zeroing = false;
     
     private final double positionDiffMax = 0.5;
 
     public enum Stop {
         // Intake occurs at zero
-        NEAR_ZERO,
+        SAFE,
         L1,
         L2,
+        L2_ALGAE,
         L3,
+        L3_ALGAE,
         L4
     };
 
     // TODO Refine heights
     // Elevator heights are defined in terms off inches that the elevator is off the ground
     private final EnumMap<Stop, Double> elevatorHeights = new EnumMap<>(Map.ofEntries(
-      Map.entry(Stop.NEAR_ZERO, Constants.Elevator.baseHeight + 2.5),
+      Map.entry(Stop.SAFE, Constants.Elevator.baseHeight + 2.5),
       Map.entry(Stop.L1, 26.0 - Constants.Elevator.endEffectorHeight),
       Map.entry(Stop.L2, 35.5 - Constants.Elevator.endEffectorHeight),
+      Map.entry(Stop.L2_ALGAE, 38.0 - Constants.Elevator.endEffectorHeight),
       Map.entry(Stop.L3, 52.5 - Constants.Elevator.endEffectorHeight),
+      Map.entry(Stop.L3_ALGAE, 55.0 - Constants.Elevator.endEffectorHeight),
       Map.entry(Stop.L4, 77.5 - Constants.Elevator.endEffectorHeight)
     ));
 
@@ -89,27 +94,33 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public void setAsZero() {
+        DogLog.log("Elevator/Status", "Set as Zero");
+        RobotState.setElevatorAtZero(true);
         leftMotor.setPosition(0);
         rightMotor.setPosition(0);
     }
 
     public Command SetZero() {
-        return LoggedCommands.runOnce("Set Elevator Zero", this::setAsZero).ignoringDisable(true);
+        return LoggedCommands.runOnce("Set Elevator Zero", 
+            () -> {
+                setAsZero();
+            }).ignoringDisable(true);
     }
 
     public Command Zero() {
         return LoggedCommands.sequence("Zero Elevator",
+            Commands.runOnce(() -> zeroing = true),
             Commands.deadline(
                 LoggedCommands.waitUntil("Wait for stall", this::isStalled),
-                Lower()),
+                Lower()).handleInterrupt(() -> zeroing = false),
             SetZero());
     }
 
     public Command FastZero() {
         return LoggedCommands.sequence("Fast Zero",
             Commands.deadline(
-                LoggedCommands.waitUntil("Wait for near zero", () -> { return atStop(Stop.NEAR_ZERO); }),
-                Move(Stop.NEAR_ZERO)),
+                LoggedCommands.waitUntil("Wait for elevator in safe zone", this::isSafe),
+                Move(Stop.SAFE)),
             Zero());
     }
 
@@ -134,31 +145,33 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     private void stop() {
+        DogLog.log("Elevator/Status", "Stopped");
         leftMotor.stopMotor();
-        // rightMotor.stopMotor();
     }
 
     private void setVoltage(double voltage) {
         stallCount = 0;
         desiredPosition = -1.0;
+        DogLog.log("Elevator/Status", "Set voltage " + String.format("%1.2f", voltage));
+        RobotState.setElevatorAtZero(false);
         leftMotor.setControl(voltageOut.withOutput(voltage));
     }
 
     public Command Move(Stop stop) {
-        return LoggedCommands.runOnce("Move Elevator to " + stop,
-            () -> {
-                setHeight(elevatorHeights.get(stop));
-            },
-            this);
+        return LoggedCommands.sequence("Move Elevator to " + stop,
+            Commands.runOnce(() -> setHeight(elevatorHeights.get(stop)), this),
+            LoggedCommands.idle("Idle to hold elevator", this));
     }
 
     public Command GoToNext() {
         return LoggedCommands.sequence("Move Elevator to stop",
             LoggedCommands.log(() -> "Next stop: " + nextStop),
-            Commands.runOnce(() -> { setHeight(elevatorHeights.get(nextStop)); }, this));
+            Commands.runOnce(() -> setHeight(elevatorHeights.get(nextStop)), this),
+            LoggedCommands.idle("Idle to hold elevator", this));
     }
 
     public void setNextStop(Stop stop) {
+        DogLog.log("Elevator/Status", "Next stop = " + stop);
         nextStop = stop;
     }
 
@@ -184,6 +197,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     private void setPosition(double position) {
         stallCount = 0;
         desiredPosition = position;
+        DogLog.log("Elevator/Status", "Move to position " + String.format("%1.2f", position));
+        RobotState.setElevatorAtZero(false);
         leftMotor.setControl(positionVoltage.withPosition(position));
     }
     
@@ -191,8 +206,20 @@ public class ElevatorSubsystem extends SubsystemBase {
         return desiredPosition >= 0.0 && Math.abs(desiredPosition - position) <= Constants.Elevator.positionError;
     }
 
+    private boolean isSafe(double height) {
+        return height < (elevatorHeights.get(Stop.SAFE) + Constants.Elevator.safetyMargin);
+    }
+
+    private boolean isSafe() {
+        return isSafe(getHeight());
+    }
+
     private boolean atStop(Stop stop) {
-        return Math.abs(elevatorHeights.get(stop) - getHeight()) <= Constants.Elevator.positionError;
+        double stopError = Math.abs(elevatorHeights.get(stop) - getHeight());
+        // The safe stop is just a guideline, and has a wider margin for error
+        double allowableError = stop == Stop.SAFE ? 3 * Constants.Elevator.positionError : Constants.Elevator.positionError;
+
+        return stopError <= allowableError;
     }
 
     private double getHeight(double position) {
@@ -255,7 +282,10 @@ public class ElevatorSubsystem extends SubsystemBase {
             if (!inRange(position) && position == lastPosition) {
                 ++stallCount;
                 if (isStalled()) {
-                    LoggedAlert.Warning("Elevator", "Elevator Stalled", "Elevator stopped due to stall");
+                    DogLog.log("Elevator/Status", "Stall detected");
+                    if (!zeroing) {
+                        LoggedAlert.Warning("Elevator", "Elevator Stalled", "Elevator stopped due to stall");
+                    }
                     stop();
                 }
             } else {
@@ -265,7 +295,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         lastPosition = position;
 
         if (Math.abs(followDifference) >= positionDiffMax) {
-            LoggedAlert.Warning("Elevator", "Elevator Unequal", "Elevator motor position difference of " + String.format("%01.2f", followDifference) + " exceeds limit");
+            // This seems to be a semi-normal experience, perhaps due to latency in reporting motor position at faster speeds
+            // The motors are mechanically connected, so it really should be impossible to actually be out of sync
+            // LoggedAlert.Warning("Elevator", "Elevator Unequal", "Elevator motor position difference of " + String.format("%01.2f", followDifference) + " exceeds limit");
             // stop();
         }
 
@@ -281,6 +313,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Elevator/Stalled", isStalled());
         SmartDashboard.putBoolean("Elevator/Moving", voltage != 0.0);
         SmartDashboard.putBoolean("Elevator/In Range", inRange(position));
+
+        SmartDashboard.putBoolean("Elevator/Safe", isSafe(height));
+        SmartDashboard.putBoolean("Elevator/L1", atStop(Stop.L1));
+        SmartDashboard.putBoolean("Elevator/L2", atStop(Stop.L2));
+        SmartDashboard.putBoolean("Elevator/L3", atStop(Stop.L3));
+        SmartDashboard.putBoolean("Elevator/L4", atStop(Stop.L4));
 
         mechanism.setLength(Units.inchesToMeters(height));
     }
