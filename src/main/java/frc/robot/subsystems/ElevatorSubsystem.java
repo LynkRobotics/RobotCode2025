@@ -154,6 +154,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     private void setVoltage(double voltage) {
         stallCount = 0;
         desiredPosition = -1.0;
+        if (RobotState.elevatorPathBlocked()) {
+            LoggedAlert.Error("Elevator", "Blocked", "Cannot set voltage on elevator while blocked");
+            return;
+        }
         DogLog.log("Elevator/Status", "Set voltage " + String.format("%1.2f", voltage));
         RobotState.setElevatorAtZero(false);
         leftMotor.setControl(voltageOut.withOutput(voltage));
@@ -199,6 +203,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     private void setPosition(double position) {
         stallCount = 0;
         desiredPosition = position;
+        if (RobotState.elevatorPathBlocked()) {
+            LoggedAlert.Error("Elevator", "Blocked", "Cannot move elevator while blocked");
+            return;
+        }
         DogLog.log("Elevator/Status", "Move to position " + String.format("%1.2f", position));
         RobotState.setElevatorAtZero(false);
         leftMotor.setControl(positionVoltage.withPosition(position));
@@ -285,7 +293,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         // Detect motor stalls
         if (voltage != 0.0) {
-            if (!inRange(position) && position == lastPosition) {
+            if (RobotState.elevatorPathBlocked()) {
+                LoggedAlert.Error("Elevator", "Blocked", "Elevator stopped due to blockage");
+                stop();
+            } else if (!inRange(position) && position == lastPosition) {
                 ++stallCount;
                 if (isStalled()) {
                     DogLog.log("Elevator/Status", "Stall detected");
