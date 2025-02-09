@@ -267,9 +267,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void initDefaultCommand() {
         setDefaultCommand(
-            LoggedCommands.sequence("Zero and Idle",
-                FastZero(),
-                LoggedCommands.idle("Elevator holding at zero", this)));
+            LoggedCommands.either("Elevator Default", 
+                Move(Stop.L1),
+                LoggedCommands.sequence("Zero and Idle",
+                    FastZero(),
+                    LoggedCommands.idle("Elevator holding at zero", this)),
+                () -> RobotState.getActiveGamePiece() == GamePiece.CORAL && RobotState.getCoralState() == CoralState.READY));
     }
 
     @Override
@@ -297,9 +300,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
         lastPosition = position;
 
-        // Automatically move to L1 when Coral is ready
+        // If we have Coral ready, and the Elevator is still at zero, cancel the current default command so that it runs again with the L1 default
         if (RobotState.getActiveGamePiece() == GamePiece.CORAL && RobotState.getCoralState() == CoralState.READY && RobotState.getElevatorAtZero()) {
-            Move(Stop.L1).schedule();
+            getCurrentCommand().cancel();
         }
 
         if (Math.abs(followDifference) >= positionDiffMax) {
