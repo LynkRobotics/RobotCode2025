@@ -166,6 +166,7 @@ public class RobotContainer {
             PathPlannerPath path = PathPlannerPath.fromPathFile("Approach E");
             PathConstraints constraints = new PathConstraints(2.0, 1.0, Units.degreesToRadians(360.0), Units.degreesToRadians(720.0));
             alignLeft.whileTrue(LoggedCommands.logWithName("Auto Align Left", AutoBuilder.pathfindThenFollowPath(path, constraints)));
+            SmartDashboard.putData(LoggedCommands.logWithName("Auto Align Left", AutoBuilder.pathfindThenFollowPath(path, constraints)));
         } catch (Exception exception) {
             LoggedAlert.Error("PathPlanner", "Left Approach Bind Failure", exception.getMessage());
         }
