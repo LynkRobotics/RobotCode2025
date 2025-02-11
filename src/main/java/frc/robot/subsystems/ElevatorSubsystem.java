@@ -58,7 +58,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     // TODO Refine heights
     // Elevator heights are defined in terms off inches that the elevator is off the ground
     private final EnumMap<Stop, Double> elevatorHeights = new EnumMap<>(Map.ofEntries(
-      Map.entry(Stop.SAFE, Constants.Elevator.baseHeight + 2.5),
+      Map.entry(Stop.SAFE, Constants.Elevator.baseHeight + 5.0),
       Map.entry(Stop.L1, 26.0 - Constants.Elevator.endEffectorHeight),
       Map.entry(Stop.L2, 35.5 - Constants.Elevator.endEffectorHeight),
       Map.entry(Stop.L2_ALGAE, 38.0 - Constants.Elevator.endEffectorHeight),
