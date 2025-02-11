@@ -167,6 +167,8 @@ public class RobotState extends SubsystemBase {
             if (getFlipperSensor()) {
                 coralState = CoralState.READY;
             }
+        } else if (coralState == CoralState.READY && !getFlipperSensor()) {
+            coralState = CoralState.ADVANCING;
         } else if (coralState == CoralState.READY || coralState == CoralState.SCORING) {
             if (getFinalSensor()) {
                 coralState = CoralState.REJECTING;
