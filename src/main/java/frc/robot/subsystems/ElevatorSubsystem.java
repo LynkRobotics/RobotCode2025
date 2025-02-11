@@ -311,7 +311,11 @@ public class ElevatorSubsystem extends SubsystemBase {
             } else if (!isSafe() && !movingToSafety && !RobotState.raisedElevatorAllowable()) {
                 // Elevator is unsafe, not allowed to raised, and not already moving to safety
                 LoggedAlert.Warning("Elevator", "Safety", "Cancelling current command to return to safe position");
-                getCurrentCommand().cancel();
+                Command currentCommand = getCurrentCommand();
+                
+                if (currentCommand != null) {
+                    currentCommand.cancel();
+                }
             } else if (!inRange(position) && position == lastPosition) {
                 // Motor not moving -- detect stalls
                 ++stallCount;
@@ -330,7 +334,11 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         // If we have Coral ready, and the Elevator is still at zero, cancel the current default command so that it runs again with the L1 default
         if (RobotState.getActiveGamePiece() == GamePiece.CORAL && RobotState.getCoralState() == CoralState.READY && RobotState.getElevatorAtZero()) {
-            getCurrentCommand().cancel();
+            Command currentCommand = getCurrentCommand();
+            if (currentCommand != null) {
+                currentCommand.cancel();
+                RobotState.setElevatorAtZero(false);
+            }
         }
         // TODO Lower Elevator if we don't have Coral?
 
