@@ -25,6 +25,7 @@ public class RobotState extends SubsystemBase {
     private static CoralState coralState = CoralState.REJECTING;
 
     private static final TunableOption optOverrideElevatorPathBlocked = new TunableOption("Override Elevator Path Blocked", false);
+    private static final TunableOption optOverrideReefElevatorZone = new TunableOption("Override Reef Safe Elevator Zone", true);
 
     public enum GamePiece {
         CORAL,
@@ -105,7 +106,7 @@ public class RobotState extends SubsystemBase {
     public static boolean raisedElevatorAllowable() {
         if (pose == null) pose = PoseSubsystem.getInstance();
         if (pose == null) return false;
-        return pose.inReefElevatorZone() && pose.isUpright();
+        return (pose.inReefElevatorZone() || optOverrideReefElevatorZone.get()) && pose.isUpright();
     }
 
     public static void setElevatorAtZero(boolean atZero) {
