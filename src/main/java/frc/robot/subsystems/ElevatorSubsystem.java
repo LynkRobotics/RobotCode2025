@@ -52,7 +52,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         L2_ALGAE,
         L3,
         L3_ALGAE,
-        L4
+        L4,
+        L4_SCORE
     };
 
     // TODO Refine heights
@@ -60,11 +61,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final EnumMap<Stop, Double> elevatorHeights = new EnumMap<>(Map.ofEntries(
       Map.entry(Stop.SAFE, Constants.Elevator.baseHeight + 5.0),
       Map.entry(Stop.L1, 26.0 - Constants.Elevator.endEffectorHeight),
-      Map.entry(Stop.L2, 35.5 - Constants.Elevator.endEffectorHeight),
+      Map.entry(Stop.L2, 34.5 - Constants.Elevator.endEffectorHeight),
       Map.entry(Stop.L2_ALGAE, 38.0 - Constants.Elevator.endEffectorHeight),
-      Map.entry(Stop.L3, 52.5 - Constants.Elevator.endEffectorHeight),
+      Map.entry(Stop.L3, 50.0 - Constants.Elevator.endEffectorHeight),
       Map.entry(Stop.L3_ALGAE, 55.0 - Constants.Elevator.endEffectorHeight),
-      Map.entry(Stop.L4, 77.5 - Constants.Elevator.endEffectorHeight)
+      Map.entry(Stop.L4, 75.0 - Constants.Elevator.endEffectorHeight),
+      Map.entry(Stop.L4_SCORE, 77.75 - Constants.Elevator.endEffectorHeight)
     ));
 
     public ElevatorSubsystem() {
@@ -331,6 +333,10 @@ public class ElevatorSubsystem extends SubsystemBase {
             }
         }
         lastPosition = position;
+
+        if (RobotState.getActiveGamePiece() == GamePiece.CORAL && RobotState.getCoralState() == CoralState.SCORING && atStop(Stop.L4)) {
+            Move(Stop.L4_SCORE).schedule();
+        }
 
         // If we have Coral ready, and the Elevator is still at zero, cancel the current default command so that it runs again with the L1 default
         if (RobotState.getActiveGamePiece() == GamePiece.CORAL && RobotState.getCoralState() == CoralState.READY && RobotState.getElevatorAtZero()) {

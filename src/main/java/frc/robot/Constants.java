@@ -235,10 +235,10 @@ public final class Constants {
         public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
         public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
 
-        public static final double safetyMargin = 1.5;  // How many inches away from safe mark to still be considered safe
-        public static final double positionError = 0.2; // Allowable rotation error to be considered in position
-        public static final double stopError = 0.5;     // Allowable inches of error to be considered at a stop
-        public static final double slowVoltage = 1.0;   // Volts to move slowly to zero
+        public static final double safetyMargin = 1.5;   // How many inches away from safe mark to still be considered safe
+        public static final double positionError = 0.35; // Allowable rotation error to be considered in position
+        public static final double stopError = 0.5;      // Allowable inches of error to be considered at a stop
+        public static final double slowVoltage = 1.0;    // Volts to move slowly to zero
 
         // NOTE Elevator height is measured from the ground to top of the carriage
         public static final double thickness = 2.0; // Thickness of the elevator (only for Mechanism2d visualization)
