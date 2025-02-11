@@ -316,7 +316,7 @@ public final class Constants {
             new ModuleConfig(
                 Swerve.wheelCircumference / 2.0,
                 Swerve.maxSpeed,
-                1.2,
+                1.916, // 3847 Spectrum Vex GripLock v2 CoF
                 DCMotor.getKrakenX60Foc(1),
                 Swerve.chosenModule.driveGearRatio,
                 Swerve.driveCurrentLimit,
