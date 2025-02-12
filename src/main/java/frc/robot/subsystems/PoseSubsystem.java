@@ -72,7 +72,7 @@ public class PoseSubsystem extends SubsystemBase {
             (speeds, feedforwards) -> s_Swerve.driveRobotRelativeAuto(speeds),
             // TODO Configure PIDs
             new PPHolonomicDriveController(
-                new PIDConstants(10.0, 0.0, 0.0), // Translation PID constants
+                new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
                 new PIDConstants(5, 0.0, 0.0)  // Rotation PID constants
             ),
             Constants.PathPlanner.robotConfig,
