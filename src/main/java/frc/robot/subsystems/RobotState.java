@@ -103,6 +103,7 @@ public class RobotState extends SubsystemBase {
         setActiveGamePiece(activePiece == GamePiece.CORAL ? GamePiece.ALGAE : GamePiece.CORAL);
     }
 
+    // TODO Consider allowing a range, so that Elevator doesn't oscillate  
     public static boolean raisedElevatorAllowable() {
         if (pose == null) pose = PoseSubsystem.getInstance();
         if (pose == null) return false;

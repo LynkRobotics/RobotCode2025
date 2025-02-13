@@ -10,6 +10,8 @@ import com.pathplanner.lib.path.PathPlannerPath;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotController;
@@ -121,6 +123,8 @@ public class RobotContainer {
         SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Coast", s_Swerve::setMotorsToCoast, s_Swerve).ignoringDisable(true));
         SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Brake", s_Swerve::setMotorsToBrake, s_Swerve).ignoringDisable(true));
         SmartDashboard.putData(LoggedCommands.run("autoSetup/Set Swerve Aligned", s_Swerve::alignStraight, s_Swerve).ignoringDisable(true));
+
+        SmartDashboard.putData("Test PID Swerve", new PIDSwerve(s_Swerve, s_Pose, new Pose2d(4.5, 1.5, Rotation2d.kCCW_90deg)));
 
         // Configure the button bindings
         configureButtonBindings();
