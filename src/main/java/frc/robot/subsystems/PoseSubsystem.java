@@ -232,6 +232,10 @@ public class PoseSubsystem extends SubsystemBase {
         return position.getDistance(reefCenter);
     }
 
+    public static double distanceTo(Translation2d target) {
+        return PoseSubsystem.getInstance().getPose().getTranslation().getDistance(target);
+    }
+
     public static boolean inReefElevatorZone(Translation2d position) {
         return reefDistance(position) <= Constants.Pose.reefElevatorZoneRadius;
     }

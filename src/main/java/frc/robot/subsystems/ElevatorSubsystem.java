@@ -10,6 +10,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -41,6 +42,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double desiredPosition = -1.0;
     private boolean zeroing = false;
     private boolean movingToSafety = false;
+    private boolean autoUp = false;
     
     private final double positionDiffMax = 0.5;
 
@@ -182,6 +184,23 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void setNextStop(Stop stop) {
         DogLog.log("Elevator/Status", "Next stop = " + stop);
         nextStop = stop;
+    }
+
+    public Command AutoElevatorUp(Translation2d target) {
+        return LoggedCommands.startRun(
+            "Auto Elevator Up",
+            () -> autoUp = false,
+            () -> {
+                if (!autoUp && PoseSubsystem.distanceTo(target) <= Constants.Pose.autoUpDistance) {
+                    setHeight(elevatorHeights.get(nextStop));
+                    autoUp = true;
+                }
+            },
+            this);
+    };
+
+    public Command WaitForNext() {
+        return LoggedCommands.waitUntil("Wait for Elevator at next stop", () -> atStop(nextStop));
     }
 
     private boolean isStalled() {

@@ -103,6 +103,7 @@ public class RobotState extends SubsystemBase {
         setActiveGamePiece(activePiece == GamePiece.CORAL ? GamePiece.ALGAE : GamePiece.CORAL);
     }
 
+    // TODO Consider allowing a range, so that Elevator doesn't oscillate  
     public static boolean raisedElevatorAllowable() {
         if (pose == null) pose = PoseSubsystem.getInstance();
         if (pose == null) return false;
@@ -140,9 +141,13 @@ public class RobotState extends SubsystemBase {
 
     @Override
     public void periodic() {
-        DogLog.log("State/Index sensor", getIntakeSensor());
-        DogLog.log("State/Flipper sensor", getFlipperSensor());
-        DogLog.log("State/Final sensor", getFinalSensor());
+        boolean intakeSensor = getIntakeSensor();
+        boolean flipperSensor = getFlipperSensor();
+        boolean finalSensor = getFinalSensor();
+
+        DogLog.log("State/Index sensor", intakeSensor);
+        DogLog.log("State/Flipper sensor", flipperSensor);
+        DogLog.log("State/Final sensor", finalSensor);
         DogLog.log("State/Coral State", coralState);
 
         SmartDashboard.putString("State/Active Game Piece", getActiveGamePiece() == GamePiece.CORAL ? "#FFFFFF" : "#48B6AB");
@@ -150,29 +155,17 @@ public class RobotState extends SubsystemBase {
         if (activePiece != GamePiece.CORAL) {
             // TODO Revisit when we can transition in various circumstances
             coralState = CoralState.REJECTING;
-        } else if (coralState == CoralState.REJECTING) {
-            if (elevatorAtZero) {
-                coralState = CoralState.INTAKING;
-            }
-        } else if (coralState == CoralState.INTAKING) {
-            if (!elevatorAtZero) {
-                coralState = CoralState.REJECTING;
-            } else if (!getIntakeSensor()) {
-                coralState = CoralState.FEEDING;
-            }
-        } else if (coralState == CoralState.FEEDING) {
-            if (getIntakeSensor()) {
-                coralState = CoralState.ADVANCING;
-            }
-        } else if (coralState == CoralState.ADVANCING) {
-            if (getFlipperSensor()) {
-                coralState = CoralState.READY;
-            }
-        } else if (coralState == CoralState.READY && !getFlipperSensor()) {
+        } else if (intakeSensor && flipperSensor && finalSensor) {
+            // No Coral is present
+            coralState = elevatorAtZero ? CoralState.INTAKING : CoralState.REJECTING;
+        } else if (!intakeSensor && finalSensor) {
+            coralState = elevatorAtZero ? CoralState.FEEDING : CoralState.REJECTING;
+        } else if (!flipperSensor) {
             coralState = CoralState.ADVANCING;
-        } else if (coralState == CoralState.READY || coralState == CoralState.SCORING) {
-            if (getFinalSensor()) {
-                coralState = CoralState.REJECTING;
+        } else {
+            assert(!finalSensor);
+            if (coralState != CoralState.SCORING) {
+                coralState = CoralState.READY;
             }
         }
     }

@@ -10,6 +10,8 @@ import com.pathplanner.lib.path.PathPlannerPath;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotController;
@@ -121,6 +123,19 @@ public class RobotContainer {
         SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Coast", s_Swerve::setMotorsToCoast, s_Swerve).ignoringDisable(true));
         SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Brake", s_Swerve::setMotorsToBrake, s_Swerve).ignoringDisable(true));
         SmartDashboard.putData(LoggedCommands.run("autoSetup/Set Swerve Aligned", s_Swerve::alignStraight, s_Swerve).ignoringDisable(true));
+
+        // Simple test
+        Pose2d targetPose = new Pose2d(4.97, 2.78, Rotation2d.fromDegrees(112.5));
+        SmartDashboard.putData(
+            LoggedCommands.sequence("Auto Align & Score",
+                LoggedCommands.parallel("PID Align",
+                    new PIDSwerve(s_Swerve, s_Pose, targetPose),
+                    LoggedCommands.deadline("Wait for auto up",
+                        s_Elevator.WaitForNext(),
+                        s_Elevator.AutoElevatorUp(targetPose.getTranslation()))),
+                Commands.parallel(
+                    RobotState.ScoreGamePiece(),
+                    Commands.waitSeconds(10.0)))); // TODO Shorter wait, and then back up for safety
 
         // Configure the button bindings
         configureButtonBindings();
