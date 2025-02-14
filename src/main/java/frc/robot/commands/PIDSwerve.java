@@ -4,6 +4,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.Pose;
 import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.subsystems.Swerve;
+import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -35,13 +36,15 @@ public class PIDSwerve extends LoggedCommandBase {
 
         xPID.setIZone(positionIZone); // Only use Integral term within this range
         xPID.setIntegratorRange(-positionKS * 2, positionKS * 2);
-        xPID.setSetpoint(targetPose.getX());
+        xPID.setSetpoint(Units.metersToInches(targetPose.getX()));
         xPID.setTolerance(positionTolerance);
+        DogLog.log("PIDSwerve/X target", xPID.getSetpoint());
 
         yPID.setIZone(positionIZone); // Only use Integral term within this range
         yPID.setIntegratorRange(-positionKS * 2, positionKS * 2);
-        yPID.setSetpoint(targetPose.getY()); // TODO Set derivative, too
+        yPID.setSetpoint(Units.metersToInches(targetPose.getY())); // TODO Set derivative, too
         yPID.setTolerance(positionTolerance);
+        DogLog.log("PIDSwerve/Y target", yPID.getSetpoint());
 
         rotationPID.enableContinuousInput(-180.0, 180.0);
         rotationPID.setIZone(Pose.rotationIZone); // Only use Integral term within this range
@@ -70,10 +73,18 @@ public class PIDSwerve extends LoggedCommandBase {
         double xCorrection = xPID.calculate(Units.metersToInches(position.getX()));
         double xFeedForward = positionKS * Math.signum(xCorrection);
         double xVal = MathUtil.clamp(xCorrection + xFeedForward, -1.0, 1.0);
+        DogLog.log("PIDSwerve/X position", Units.metersToInches(position.getX()));
+        DogLog.log("PIDSwerve/X correction", xCorrection);
+        DogLog.log("PIDSwerve/X feedforward", xFeedForward);
+        DogLog.log("PIDSwerve/X value", xVal);
 
         double yCorrection = yPID.calculate(Units.metersToInches(position.getY()));
         double yFeedForward = positionKS * Math.signum(yCorrection);
         double yVal = MathUtil.clamp(yCorrection + yFeedForward, -1.0, 1.0);
+        DogLog.log("PIDSwerve/Y position", Units.metersToInches(position.getY()));
+        DogLog.log("PIDSwerve/Y correction", yCorrection);
+        DogLog.log("PIDSwerve/Y feedforward", yFeedForward);
+        DogLog.log("PIDSwerve/Y value", yVal);
 
         double correction = rotationPID.calculate(rotation.getDegrees());
         double feedForward = Pose.rotationKS * Math.signum(correction);

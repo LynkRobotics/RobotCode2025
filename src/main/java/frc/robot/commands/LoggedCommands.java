@@ -92,6 +92,10 @@ public class LoggedCommands {
     return logWithName(name, Commands.runEnd(run, end, requirements));
   }
 
+  public static Command startRun(String name, Runnable start, Runnable run, Subsystem... requirements) {
+    return logWithName(name, Commands.startRun(start, run, requirements));
+  }
+
   public static Command print(String name, String message) {
     return logWithName(name, Commands.print(message));
   }

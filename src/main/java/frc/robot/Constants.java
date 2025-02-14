@@ -204,6 +204,7 @@ public final class Constants {
         }
 
         public static final double reefElevatorZoneRadius = Units.inchesToMeters(65.0);
+        public static final double autoUpDistance = Units.inchesToMeters(24.0);
         public static final double wingLength = Units.inchesToMeters(280);
 
         // Locations from the Blue Alliance perspective
