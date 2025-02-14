@@ -1,8 +1,5 @@
 package frc.robot.subsystems;
 
-import java.util.EnumMap;
-import java.util.Map;
-
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
