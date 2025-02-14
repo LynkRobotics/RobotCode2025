@@ -48,28 +48,21 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public enum Stop {
         // Intake occurs at zero
-        SAFE,
-        L1,
-        L2,
-        L2_ALGAE,
-        L3,
-        L3_ALGAE,
-        L4,
-        L4_SCORE
-    };
+        SAFE     (Constants.Elevator.baseHeight + 5.0),
+        L1       (26.0  - Constants.Elevator.endEffectorHeight),
+        L2       (34.5  - Constants.Elevator.endEffectorHeight),
+        L2_ALGAE (38.0  - Constants.Elevator.endEffectorHeight),
+        L3       (50.0  - Constants.Elevator.endEffectorHeight),
+        L3_ALGAE (55.0  - Constants.Elevator.endEffectorHeight),
+        L4       (75.0  - Constants.Elevator.endEffectorHeight),
+        L4_SCORE (77.75 - Constants.Elevator.endEffectorHeight);
 
-    // TODO Refine heights
-    // Elevator heights are defined in terms off inches that the elevator is off the ground
-    private final EnumMap<Stop, Double> elevatorHeights = new EnumMap<>(Map.ofEntries(
-      Map.entry(Stop.SAFE, Constants.Elevator.baseHeight + 5.0),
-      Map.entry(Stop.L1, 26.0 - Constants.Elevator.endEffectorHeight),
-      Map.entry(Stop.L2, 34.5 - Constants.Elevator.endEffectorHeight),
-      Map.entry(Stop.L2_ALGAE, 38.0 - Constants.Elevator.endEffectorHeight),
-      Map.entry(Stop.L3, 50.0 - Constants.Elevator.endEffectorHeight),
-      Map.entry(Stop.L3_ALGAE, 55.0 - Constants.Elevator.endEffectorHeight),
-      Map.entry(Stop.L4, 75.0 - Constants.Elevator.endEffectorHeight),
-      Map.entry(Stop.L4_SCORE, 77.75 - Constants.Elevator.endEffectorHeight)
-    ));
+        Stop(double height) {
+            this.height = height;
+        }
+
+        public final double height;
+    }
 
     public ElevatorSubsystem() {
         leftMotor = new TalonFX(Constants.Elevator.leftID, Constants.Elevator.canBus);
@@ -170,14 +163,14 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Command Move(Stop stop) {
         return LoggedCommands.sequence("Move Elevator to " + stop,
-            Commands.runOnce(() -> setHeight(elevatorHeights.get(stop)), this),
+            Commands.runOnce(() -> setHeight(stop.height), this),
             LoggedCommands.idle("Idle to hold elevator", this));
     }
 
     public Command GoToNext() {
         return LoggedCommands.sequence("Move Elevator to stop",
             LoggedCommands.log(() -> "Next stop: " + nextStop),
-            Commands.runOnce(() -> setHeight(elevatorHeights.get(nextStop)), this),
+            Commands.runOnce(() -> setHeight(nextStop.height), this),
             LoggedCommands.idle("Idle to hold elevator", this));
     }
 
@@ -192,7 +185,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             () -> autoUp = false,
             () -> {
                 if (!autoUp && PoseSubsystem.distanceTo(target) <= Constants.Pose.autoUpDistance) {
-                    setHeight(elevatorHeights.get(nextStop));
+                    setHeight(nextStop.height);
                     autoUp = true;
                 }
             },
@@ -243,7 +236,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     private boolean isSafe(double height) {
-        return height < (elevatorHeights.get(safetyStop()) + Constants.Elevator.safetyMargin);
+        return height < (safetyStop().height + Constants.Elevator.safetyMargin);
     }
 
     private boolean isSafe() {
@@ -251,7 +244,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     private boolean atStop(Stop stop) {
-        double stopError = Math.abs(elevatorHeights.get(stop) - getHeight());
+        double stopError = Math.abs(stop.height - getHeight());
         // The safe stop is just a guideline, and has a wider margin for error
         double allowableError = stop == Stop.SAFE ? 3 * Constants.Elevator.positionError : Constants.Elevator.positionError;
 
