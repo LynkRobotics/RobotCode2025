@@ -158,7 +158,7 @@ public class RobotState extends SubsystemBase {
         } else if (intakeSensor && flipperSensor && finalSensor) {
             // No Coral is present
             coralState = elevatorAtZero ? CoralState.INTAKING : CoralState.REJECTING;
-        } else if (!intakeSensor) {
+        } else if (!intakeSensor && finalSensor) {
             coralState = elevatorAtZero ? CoralState.FEEDING : CoralState.REJECTING;
         } else if (!flipperSensor) {
             coralState = CoralState.ADVANCING;
