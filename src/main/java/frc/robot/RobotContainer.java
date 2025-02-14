@@ -124,19 +124,18 @@ public class RobotContainer {
         SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Brake", s_Swerve::setMotorsToBrake, s_Swerve).ignoringDisable(true));
         SmartDashboard.putData(LoggedCommands.run("autoSetup/Set Swerve Aligned", s_Swerve::alignStraight, s_Swerve).ignoringDisable(true));
 
+        // Simple test
         Pose2d targetPose = new Pose2d(4.97, 2.78, Rotation2d.fromDegrees(112.5));
-        SmartDashboard.putData("Test PID Swerve", new PIDSwerve(s_Swerve, s_Pose, targetPose));
-        SmartDashboard.putData("Test PID Swerve with Elevator", 
-            LoggedCommands.parallel("PID Swerve Align",
-                new PIDSwerve(s_Swerve, s_Pose, targetPose),
-                LoggedCommands.deadline("Wait for auto up",
-                    s_Elevator.WaitForNext(),
-                    s_Elevator.AutoElevatorUp(targetPose.getTranslation())))
-            .andThen(
+        SmartDashboard.putData(
+            LoggedCommands.sequence("Auto Align & Score",
+                LoggedCommands.parallel("PID Align",
+                    new PIDSwerve(s_Swerve, s_Pose, targetPose),
+                    LoggedCommands.deadline("Wait for auto up",
+                        s_Elevator.WaitForNext(),
+                        s_Elevator.AutoElevatorUp(targetPose.getTranslation()))),
                 Commands.parallel(
                     RobotState.ScoreGamePiece(),
-                    Commands.waitSeconds(10.0))));
-        SmartDashboard.putData("Auto Elevator Up", s_Elevator.AutoElevatorUp(targetPose.getTranslation()));
+                    Commands.waitSeconds(10.0)))); // TODO Shorter wait, and then back up for safety
 
         // Configure the button bindings
         configureButtonBindings();

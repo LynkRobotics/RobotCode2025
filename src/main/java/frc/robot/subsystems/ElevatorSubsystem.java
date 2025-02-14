@@ -189,19 +189,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Command AutoElevatorUp(Translation2d target) {
         return LoggedCommands.startRun(
             "Auto Elevator Up",
-            () -> { autoUp = false; },
+            () -> autoUp = false,
             () -> {
-                DogLog.log("AutoUp/autoUp", autoUp);
-                DogLog.log("AutoUp/distance", PoseSubsystem.distanceTo(target));
-                DogLog.log("AutoUp/threshold", Constants.Pose.autoUpDistance);
                 if (!autoUp && PoseSubsystem.distanceTo(target) <= Constants.Pose.autoUpDistance) {
-                    DogLog.log("AutoUp/Status", "Moving to position for " + nextStop);
                     setHeight(elevatorHeights.get(nextStop));
-                    DogLog.log("AutoUp/Status", "Setting autoUp true");
                     autoUp = true;
-                }
-                else {
-                    DogLog.log("AutoUp/Status", "Not true");
                 }
             },
             this);
