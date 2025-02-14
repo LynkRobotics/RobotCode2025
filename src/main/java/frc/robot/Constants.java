@@ -7,6 +7,7 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -194,21 +195,41 @@ public final class Constants {
         public static final double fieldWidth = Units.inchesToMeters(26*12 + 5);
         public static final double fieldLength = Units.inchesToMeters(57*12 + 6.875);
 
-        public static enum ReefFace {
-            AB,
-            CD,
-            EF,
-            GH,
-            IJ,
-            KL
-        }
-
         public static final double reefElevatorZoneRadius = Units.inchesToMeters(65.0);
         public static final double autoUpDistance = Units.inchesToMeters(24.0);
         public static final double wingLength = Units.inchesToMeters(280);
 
+        public static final double bumperWidth = Units.inchesToMeters(3.0);
+        public static final double reefOffset = Swerve.wheelBase / 2.0 + bumperWidth;
+
         // Locations from the Blue Alliance perspective
         public static final Translation2d reefCenter = new Translation2d(Units.inchesToMeters(176.75), fieldWidth / 2.0);
+        public static final double reefToFaceDistance = reefCenter.getX() - Units.inchesToMeters(144.0);
+        public static final double branchSeparation = 12.0 + 15.0 / 16.0;
+
+        // Offset to the reef face, not at the branches, but on the faces directly in front
+        private static final Translation2d centerOffset = new Translation2d(reefToFaceDistance + reefOffset, 0.0);
+        private static final Translation2d leftOffset = new Translation2d(reefToFaceDistance + reefOffset, -branchSeparation / 2.0);
+        private static final Translation2d rightOffset = new Translation2d(reefToFaceDistance + reefOffset, branchSeparation / 2.0);
+
+        public static enum ReefFace {
+            AB(-180),
+            CD(-120),
+            EF(-60),
+            GH(0),
+            IJ(60),
+            KL(120);
+
+            ReefFace(double directionDegrees) {
+                directionFromCenter = Rotation2d.fromDegrees(directionDegrees);
+                alignMiddle = new Pose2d(reefCenter.plus(centerOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.unaryMinus());
+                alignLeft = new Pose2d(reefCenter.plus(leftOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.unaryMinus());
+                alignRight = new Pose2d(reefCenter.plus(rightOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.unaryMinus());
+            }
+
+            public final Rotation2d directionFromCenter;
+            public final Pose2d alignLeft, alignMiddle, alignRight;
+        }
     }
 
     public static final class Vision {

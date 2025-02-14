@@ -284,6 +284,9 @@ public class PoseSubsystem extends SubsystemBase {
         Translation2d position = pose.getTranslation();
         SmartDashboard.putNumber("Pose/Reef Bearing", reefBearing(position).getDegrees());
         SmartDashboard.putString("Pose/Nearest Face", nearestFace(position).toString());
+        SmartDashboard.putString("Pose/Face Middle Alignment", prettyPose(nearestFace(position).alignMiddle));
+        SmartDashboard.putString("Pose/Face Left Alignment", prettyPose(nearestFace(position).alignLeft));
+        SmartDashboard.putString("Pose/Face Right Alignment", prettyPose(nearestFace(position).alignRight));
         SmartDashboard.putNumber("Pose/Reef Center Distance", reefDistance(position));
         SmartDashboard.putBoolean("Pose/Reef Elevator Zone", inReefElevatorZone(position));
         SmartDashboard.putBoolean("Pose/In Wing", inWing(position));

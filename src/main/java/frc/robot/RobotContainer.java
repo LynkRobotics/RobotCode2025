@@ -125,7 +125,8 @@ public class RobotContainer {
         SmartDashboard.putData(LoggedCommands.run("autoSetup/Set Swerve Aligned", s_Swerve::alignStraight, s_Swerve).ignoringDisable(true));
 
         // Simple test
-        Pose2d targetPose = new Pose2d(4.97, 2.78, Rotation2d.fromDegrees(112.5));
+        // Pose2d targetPose = new Pose2d(4.97, 2.78, Rotation2d.fromDegrees(112.5));
+        Pose2d targetPose = Constants.Pose.ReefFace.EF.alignLeft;
         SmartDashboard.putData(
             LoggedCommands.sequence("Auto Align & Score",
                 LoggedCommands.parallel("PID Align",
