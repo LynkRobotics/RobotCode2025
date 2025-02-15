@@ -15,16 +15,17 @@ import edu.wpi.first.math.util.Units;
 public class PIDSwerve extends LoggedCommandBase {
     private final Swerve s_Swerve;
     private final PoseSubsystem s_Pose;
+    private final Pose2d targetPose;
 
     private final PIDController xPID = new PIDController(0.05, 0, 0);
     private final PIDController yPID = new PIDController(0.05, 0, 0);
-    private final double positionTolerance = 1.0; // inches
+    private final double positionTolerance = 0.5; // inches
     private final double maxSpeed = Constants.Swerve.maxSpeed / 5.0;
     private final double positionKS = 0.02;
     private final double positionIZone = 4.0;
 
     private final PIDController rotationPID = new PIDController(0.003, 0, 0);
-    private final double rotationTolerance = 1.5; // degrees
+    private final double rotationTolerance = 1.0; // degrees
     private final double maxAngularVelocity = Constants.Swerve.maxAngularVelocity / 2.0;
 
     public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose) {
@@ -32,19 +33,18 @@ public class PIDSwerve extends LoggedCommandBase {
 
         this.s_Swerve = s_Swerve;
         this.s_Pose = s_Pose;
+        this.targetPose = targetPose;
         addRequirements(s_Swerve);
 
         xPID.setIZone(positionIZone); // Only use Integral term within this range
         xPID.setIntegratorRange(-positionKS * 2, positionKS * 2);
         xPID.setSetpoint(Units.metersToInches(targetPose.getX()));
         xPID.setTolerance(positionTolerance);
-        DogLog.log("PIDSwerve/X target", xPID.getSetpoint());
 
         yPID.setIZone(positionIZone); // Only use Integral term within this range
         yPID.setIntegratorRange(-positionKS * 2, positionKS * 2);
         yPID.setSetpoint(Units.metersToInches(targetPose.getY())); // TODO Set derivative, too
         yPID.setTolerance(positionTolerance);
-        DogLog.log("PIDSwerve/Y target", yPID.getSetpoint());
 
         rotationPID.enableContinuousInput(-180.0, 180.0);
         rotationPID.setIZone(Pose.rotationIZone); // Only use Integral term within this range
@@ -60,6 +60,8 @@ public class PIDSwerve extends LoggedCommandBase {
         xPID.reset();
         yPID.reset();
         rotationPID.reset();
+
+        DogLog.log("PIDSwerve/Pose target", targetPose);
     }
 
     @Override

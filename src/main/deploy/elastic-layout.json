@@ -783,6 +783,32 @@
               "period": 0.06,
               "show_type": true
             }
+          },
+          {
+            "title": "Move to L3 Algae",
+            "x": 928.0,
+            "y": 416.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Move to L3 Algae",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Move to L2 Algae",
+            "x": 928.0,
+            "y": 288.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Move to L2 Algae",
+              "period": 0.06,
+              "show_type": true
+            }
           }
         ]
       }
@@ -795,7 +821,7 @@
           {
             "title": "Reef Bearing",
             "x": 416.0,
-            "y": 64.0,
+            "y": 0.0,
             "width": 256.0,
             "height": 256.0,
             "type": "Radial Gauge",
@@ -816,7 +842,7 @@
           {
             "title": "Reef Elevator Zone",
             "x": 672.0,
-            "y": 64.0,
+            "y": 0.0,
             "width": 224.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -833,7 +859,7 @@
           {
             "title": "In Wing",
             "x": 672.0,
-            "y": 192.0,
+            "y": 128.0,
             "width": 224.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -849,8 +875,8 @@
           },
           {
             "title": "Nearest Face",
-            "x": 896.0,
-            "y": 64.0,
+            "x": 256.0,
+            "y": 0.0,
             "width": 160.0,
             "height": 160.0,
             "type": "Text Display",
@@ -863,8 +889,8 @@
           },
           {
             "title": "Reef Center Distance",
-            "x": 672.0,
-            "y": 320.0,
+            "x": 416.0,
+            "y": 256.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
@@ -872,6 +898,48 @@
               "topic": "/SmartDashboard/Pose/Reef Center Distance",
               "period": 0.06,
               "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Face Left Alignment",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Pose/Face Left Alignment",
+              "period": 0.06,
+              "data_type": "string",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Face Middle Alignment",
+            "x": 0.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Pose/Face Middle Alignment",
+              "period": 0.06,
+              "data_type": "string",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Face Right Alignment",
+            "x": 0.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Pose/Face Right Alignment",
+              "period": 0.06,
+              "data_type": "string",
               "show_submit_button": false
             }
           }

@@ -1,5 +1,6 @@
 package frc.robot;
 
+import java.util.EnumMap;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -10,7 +11,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotController;
@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.LoggedAlert;
+import frc.robot.Constants.Pose.ReefFace;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.ElevatorSubsystem.Stop;
@@ -62,6 +63,11 @@ public class RobotContainer {
 
     /* Autonomous Control */
     private final SendableChooser<Command> autoChooser;
+
+    EnumMap<ReefFace, Command> alignLeftCommands = new EnumMap<>(ReefFace.class);
+    EnumMap<ReefFace, Command> alignRightCommands = new EnumMap<>(ReefFace.class);
+    EnumMap<ReefFace, Command> deAlgaefyLeftCommands = new EnumMap<>(ReefFace.class);
+    EnumMap<ReefFace, Command> deAlgaefyRightCommands = new EnumMap<>(ReefFace.class);
 
     private static void autoNamedCommand(String name, Command command) {
         NamedCommands.registerCommand(name, LoggedCommands.logWithName(name + " (auto)", command));
@@ -123,22 +129,44 @@ public class RobotContainer {
         SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Brake", s_Swerve::setMotorsToBrake, s_Swerve).ignoringDisable(true));
         SmartDashboard.putData(LoggedCommands.run("autoSetup/Set Swerve Aligned", s_Swerve::alignStraight, s_Swerve).ignoringDisable(true));
 
-        // Simple test
-        // Pose2d targetPose = new Pose2d(4.97, 2.78, Rotation2d.fromDegrees(112.5));
-        Pose2d targetPose = Constants.Pose.ReefFace.EF.alignLeft;
-        SmartDashboard.putData(
-            LoggedCommands.sequence("Auto Align & Score",
-                LoggedCommands.parallel("PID Align",
-                    new PIDSwerve(s_Swerve, s_Pose, targetPose),
-                    LoggedCommands.deadline("Wait for auto up",
-                        s_Elevator.WaitForNext(),
-                        s_Elevator.AutoElevatorUp(targetPose.getTranslation()))),
-                Commands.parallel(
-                    RobotState.ScoreGamePiece(),
-                    Commands.waitSeconds(10.0)))); // TODO Shorter wait, and then back up for safety
+        SmartDashboard.putData("Move to L2 Algae", s_Elevator.Move(Stop.L2_ALGAE));
+        SmartDashboard.putData("Move to L3 Algae", s_Elevator.Move(Stop.L3_ALGAE));
+
+        for (ReefFace face: ReefFace.values()) {
+            setFaceCommands(face);
+        }
 
         // Configure the button bindings
         configureButtonBindings();
+    }
+
+    private void setFaceCommands(ReefFace face) {
+        alignLeftCommands.put(face,
+            LoggedCommands.sequence("Auto Align Left " + face.toString() + " & Score",
+                LoggedCommands.parallel("PID Align Left " + face.toString(),
+                    new PIDSwerve(s_Swerve, s_Pose, face.alignLeft),
+                    LoggedCommands.deadline("Wait for auto up",
+                        s_Elevator.WaitForNext(),
+                        s_Elevator.AutoElevatorUp(face.alignLeft.getTranslation()))),
+                LoggedCommands.parallel("Score & Wait",
+                    RobotState.ScoreGamePiece(),
+                    Commands.waitSeconds(10.0)))); // TODO Shorter wait, and then back up for safety
+                    // TODO Alternative -- ensure that elevator only drops to a safe position after scoring, and wait until further away to drop the remainder
+
+        alignRightCommands.put(face,
+            LoggedCommands.sequence("Auto Align Right " + face.toString() + " & Score",
+                LoggedCommands.parallel("PID Align Right " + face.toString(),
+                    new PIDSwerve(s_Swerve, s_Pose, face.alignRight),
+                    LoggedCommands.deadline("Wait for auto up",
+                        s_Elevator.WaitForNext(),
+                        s_Elevator.AutoElevatorUp(face.alignRight.getTranslation()))),
+                LoggedCommands.parallel("Score & Wait",
+                    RobotState.ScoreGamePiece(),
+                    Commands.waitSeconds(10.0)))); // TODO Shorter wait, and then back up for safety
+                    // TODO Alternative -- ensure that elevator only drops to a safe position after scoring, and wait until further away to drop the remainder
+        
+        deAlgaefyLeftCommands.put(face, Commands.print("Dealgaefy"));
+        deAlgaefyRightCommands.put(face, Commands.print("Dealgaefy"));
     }
 
     /**
@@ -153,12 +181,15 @@ public class RobotContainer {
         /* Driver Buttons */
         final Trigger moveElevator = driver.leftBumper();
         final Trigger score = driver.rightBumper();
+        final Trigger goLeft = driver.leftTrigger();
+        final Trigger goRight = driver.rightTrigger();
         final Trigger L4 = driver.y();
         final Trigger L3 = driver.x();
         final Trigger L2 = driver.b();
         final Trigger L1 = driver.a();
         final Trigger alignLeft = driver.povLeft();
         final Trigger toggleGamePiece = driver.back();
+        final Trigger zero = driver.start();
 
         moveElevator.whileTrue(s_Elevator.GoToNext());
         score.onTrue(RobotState.ScoreGamePiece());
@@ -186,6 +217,20 @@ public class RobotContainer {
             LoggedAlert.Error("PathPlanner", "Left Approach Bind Failure", exception.getMessage());
         }
 
+        goLeft.whileTrue(
+            Commands.either(
+                Commands.select(alignLeftCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation())),
+                Commands.select(deAlgaefyLeftCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation())),
+                RobotState::haveCoral));
+
+        goRight.whileTrue(
+            Commands.either(
+                Commands.select(alignRightCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation())),
+                Commands.select(deAlgaefyRightCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation())),
+                RobotState::haveCoral));
+
+        zero.onTrue(s_Elevator.Zero());
+        
         SmartDashboard.putData("Disable speed limit", Commands.runOnce(s_Swerve::disableSpeedLimit));
     }
 
