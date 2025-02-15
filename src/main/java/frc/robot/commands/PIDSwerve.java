@@ -17,9 +17,9 @@ public class PIDSwerve extends LoggedCommandBase {
     private final PoseSubsystem s_Pose;
     private final Pose2d targetPose;
 
-    private final PIDController xPID = new PIDController(0.05, 0, 0);
-    private final PIDController yPID = new PIDController(0.05, 0, 0);
-    private final double positionTolerance = 0.5; // inches
+    private final PIDController xPID = new PIDController(0.06, 0, 0);
+    private final PIDController yPID = new PIDController(0.06, 0, 0);
+    private final double positionTolerance = 1.0; // inches
     private final double maxSpeed = Constants.Swerve.maxSpeed / 5.0;
     private final double positionKS = 0.02;
     private final double positionIZone = 4.0;
