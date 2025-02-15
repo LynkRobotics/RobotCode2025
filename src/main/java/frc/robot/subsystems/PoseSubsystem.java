@@ -89,7 +89,6 @@ public class PoseSubsystem extends SubsystemBase {
         PathPlannerLogging.setLogCurrentPoseCallback((currentPose) -> {
             DogLog.log("Pose/PP Current Pose", currentPose);
         });
-
     }
 
     public static PoseSubsystem getInstance() {
