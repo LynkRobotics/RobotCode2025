@@ -140,46 +140,34 @@ public class RobotContainer {
         configureButtonBindings();
     }
 
-    private void setFaceCommands(ReefFace face) {
-        alignLeftCommands.put(face,
-            LoggedCommands.sequence("Auto Align Left " + face.toString() + " & Score",
-                LoggedCommands.parallel("PID Align Left " + face.toString(),
-                    Commands.sequence(
-                        new PIDSwerve(s_Swerve, s_Pose, face.approachLeft, false),
-                        new PIDSwerve(s_Swerve, s_Pose, face.alignLeft, true),
-                        s_Swerve.Stop()),
-                    LoggedCommands.deadline("Wait for auto up",
-                        s_Elevator.WaitForNext(),
-                        s_Elevator.AutoElevatorUp(face.alignLeft.getTranslation()))),
-                RobotState.ScoreGamePiece()));
+    private Command ScoreCoral(ReefFace face, boolean left) {
+        return LoggedCommands.sequence("Auto Align " + (left ? "Left " : "Right ") + face.toString() + " & Score",
+            LoggedCommands.parallel("PID Align " + (left ? "Left " : "Right ") + face.toString(),
+                Commands.sequence(
+                    new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, false),
+                    new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true),
+                    s_Swerve.Stop()),
+                LoggedCommands.deadline("Wait for auto up",
+                    s_Elevator.WaitForNext(),
+                    s_Elevator.AutoElevatorUp(left ? face.alignLeft.getTranslation() : face.alignRight.getTranslation()))),
+            RobotState.ScoreGamePiece());
+    }
 
-        alignRightCommands.put(face,
-            LoggedCommands.sequence("Auto Align Right " + face.toString() + " & Score",
-                LoggedCommands.parallel("PID Align Right " + face.toString(),
-                    Commands.sequence(
-                        new PIDSwerve(s_Swerve, s_Pose, face.approachRight, false),
-                        new PIDSwerve(s_Swerve, s_Pose, face.alignRight, true),
-                        s_Swerve.Stop()),
-                    LoggedCommands.deadline("Wait for auto up",
-                        s_Elevator.WaitForNext(),
-                        s_Elevator.AutoElevatorUp(face.alignRight.getTranslation()))),
-                RobotState.ScoreGamePiece()));
-        
-        // TODO
-        deAlgaefyLeftCommands.put(face,
-        LoggedCommands.sequence("Auto Align Middle " + face.toString(),
+    // TODO
+    private Command DeAlgaefy(ReefFace face) {
+        return LoggedCommands.sequence("Auto Align Middle " + face.toString(),
             LoggedCommands.parallel("PID Align Middle " + face.toString(),
                 Commands.sequence(
                     new PIDSwerve(s_Swerve, s_Pose, face.approachMiddle, false),
                     new PIDSwerve(s_Swerve, s_Pose, face.alignMiddle, true),
-                    s_Swerve.Stop()))));
-        deAlgaefyRightCommands.put(face,
-        LoggedCommands.sequence("Auto Align Middle " + face.toString(),
-            LoggedCommands.parallel("PID Align Middle " + face.toString(),
-                Commands.sequence(
-                    new PIDSwerve(s_Swerve, s_Pose, face.approachMiddle, false),
-                    new PIDSwerve(s_Swerve, s_Pose, face.alignMiddle, true),
-                    s_Swerve.Stop()))));
+                    s_Swerve.Stop())));
+    }
+    
+    private void setFaceCommands(ReefFace face) {
+        alignLeftCommands.put(face, ScoreCoral(face, true));
+        alignRightCommands.put(face, ScoreCoral(face, false));
+        deAlgaefyLeftCommands.put(face, DeAlgaefy(face));
+        deAlgaefyRightCommands.put(face, DeAlgaefy(face));
     }
 
     private double speedLimitFactor() {
