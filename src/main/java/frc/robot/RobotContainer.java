@@ -145,7 +145,8 @@ public class RobotContainer {
             LoggedCommands.sequence("Auto Align Left " + face.toString() + " & Score",
                 LoggedCommands.parallel("PID Align Left " + face.toString(),
                     Commands.sequence(
-                        new PIDSwerve(s_Swerve, s_Pose, face.alignLeft),
+                        new PIDSwerve(s_Swerve, s_Pose, face.approachLeft, false),
+                        new PIDSwerve(s_Swerve, s_Pose, face.alignLeft, true),
                         s_Swerve.Stop()),
                     LoggedCommands.deadline("Wait for auto up",
                         s_Elevator.WaitForNext(),
@@ -156,15 +157,29 @@ public class RobotContainer {
             LoggedCommands.sequence("Auto Align Right " + face.toString() + " & Score",
                 LoggedCommands.parallel("PID Align Right " + face.toString(),
                     Commands.sequence(
-                        new PIDSwerve(s_Swerve, s_Pose, face.alignRight),
+                        new PIDSwerve(s_Swerve, s_Pose, face.approachRight, false),
+                        new PIDSwerve(s_Swerve, s_Pose, face.alignRight, true),
                         s_Swerve.Stop()),
                     LoggedCommands.deadline("Wait for auto up",
                         s_Elevator.WaitForNext(),
                         s_Elevator.AutoElevatorUp(face.alignRight.getTranslation()))),
                 RobotState.ScoreGamePiece()));
         
-        deAlgaefyLeftCommands.put(face, Commands.print("Dealgaefy"));
-        deAlgaefyRightCommands.put(face, Commands.print("Dealgaefy"));
+        // TODO
+        deAlgaefyLeftCommands.put(face,
+        LoggedCommands.sequence("Auto Align Middle " + face.toString(),
+            LoggedCommands.parallel("PID Align Middle " + face.toString(),
+                Commands.sequence(
+                    new PIDSwerve(s_Swerve, s_Pose, face.approachMiddle, false),
+                    new PIDSwerve(s_Swerve, s_Pose, face.alignMiddle, true),
+                    s_Swerve.Stop()))));
+        deAlgaefyRightCommands.put(face,
+        LoggedCommands.sequence("Auto Align Middle " + face.toString(),
+            LoggedCommands.parallel("PID Align Middle " + face.toString(),
+                Commands.sequence(
+                    new PIDSwerve(s_Swerve, s_Pose, face.approachMiddle, false),
+                    new PIDSwerve(s_Swerve, s_Pose, face.alignMiddle, true),
+                    s_Swerve.Stop()))));
     }
 
     private double speedLimitFactor() {

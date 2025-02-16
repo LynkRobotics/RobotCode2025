@@ -200,6 +200,7 @@ public final class Constants {
         public static final double bumperWidth = Units.inchesToMeters(3.2);
         public static final double reefStandoff = Units.inchesToMeters(1.0);
         public static final double reefOffset = robotFrameLength / 2.0 + bumperWidth + reefStandoff;
+        public static final double reefExtraOffset = Units.inchesToMeters(6.0);
 
         // Locations from the Blue Alliance perspective
         public static final Translation2d reefCenter = new Translation2d(Units.inchesToMeters(176.75), fieldWidth / 2.0);
@@ -210,6 +211,10 @@ public final class Constants {
         public static final Translation2d centerOffset = new Translation2d(reefToFaceDistance + reefOffset, 0.0);
         private static final Translation2d leftOffset = new Translation2d(reefToFaceDistance + reefOffset, -branchSeparation / 2.0);
         private static final Translation2d rightOffset = new Translation2d(reefToFaceDistance + reefOffset, branchSeparation / 2.0);
+        private static final Translation2d extraOffset = new Translation2d(reefExtraOffset, 0.0);
+        private static final Translation2d centerApproachOffset = centerOffset.plus(extraOffset);
+        private static final Translation2d leftApproachOffset = leftOffset.plus(extraOffset);
+        private static final Translation2d rightApproachOffset = rightOffset.plus(extraOffset);
 
         public static final double elevatorNoDownDistance = reefToFaceDistance + reefOffset + Units.inchesToMeters(12.0);
 
@@ -226,10 +231,14 @@ public final class Constants {
                 alignMiddle = new Pose2d(reefCenter.plus(centerOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
                 alignLeft = new Pose2d(reefCenter.plus(leftOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
                 alignRight = new Pose2d(reefCenter.plus(rightOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
+                approachMiddle = new Pose2d(reefCenter.plus(centerApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
+                approachLeft = new Pose2d(reefCenter.plus(leftApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
+                approachRight = new Pose2d(reefCenter.plus(rightApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
             }
 
             public final Rotation2d directionFromCenter;
             public final Pose2d alignLeft, alignMiddle, alignRight;
+            public final Pose2d approachLeft, approachMiddle, approachRight;
         }
     }
 
