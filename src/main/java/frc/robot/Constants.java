@@ -219,14 +219,14 @@ public final class Constants {
         public static final double elevatorNoDownDistance = reefToFaceDistance + reefOffset + Units.inchesToMeters(12.0);
 
         public static enum ReefFace {
-            AB(-180),
-            CD(-120),
-            EF(-60),
-            GH(0),
-            IJ(60),
-            KL(120);
+            AB(-180, true),
+            CD(-120, false),
+            EF(-60, true),
+            GH(0, false),
+            IJ(60, true),
+            KL(120, false);
 
-            ReefFace(double directionDegrees) {
+            ReefFace(double directionDegrees, boolean algaeHigh) {
                 directionFromCenter = Rotation2d.fromDegrees(directionDegrees);
                 alignMiddle = new Pose2d(reefCenter.plus(centerOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
                 alignLeft = new Pose2d(reefCenter.plus(leftOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
@@ -234,11 +234,13 @@ public final class Constants {
                 approachMiddle = new Pose2d(reefCenter.plus(centerApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
                 approachLeft = new Pose2d(reefCenter.plus(leftApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
                 approachRight = new Pose2d(reefCenter.plus(rightApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
+                this.algaeHigh = algaeHigh;
             }
 
             public final Rotation2d directionFromCenter;
             public final Pose2d alignLeft, alignMiddle, alignRight;
             public final Pose2d approachLeft, approachMiddle, approachRight;
+            public final boolean algaeHigh;
         }
     }
 
