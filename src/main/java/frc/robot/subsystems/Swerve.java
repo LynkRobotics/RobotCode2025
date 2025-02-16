@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import frc.lib.util.SwerveModule;
 import frc.robot.Constants;
+import frc.robot.commands.LoggedCommands;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -13,10 +14,10 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
-    private boolean speedLimit = false;
     private PoseSubsystem s_Pose = null;
 
     public SwerveModule[] mSwerveMods;
@@ -121,20 +122,6 @@ public class Swerve extends SubsystemBase {
         }
     }
 
-    public void enableSpeedLimit() {
-        speedLimit = true;
-        DogLog.log("Swerve/Status", "Swerve Speed Limit Enabled");
-    }
-
-    public void disableSpeedLimit() {
-        speedLimit = false;
-        DogLog.log("Swerve/Status", "Swerve Speed Limit Disabled");
-    }
-
-    public double getSpeedLimitRot() {
-        return speedLimit ? Constants.Swerve.speedLimitRot : 1.0;
-    }
-
     public void setMotorsToCoast(){
         for(SwerveModule mod : mSwerveMods){
             mod.setCoastMode();  
@@ -166,6 +153,10 @@ public class Swerve extends SubsystemBase {
     public void stopSwerve(){
         drive(new Translation2d(0, 0), 0, false);
         DogLog.log("Swerve/Status", "Stopped Swerve");
+    }
+
+    public Command Stop() {
+        return LoggedCommands.runOnce("Stop Swerve", this::stopSwerve, this);
     }
 
     @Override

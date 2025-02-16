@@ -20,13 +20,13 @@ public class TeleopSwerve extends LoggedCommandBase {
     private final DoubleSupplier translationSup;
     private final DoubleSupplier strafeSup;
     private final DoubleSupplier rotationSup;
-    private DoubleSupplier speedLimitRotSupplier;
+    private DoubleSupplier speedLimitSupplier;
     private PoseSubsystem s_Pose = null;
     private boolean autoAiming = false;
     private Rotation2d lastAngle = null;
     private static final TunableOption optAutoReefAiming = new TunableOption("Automatically Aim at Reef", false);
 
-    public TeleopSwerve(Swerve s_Swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, DoubleSupplier speedLimitRotSupplier) {
+    public TeleopSwerve(Swerve s_Swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, DoubleSupplier speedLimitSupplier) {
         super();
 
         this.s_Swerve = s_Swerve;
@@ -35,7 +35,7 @@ public class TeleopSwerve extends LoggedCommandBase {
         this.translationSup = translationSup;
         this.strafeSup = strafeSup;
         this.rotationSup = rotationSup;
-        this.speedLimitRotSupplier = speedLimitRotSupplier;
+        this.speedLimitSupplier = speedLimitSupplier;
     }
 
     @Override
@@ -88,10 +88,9 @@ public class TeleopSwerve extends LoggedCommandBase {
 
         /* Drive */
         s_Swerve.drive(
-            new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed),
-            rotationVal * Constants.Swerve.maxAngularVelocity * speedLimitRotSupplier.getAsDouble(), 
+            new Translation2d(translationVal, strafeVal).times(speedLimitSupplier.getAsDouble()).times(Constants.Swerve.maxSpeed),
+            rotationVal * Constants.Swerve.maxAngularVelocity * speedLimitSupplier.getAsDouble(), 
             true
         );
-        // SmartDashboard.putNumber("rotationValue", speedLimitRotSupplier.getAsDouble());
     }
 }

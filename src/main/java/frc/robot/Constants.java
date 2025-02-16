@@ -46,9 +46,6 @@ public final class Constants {
     public static final class Swerve {
         public static final String swerveCanBus = "lynk";
 
-        // Multipliers when speed limit is in effect;
-        public static final double speedLimitRot = 0.50;
-
         public static final COTSTalonFXSwerveConstants chosenModule =  
             COTSTalonFXSwerveConstants.SDS.MK4i.KrakenX60(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L2);
 
@@ -195,13 +192,13 @@ public final class Constants {
         public static final double fieldWidth = Units.inchesToMeters(26*12 + 5);
         public static final double fieldLength = Units.inchesToMeters(57*12 + 6.875);
 
-        public static final double reefElevatorZoneRadius = Units.inchesToMeters(65.0);
+        public static final double reefElevatorZoneRadius = Units.inchesToMeters(80.0); // TODO Revisit
         public static final double autoUpDistance = Units.inchesToMeters(24.0);
         public static final double wingLength = Units.inchesToMeters(280);
 
         public static final double robotFrameLength = Units.inchesToMeters(30);
         public static final double bumperWidth = Units.inchesToMeters(3.2);
-        public static final double reefStandoff = Units.inchesToMeters(0.0);
+        public static final double reefStandoff = Units.inchesToMeters(1.0);
         public static final double reefOffset = robotFrameLength / 2.0 + bumperWidth + reefStandoff;
 
         // Locations from the Blue Alliance perspective
@@ -213,6 +210,8 @@ public final class Constants {
         public static final Translation2d centerOffset = new Translation2d(reefToFaceDistance + reefOffset, 0.0);
         private static final Translation2d leftOffset = new Translation2d(reefToFaceDistance + reefOffset, -branchSeparation / 2.0);
         private static final Translation2d rightOffset = new Translation2d(reefToFaceDistance + reefOffset, branchSeparation / 2.0);
+
+        public static final double elevatorNoDownDistance = reefToFaceDistance + reefOffset + Units.inchesToMeters(12.0);
 
         public static enum ReefFace {
             AB(-180),
@@ -284,6 +283,8 @@ public final class Constants {
         public static final double kG = 0.4; // output to overcome gravity
         public static final double cruiseVelocity = 20.0; // RPS
         public static final double acceleration = cruiseVelocity * 0.25; // Accelerate in 0.25 seconds
+
+        public static final double speedLimitAtMax = 0.30;
     }
 
     public static final class EndEffector {

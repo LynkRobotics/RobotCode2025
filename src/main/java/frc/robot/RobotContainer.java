@@ -84,7 +84,7 @@ public class RobotContainer {
             .withCaptureNt(true)
             .withLogEntryQueueCapacity(1000)
             .withLogExtras(true)
-            .withNtPublish(true));
+            .withNtPublish(Constants.atHQ));
 
         DogLog.log("Misc/RIO Serial Number", RobotController.getSerialNumber());
         DogLog.log("Misc/Is Rocky?", Constants.isRocky);
@@ -105,7 +105,7 @@ public class RobotContainer {
                 () -> -translation.get() * Constants.driveStickSensitivity,
                 () -> -strafe.get() * Constants.driveStickSensitivity,
                 () -> -rotation.get() * Constants.turnStickSensitivity,
-                s_Swerve::getSpeedLimitRot
+                this::speedLimitFactor
             ));
 
         SmartDashboard.putData("Command scheduler", CommandScheduler.getInstance());
@@ -144,29 +144,31 @@ public class RobotContainer {
         alignLeftCommands.put(face,
             LoggedCommands.sequence("Auto Align Left " + face.toString() + " & Score",
                 LoggedCommands.parallel("PID Align Left " + face.toString(),
-                    new PIDSwerve(s_Swerve, s_Pose, face.alignLeft),
+                    Commands.sequence(
+                        new PIDSwerve(s_Swerve, s_Pose, face.alignLeft),
+                        s_Swerve.Stop()),
                     LoggedCommands.deadline("Wait for auto up",
                         s_Elevator.WaitForNext(),
                         s_Elevator.AutoElevatorUp(face.alignLeft.getTranslation()))),
-                LoggedCommands.parallel("Score & Wait",
-                    RobotState.ScoreGamePiece(),
-                    Commands.waitSeconds(10.0)))); // TODO Shorter wait, and then back up for safety
-                    // TODO Alternative -- ensure that elevator only drops to a safe position after scoring, and wait until further away to drop the remainder
+                RobotState.ScoreGamePiece()));
 
         alignRightCommands.put(face,
             LoggedCommands.sequence("Auto Align Right " + face.toString() + " & Score",
                 LoggedCommands.parallel("PID Align Right " + face.toString(),
-                    new PIDSwerve(s_Swerve, s_Pose, face.alignRight),
+                    Commands.sequence(
+                        new PIDSwerve(s_Swerve, s_Pose, face.alignRight),
+                        s_Swerve.Stop()),
                     LoggedCommands.deadline("Wait for auto up",
                         s_Elevator.WaitForNext(),
                         s_Elevator.AutoElevatorUp(face.alignRight.getTranslation()))),
-                LoggedCommands.parallel("Score & Wait",
-                    RobotState.ScoreGamePiece(),
-                    Commands.waitSeconds(10.0)))); // TODO Shorter wait, and then back up for safety
-                    // TODO Alternative -- ensure that elevator only drops to a safe position after scoring, and wait until further away to drop the remainder
+                RobotState.ScoreGamePiece()));
         
         deAlgaefyLeftCommands.put(face, Commands.print("Dealgaefy"));
         deAlgaefyRightCommands.put(face, Commands.print("Dealgaefy"));
+    }
+
+    private double speedLimitFactor() {
+        return 1.0 - s_Elevator.raisedPercentage() * (1.0 - Constants.Elevator.speedLimitAtMax);
     }
 
     /**
@@ -230,8 +232,6 @@ public class RobotContainer {
                 RobotState::haveCoral));
 
         zero.onTrue(s_Elevator.Zero());
-        
-        SmartDashboard.putData("Disable speed limit", Commands.runOnce(s_Swerve::disableSpeedLimit));
     }
 
     /**

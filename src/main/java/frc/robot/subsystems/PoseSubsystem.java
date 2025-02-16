@@ -243,6 +243,14 @@ public class PoseSubsystem extends SubsystemBase {
         return inReefElevatorZone(getPose().getTranslation());
     }
 
+    public static boolean elevatorDownAllowed(Translation2d position) {
+        return reefDistance(position) >= Constants.Pose.elevatorNoDownDistance;
+    }
+
+    public boolean elevatorDownAllowed() {
+        return elevatorDownAllowed(getPose().getTranslation());
+    }
+
     public static boolean inWing(Translation2d position) {
         return flipIfRed(position).getX() <= Constants.Pose.wingLength;
     }

@@ -9,6 +9,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.TunableOption;
@@ -26,6 +27,7 @@ public class RobotState extends SubsystemBase {
 
     private static final TunableOption optOverrideElevatorPathBlocked = new TunableOption("Override Elevator Path Blocked", false);
     private static final TunableOption optOverrideReefElevatorZone = new TunableOption("Override Reef Safe Elevator Zone", true);
+    private static final TunableOption optOverrideElevatorDownAllowed = new TunableOption("Override Elevator Down Allowed", false);
 
     public enum GamePiece {
         CORAL,
@@ -89,7 +91,7 @@ public class RobotState extends SubsystemBase {
     public static boolean elevatorPathBlocked() {
         return (!getIntakeSensor() || !getFlipperSensor()) && !optOverrideElevatorPathBlocked.get();
     }
-    
+
     public static void setActiveGamePiece(GamePiece piece) {
         activePiece = piece;
         DogLog.log("State/Game piece", activePiece);
@@ -109,7 +111,12 @@ public class RobotState extends SubsystemBase {
         if (pose == null) return false;
         return (pose.inReefElevatorZone() || optOverrideReefElevatorZone.get()) && pose.isUpright();
     }
-
+    public static boolean elevatorDownAllowed() {
+        if (pose == null) pose = PoseSubsystem.getInstance();
+        if (pose == null) return true;
+        return pose.elevatorDownAllowed() || optOverrideElevatorDownAllowed.get();
+    }
+    
     public static void setElevatorAtZero(boolean atZero) {
         elevatorAtZero = atZero;
         DogLog.log("State/Elevator at zero", elevatorAtZero);
@@ -126,13 +133,12 @@ public class RobotState extends SubsystemBase {
     public static Command ScoreGamePiece() {
         // TODO Support Algae
         // Require additional conditions?
-        return LoggedCommands.runOnce("Score Game Piece", () -> {
-            if (coralState == CoralState.READY) {
-                coralState = CoralState.SCORING;
-            } else {
-                LoggedAlert.Warning("Robot State", "Cannot Score", "Cannot score coral without coral ready");
-            }
-        });
+        return Commands.either(
+            LoggedCommands.sequence("Score Game Piece",
+                LoggedCommands.runOnce("Initiate Scoring", () -> coralState = CoralState.SCORING),
+                LoggedCommands.waitUntil("Wait for Score", RobotState::getFinalSensor)),
+            LoggedCommands.runOnce("Cannot Score", () -> LoggedAlert.Warning("Robot State", "Cannot Score", "Cannot score coral without coral ready")),
+            () -> coralState == CoralState.READY);
     }
 
     public static CoralState getCoralState() {

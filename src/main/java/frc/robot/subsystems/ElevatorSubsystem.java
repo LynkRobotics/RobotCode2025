@@ -7,6 +7,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -39,6 +40,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double desiredPosition = -1.0;
     private boolean zeroing = false;
     private boolean movingToSafety = false;
+    private boolean safetyDeferred = false;
     private boolean autoUp = false;
     
     private final double positionDiffMax = 0.5;
@@ -87,7 +89,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         mechanism = offset.append(new MechanismLigament2d("elevator", Units.inchesToMeters(Constants.Elevator.baseHeight), 90.0, Units.inchesToMeters(Constants.Elevator.thickness), new Color8Bit(0xBF, 0x57, 0x00)));
 
         SmartDashboard.putData("Elevator/mechanism", canvas);
-        // initDefaultCommand();
+        initDefaultCommand();
     }
 
     public void setAsZero() {
@@ -256,6 +258,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         return getHeight(leftMotor.getPosition().getValueAsDouble());
     }
 
+    public double raisedPercentage() {
+        return MathUtil.clamp((getHeight() - Stop.L1.height) / Stop.L4_SCORE.height, 0.0, 1.0);
+    }
+
     private void applyConfigs() {
         // Configure the primary motor
         var motorConfig = new TalonFXConfiguration();
@@ -290,19 +296,25 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command MoveToSafety() {
-        return LoggedCommands.sequence("Move Elevator to Safety", 
-            Commands.runOnce(() -> movingToSafety = true),
+        return LoggedCommands.sequence("Move Elevator to Safety",
+            Commands.runOnce(() -> { movingToSafety = true; safetyDeferred = false; }),
             Commands.either(
                 Move(Stop.L1),
                 LoggedCommands.sequence("Zero and Idle",
                     FastZero(),
                     LoggedCommands.idle("Elevator holding at zero", this)),
                 () -> RobotState.getActiveGamePiece() == GamePiece.CORAL && RobotState.getCoralState() == CoralState.READY))
-            .handleInterrupt(() -> movingToSafety = false);
+                .handleInterrupt(() -> movingToSafety = false);
+
     }
     
     public void initDefaultCommand() {
-        setDefaultCommand(MoveToSafety());
+        setDefaultCommand(LoggedCommands.either("Elevator Default Command",
+            MoveToSafety(),
+            LoggedCommands.sequence("Defer Elevator Safety",
+                Commands.runOnce(() -> safetyDeferred = true),
+                LoggedCommands.idle("Idle to hold elevator", this)),
+            RobotState::elevatorDownAllowed));
     }
 
     @Override
@@ -319,6 +331,13 @@ public class ElevatorSubsystem extends SubsystemBase {
                 // Stop elevator when moving and blockage detected
                 LoggedAlert.Error("Elevator", "Blocked", "Elevator stopped due to blockage");
                 stop();
+            } else if (safetyDeferred && RobotState.elevatorDownAllowed()) {
+                // Moving elevator to safety was deferred, but is available now
+                Command currentCommand = getCurrentCommand();
+                
+                if (currentCommand != null) {
+                    currentCommand.cancel();
+                }
             } else if (!isSafe() && !movingToSafety && !RobotState.raisedElevatorAllowable()) {
                 // Elevator is unsafe, not allowed to raised, and not already moving to safety
                 LoggedAlert.Warning("Elevator", "Safety", "Cancelling current command to return to safe position");
@@ -343,8 +362,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
         lastPosition = position;
 
+        // TODO Can we move this into ScoreGamePiece command?
         if (RobotState.getActiveGamePiece() == GamePiece.CORAL && RobotState.getCoralState() == CoralState.SCORING && atStop(Stop.L4)) {
-            Move(Stop.L4_SCORE).schedule();
+            setHeight(Stop.L4_SCORE.height); // TODO Avoid repeatedly calling ... even though it might not be an issue?
         }
 
         // If we have Coral ready, and the Elevator is still at zero, cancel the current default command so that it runs again with the L1 default
