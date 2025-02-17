@@ -1,6 +1,7 @@
 package frc.robot;
 
 import static frc.robot.Options.optAutoReefAiming;
+import static frc.robot.Options.optBonusCoralStandoff;
 
 import java.util.EnumMap;
 import java.util.Set;
@@ -26,9 +27,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.LoggedAlert;
 import frc.robot.Constants.Pose.ReefFace;
+import frc.robot.Constants.Elevator.Stop;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.ElevatorSubsystem.Stop;
 import frc.robot.subsystems.RobotState.GamePiece;
 
 /**
@@ -156,7 +157,10 @@ public class RobotContainer {
             LoggedCommands.parallel("PID Align " + (left ? "Left " : "Right ") + face.toString(),
                 Commands.sequence(
                     new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, false),
-                    new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true),
+                    Commands.either(
+                        new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true),
+                        new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true),
+                        optBonusCoralStandoff::get),
                     s_Swerve.Stop()),
                 Commands.sequence(
                     RobotState.WaitForCoralReady(),

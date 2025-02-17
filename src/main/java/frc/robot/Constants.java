@@ -179,71 +179,6 @@ public final class Constants {
         }
     }
 
-    public static final class Pose {
-        public static final int pigeonID = 1;
-
-        public static final PIDController rotationPID = new PIDController(0.003, 0.0, 0.0); // kI was 0.050 for NCCMP 2024
-        public static final double rotationKS = 0.02;
-        public static final double rotationIZone = 2.0; // degrees
-
-        public static final double tiltWarning = 5.0;
-        public static final double tiltError = 10.0;
-
-        public static final double fieldWidth = Units.inchesToMeters(26*12 + 5);
-        public static final double fieldLength = Units.inchesToMeters(57*12 + 6.875);
-
-        public static final double reefElevatorZoneRadius = Units.inchesToMeters(80.0); // TODO Revisit
-        public static final double autoUpDistance = Units.inchesToMeters(24.0);
-        public static final double wingLength = Units.inchesToMeters(280);
-
-        public static final double robotFrameLength = Units.inchesToMeters(30);
-        public static final double bumperWidth = Units.inchesToMeters(3.2);
-        public static final double reefStandoff = Units.inchesToMeters(1.0);
-        public static final double reefOffset = robotFrameLength / 2.0 + bumperWidth + reefStandoff;
-        public static final double reefExtraOffset = Units.inchesToMeters(6.0);
-
-        // Locations from the Blue Alliance perspective
-        public static final Translation2d reefCenter = new Translation2d(Units.inchesToMeters(176.75), fieldWidth / 2.0);
-        public static final double reefToFaceDistance = reefCenter.getX() - Units.inchesToMeters(144.0);
-        public static final double branchSeparation = Units.inchesToMeters(12.0 + 15.0 / 16.0);
-
-        // Offset to the reef face, not at the branches, but on the faces directly in front
-        public static final Translation2d centerOffset = new Translation2d(reefToFaceDistance + reefOffset, 0.0);
-        private static final Translation2d leftOffset = new Translation2d(reefToFaceDistance + reefOffset, -branchSeparation / 2.0);
-        private static final Translation2d rightOffset = new Translation2d(reefToFaceDistance + reefOffset, branchSeparation / 2.0);
-        private static final Translation2d extraOffset = new Translation2d(reefExtraOffset, 0.0);
-        private static final Translation2d centerApproachOffset = centerOffset.plus(extraOffset);
-        private static final Translation2d leftApproachOffset = leftOffset.plus(extraOffset);
-        private static final Translation2d rightApproachOffset = rightOffset.plus(extraOffset);
-
-        public static final double elevatorNoDownDistance = reefToFaceDistance + reefOffset + Units.inchesToMeters(12.0);
-
-        public static enum ReefFace {
-            AB(-180, true),
-            CD(-120, false),
-            EF(-60, true),
-            GH(0, false),
-            IJ(60, true),
-            KL(120, false);
-
-            ReefFace(double directionDegrees, boolean algaeHigh) {
-                directionFromCenter = Rotation2d.fromDegrees(directionDegrees);
-                alignMiddle = new Pose2d(reefCenter.plus(centerOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
-                alignLeft = new Pose2d(reefCenter.plus(leftOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
-                alignRight = new Pose2d(reefCenter.plus(rightOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
-                approachMiddle = new Pose2d(reefCenter.plus(centerApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
-                approachLeft = new Pose2d(reefCenter.plus(leftApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
-                approachRight = new Pose2d(reefCenter.plus(rightApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
-                this.algaeHigh = algaeHigh;
-            }
-
-            public final Rotation2d directionFromCenter;
-            public final Pose2d alignLeft, alignMiddle, alignRight;
-            public final Pose2d approachLeft, approachMiddle, approachRight;
-            public final boolean algaeHigh;
-        }
-    }
-
     public static final class Vision {
         public static final String cameraName = "AprilTagCam";
         public static final Transform3d robotToCam =
@@ -296,6 +231,26 @@ public final class Constants {
         public static final double acceleration = cruiseVelocity * 0.25; // Accelerate in 0.25 seconds
 
         public static final double speedLimitAtMax = 0.30;
+
+        public enum Stop {
+            // Intake occurs at zero
+            SAFE     (Constants.Elevator.baseHeight + 5.0),
+            L1       (26.0  - Constants.Elevator.endEffectorHeight),
+            L2       (34.5  - Constants.Elevator.endEffectorHeight),
+            L2_ALGAE (38.0  - Constants.Elevator.endEffectorHeight),
+            L3       (50.0  - Constants.Elevator.endEffectorHeight),
+            L3_ALGAE (55.0  - Constants.Elevator.endEffectorHeight),
+            L4       (75.0  - Constants.Elevator.endEffectorHeight),
+            L4_SCORE (77.75 - Constants.Elevator.endEffectorHeight);
+    
+            Stop(double height) {
+                this.height = height;
+            }
+    
+            public final double height;
+        }
+
+        public static final double standoffBoost = Units.inchesToMeters(2.0);
     }
 
     public static final class EndEffector {
@@ -328,6 +283,78 @@ public final class Constants {
         /* Motor Control Values */
         public static final double intakeVoltage = -1.50;
         public static final double rejectVoltage = 0.50;
+    }
+
+    public static final class Pose {
+        public static final int pigeonID = 1;
+
+        public static final PIDController rotationPID = new PIDController(0.003, 0.0, 0.0); // kI was 0.050 for NCCMP 2024
+        public static final double rotationKS = 0.02;
+        public static final double rotationIZone = 2.0; // degrees
+
+        public static final double tiltWarning = 5.0;
+        public static final double tiltError = 10.0;
+
+        public static final double fieldWidth = Units.inchesToMeters(26*12 + 5);
+        public static final double fieldLength = Units.inchesToMeters(57*12 + 6.875);
+
+        public static final double reefElevatorZoneRadius = Units.inchesToMeters(80.0); // TODO Revisit
+        public static final double autoUpDistance = Units.inchesToMeters(24.0);
+        public static final double wingLength = Units.inchesToMeters(280);
+
+        public static final double robotFrameLength = Units.inchesToMeters(30);
+        public static final double bumperWidth = Units.inchesToMeters(3.2);
+        public static final double reefStandoff = Units.inchesToMeters(1.0);
+        public static final double reefOffset = robotFrameLength / 2.0 + bumperWidth + reefStandoff;
+        public static final double reefExtraOffset = Units.inchesToMeters(6.0);
+        public static final double bonusStandoff = Units.inchesToMeters(4.0);
+
+        // Locations from the Blue Alliance perspective
+        public static final Translation2d reefCenter = new Translation2d(Units.inchesToMeters(176.75), fieldWidth / 2.0);
+        public static final double reefToFaceDistance = reefCenter.getX() - Units.inchesToMeters(144.0);
+        public static final double branchSeparation = Units.inchesToMeters(12.0 + 15.0 / 16.0);
+
+        // Offset to the reef face, not at the branches, but on the faces directly in front
+        public static final Translation2d centerOffset = new Translation2d(reefToFaceDistance + reefOffset, 0.0);
+        private static final Translation2d leftOffset = new Translation2d(reefToFaceDistance + reefOffset, -branchSeparation / 2.0);
+        private static final Translation2d rightOffset = new Translation2d(reefToFaceDistance + reefOffset, branchSeparation / 2.0);
+        private static final Translation2d extraOffset = new Translation2d(reefExtraOffset, 0.0);
+        private static final Translation2d centerApproachOffset = centerOffset.plus(extraOffset);
+        private static final Translation2d leftApproachOffset = leftOffset.plus(extraOffset);
+        private static final Translation2d rightApproachOffset = rightOffset.plus(extraOffset);
+        private static final Translation2d bonusOffset = new Translation2d(bonusStandoff, 0.0);
+        private static final Translation2d leftBonusOffset = leftOffset.plus(bonusOffset);
+        private static final Translation2d rightBonusOffset = rightOffset.plus(bonusOffset);
+
+        public static final double elevatorNoDownDistance = reefToFaceDistance + reefOffset + Units.inchesToMeters(12.0);
+
+        public static enum ReefFace {
+            AB(-180, true),
+            CD(-120, false),
+            EF(-60, true),
+            GH(0, false),
+            IJ(60, true),
+            KL(120, false);
+
+            ReefFace(double directionDegrees, boolean algaeHigh) {
+                directionFromCenter = Rotation2d.fromDegrees(directionDegrees);
+                alignMiddle = new Pose2d(reefCenter.plus(centerOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
+                alignLeft = new Pose2d(reefCenter.plus(leftOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
+                alignRight = new Pose2d(reefCenter.plus(rightOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
+                approachMiddle = new Pose2d(reefCenter.plus(centerApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
+                approachLeft = new Pose2d(reefCenter.plus(leftApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
+                approachRight = new Pose2d(reefCenter.plus(rightApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
+                alignBonusLeft = new Pose2d(reefCenter.plus(leftBonusOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
+                alignBonusRight = new Pose2d(reefCenter.plus(rightBonusOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
+                this.algaeHigh = algaeHigh;
+            }
+
+            public final Rotation2d directionFromCenter;
+            public final Pose2d alignLeft, alignMiddle, alignRight;
+            public final Pose2d approachLeft, approachMiddle, approachRight;
+            public final Pose2d alignBonusLeft, alignBonusRight;
+            public final boolean algaeHigh;
+        }
     }
 
     public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot

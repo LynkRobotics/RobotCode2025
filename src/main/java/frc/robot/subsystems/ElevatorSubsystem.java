@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 import frc.robot.Constants;
+import frc.robot.Constants.Elevator.Stop;
 import frc.robot.commands.LoggedCommands;
 import frc.robot.subsystems.RobotState.CoralState;
 import frc.robot.subsystems.RobotState.GamePiece;
@@ -46,24 +47,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     private boolean autoUp = false;
     
     private final double positionDiffMax = 0.5;
-
-    public enum Stop {
-        // Intake occurs at zero
-        SAFE     (Constants.Elevator.baseHeight + 5.0),
-        L1       (26.0  - Constants.Elevator.endEffectorHeight),
-        L2       (34.5  - Constants.Elevator.endEffectorHeight),
-        L2_ALGAE (38.0  - Constants.Elevator.endEffectorHeight),
-        L3       (50.0  - Constants.Elevator.endEffectorHeight),
-        L3_ALGAE (55.0  - Constants.Elevator.endEffectorHeight),
-        L4       (75.0  - Constants.Elevator.endEffectorHeight),
-        L4_SCORE (77.75 - Constants.Elevator.endEffectorHeight);
-
-        Stop(double height) {
-            this.height = height;
-        }
-
-        public final double height;
-    }
 
     public ElevatorSubsystem() {
         leftMotor = new TalonFX(Constants.Elevator.leftID, Constants.Elevator.canBus);
@@ -162,16 +145,20 @@ public class ElevatorSubsystem extends SubsystemBase {
         leftMotor.setControl(voltageOut.withOutput(voltage));
     }
 
+    public double bonusHeight(Stop stop) {
+        return (stop == Stop.L1 || stop == Stop.L2 || stop == Stop.L3 || stop == Stop.L4) ? Constants.Elevator.standoffBoost : 0.0;
+    }
+
     public Command Move(Stop stop) {
         return IfNotBlocked(LoggedCommands.sequence("Move Elevator to " + stop,
-            Commands.runOnce(() -> setHeight(stop.height), this),
+            Commands.runOnce(() -> setHeight(stop.height + bonusHeight(stop)), this),
             LoggedCommands.idle("Idle to hold elevator", this)));
     }
 
     public Command GoToNext() {
         return IfNotBlocked(LoggedCommands.sequence("Move Elevator to stop",
             LoggedCommands.log(() -> "Next stop: " + nextStop),
-            Commands.runOnce(() -> setHeight(nextStop.height), this),
+            Commands.runOnce(() -> setHeight(nextStop.height + bonusHeight(nextStop)), this),
             LoggedCommands.idle("Idle to hold elevator", this)));
     }
 
@@ -193,7 +180,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             () -> autoUp = false,
             () -> {
                 if (!autoUp && PoseSubsystem.distanceTo(target) <= Constants.Pose.autoUpDistance) {
-                    setHeight(stopSupplier.get().height);
+                    setHeight(stopSupplier.get().height + bonusHeight(stopSupplier.get()));
                     autoUp = true;
                 }
             },
@@ -256,7 +243,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     private boolean atStop(Stop stop) {
-        double stopError = Math.abs(stop.height - getHeight());
+        double stopError = Math.abs(stop.height + bonusHeight(stop) - getHeight());
         // The safe stop is just a guideline, and has a wider margin for error
         double allowableError = stop == Stop.SAFE ? 3 * Constants.Elevator.positionError : Constants.Elevator.positionError;
 
