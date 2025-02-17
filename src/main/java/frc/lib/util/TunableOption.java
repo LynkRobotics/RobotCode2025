@@ -33,4 +33,8 @@ public class TunableOption implements BooleanSupplier {
   public boolean getAsBoolean() {
     return get();
   }
+
+  public boolean toggle() {
+    return SmartDashboard.putBoolean(key, !get());
+  }
 }

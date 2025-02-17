@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import frc.lib.util.TunableOption;
 import frc.robot.Constants;
 import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.Robot;
@@ -15,6 +14,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import static frc.robot.Options.*;
+
 public class TeleopSwerve extends LoggedCommandBase {
     private final Swerve s_Swerve;
     private final DoubleSupplier translationSup;
@@ -24,7 +25,6 @@ public class TeleopSwerve extends LoggedCommandBase {
     private PoseSubsystem s_Pose = null;
     private boolean autoAiming = false;
     private Rotation2d lastAngle = null;
-    private static final TunableOption optAutoReefAiming = new TunableOption("Automatically Aim at Reef", false);
 
     public TeleopSwerve(Swerve s_Swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, DoubleSupplier speedLimitSupplier) {
         super();

@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.Supplier;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -179,20 +181,31 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command AutoElevatorUp(Translation2d target) {
-        return LoggedCommands.startRun(
-            "Auto Elevator Up",
+        return AutoElevatorUp(target, () -> nextStop).withName("Auto Elevator Up to Next");
+    }
+
+    public Command AutoElevatorUp(Translation2d target, Stop stop) {
+        return AutoElevatorUp(target, () -> stop).withName("Auto Elevator Up to " + stop);
+    };
+
+    public Command AutoElevatorUp(Translation2d target, Supplier<Stop> stopSupplier) {
+        return LoggedCommands.startRun("Auto Elevator Up",
             () -> autoUp = false,
             () -> {
                 if (!autoUp && PoseSubsystem.distanceTo(target) <= Constants.Pose.autoUpDistance) {
-                    setHeight(nextStop.height);
+                    setHeight(stopSupplier.get().height);
                     autoUp = true;
                 }
             },
             this);
     };
 
+    public Command WaitForStop(Stop stop) {
+        return LoggedCommands.waitUntil("Wait for Elevator to reach " + stop, () -> atStop(stop));
+    }
+
     public Command WaitForNext() {
-        return LoggedCommands.waitUntil("Wait for Elevator at next stop", () -> atStop(nextStop));
+        return LoggedCommands.waitUntil("Wait for Elevator to reach next stop", () -> atStop(nextStop));
     }
 
     private boolean isStalled() {

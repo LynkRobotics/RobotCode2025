@@ -12,6 +12,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.RobotState.CoralState;
+import frc.robot.subsystems.RobotState.GamePiece;
 
 public class EndEffectorSubsystem extends SubsystemBase {
     /* Devices */
@@ -20,8 +21,10 @@ public class EndEffectorSubsystem extends SubsystemBase {
     private final VoltageOut feedControl = new VoltageOut(Constants.EndEffector.feedVoltage).withEnableFOC(true);
     private final VoltageOut advanceControl = new VoltageOut(Constants.EndEffector.advanceVoltage).withEnableFOC(true);
     private final VoltageOut scoreControl = new VoltageOut(Constants.EndEffector.scoreVoltage).withEnableFOC(true);
+    private final VoltageOut algaeControl = new VoltageOut(Constants.EndEffector.algaeVoltage).withEnableFOC(true);
     
     CoralState lastState = CoralState.REJECTING;
+    GamePiece lastPiece = GamePiece.CORAL;
 
     public EndEffectorSubsystem() {
         /* Devices */
@@ -46,8 +49,12 @@ public class EndEffectorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        GamePiece activePiece = RobotState.getActiveGamePiece();
         CoralState coralState = RobotState.getCoralState();
 
+        if (activePiece == GamePiece.ALGAE && lastPiece != GamePiece.ALGAE) {
+            motor.setControl(algaeControl);
+        }
         if (coralState != lastState) {
             if (coralState == CoralState.FEEDING) {
                 DogLog.log("EndEffector/Control", "Feeding");
@@ -68,5 +75,6 @@ public class EndEffectorSubsystem extends SubsystemBase {
         }
         
         lastState = coralState;
+        lastPiece = activePiece;
     }
 }

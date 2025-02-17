@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static frc.robot.Options.optAutoReefAiming;
+
 import java.util.EnumMap;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -138,6 +140,15 @@ public class RobotContainer {
 
         // Configure the button bindings
         configureButtonBindings();
+
+        // Debug PathPlanner commands
+        try {
+            PathPlannerPath path = PathPlannerPath.fromPathFile("Approach E");
+            PathConstraints constraints = new PathConstraints(2.0, 1.0, Units.degreesToRadians(360.0), Units.degreesToRadians(720.0));
+            SmartDashboard.putData(LoggedCommands.logWithName("Auto Align Left", AutoBuilder.pathfindThenFollowPath(path, constraints)));
+        } catch (Exception exception) {
+            LoggedAlert.Error("PathPlanner", "Left Approach Bind Failure", exception.getMessage());
+        }
     }
 
     private Command ScoreCoral(ReefFace face, boolean left) {
@@ -147,20 +158,27 @@ public class RobotContainer {
                     new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, false),
                     new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true),
                     s_Swerve.Stop()),
-                LoggedCommands.deadline("Wait for auto up",
-                    s_Elevator.WaitForNext(),
-                    s_Elevator.AutoElevatorUp(left ? face.alignLeft.getTranslation() : face.alignRight.getTranslation()))),
+                Commands.sequence(
+                    RobotState.WaitForCoralReady(),
+                    LoggedCommands.deadline("Wait for auto up",
+                        s_Elevator.WaitForNext(),
+                        s_Elevator.AutoElevatorUp(left ? face.alignLeft.getTranslation() : face.alignRight.getTranslation())))),
             RobotState.ScoreGamePiece());
     }
 
-    // TODO
     private Command DeAlgaefy(ReefFace face) {
+        Stop algaeStop = face.algaeHigh ? Stop.L3_ALGAE: Stop.L2_ALGAE;
+
         return LoggedCommands.sequence("Auto Align Middle " + face.toString(),
+            RobotState.SwitchGamePiece(GamePiece.ALGAE),
             LoggedCommands.parallel("PID Align Middle " + face.toString(),
                 Commands.sequence(
                     new PIDSwerve(s_Swerve, s_Pose, face.approachMiddle, false),
                     new PIDSwerve(s_Swerve, s_Pose, face.alignMiddle, true),
-                    s_Swerve.Stop())));
+                    s_Swerve.Stop()),
+                LoggedCommands.deadline("Wait for auto up",
+                    s_Elevator.WaitForStop(algaeStop),
+                    s_Elevator.AutoElevatorUp(face.alignMiddle.getTranslation(), algaeStop))));
     }
     
     private void setFaceCommands(ReefFace face) {
@@ -172,6 +190,12 @@ public class RobotContainer {
 
     private double speedLimitFactor() {
         return 1.0 - s_Elevator.raisedPercentage() * (1.0 - Constants.Elevator.speedLimitAtMax);
+    }
+
+    private Command SetStop(Stop stop) {
+        return LoggedCommands.sequence("Set stop to " + stop,
+            RobotState.SwitchGamePiece(GamePiece.CORAL),
+            Commands.runOnce(() -> s_Elevator.setNextStop(stop)));
     }
 
     /**
@@ -192,35 +216,17 @@ public class RobotContainer {
         final Trigger L3 = driver.x();
         final Trigger L2 = driver.b();
         final Trigger L1 = driver.a();
-        final Trigger alignLeft = driver.povLeft();
-        final Trigger toggleGamePiece = driver.back();
         final Trigger zero = driver.start();
+        final Trigger alignmentToggle = driver.back();
 
+        // Only used in case of automation failure
         moveElevator.whileTrue(s_Elevator.GoToNext());
         score.onTrue(RobotState.ScoreGamePiece());
-        L4.onTrue(LoggedCommands.runOnce("Set stop to L4", () -> s_Elevator.setNextStop(Stop.L4)));
-        L3.onTrue(
-            Commands.either(
-                LoggedCommands.runOnce("Set stop to L3 Algae", () -> s_Elevator.setNextStop(Stop.L3_ALGAE)),
-                LoggedCommands.runOnce("Set stop to L3", () -> s_Elevator.setNextStop(Stop.L3)),
-                () -> RobotState.getActiveGamePiece() == GamePiece.ALGAE));
-        L2.onTrue(
-            Commands.either(
-                LoggedCommands.runOnce("Set stop to L2 Algae", () -> s_Elevator.setNextStop(Stop.L2_ALGAE)),
-                LoggedCommands.runOnce("Set stop to L2", () -> s_Elevator.setNextStop(Stop.L2)),
-                () -> RobotState.getActiveGamePiece() == GamePiece.ALGAE));
-        L1.onTrue(LoggedCommands.runOnce("Set stop to L1", () -> s_Elevator.setNextStop(Stop.L1)));
 
-        toggleGamePiece.onTrue(RobotState.ToggleGamePiece());
-
-        try {
-            PathPlannerPath path = PathPlannerPath.fromPathFile("Approach E");
-            PathConstraints constraints = new PathConstraints(2.0, 1.0, Units.degreesToRadians(360.0), Units.degreesToRadians(720.0));
-            alignLeft.whileTrue(LoggedCommands.logWithName("Auto Align Left", AutoBuilder.pathfindThenFollowPath(path, constraints)));
-            SmartDashboard.putData(LoggedCommands.logWithName("Auto Align Left", AutoBuilder.pathfindThenFollowPath(path, constraints)));
-        } catch (Exception exception) {
-            LoggedAlert.Error("PathPlanner", "Left Approach Bind Failure", exception.getMessage());
-        }
+        L4.onTrue(SetStop(Stop.L4));
+        L3.onTrue(SetStop(Stop.L3));
+        L2.onTrue(SetStop(Stop.L2));
+        L1.onTrue(SetStop(Stop.L1));
 
         goLeft.whileTrue(
             Commands.either(
@@ -233,6 +239,8 @@ public class RobotContainer {
                 Commands.select(alignRightCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation())),
                 Commands.select(deAlgaefyRightCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation())),
                 RobotState::haveCoral));
+
+        alignmentToggle.onTrue(LoggedCommands.runOnce("Toggle Alignment", optAutoReefAiming::toggle));
 
         zero.onTrue(s_Elevator.Zero());
     }

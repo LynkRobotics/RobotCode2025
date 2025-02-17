@@ -312,6 +312,7 @@ public final class Constants {
         public static final double feedVoltage = -2.00;
         public static final double advanceVoltage = -0.70;
         public static final double scoreVoltage = -3.00;
+        public static final double algaeVoltage = 3.00;
     }
 
     public static final class Index {
