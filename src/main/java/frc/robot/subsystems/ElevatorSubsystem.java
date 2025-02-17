@@ -109,20 +109,20 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command Zero() {
-        return LoggedCommands.sequence("Zero Elevator",
+        return IfNotBlocked(LoggedCommands.sequence("Zero Elevator",
             Commands.runOnce(() -> zeroing = true),
             Commands.deadline(
                 LoggedCommands.waitUntil("Wait for stall", this::isStalled),
                 Lower()).handleInterrupt(() -> zeroing = false),
-            SetZero());
+            SetZero()));
     }
 
     public Command FastZero() {
-        return LoggedCommands.sequence("Fast Zero",
+        return IfNotBlocked(LoggedCommands.sequence("Fast Zero",
             Commands.deadline(
                 LoggedCommands.waitUntil("Wait for elevator in safe zone", this::isSafe),
                 Move(Stop.SAFE)),
-            Zero());
+            Zero()));
     }
 
     public Command Raise() {
@@ -163,16 +163,16 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command Move(Stop stop) {
-        return LoggedCommands.sequence("Move Elevator to " + stop,
+        return IfNotBlocked(LoggedCommands.sequence("Move Elevator to " + stop,
             Commands.runOnce(() -> setHeight(stop.height), this),
-            LoggedCommands.idle("Idle to hold elevator", this));
+            LoggedCommands.idle("Idle to hold elevator", this)));
     }
 
     public Command GoToNext() {
-        return LoggedCommands.sequence("Move Elevator to stop",
+        return IfNotBlocked(LoggedCommands.sequence("Move Elevator to stop",
             LoggedCommands.log(() -> "Next stop: " + nextStop),
             Commands.runOnce(() -> setHeight(nextStop.height), this),
-            LoggedCommands.idle("Idle to hold elevator", this));
+            LoggedCommands.idle("Idle to hold elevator", this)));
     }
 
     public void setNextStop(Stop stop) {
@@ -189,7 +189,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     };
 
     public Command AutoElevatorUp(Translation2d target, Supplier<Stop> stopSupplier) {
-        return LoggedCommands.startRun("Auto Elevator Up",
+        return IfNotBlocked(LoggedCommands.startRun("Auto Elevator Up",
             () -> autoUp = false,
             () -> {
                 if (!autoUp && PoseSubsystem.distanceTo(target) <= Constants.Pose.autoUpDistance) {
@@ -197,7 +197,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                     autoUp = true;
                 }
             },
-            this);
+            this));
     };
 
     public Command WaitForStop(Stop stop) {
@@ -273,6 +273,14 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public double raisedPercentage() {
         return MathUtil.clamp((getHeight() - Stop.L1.height) / Stop.L4_SCORE.height, 0.0, 1.0);
+    }
+
+    public Command IfNotBlocked(Command command) {
+        return LoggedCommands.either("Block check then run " + command.getName(),
+            command,
+            LoggedCommands.runOnce("Blocked Elevator Warning",
+                () -> LoggedAlert.Warning("Elevator", "Blocked", "Block Elevator prevents running " + command.getName())),
+            () -> !RobotState.elevatorPathBlocked());
     }
 
     private void applyConfigs() {
