@@ -18,8 +18,8 @@ public class PIDSwerve extends LoggedCommandBase {
     private final Pose2d targetPose;
     private final boolean precise;
 
-    private final PIDController xPID = new PIDController(0.08, 0, 0); //TODO Make Constants
-    private final PIDController yPID = new PIDController(0.08, 0, 0);
+    private final PIDController xPID = new PIDController(0.1, 0, 0); //TODO Make Constants
+    private final PIDController yPID = new PIDController(0.1, 0, 0);
     private final double positionTolerance = 1.0; // inches
     private final double roughPositionTolerance = 2.5; // inches
     private final double maxSpeed = Constants.Swerve.maxSpeed / 3.0;
@@ -95,6 +95,10 @@ public class PIDSwerve extends LoggedCommandBase {
         double correction = rotationPID.calculate(rotation.getDegrees());
         double feedForward = Pose.rotationKS * Math.signum(correction);
         double rotationVal = MathUtil.clamp(correction + feedForward, -1.0, 1.0);
+        DogLog.log("PIDSwerve/Rot position", rotation.getDegrees());
+        DogLog.log("PIDSwerve/Rot correction", correction);
+        DogLog.log("PIDSwerve/Rot feedforward", feedForward);
+        DogLog.log("PIDSwerve/Rot value", rotationVal);
 
         /* Drive */
         s_Swerve.drive(
