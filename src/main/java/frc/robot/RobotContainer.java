@@ -221,7 +221,7 @@ public class RobotContainer {
         final Trigger L2 = driver.b();
         final Trigger L1 = driver.a();
         final Trigger zero = driver.start();
-        final Trigger alignmentToggle = driver.back();
+        final Trigger alignmentToggle = driver.rightStick();
 
         // Only used in case of automation failure
         moveElevator.whileTrue(s_Elevator.GoToNext());
