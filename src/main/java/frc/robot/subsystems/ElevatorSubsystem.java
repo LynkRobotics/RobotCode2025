@@ -26,7 +26,6 @@ import frc.robot.Constants;
 import frc.robot.Constants.Elevator.Stop;
 import frc.robot.commands.LoggedCommands;
 import frc.robot.subsystems.RobotState.CoralState;
-import frc.robot.subsystems.RobotState.GamePiece;
 
 public class ElevatorSubsystem extends SubsystemBase {
     private final TalonFX leftMotor;
@@ -308,9 +307,6 @@ public class ElevatorSubsystem extends SubsystemBase {
             Commands.runOnce(() -> {
                 movingToSafety = true;
                 safetyDeferred = false;
-                if (RobotState.getActiveGamePiece() == GamePiece.ALGAE && !RobotState.haveAlgae()) {
-                    RobotState.setActiveGamePiece(GamePiece.CORAL);
-                }
             }),
             Commands.either(
                 Move(Stop.L1),
@@ -320,7 +316,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                         FastZero(),
                         RobotState::haveAlgae),
                     LoggedCommands.idle("Elevator holding at zero", this)),
-                () -> RobotState.getActiveGamePiece() == GamePiece.CORAL && RobotState.getCoralState() == CoralState.READY))
+                () -> RobotState.getCoralState() == CoralState.READY))
                 .handleInterrupt(() -> movingToSafety = false);
 
     }
@@ -380,12 +376,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         lastPosition = position;
 
         // TODO Can we move this into ScoreGamePiece command?
-        if (RobotState.getActiveGamePiece() == GamePiece.CORAL && RobotState.getCoralState() == CoralState.SCORING && atStop(Stop.L4)) {
+        if (RobotState.getCoralState() == CoralState.SCORING && atStop(Stop.L4)) {
             setHeight(Stop.L4_SCORE.height); // TODO Avoid repeatedly calling ... even though it might not be an issue?
         }
 
         // If we have Coral ready, and the Elevator is still at zero, cancel the current default command so that it runs again with the L1 default
-        if (RobotState.getActiveGamePiece() == GamePiece.CORAL && RobotState.getCoralState() == CoralState.READY && RobotState.getElevatorAtZero()) {
+        if (RobotState.getCoralState() == CoralState.READY && RobotState.getElevatorAtZero()) {
             Command currentCommand = getCurrentCommand();
             if (currentCommand != null) {
                 currentCommand.cancel();

@@ -30,7 +30,6 @@ import frc.robot.Constants.Pose.ReefFace;
 import frc.robot.Constants.Elevator.Stop;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.RobotState.GamePiece;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -174,7 +173,7 @@ public class RobotContainer {
         Stop algaeStop = face.algaeHigh ? Stop.L3_ALGAE: Stop.L2_ALGAE;
 
         return LoggedCommands.sequence("Auto Align Middle " + face.toString(),
-            RobotState.SwitchGamePiece(GamePiece.ALGAE),
+            RobotState.IntakeAlgae(),
             LoggedCommands.parallel("PID Align Middle " + face.toString(),
                 Commands.sequence(
                     new PIDSwerve(s_Swerve, s_Pose, face.approachMiddle, false),
@@ -198,7 +197,7 @@ public class RobotContainer {
 
     private Command SetStop(Stop stop) {
         return LoggedCommands.sequence("Set stop to " + stop,
-            RobotState.SwitchGamePiece(GamePiece.CORAL),
+            RobotState.SetCoralMode(),
             Commands.runOnce(() -> s_Elevator.setNextStop(stop)));
     }
 

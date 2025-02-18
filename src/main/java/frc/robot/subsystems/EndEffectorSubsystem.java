@@ -11,8 +11,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.RobotState.AlgaeState;
 import frc.robot.subsystems.RobotState.CoralState;
-import frc.robot.subsystems.RobotState.GamePiece;
 
 public class EndEffectorSubsystem extends SubsystemBase {
     /* Devices */
@@ -22,9 +22,10 @@ public class EndEffectorSubsystem extends SubsystemBase {
     private final VoltageOut advanceControl = new VoltageOut(Constants.EndEffector.advanceVoltage).withEnableFOC(true);
     private final VoltageOut scoreControl = new VoltageOut(Constants.EndEffector.scoreVoltage).withEnableFOC(true);
     private final VoltageOut algaeControl = new VoltageOut(Constants.EndEffector.algaeVoltage).withEnableFOC(true);
+    private final VoltageOut algaeOutControl = new VoltageOut(Constants.EndEffector.algaeOutVoltage).withEnableFOC(true);
     
-    CoralState lastState = CoralState.REJECTING;
-    GamePiece lastPiece = GamePiece.CORAL;
+    CoralState lastCoralState = CoralState.REJECTING;
+    AlgaeState lastAlgaeState = AlgaeState.NONE;
 
     public EndEffectorSubsystem() {
         /* Devices */
@@ -49,14 +50,25 @@ public class EndEffectorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        GamePiece activePiece = RobotState.getActiveGamePiece();
+        AlgaeState algaeState = RobotState.getAlgaeState();
         CoralState coralState = RobotState.getCoralState();
 
-        if (activePiece == GamePiece.ALGAE && lastPiece != GamePiece.ALGAE) {
-            DogLog.log("EndEffector/Control", "Algae");
-            motor.setControl(algaeControl);
+        if (algaeState != lastAlgaeState) {
+            if (algaeState == AlgaeState.NONE) {
+                DogLog.log("EndEffector/Control", "Stopping (no algae)");
+                motor.stopMotor();
+            } else if (algaeState == AlgaeState.INTAKING) {
+                DogLog.log("EndEffector/Control", "Intaking algae");
+                motor.setControl(algaeControl);
+            } else if (algaeState == AlgaeState.HOLDING) {
+                // No change currently
+            } else if (algaeState == AlgaeState.SCORING) {
+                motor.setControl(algaeOutControl);
+                // TODO How to persist?
+            }
+            lastAlgaeState = algaeState;
         }
-        if (activePiece == GamePiece.CORAL && coralState != lastState) {
+        if (coralState != lastCoralState || (algaeState != lastAlgaeState && algaeState == AlgaeState.NONE)) {
             if (coralState == CoralState.FEEDING) {
                 DogLog.log("EndEffector/Control", "Feeding");
                 motor.setControl(feedControl);
@@ -70,18 +82,16 @@ public class EndEffectorSubsystem extends SubsystemBase {
                 DogLog.log("EndEffector/Control", "Scoring");
                 motor.setControl(scoreControl);
             } else {
-                DogLog.log("EndEffector/Control", "Stopping");
+                DogLog.log("EndEffector/Control", "Stopping (coral state)");
                 motor.stopMotor();
             }
-            lastState = coralState;
+            lastCoralState = coralState;
         }
         
-        lastPiece = activePiece;
-
         double current = motor.getTorqueCurrent().getValueAsDouble();
         DogLog.log("EndEffector/TorqueCurrent", motor.getTorqueCurrent().getValueAsDouble());
 
-        if (activePiece == GamePiece.ALGAE) {
+        if (algaeState != AlgaeState.NONE) {
             if (current > 80.0 && !RobotState.getFinalSensor()) {
                 RobotState.setHaveAlgae();
             }
