@@ -239,7 +239,7 @@ public final class Constants {
             L2       (34.5  - Constants.Elevator.endEffectorHeight),
             L2_ALGAE (38.0  - Constants.Elevator.endEffectorHeight),
             L3       (50.0  - Constants.Elevator.endEffectorHeight),
-            L3_ALGAE (55.0  - Constants.Elevator.endEffectorHeight),
+            L3_ALGAE (53.5  - Constants.Elevator.endEffectorHeight),
             L4       (75.0  - Constants.Elevator.endEffectorHeight),
             L4_SCORE (77.75 - Constants.Elevator.endEffectorHeight);
     
