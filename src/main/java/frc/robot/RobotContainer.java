@@ -158,8 +158,8 @@ public class RobotContainer {
                 Commands.sequence(
                     new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, false),
                     Commands.either(
-                        new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true),
                         new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true),
+                        new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true),
                         optBonusCoralStandoff::get),
                     s_Swerve.Stop()),
                 Commands.sequence(
