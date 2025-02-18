@@ -64,7 +64,7 @@ public class LEDSubsystem extends SubsystemBase {
     m_candle.configV5Enabled(true);
     m_candle.configLOSBehavior(false); // TODO: true -- why is this triggering?
     // m_candle.animate(new RainbowAnimation(1,0.4, 94));
-    m_candle.animate(new FireAnimation(1.0, 0.5, 94, 0.5, 0.5));
+    m_candle.animate(new FireAnimation(1.0, 0.3, 94, 0.65, 0.25));
     // setBaseState(BaseState.READY);
   }
 
