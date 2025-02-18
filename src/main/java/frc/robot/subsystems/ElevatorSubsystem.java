@@ -309,7 +309,10 @@ public class ElevatorSubsystem extends SubsystemBase {
             Commands.either(
                 Move(Stop.L1),
                 LoggedCommands.sequence("Zero and Idle",
-                    FastZero(),
+                    Commands.either(
+                        Zero(),
+                        FastZero(),
+                        RobotState::getHaveAlgae),
                     LoggedCommands.idle("Elevator holding at zero", this)),
                 () -> RobotState.getActiveGamePiece() == GamePiece.CORAL && RobotState.getCoralState() == CoralState.READY))
                 .handleInterrupt(() -> movingToSafety = false);

@@ -153,6 +153,20 @@ public class RobotState extends SubsystemBase {
         return coralState;
     }
 
+    public static void setHaveAlgae(boolean haveAlgae) {
+        // Only revert to coral if we have algae and then lose it
+        if (!haveAlgae && RobotState.haveAlgae) {
+            // TODO Do we need to allow time to score algae first?
+            // Maybe have the scoring trigger lock the state until released?
+            activePiece = GamePiece.CORAL;
+        }
+        RobotState.haveAlgae = haveAlgae;
+    }
+
+    public static boolean getHaveAlgae() {
+        return haveAlgae;
+    }
+
     @Override
     public void periodic() {
         boolean intakeSensor = getIntakeSensor();
@@ -163,23 +177,14 @@ public class RobotState extends SubsystemBase {
         DogLog.log("State/Flipper sensor", flipperSensor);
         DogLog.log("State/Final sensor", finalSensor);
         DogLog.log("State/Coral State", coralState);
+        DogLog.log("State/Game Piece", activePiece);
+        DogLog.log("State/Have Algae", haveAlgae);
 
         SmartDashboard.putString("State/Active Game Piece", getActiveGamePiece() == GamePiece.CORAL ? "#FFFFFF" : "#48B6AB");
 
         if (activePiece != GamePiece.CORAL) {
             assert(activePiece == GamePiece.ALGAE);
             coralState = CoralState.REJECTING;
-            if (finalSensor) {
-                haveAlgae = true;
-            } else {
-                // Only revert to coral if we have algae and then lose it
-                if (haveAlgae) {
-                    // TODO Do we need to allow time to score algae first?
-                    // Maybe have the scoring trigger lock the state until released?
-                    haveAlgae = false;
-                    activePiece = GamePiece.CORAL;
-                }
-            }
         } else if (intakeSensor && flipperSensor && finalSensor) {
             // No Coral is present
             coralState = elevatorAtZero ? CoralState.INTAKING : CoralState.REJECTING;
