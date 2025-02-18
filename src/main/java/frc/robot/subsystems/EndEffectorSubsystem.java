@@ -89,10 +89,11 @@ public class EndEffectorSubsystem extends SubsystemBase {
         double current = motor.getTorqueCurrent().getValueAsDouble();
         DogLog.log("EndEffector/TorqueCurrent", motor.getTorqueCurrent().getValueAsDouble());
 
-        if (gamePieceState == GamePieceState.INTAKING_ALGAE || gamePieceState == GamePieceState.HOLDING_ALGAE || gamePieceState == GamePieceState.SCORING_ALGAE) {
-            if (current > 80.0 && !RobotState.getFinalSensor()) {
-                RobotState.setHaveAlgae();
-            }
+        if (gamePieceState == GamePieceState.INTAKING_ALGAE && current > 80.0 && !RobotState.getFinalSensor()) {
+            RobotState.setHaveAlgae();
+        }
+        if (gamePieceState == GamePieceState.HOLDING_ALGAE || gamePieceState == GamePieceState.SCORING_ALGAE) {
+            // TODO Hold scoring state longer?
             if (current < 60.0) {
                 RobotState.setNoAlgae();
             }
