@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import java.util.function.Supplier;
 
+import com.ctre.phoenix.GadgeteerUartClient.GadgeteerConnection;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -305,7 +306,13 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Command MoveToSafety() {
         return LoggedCommands.sequence("Move Elevator to Safety",
-            Commands.runOnce(() -> { movingToSafety = true; safetyDeferred = false; }),
+            Commands.runOnce(() -> {
+                movingToSafety = true;
+                safetyDeferred = false;
+                if (RobotState.getActiveGamePiece() == GamePiece.ALGAE && !RobotState.getHaveAlgae()) {
+                    RobotState.setActiveGamePiece(GamePiece.CORAL);
+                }
+            }),
             Commands.either(
                 Move(Stop.L1),
                 LoggedCommands.sequence("Zero and Idle",
