@@ -308,7 +308,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             Commands.runOnce(() -> {
                 movingToSafety = true;
                 safetyDeferred = false;
-                if (RobotState.getActiveGamePiece() == GamePiece.ALGAE && !RobotState.getHaveAlgae()) {
+                if (RobotState.getActiveGamePiece() == GamePiece.ALGAE && !RobotState.haveAlgae()) {
                     RobotState.setActiveGamePiece(GamePiece.CORAL);
                 }
             }),
@@ -318,7 +318,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                     Commands.either(
                         Zero(),
                         FastZero(),
-                        RobotState::getHaveAlgae),
+                        RobotState::haveAlgae),
                     LoggedCommands.idle("Elevator holding at zero", this)),
                 () -> RobotState.getActiveGamePiece() == GamePiece.CORAL && RobotState.getCoralState() == CoralState.READY))
                 .handleInterrupt(() -> movingToSafety = false);

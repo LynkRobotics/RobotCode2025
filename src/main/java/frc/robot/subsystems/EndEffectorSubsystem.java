@@ -53,6 +53,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
         CoralState coralState = RobotState.getCoralState();
 
         if (activePiece == GamePiece.ALGAE && lastPiece != GamePiece.ALGAE) {
+            DogLog.log("EndEffector/Control", "Algae");
             motor.setControl(algaeControl);
         }
         if (activePiece == GamePiece.CORAL && coralState != lastState) {
@@ -77,12 +78,15 @@ public class EndEffectorSubsystem extends SubsystemBase {
         
         lastPiece = activePiece;
 
+        double current = motor.getTorqueCurrent().getValueAsDouble();
         DogLog.log("EndEffector/TorqueCurrent", motor.getTorqueCurrent().getValueAsDouble());
+
         if (activePiece == GamePiece.ALGAE) {
-            if (motor.getTorqueCurrent().getValueAsDouble() > 80.0) {
-                RobotState.setHaveAlgae(true);
-            } else {
-                RobotState.setHaveAlgae(false);
+            if (current > 80.0 && !RobotState.getFinalSensor()) {
+                RobotState.setHaveAlgae();
+            }
+            if (current < 60.0) {
+                RobotState.setNoAlgae();
             }
         }
     }

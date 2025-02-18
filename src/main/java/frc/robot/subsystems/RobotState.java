@@ -21,10 +21,10 @@ public class RobotState extends SubsystemBase {
     private static PoseSubsystem pose;
     private static final CANdi candi;
     private static final DigitalInput indexSensor;
-    private static GamePiece activePiece = GamePiece.CORAL;
+    private static GamePiece activePiece = GamePiece.CORAL; // TODO Needed?  Or equivalent to AlgaeState.NONE?
     private static boolean elevatorAtZero = false;
     private static CoralState coralState = CoralState.REJECTING;
-    private static boolean haveAlgae = false;
+    private static AlgaeState algaeState = AlgaeState.NONE;
 
     private static final TunableOption optOverrideElevatorPathBlocked = new TunableOption("Override Elevator Path Blocked", false);
     private static final TunableOption optOverrideReefElevatorZone = new TunableOption("Override Reef Safe Elevator Zone", true);
@@ -41,6 +41,13 @@ public class RobotState extends SubsystemBase {
         FEEDING,
         ADVANCING,
         READY,
+        SCORING
+    }
+
+    public enum AlgaeState {
+        NONE,
+        INTAKING,
+        HOLDING,
         SCORING
     }
 
@@ -140,31 +147,34 @@ public class RobotState extends SubsystemBase {
     }
 
     public static Command ScoreGamePiece() {
-        // TODO Support Algae -- does Algae need a state? (NONE, INTAKE, HOLD, SCORE, etc.) rather than a haveAlgae boolean
         return Commands.either(
-            LoggedCommands.sequence("Score Game Piece",
-                LoggedCommands.runOnce("Initiate Scoring", () -> coralState = CoralState.SCORING),
-                LoggedCommands.waitUntil("Wait for Score", RobotState::getFinalSensor)),
-            LoggedCommands.runOnce("Cannot Score", () -> LoggedAlert.Warning("Robot State", "Cannot Score", "Cannot score coral without coral ready")),
-            () -> coralState == CoralState.READY);
+            LoggedCommands.runOnce("Score Algae", () -> algaeState = AlgaeState.SCORING),
+            Commands.either(
+                LoggedCommands.sequence("Score Coral",
+                    LoggedCommands.runOnce("Initiate Scoring", () -> coralState = CoralState.SCORING),
+                    LoggedCommands.waitUntil("Wait for Score", RobotState::getFinalSensor)),
+                LoggedCommands.runOnce("Cannot Score", () -> LoggedAlert.Warning("Robot State", "Cannot Score", "Cannot score coral without coral ready")),
+                () -> coralState == CoralState.READY),
+            RobotState::haveAlgae);
     }
 
     public static CoralState getCoralState() {
         return coralState;
     }
 
-    public static void setHaveAlgae(boolean haveAlgae) {
-        // Only revert to coral if we have algae and then lose it
-        if (!haveAlgae && RobotState.haveAlgae) {
-            // TODO Do we need to allow time to score algae first?
-            // Maybe have the scoring trigger lock the state until released?
-            activePiece = GamePiece.CORAL;
-        }
-        RobotState.haveAlgae = haveAlgae;
+    public static boolean haveAlgae() {
+        return activePiece == GamePiece.ALGAE && (algaeState == AlgaeState.HOLDING || algaeState == AlgaeState.SCORING);
     }
 
-    public static boolean getHaveAlgae() {
-        return haveAlgae;
+    public static void setHaveAlgae() {
+        if (algaeState == AlgaeState.NONE || algaeState == AlgaeState.INTAKING) {
+            algaeState = AlgaeState.HOLDING;
+        }
+    }
+
+    public static void setNoAlgae() {
+        algaeState = AlgaeState.NONE;
+        activePiece = GamePiece.CORAL;
     }
 
     @Override
@@ -177,8 +187,8 @@ public class RobotState extends SubsystemBase {
         DogLog.log("State/Flipper sensor", flipperSensor);
         DogLog.log("State/Final sensor", finalSensor);
         DogLog.log("State/Coral State", coralState);
+        DogLog.log("State/Algae State", algaeState);
         DogLog.log("State/Game Piece", activePiece);
-        DogLog.log("State/Have Algae", haveAlgae);
 
         SmartDashboard.putString("State/Active Game Piece", getActiveGamePiece() == GamePiece.CORAL ? "#FFFFFF" : "#48B6AB");
 
