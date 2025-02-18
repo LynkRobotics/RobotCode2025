@@ -11,7 +11,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.RobotState.CoralState;
+import frc.robot.subsystems.RobotState.GamePieceState;
 
 public class IndexSubsystem extends SubsystemBase {
     /* Devices */
@@ -44,9 +44,9 @@ public class IndexSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        CoralState coralState = RobotState.getCoralState();
+        GamePieceState gamePieceState = RobotState.getGamePieceState();
 
-        if (coralState == CoralState.INTAKING || coralState == CoralState.FEEDING) {
+        if (gamePieceState == GamePieceState.INTAKING_CORAL || gamePieceState == GamePieceState.FEEDING_CORAL) {
             if (!intaking) {
                 DogLog.log("Index/Control", "Intaking");
                 motor.setControl(intakeControl);

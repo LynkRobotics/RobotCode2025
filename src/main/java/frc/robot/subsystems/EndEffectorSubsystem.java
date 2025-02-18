@@ -11,8 +11,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.RobotState.AlgaeState;
-import frc.robot.subsystems.RobotState.CoralState;
+import frc.robot.subsystems.RobotState.GamePieceState;
 
 public class EndEffectorSubsystem extends SubsystemBase {
     /* Devices */
@@ -24,8 +23,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
     private final VoltageOut algaeControl = new VoltageOut(Constants.EndEffector.algaeVoltage).withEnableFOC(true);
     private final VoltageOut algaeOutControl = new VoltageOut(Constants.EndEffector.algaeOutVoltage).withEnableFOC(true);
     
-    CoralState lastCoralState = CoralState.REJECTING;
-    AlgaeState lastAlgaeState = AlgaeState.NONE;
+    GamePieceState lastState = GamePieceState.NONE;
 
     public EndEffectorSubsystem() {
         /* Devices */
@@ -50,48 +48,48 @@ public class EndEffectorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        AlgaeState algaeState = RobotState.getAlgaeState();
-        CoralState coralState = RobotState.getCoralState();
+        GamePieceState gamePieceState = RobotState.getGamePieceState();
 
-        if (algaeState != lastAlgaeState) {
-            if (algaeState == AlgaeState.NONE) {
-                DogLog.log("EndEffector/Control", "Stopping (no algae)");
+        if (gamePieceState != lastState) {
+            if (gamePieceState == GamePieceState.NONE) {
+                DogLog.log("EndEffector/Control", "Stopping (no game piece)");
                 motor.stopMotor();
-            } else if (algaeState == AlgaeState.INTAKING) {
+            } else if (gamePieceState == GamePieceState.INTAKING_ALGAE) {
                 DogLog.log("EndEffector/Control", "Intaking algae");
                 motor.setControl(algaeControl);
-            } else if (algaeState == AlgaeState.HOLDING) {
-                // No change currently
-            } else if (algaeState == AlgaeState.SCORING) {
+            } else if (gamePieceState == GamePieceState.HOLDING_ALGAE) {
+                // No change currently, but issue it anyway, for kicks
+                DogLog.log("EndEffector/Control", "Holding algae");
+                motor.setControl(algaeControl);
+            } else if (gamePieceState == GamePieceState.SCORING_ALGAE) {
                 motor.setControl(algaeOutControl);
                 // TODO How to persist?
-            }
-            lastAlgaeState = algaeState;
-        }
-        if (coralState != lastCoralState || (algaeState != lastAlgaeState && algaeState == AlgaeState.NONE)) {
-            if (coralState == CoralState.FEEDING) {
-                DogLog.log("EndEffector/Control", "Feeding");
-                motor.setControl(feedControl);
-            } else if (coralState == CoralState.ADVANCING) {
-                DogLog.log("EndEffector/Control", "Advancing");
-                motor.setControl(advanceControl);
-            } else if (coralState == CoralState.READY) {
-                DogLog.log("EndEffector/Control", "Stopping (ready)");
+            } else if (gamePieceState == GamePieceState.INTAKING_CORAL) {
+                DogLog.log("EndEffector/Control", "Stop (intaking coral)");
                 motor.stopMotor();
-            } else if (coralState == CoralState.SCORING) {
-                DogLog.log("EndEffector/Control", "Scoring");
+            } else if (gamePieceState == GamePieceState.FEEDING_CORAL) {
+                DogLog.log("EndEffector/Control", "Feeding coral");
+                motor.setControl(feedControl);
+            } else if (gamePieceState == GamePieceState.ADVANCING_CORAL) {
+                DogLog.log("EndEffector/Control", "Advancing coral");
+                motor.setControl(advanceControl);
+            } else if (gamePieceState == GamePieceState.HOLDING_CORAL) {
+                DogLog.log("EndEffector/Control", "Stopping (coral ready)");
+                motor.stopMotor();
+            } else if (gamePieceState == GamePieceState.SCORING_CORAL) {
+                DogLog.log("EndEffector/Control", "Scoring coral");
                 motor.setControl(scoreControl);
             } else {
-                DogLog.log("EndEffector/Control", "Stopping (coral state)");
+                DogLog.log("EndEffector/Control", "Stopping (unhandled state)");
                 motor.stopMotor();
             }
-            lastCoralState = coralState;
+            lastState = gamePieceState;
         }
         
         double current = motor.getTorqueCurrent().getValueAsDouble();
         DogLog.log("EndEffector/TorqueCurrent", motor.getTorqueCurrent().getValueAsDouble());
 
-        if (algaeState != AlgaeState.NONE) {
+        if (gamePieceState == GamePieceState.INTAKING_ALGAE || gamePieceState == GamePieceState.HOLDING_ALGAE || gamePieceState == GamePieceState.SCORING_ALGAE) {
             if (current > 80.0 && !RobotState.getFinalSensor()) {
                 RobotState.setHaveAlgae();
             }

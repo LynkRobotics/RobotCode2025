@@ -22,27 +22,22 @@ public class RobotState extends SubsystemBase {
     private static final CANdi candi;
     private static final DigitalInput indexSensor;
     private static boolean elevatorAtZero = false;
-    private static CoralState coralState = CoralState.REJECTING;
-    private static AlgaeState algaeState = AlgaeState.NONE;
+    private static GamePieceState gamePieceState = GamePieceState.NONE;
 
     private static final TunableOption optOverrideElevatorPathBlocked = new TunableOption("Override Elevator Path Blocked", false);
     private static final TunableOption optOverrideReefElevatorZone = new TunableOption("Override Reef Safe Elevator Zone", true);
     private static final TunableOption optOverrideElevatorDownAllowed = new TunableOption("Override Elevator Down Allowed", false);
 
-    public enum CoralState {
-        REJECTING,
-        INTAKING,
-        FEEDING,
-        ADVANCING,
-        READY,
-        SCORING
-    }
-
-    public enum AlgaeState {
+    public enum GamePieceState {
         NONE,
-        INTAKING,
-        HOLDING,
-        SCORING
+        INTAKING_ALGAE,
+        HOLDING_ALGAE,
+        SCORING_ALGAE,
+        INTAKING_CORAL,
+        FEEDING_CORAL,
+        ADVANCING_CORAL,
+        HOLDING_CORAL,
+        SCORING_CORAL
     }
 
     static {
@@ -87,7 +82,7 @@ public class RobotState extends SubsystemBase {
     }
 
     public static boolean haveCoral() {
-        return algaeState == AlgaeState.NONE && (!getIntakeSensor() || !getFlipperSensor() || !getFinalSensor());
+        return !haveAlgae() && (!getIntakeSensor() || !getFlipperSensor() || !getFinalSensor());
     }
 
     public static boolean elevatorPathBlocked() {
@@ -116,52 +111,59 @@ public class RobotState extends SubsystemBase {
     }
 
     public static Command WaitForCoralReady() {
-        return LoggedCommands.waitUntil("Wait for Coral Ready", () -> coralState == CoralState.READY);
+        return LoggedCommands.waitUntil("Wait for Coral Ready", () -> gamePieceState == GamePieceState.HOLDING_CORAL);
     }
 
     public static Command ScoreGamePiece() {
         return LoggedCommands.either("Score Game Piece",
             Commands.either(
-                LoggedCommands.runOnce("Score Algae", () -> algaeState = AlgaeState.SCORING),
+                LoggedCommands.runOnce("Score Algae", () -> gamePieceState = GamePieceState.SCORING_ALGAE),
                 LoggedCommands.runOnce("Cannot Score Algae", () -> LoggedAlert.Warning("Robot State", "Cannot Score", "Cannot score algae without holding algae")),
-                () -> algaeState == AlgaeState.HOLDING),
+                () -> gamePieceState == GamePieceState.HOLDING_ALGAE),
             Commands.either(
                 LoggedCommands.sequence("Score Coral",
-                    LoggedCommands.runOnce("Initiate Scoring", () -> coralState = CoralState.SCORING),
+                    LoggedCommands.runOnce("Initiate Scoring", () -> gamePieceState = GamePieceState.SCORING_CORAL),
                     LoggedCommands.waitUntil("Wait for Score", RobotState::getFinalSensor)),
                 LoggedCommands.runOnce("Cannot Score Coral", () -> LoggedAlert.Warning("Robot State", "Cannot Score", "Cannot score coral without coral ready")),
-                () -> coralState == CoralState.READY),
+                () -> gamePieceState == GamePieceState.HOLDING_CORAL),
             RobotState::haveAlgae);
     }
 
     public static Command IntakeAlgae() {
-        return LoggedCommands.runOnce("Intake Algae", () -> algaeState = AlgaeState.INTAKING);
+        // TODO Reject if we have coral
+        return LoggedCommands.runOnce("Intake Algae", () -> gamePieceState = GamePieceState.INTAKING_ALGAE);
     }
 
     public static Command SetCoralMode() {
-        return LoggedCommands.runOnce("Set Coral Mode", () -> algaeState = AlgaeState.NONE);
+        return LoggedCommands.runOnce("Set Coral Mode", () -> gamePieceState = GamePieceState.NONE);
     }
 
-    public static CoralState getCoralState() {
-        return coralState;
-    }
-
-    public static AlgaeState getAlgaeState() {
-        return algaeState;
+    public static GamePieceState getGamePieceState() {
+        return gamePieceState;
     }
 
     public static boolean haveAlgae() {
-        return algaeState == AlgaeState.HOLDING || algaeState == AlgaeState.SCORING;
+        return gamePieceState == GamePieceState.HOLDING_ALGAE || gamePieceState == GamePieceState.SCORING_ALGAE;
     }
 
     public static void setHaveAlgae() {
-        if (algaeState == AlgaeState.NONE || algaeState == AlgaeState.INTAKING) {
-            algaeState = AlgaeState.HOLDING;
+        if (gamePieceState == GamePieceState.NONE || gamePieceState == GamePieceState.INTAKING_ALGAE) {
+            gamePieceState = GamePieceState.HOLDING_ALGAE;
+        } else {
+            // TODO Some sort of warning
         }
     }
 
+    public static boolean coralReady() {
+        return gamePieceState == GamePieceState.HOLDING_CORAL;
+    }
+
+    public static boolean coralScoring() {
+        return gamePieceState == GamePieceState.SCORING_CORAL;
+    }
+
     public static void setNoAlgae() {
-        algaeState = AlgaeState.NONE;
+        gamePieceState = GamePieceState.NONE;
     }
 
     @Override
@@ -173,24 +175,23 @@ public class RobotState extends SubsystemBase {
         DogLog.log("State/Index sensor", intakeSensor);
         DogLog.log("State/Flipper sensor", flipperSensor);
         DogLog.log("State/Final sensor", finalSensor);
-        DogLog.log("State/Coral State", coralState);
-        DogLog.log("State/Algae State", algaeState);
+        DogLog.log("State/Game Piece State", gamePieceState);
 
         SmartDashboard.putString("State/Active Game Piece", haveAlgae() ? "#48B6AB" : haveCoral() ? "#FFFFFF" : "#A0A0A0");
 
-        if (algaeState != AlgaeState.NONE) {
-            coralState = CoralState.REJECTING;
-        } else if (intakeSensor && flipperSensor && finalSensor) {
-            // No Coral is present
-            coralState = elevatorAtZero ? CoralState.INTAKING : CoralState.REJECTING;
-        } else if (!intakeSensor && finalSensor) {
-            coralState = elevatorAtZero ? CoralState.FEEDING : CoralState.REJECTING;
-        } else if (!flipperSensor) {
-            coralState = CoralState.ADVANCING;
-        } else {
-            assert(!finalSensor);
-            if (coralState != CoralState.SCORING) {
-                coralState = CoralState.READY;
+        if (!haveAlgae() && gamePieceState != GamePieceState.INTAKING_ALGAE) {
+            if (intakeSensor && flipperSensor && finalSensor) {
+                // No Coral is present
+                gamePieceState = elevatorAtZero ? GamePieceState.INTAKING_CORAL : GamePieceState.NONE;
+            } else if (!intakeSensor && finalSensor) {
+                gamePieceState = elevatorAtZero ? GamePieceState.FEEDING_CORAL : GamePieceState.NONE;
+            } else if (!flipperSensor) {
+                gamePieceState = GamePieceState.ADVANCING_CORAL;
+            } else {
+                assert(!finalSensor);
+                if (gamePieceState != GamePieceState.SCORING_CORAL) {
+                    gamePieceState = GamePieceState.HOLDING_CORAL;
+                }
             }
         }
     }
