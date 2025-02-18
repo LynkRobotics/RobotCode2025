@@ -265,7 +265,7 @@ public final class Constants {
         public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
         /* Motor Control Values */
         public static final double feedVoltage = -2.00;
-        public static final double advanceVoltage = -0.70;
+        public static final double advanceVoltage = -0.77;
         public static final double scoreVoltage = -3.00;
         public static final double algaeVoltage = 3.00;
         public static final double algaeOutVoltage = -2.00;
@@ -293,8 +293,8 @@ public final class Constants {
         public static final double rotationKS = 0.02;
         public static final double rotationIZone = 2.0; // degrees
 
-        public static final double tiltWarning = 5.0;
-        public static final double tiltError = 10.0;
+        public static final double tiltWarning = 10.0;
+        public static final double tiltError = 30.0;
 
         public static final double fieldWidth = Units.inchesToMeters(26*12 + 5);
         public static final double fieldLength = Units.inchesToMeters(57*12 + 6.875);

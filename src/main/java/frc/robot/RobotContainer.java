@@ -131,9 +131,6 @@ public class RobotContainer {
         SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Brake", s_Swerve::setMotorsToBrake, s_Swerve).ignoringDisable(true));
         SmartDashboard.putData(LoggedCommands.run("autoSetup/Set Swerve Aligned", s_Swerve::alignStraight, s_Swerve).ignoringDisable(true));
 
-        SmartDashboard.putData("Move to L2 Algae", s_Elevator.Move(Stop.L2_ALGAE));
-        SmartDashboard.putData("Move to L3 Algae", s_Elevator.Move(Stop.L3_ALGAE));
-
         for (ReefFace face: ReefFace.values()) {
             setFaceCommands(face);
         }

@@ -18,6 +18,8 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -88,6 +90,22 @@ public class PoseSubsystem extends SubsystemBase {
         });
         PathPlannerLogging.setLogCurrentPoseCallback((currentPose) -> {
             DogLog.log("Pose/PP Current Pose", currentPose);
+        });
+
+        SmartDashboard.putData("Pose/Heading", new Sendable() {
+            @Override
+            public void initSendable(SendableBuilder builder) {
+                builder.setSmartDashboardType("Gyro");
+                builder.addDoubleProperty("Value", () -> getHeading().getDegrees(), null);
+            }
+        });
+
+        SmartDashboard.putData("Pose/Reef Bearing", new Sendable() {
+            @Override
+            public void initSendable(SendableBuilder builder) {
+                builder.setSmartDashboardType("Gyro");
+                builder.addDoubleProperty("Value", () -> reefBearing(getPose().getTranslation()).getDegrees(), null);
+            }
         });
     }
 
@@ -274,8 +292,8 @@ public class PoseSubsystem extends SubsystemBase {
         field.setRobotPose(pose);
 
         SmartDashboard.putString("Pose/Pose", prettyPose(pose));
-        SmartDashboard.putNumber("Pose/Gyro Yaw", getHeading().getDegrees());
-
+        SmartDashboard.putData("Pose/Gyro (raw)", gyro);
+ 
         double roll = getGyroRoll().getDegrees();
         double pitch = getGyroPitch().getDegrees();
         SmartDashboard.putNumber("Pose/Gyro Roll", -roll);
@@ -289,11 +307,7 @@ public class PoseSubsystem extends SubsystemBase {
         }
 
         Translation2d position = pose.getTranslation();
-        SmartDashboard.putNumber("Pose/Reef Bearing", reefBearing(position).getDegrees());
         SmartDashboard.putString("Pose/Nearest Face", nearestFace(position).toString());
-        SmartDashboard.putString("Pose/Face Middle Alignment", prettyPose(nearestFace(position).alignMiddle));
-        SmartDashboard.putString("Pose/Face Left Alignment", prettyPose(nearestFace(position).alignLeft));
-        SmartDashboard.putString("Pose/Face Right Alignment", prettyPose(nearestFace(position).alignRight));
         SmartDashboard.putNumber("Pose/Reef Center Distance", reefDistance(position));
         SmartDashboard.putBoolean("Pose/Reef Elevator Zone", inReefElevatorZone(position));
         SmartDashboard.putBoolean("Pose/In Wing", inWing(position));

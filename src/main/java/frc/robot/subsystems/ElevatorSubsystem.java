@@ -414,6 +414,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Elevator/L2", atStop(Stop.L2));
         SmartDashboard.putBoolean("Elevator/L3", atStop(Stop.L3));
         SmartDashboard.putBoolean("Elevator/L4", atStop(Stop.L4));
+        SmartDashboard.putString("Elevator/Next Stop", nextStop.toString());
 
         mechanism.setLength(Units.inchesToMeters(height));
     }

@@ -177,7 +177,7 @@ public class RobotState extends SubsystemBase {
         DogLog.log("State/Final sensor", finalSensor);
         DogLog.log("State/Game Piece State", gamePieceState);
 
-        SmartDashboard.putString("State/Active Game Piece", haveAlgae() ? "#48B6AB" : haveCoral() ? "#FFFFFF" : "#A0A0A0");
+        SmartDashboard.putString("State/Active Game Piece", haveAlgae() ? "#48B6AB" : haveCoral() ? "#FFFFFF" : "#888888");
 
         if (!haveAlgae() && gamePieceState != GamePieceState.INTAKING_ALGAE) {
             if (intakeSensor && flipperSensor && finalSensor) {

@@ -11,7 +11,7 @@
             "title": "FMSInfo",
             "x": 0.0,
             "y": 576.0,
-            "width": 448.0,
+            "width": 384.0,
             "height": 128.0,
             "type": "FMSInfo",
             "properties": {
@@ -41,9 +41,9 @@
           },
           {
             "title": "Match Time",
-            "x": 544.0,
+            "x": 448.0,
             "y": 320.0,
-            "width": 288.0,
+            "width": 384.0,
             "height": 224.0,
             "type": "Match Time",
             "properties": {
@@ -65,6 +65,7 @@
             "properties": {
               "topic": "/CameraPublisher/photonvision_Port_1182_Output_MJPEG_Server",
               "period": 0.06,
+              "rotation_turns": 0,
               "fps": 10,
               "resolution": [
                 640.0,
@@ -90,27 +91,6 @@
               "field_rotation": 0.0,
               "robot_color": 4290729728,
               "trajectory_color": 4294967295
-            }
-          },
-          {
-            "title": "Gyro Yaw",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 288.0,
-            "height": 256.0,
-            "type": "Radial Gauge",
-            "properties": {
-              "topic": "/SmartDashboard/Pose/Gyro Yaw",
-              "period": 0.06,
-              "data_type": "double",
-              "start_angle": -180.0,
-              "end_angle": 180.0,
-              "min_value": -180.0,
-              "max_value": 180.0,
-              "number_of_labels": 8,
-              "wrap_value": true,
-              "show_pointer": true,
-              "show_ticks": false
             }
           },
           {
@@ -156,19 +136,6 @@
             }
           },
           {
-            "title": "Reset heading",
-            "x": 288.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Command",
-            "properties": {
-              "topic": "/SmartDashboard/Reset heading",
-              "period": 0.06,
-              "show_type": true
-            }
-          },
-          {
             "title": "Tilt Warning",
             "x": 0.0,
             "y": 256.0,
@@ -177,6 +144,84 @@
             "type": "Single Color View",
             "properties": {
               "topic": "/SmartDashboard/Pose/Tilt State",
+              "period": 0.06,
+              "data_type": "string"
+            }
+          },
+          {
+            "title": "Automatically Aim at Reef",
+            "x": 448.0,
+            "y": 544.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Toggle Button",
+            "properties": {
+              "topic": "/SmartDashboard/TunableOptions/Automatically Aim at Reef",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Bonus Coral Standoff",
+            "x": 640.0,
+            "y": 544.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Toggle Button",
+            "properties": {
+              "topic": "/SmartDashboard/TunableOptions/Bonus Coral Standoff",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Active Game Piece",
+            "x": 288.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Single Color View",
+            "properties": {
+              "topic": "/SmartDashboard/State/Active Game Piece",
+              "period": 0.06,
+              "data_type": "string"
+            }
+          },
+          {
+            "title": "Next Stop",
+            "x": 288.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/Next Stop",
+              "period": 0.06,
+              "data_type": "string"
+            }
+          },
+          {
+            "title": "Reset heading (Logged)",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 288.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Reset heading (Logged)",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Nearest Face",
+            "x": 0.0,
+            "y": 128.0,
+            "width": 288.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Pose/Nearest Face",
               "period": 0.06,
               "data_type": "string"
             }
@@ -558,29 +603,16 @@
             }
           },
           {
-            "title": "Zero Gyro",
+            "title": "Zero Gyro (Logged)",
             "x": 0.0,
             "y": 320.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Command",
             "properties": {
-              "topic": "/SmartDashboard/Zero Gyro",
+              "topic": "/SmartDashboard/Zero Gyro (Logged)",
               "period": 0.06,
               "show_type": true
-            }
-          },
-          {
-            "title": "Automatically Aim at Reef",
-            "x": 864.0,
-            "y": 384.0,
-            "width": 224.0,
-            "height": 128.0,
-            "type": "Toggle Switch",
-            "properties": {
-              "topic": "/SmartDashboard/TunableOptions/Automatically Aim at Reef",
-              "period": 0.06,
-              "data_type": "boolean"
             }
           }
         ]
@@ -641,40 +673,6 @@
               "topic": "/SmartDashboard/Elevator/Stop",
               "period": 0.06,
               "show_type": true
-            }
-          },
-          {
-            "title": "moving",
-            "x": 288.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/elevator/moving",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "stalled",
-            "x": 288.0,
-            "y": 160.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/elevator/stalled",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
             }
           },
           {
@@ -785,29 +783,139 @@
             }
           },
           {
-            "title": "Move to L3 Algae",
-            "x": 928.0,
-            "y": 416.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Command",
+            "title": "L1",
+            "x": 992.0,
+            "y": 288.0,
+            "width": 128.0,
+            "height": 96.0,
+            "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Move to L3 Algae",
+              "topic": "/SmartDashboard/Elevator/L1",
               "period": 0.06,
-              "show_type": true
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           },
           {
-            "title": "Move to L2 Algae",
-            "x": 928.0,
-            "y": 288.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Command",
+            "title": "L2",
+            "x": 992.0,
+            "y": 192.0,
+            "width": 128.0,
+            "height": 96.0,
+            "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Move to L2 Algae",
+              "topic": "/SmartDashboard/Elevator/L2",
               "period": 0.06,
-              "show_type": true
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "L3",
+            "x": 992.0,
+            "y": 96.0,
+            "width": 128.0,
+            "height": 96.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/L3",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "L4",
+            "x": 992.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 96.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/L4",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Moving",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/Moving",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Safe",
+            "x": 992.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 96.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/Safe",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "In Range",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/In Range",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Stalled",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/Stalled",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           }
         ]
@@ -819,31 +927,10 @@
         "layouts": [],
         "containers": [
           {
-            "title": "Reef Bearing",
-            "x": 416.0,
+            "title": "Reef Elevator Zone",
+            "x": 928.0,
             "y": 0.0,
             "width": 256.0,
-            "height": 256.0,
-            "type": "Radial Gauge",
-            "properties": {
-              "topic": "/SmartDashboard/Pose/Reef Bearing",
-              "period": 0.06,
-              "data_type": "double",
-              "start_angle": -180.0,
-              "end_angle": 180.0,
-              "min_value": -180.0,
-              "max_value": 180.0,
-              "number_of_labels": 8,
-              "wrap_value": false,
-              "show_pointer": true,
-              "show_ticks": false
-            }
-          },
-          {
-            "title": "Reef Elevator Zone",
-            "x": 672.0,
-            "y": 0.0,
-            "width": 224.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
@@ -858,9 +945,9 @@
           },
           {
             "title": "In Wing",
-            "x": 672.0,
+            "x": 928.0,
             "y": 128.0,
-            "width": 224.0,
+            "width": 256.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
@@ -874,73 +961,59 @@
             }
           },
           {
-            "title": "Nearest Face",
-            "x": 256.0,
-            "y": 0.0,
-            "width": 160.0,
-            "height": 160.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/Pose/Nearest Face",
-              "period": 0.06,
-              "data_type": "string",
-              "show_submit_button": false
-            }
-          },
-          {
             "title": "Reef Center Distance",
             "x": 416.0,
             "y": 256.0,
             "width": 256.0,
             "height": 128.0,
-            "type": "Text Display",
+            "type": "Number Slider",
             "properties": {
               "topic": "/SmartDashboard/Pose/Reef Center Distance",
               "period": 0.06,
               "data_type": "double",
-              "show_submit_button": false
+              "min_value": 0.0,
+              "max_value": 15.0,
+              "divisions": 5,
+              "update_continuously": false
             }
           },
           {
-            "title": "Face Left Alignment",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/Pose/Face Left Alignment",
-              "period": 0.06,
-              "data_type": "string",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "Face Middle Alignment",
-            "x": 0.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/Pose/Face Middle Alignment",
-              "period": 0.06,
-              "data_type": "string",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "Face Right Alignment",
-            "x": 0.0,
+            "title": "Reset heading (Logged)",
+            "x": 672.0,
             "y": 256.0,
             "width": 256.0,
             "height": 128.0,
-            "type": "Text Display",
+            "type": "Command",
             "properties": {
-              "topic": "/SmartDashboard/Pose/Face Right Alignment",
+              "topic": "/SmartDashboard/Reset heading (Logged)",
               "period": 0.06,
-              "data_type": "string",
-              "show_submit_button": false
+              "show_type": true
+            }
+          },
+          {
+            "title": "Heading",
+            "x": 416.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Gyro",
+            "properties": {
+              "topic": "/SmartDashboard/Pose/Heading",
+              "period": 0.06,
+              "counter_clockwise_positive": true
+            }
+          },
+          {
+            "title": "Reef Bearing",
+            "x": 672.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Gyro",
+            "properties": {
+              "topic": "/SmartDashboard/Pose/Reef Bearing",
+              "period": 0.06,
+              "counter_clockwise_positive": false
             }
           }
         ]
