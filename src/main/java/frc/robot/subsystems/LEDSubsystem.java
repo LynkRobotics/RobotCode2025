@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.led.CANdle;
+import com.ctre.phoenix.led.FireAnimation;
 import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 
@@ -62,7 +63,8 @@ public class LEDSubsystem extends SubsystemBase {
     m_candle.configLEDType(LEDStripType.GRB);
     m_candle.configV5Enabled(true);
     m_candle.configLOSBehavior(false); // TODO: true -- why is this triggering?
-    m_candle.animate(new RainbowAnimation(1,1, 94));
+    // m_candle.animate(new RainbowAnimation(1,0.4, 94));
+    m_candle.animate(new FireAnimation(1.0, 0.5, 94, 0.5, 0.5));
     // setBaseState(BaseState.READY);
   }
 
