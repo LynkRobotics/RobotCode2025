@@ -114,6 +114,14 @@ public class RobotState extends SubsystemBase {
         return LoggedCommands.waitUntil("Wait for Coral Ready", () -> gamePieceState == GamePieceState.HOLDING_CORAL);
     }
 
+    public static Command WaitForCoral() {
+        return LoggedCommands.waitUntil("Wait for Coral", RobotState::haveCoral);
+    }
+
+    public static Command WaitForCoral(double timeout) {
+        return LoggedCommands.race("Wait for Coral with timeout", WaitForCoral(), Commands.waitSeconds(timeout));
+    }
+
     public static Command ScoreGamePiece() {
         return LoggedCommands.either("Score Game Piece",
             Commands.either(

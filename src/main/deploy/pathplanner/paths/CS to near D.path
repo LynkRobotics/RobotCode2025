@@ -21,7 +21,7 @@
       },
       "prevControl": {
         "x": 3.3281663907284758,
-        "y": 1.6625755895930447
+        "y": 1.6625755895930445
       },
       "nextControl": null,
       "isLocked": true,
@@ -31,7 +31,14 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Return to safety",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 2.0,
     "maxAcceleration": 1.0,

@@ -317,7 +317,6 @@ public class ElevatorSubsystem extends SubsystemBase {
                     LoggedCommands.idle("Elevator holding at zero", this)),
                 RobotState::coralReady))
                 .handleInterrupt(() -> movingToSafety = false);
-
     }
     
     public void initDefaultCommand() {

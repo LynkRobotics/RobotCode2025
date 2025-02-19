@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import dev.doglog.DogLog;
@@ -67,6 +68,15 @@ public class PoseSubsystem extends SubsystemBase {
         field = new Field2d();
         SmartDashboard.putData("Pose/Field", field);
 
+        // TODO Why isn't loading from Constants working?
+        RobotConfig config;
+        try {
+            config = RobotConfig.fromGUISettings();
+        } catch (Exception e) {
+            DriverStation.reportError(e.getMessage(), false);
+            config = Constants.PathPlanner.robotConfig;
+        }
+
         AutoBuilder.configure(
             this::getPose,
             this::setPose,
@@ -77,7 +87,8 @@ public class PoseSubsystem extends SubsystemBase {
                 new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
                 new PIDConstants(5, 0.0, 0.0)  // Rotation PID constants
             ),
-            Constants.PathPlanner.robotConfig,
+            // Constants.PathPlanner.robotConfig,
+            config,
             Robot::isRed,
             s_Swerve // Reference to Swerve subsystem to set requirements
         );

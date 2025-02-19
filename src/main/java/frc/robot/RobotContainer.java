@@ -9,12 +9,11 @@ import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.events.EventTrigger;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
@@ -117,11 +116,6 @@ public class RobotContainer {
         autoNamedCommand("Startup delay", Commands.defer(() -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()));
         autoNamedCommand("Stop", Commands.runOnce(s_Swerve::stopSwerve));
 
-        // Build an autoChooser (defaults to none)
-        autoChooser = AutoBuilder.buildAutoChooser();
-        SmartDashboard.putData("auto/Auto Chooser", autoChooser);
-        // buildAutos(autoChooser);
-
         SmartDashboard.putNumber("TeleOp Speed Governor", 1.0);
 
         SmartDashboard.putData(LoggedCommands.runOnce("Zero Gyro", s_Pose::zeroGyro, s_Swerve));
@@ -135,17 +129,12 @@ public class RobotContainer {
             setFaceCommands(face);
         }
 
-        // Configure the button bindings
         configureButtonBindings();
 
-        // Debug PathPlanner commands
-        try {
-            PathPlannerPath path = PathPlannerPath.fromPathFile("Approach E");
-            PathConstraints constraints = new PathConstraints(2.0, 1.0, Units.degreesToRadians(360.0), Units.degreesToRadians(720.0));
-            SmartDashboard.putData(LoggedCommands.logWithName("Auto Align Left", AutoBuilder.pathfindThenFollowPath(path, constraints)));
-        } catch (Exception exception) {
-            LoggedAlert.Error("PathPlanner", "Left Approach Bind Failure", exception.getMessage());
-        }
+        // Build an autoChooser (defaults to none)
+        autoChooser = AutoBuilder.buildAutoChooser();
+        SmartDashboard.putData("auto/Auto Chooser", autoChooser);
+        buildAutos(autoChooser);
     }
 
     private Command ScoreCoral(ReefFace face, boolean left) {
@@ -198,6 +187,20 @@ public class RobotContainer {
             Commands.runOnce(() -> s_Elevator.setNextStop(stop)));
     }
 
+    private Command PathCommand(String pathName) {
+        Command pathCommand;
+        
+        try {
+            PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
+            pathCommand = AutoBuilder.followPath(path);
+        } catch (Exception exception) {
+            LoggedAlert.Error("PathPlanner", "Failed to load path \"" + pathName + "\"", exception.getMessage());
+            pathCommand = LoggedCommands.log("Missing PathPlanner path due to failure to load \"" + pathName + "\": " + exception.getMessage());
+        }
+
+        return pathCommand;
+    }
+
     /**
      * Use this method to define your button->command mappings. Buttons can be
      * created by
@@ -222,6 +225,7 @@ public class RobotContainer {
         // Only used in case of automation failure
         moveElevator.whileTrue(s_Elevator.GoToNext());
         score.onTrue(RobotState.ScoreGamePiece());
+        zero.onTrue(s_Elevator.Zero());
 
         L4.onTrue(SetStop(Stop.L4));
         L3.onTrue(SetStop(Stop.L3));
@@ -241,8 +245,6 @@ public class RobotContainer {
                 RobotState::haveCoral));
 
         alignmentToggle.onTrue(LoggedCommands.runOnce("Toggle Alignment", optAutoReefAiming::toggle));
-
-        zero.onTrue(s_Elevator.Zero());
     }
 
     /**
@@ -254,13 +256,29 @@ public class RobotContainer {
         return autoChooser.getSelected();
     }
 
-    // private void addAutoCommand(SendableChooser<Command> chooser, Command command) {
-        // chooser.addOption(command.getName(), command);
-    // }
+    private void addAutoCommand(SendableChooser<Command> chooser, Command command) {
+        chooser.addOption(command.getName(), command);
+    }
 
-    // private void buildAutos(SendableChooser<Command> chooser) {
-        // TODO add programatically defined Autos as needed
-    // }
+    private void buildAutos(SendableChooser<Command> chooser) {
+        new EventTrigger("Return to safety").onTrue(s_Elevator.MoveToSafety());
+
+        Command autoCommand = LoggedCommands.sequence("Auto Test",
+            SetStop(Stop.L3),
+            LoggedCommands.proxy(PathCommand("Start to near E")),
+            LoggedCommands.proxy(ScoreCoral(ReefFace.EF, true)),
+            LoggedCommands.proxy(PathCommand("E to CS")),
+            RobotState.WaitForCoral(1.5),
+            LoggedCommands.proxy(PathCommand("CS to near C")),
+            LoggedCommands.proxy(ScoreCoral(ReefFace.CD, true)),
+            LoggedCommands.proxy(PathCommand("C to CS")),
+            RobotState.WaitForCoral(1.5),
+            LoggedCommands.proxy(PathCommand("CS to near D")),
+            LoggedCommands.proxy(ScoreCoral(ReefFace.CD, false)));
+
+        driver.povUp().whileTrue(autoCommand);
+        addAutoCommand(chooser, autoCommand);
+    }
 
     public void teleopInit() {
     }

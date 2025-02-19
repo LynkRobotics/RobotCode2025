@@ -66,6 +66,10 @@ public class LoggedCommands {
     return Commands.runOnce(() -> { DogLog.log(key, supplier.get()); });
   }
 
+  public static Command proxy(Command command) {
+    return logWithName("Proxy: " + command.getName(), command.asProxy());
+  }
+
   /* The following map to the static utilities from the standard Commands class */
 
   public static Command none(String name) {
