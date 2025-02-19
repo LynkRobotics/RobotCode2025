@@ -1,8 +1,8 @@
 package frc.robot.subsystems;
 
+import frc.lib.util.LoggedCommands;
 import frc.lib.util.SwerveModule;
 import frc.robot.Constants;
-import frc.robot.commands.LoggedCommands;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;

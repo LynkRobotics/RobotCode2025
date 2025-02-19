@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import frc.lib.util.LoggedCommandBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Pose;
 import frc.robot.subsystems.PoseSubsystem;
