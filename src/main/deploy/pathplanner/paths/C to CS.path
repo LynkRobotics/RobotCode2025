@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 1.598096026490066,
-        "y": 0.7489031456953625
+        "x": 1.3,
+        "y": 0.843
       },
       "prevControl": {
-        "x": 3.1236829780983233,
-        "y": 2.3579516114184935
+        "x": 2.3320537120635114,
+        "y": 1.9315151057362168
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,19 +31,12 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "Return to safety",
-      "waypointRelativePos": 0.2,
-      "endWaypointRelativePos": null,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
-    "maxAcceleration": 1.0,
-    "maxAngularVelocity": 360.0,
-    "maxAngularAcceleration": 720.0,
+    "maxVelocity": 3.6,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 1080.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },

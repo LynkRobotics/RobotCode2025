@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.598096026490066,
-        "y": 0.7489031456953625
+        "x": 1.3,
+        "y": 0.843
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.001016144636059,
-        "y": 1.2354175742079148
+        "x": 1.7550904860407717,
+        "y": 1.2965324905982683
       },
       "isLocked": false,
       "linkedName": "Control Station"
@@ -20,8 +20,8 @@
         "y": 2.6811465231788087
       },
       "prevControl": {
-        "x": 3.1987241950751795,
-        "y": 2.081608646320201
+        "x": 3.382900655097339,
+        "y": 2.400611632636759
       },
       "nextControl": null,
       "isLocked": true,
@@ -31,24 +31,17 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "Return to safety",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
-    "maxAcceleration": 1.0,
-    "maxAngularVelocity": 360.0,
-    "maxAngularAcceleration": 720.0,
+    "maxVelocity": 3.6,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 1080.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.5,
+    "velocity": 0.8,
     "rotation": 59.99999999999999
   },
   "reversed": false,

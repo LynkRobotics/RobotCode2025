@@ -262,18 +262,16 @@ public class RobotContainer {
     }
 
     private void buildAutos(SendableChooser<Command> chooser) {
-        new EventTrigger("Return to safety").onTrue(s_Elevator.MoveToSafety());
-
         Command autoCommand = LoggedCommands.sequence("Auto Test",
-            SetStop(Stop.L3),
+            SetStop(Stop.L4),
             LoggedCommands.proxy(PathCommand("Start to near E")),
             LoggedCommands.proxy(ScoreCoral(ReefFace.EF, true)),
             LoggedCommands.proxy(PathCommand("E to CS")),
-            RobotState.WaitForCoral(1.5),
+            RobotState.WaitForCoral(),
             LoggedCommands.proxy(PathCommand("CS to near C")),
             LoggedCommands.proxy(ScoreCoral(ReefFace.CD, true)),
             LoggedCommands.proxy(PathCommand("C to CS")),
-            RobotState.WaitForCoral(1.5),
+            RobotState.WaitForCoral(),
             LoggedCommands.proxy(PathCommand("CS to near D")),
             LoggedCommands.proxy(ScoreCoral(ReefFace.CD, false)));
 

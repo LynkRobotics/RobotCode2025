@@ -300,7 +300,7 @@ public final class Constants {
         public static final double fieldLength = Units.inchesToMeters(57*12 + 6.875);
 
         public static final double reefElevatorZoneRadius = Units.inchesToMeters(80.0); // TODO Revisit
-        public static final double autoUpDistance = Units.inchesToMeters(24.0);
+        public static final double autoUpDistance = Units.inchesToMeters(32.0);
         public static final double wingLength = Units.inchesToMeters(280);
 
         public static final double robotFrameLength = Units.inchesToMeters(30);
