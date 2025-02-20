@@ -380,8 +380,8 @@ public final class Constants {
             Mass.ofRelativeUnits(isRocky ? 145.0 : 132.0, Pounds),
             MomentOfInertia.ofRelativeUnits(isRocky ? 8.224 : 7.267, KilogramSquareMeters),
             new ModuleConfig(
-                Swerve.wheelCircumference / 2.0,
-                Swerve.maxSpeed * 0.85,
+                Swerve.wheelCircumference / (Math.PI * 2.0),
+                Swerve.maxSpeed * 0.95, // Leave a little headroom for inefficiencies
                 1.916, // 3847 Spectrum Vex GripLock v2 CoF
                 DCMotor.getKrakenX60Foc(1),
                 Swerve.chosenModule.driveGearRatio,
