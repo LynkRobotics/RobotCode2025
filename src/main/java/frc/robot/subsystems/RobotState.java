@@ -163,8 +163,7 @@ public class RobotState extends SubsystemBase {
         if (gamePieceState == GamePieceState.NONE || gamePieceState == GamePieceState.INTAKING_ALGAE) {
             gamePieceState = GamePieceState.HOLDING_ALGAE;
         } else {
-            // TODO Some sort of warning
-            LoggedAlert.Warning("Robot State", "Algae duplication line 157", "Algae already present");
+            LoggedAlert.Warning("Robot State", "Invalid Algae Transition", "Cannot hold algae from " + gamePieceState + " state");
         }
     }
 
