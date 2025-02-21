@@ -1,7 +1,9 @@
 package frc.robot;
 
 import static frc.robot.Options.optAutoReefAiming;
+import static frc.robot.Options.optBackupPush;
 import static frc.robot.Options.optBonusCoralStandoff;
+import static frc.robot.Options.optMirrorAuto;
 
 import java.util.EnumMap;
 import java.util.Set;
@@ -9,11 +11,13 @@ import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.events.EventTrigger;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
@@ -139,21 +143,39 @@ public class RobotContainer {
     }
 
     private Command ScoreCoral(ReefFace face, boolean left) {
-        return LoggedCommands.sequence("Auto Align " + (left ? "Left " : "Right ") + face.toString() + " & Score",
-            LoggedCommands.parallel("PID Align " + (left ? "Left " : "Right ") + face.toString(),
-                Commands.sequence(
-                    new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, false),
-                    Commands.either(
-                        new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true),
-                        new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true),
-                        optBonusCoralStandoff::get),
-                    s_Swerve.Stop()),
-                Commands.sequence(
-                    RobotState.WaitForCoralReady(),
-                    LoggedCommands.deadline("Wait for auto up",
-                        s_Elevator.WaitForNext(),
-                        s_Elevator.AutoElevatorUp(left ? face.alignLeft.getTranslation() : face.alignRight.getTranslation())))),
-            RobotState.ScoreGamePiece());
+        return Commands.either(
+            LoggedCommands.sequence("Auto Align " + (left ? "Left " : "Right ") + face.toString() + " & Score",
+                LoggedCommands.parallel("PID Align " + (left ? "Left " : "Right ") + face.toString(),
+                    Commands.sequence(
+                        new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, false),
+                        Commands.either(
+                            LoggedCommands.log("Elevator reached stop in time"),
+                            LoggedCommands.sequence("Pause to wait for elevator to catch up",
+                                s_Swerve.Stop(),
+                                s_Elevator.WaitForNearNext()),
+                            s_Elevator::nearNextStop),
+                        Commands.either(
+                            new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true),
+                            new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true),
+                            optBonusCoralStandoff::get),
+                        s_Swerve.Stop()),
+                    Commands.sequence(
+                        RobotState.WaitForCoralReady(),
+                        LoggedCommands.deadline("Wait for auto up",
+                            s_Elevator.WaitForNext(),
+                            s_Elevator.AutoElevatorUp(left ? face.alignLeft.getTranslation() : face.alignRight.getTranslation())))),
+                RobotState.ScoreGamePiece()),
+            LoggedCommands.log("Cannot score coral without coral"),
+            RobotState::haveCoral);
+    }
+
+    private Command ScoreCoralMaybeMirror(ReefFace face, boolean left) {
+        ReefFace mirroredFace = Constants.Pose.mirroredFaces.get(face);
+
+        return Commands.either(
+            ScoreCoral(mirroredFace, face == mirroredFace ? !left : left),
+            ScoreCoral(face, left),
+            this::shouldMirror);
     }
 
     private Command DeAlgaefy(ReefFace face) {
@@ -188,18 +210,25 @@ public class RobotContainer {
             Commands.runOnce(() -> s_Elevator.setNextStop(stop)));
     }
 
+    private boolean shouldMirror() {
+        return optMirrorAuto.get() && DriverStation.isAutonomousEnabled();
+    }
+
     private Command PathCommand(String pathName) {
-        Command pathCommand;
+        Command pathCommand, mirrorCommand;
         
         try {
             PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
             pathCommand = AutoBuilder.followPath(path);
+            pathCommand.setName("Follow PathPlanner path \"" + pathName + "\"");
+            mirrorCommand = AutoBuilder.followPath(path.mirrorPath());
+            mirrorCommand.setName("Follow Mirrored PathPlanner path \"" + pathName + "\"");
         } catch (Exception exception) {
             LoggedAlert.Error("PathPlanner", "Failed to load path \"" + pathName + "\"", exception.getMessage());
-            pathCommand = LoggedCommands.log("Missing PathPlanner path due to failure to load \"" + pathName + "\": " + exception.getMessage());
+            return LoggedCommands.log("Missing PathPlanner path due to failure to load \"" + pathName + "\": " + exception.getMessage());
         }
 
-        return pathCommand;
+        return Commands.either(mirrorCommand, pathCommand,this::shouldMirror);
     }
 
     /**
@@ -261,23 +290,48 @@ public class RobotContainer {
         chooser.addOption(command.getName(), command);
     }
 
+    private Command BackUpCommand() {
+        Transform2d transform = new Transform2d(-Constants.AutoConstants.backUpPushDistance, 0.0, Rotation2d.kZero); 
+        return new PIDSwerve(s_Swerve, s_Pose, s_Pose.getPose().transformBy(transform), true);
+    }
+
     private void buildAutos(SendableChooser<Command> chooser) {
-        Command autoCommand = LoggedCommands.sequence("Auto Test",
+        Command autoECD = LoggedCommands.sequence("ECD",
+            Commands.either(
+                LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
+                LoggedCommands.log("Skip back up option"),
+                optBackupPush::get),
             SetStop(Stop.L4),
             LoggedCommands.proxy(PathCommand("Start to near E")),
-            LoggedCommands.proxy(ScoreCoral(ReefFace.EF, true)),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
             LoggedCommands.proxy(PathCommand("E to CS")),
             RobotState.WaitForCoral(),
             LoggedCommands.proxy(PathCommand("CS to near C")),
-            LoggedCommands.proxy(ScoreCoral(ReefFace.CD, true)),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, true)),
             LoggedCommands.proxy(PathCommand("C to CS")),
             RobotState.WaitForCoral(),
             LoggedCommands.proxy(PathCommand("CS to near D")),
-            LoggedCommands.proxy(ScoreCoral(ReefFace.CD, false)));
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false)),
+            LoggedCommands.proxy(PathCommand("D to CS")));
 
-        driver.povUp().whileTrue(autoCommand);
-        addAutoCommand(chooser, autoCommand);
-    }
+        addAutoCommand(chooser, autoECD);
+
+        Command autoBA = LoggedCommands.sequence("BA",
+            Commands.either(
+                LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
+                LoggedCommands.log("Skip back up option"),
+                optBackupPush::get),
+            SetStop(Stop.L4),
+            LoggedCommands.proxy(PathCommand("Start to near B")),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
+            LoggedCommands.proxy(PathCommand("B to CS2")),
+            RobotState.WaitForCoral(),
+            LoggedCommands.proxy(PathCommand("CS2 to near A")),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, true)),
+            LoggedCommands.proxy(PathCommand("A backup")));
+
+        addAutoCommand(chooser, autoBA);
+        }
 
     public void teleopInit() {
     }

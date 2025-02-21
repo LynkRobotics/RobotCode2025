@@ -7,6 +7,7 @@ import com.ctre.phoenix6.signals.S2CloseStateValue;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -15,6 +16,7 @@ import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
 import frc.lib.util.TunableOption;
 import frc.robot.Constants;
+import frc.robot.Constants.Elevator.Stop;
 
 public class RobotState extends SubsystemBase {
     private static RobotState instance;
@@ -23,6 +25,9 @@ public class RobotState extends SubsystemBase {
     private static final DigitalInput indexSensor;
     private static boolean elevatorAtZero = false;
     private static GamePieceState gamePieceState = GamePieceState.NONE;
+    private static Timer L1Timer = new Timer();
+    private static Stop activeStop = Stop.SAFE;
+    private static Stop nextStop = Stop.SAFE;
 
     private static final TunableOption optOverrideElevatorPathBlocked = new TunableOption("Override Elevator Path Blocked", false);
     private static final TunableOption optOverrideReefElevatorZone = new TunableOption("Override Reef Safe Elevator Zone", true);
@@ -158,7 +163,7 @@ public class RobotState extends SubsystemBase {
         if (gamePieceState == GamePieceState.NONE || gamePieceState == GamePieceState.INTAKING_ALGAE) {
             gamePieceState = GamePieceState.HOLDING_ALGAE;
         } else {
-            // TODO Some sort of warning
+            LoggedAlert.Warning("Robot State", "Invalid Algae Transition", "Cannot hold algae from " + gamePieceState + " state");
         }
     }
 
@@ -172,6 +177,22 @@ public class RobotState extends SubsystemBase {
 
     public static void setNoAlgae() {
         gamePieceState = GamePieceState.NONE;
+    }
+
+    public static void updateActiveStop(Stop stop) {
+        activeStop = stop;
+    }
+
+    public static Stop getActiveStop() {
+        return activeStop;
+    }
+
+    public static void updateNextStop(Stop stop) {
+        nextStop = stop;
+    }
+
+    public static Stop getNextStop() {
+        return nextStop;
     }
 
     @Override
@@ -190,7 +211,16 @@ public class RobotState extends SubsystemBase {
         if (!haveAlgae() && gamePieceState != GamePieceState.INTAKING_ALGAE) {
             if (intakeSensor && flipperSensor && finalSensor) {
                 // No Coral is present
-                gamePieceState = elevatorAtZero ? GamePieceState.INTAKING_CORAL : GamePieceState.NONE;
+                if (gamePieceState == GamePieceState.SCORING_CORAL && activeStop == Stop.L1) {
+                    if (!L1Timer.isRunning()) {
+                        L1Timer.restart();
+                    } else if (L1Timer.hasElapsed(Constants.EndEffector.L1RunTime)) {
+                        L1Timer.stop();
+                        gamePieceState = GamePieceState.NONE;
+                    }
+                } else {
+                    gamePieceState = elevatorAtZero ? GamePieceState.INTAKING_CORAL : GamePieceState.NONE;
+                }
             } else if (!intakeSensor && finalSensor) {
                 gamePieceState = elevatorAtZero ? GamePieceState.FEEDING_CORAL : GamePieceState.NONE;
             } else if (!flipperSensor) {

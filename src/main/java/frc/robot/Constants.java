@@ -18,6 +18,10 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.*;
+
+import java.util.EnumMap;
+import java.util.Map;
+
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.wpilibj.RobotController;
@@ -204,11 +208,6 @@ public final class Constants {
         public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
         public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
 
-        public static final double safetyMargin = 1.5;   // How many inches away from safe mark to still be considered safe
-        public static final double positionError = 0.35; // Allowable rotation error to be considered in position
-        public static final double stopError = 0.5;      // Allowable inches of error to be considered at a stop
-        public static final double slowVoltage = 1.0;    // Volts to move slowly to zero
-
         // NOTE Elevator height is measured from the ground to top of the carriage
         public static final double thickness = 2.0; // Thickness of the elevator (only for Mechanism2d visualization)
         public static final double setback = 9.5; // Distance from front edge of robot (only for Mechanism2d visualization)
@@ -217,6 +216,12 @@ public final class Constants {
         public static final double maxHeight = 72.0 + bellyHeight; // Height that elevator should never exceed
         public static final double endEffectorHeight = 6.0; // Height of end effector "target" above elevator height
         public static final double rotPerInch = 0.704; // Rotations to drive elevator one inch
+
+        public static final double safetyMargin = 1.5;   // How many inches away from safe mark to still be considered safe
+        public static final double positionError = rotPerInch * 0.5; // Allowable rotation error to be considered in position
+        public static final double positionCloseError = rotPerInch * 6.0; // Allowable rotation error to be considered in position
+        public static final double stopError = 0.5;      // Allowable inches of error to be considered at a stop
+        public static final double slowVoltage = 1.0;    // Volts to move slowly to zero
 
         // TODO Tune PID / FF
         public static final double RPSperVolt = 7.9; // RPS increase with every volt
@@ -269,6 +274,8 @@ public final class Constants {
         public static final double scoreVoltage = -3.00;
         public static final double algaeVoltage = 3.00;
         public static final double algaeOutVoltage = -2.00;
+
+        public static final double L1RunTime = 1.0;
     }
 
     public static final class Index {
@@ -282,7 +289,7 @@ public final class Constants {
         public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
         public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
         /* Motor Control Values */
-        public static final double intakeVoltage = -1.50;
+        public static final double intakeVoltage = -2.00;
         public static final double rejectVoltage = 0.50;
     }
 
@@ -300,7 +307,7 @@ public final class Constants {
         public static final double fieldLength = Units.inchesToMeters(57*12 + 6.875);
 
         public static final double reefElevatorZoneRadius = Units.inchesToMeters(80.0); // TODO Revisit
-        public static final double autoUpDistance = Units.inchesToMeters(32.0);
+        public static final double autoUpDistance = Units.inchesToMeters(44.0);
         public static final double wingLength = Units.inchesToMeters(280);
 
         public static final double robotFrameLength = Units.inchesToMeters(30);
@@ -356,6 +363,14 @@ public final class Constants {
             public final Pose2d alignBonusLeft, alignBonusRight;
             public final boolean algaeHigh;
         }
+
+        public static final EnumMap<ReefFace, ReefFace> mirroredFaces = new EnumMap<>(Map.of(
+            ReefFace.AB, ReefFace.AB,
+            ReefFace.CD, ReefFace.KL,
+            ReefFace.EF, ReefFace.IJ,
+            ReefFace.GH, ReefFace.GH,
+            ReefFace.IJ, ReefFace.EF,
+            ReefFace.KL, ReefFace.CD));
     }
 
     public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
@@ -367,6 +382,8 @@ public final class Constants {
         public static final double kPXController = 1;
         public static final double kPYController = 1;
         public static final double kPThetaController = 1;
+
+        public static final double backUpPushDistance = Units.inchesToMeters(4.0);
     
         /* Constraint for the motion profilied robot angle controller */
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
