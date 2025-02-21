@@ -159,6 +159,7 @@ public class RobotState extends SubsystemBase {
             gamePieceState = GamePieceState.HOLDING_ALGAE;
         } else {
             // TODO Some sort of warning
+            LoggedAlert.Warning("Robot State", "Algae duplication line 157", "Algae already present");
         }
     }
 
