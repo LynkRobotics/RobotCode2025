@@ -10,9 +10,13 @@ import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.LoggedCommands;
 
 public class LEDSubsystem extends SubsystemBase {
   /** Creates a new LEDSubsystem. */
@@ -110,11 +114,38 @@ public class LEDSubsystem extends SubsystemBase {
     }
   }
 
+
+
   @Override
   public void periodic() {
     SmartDashboard.putString("LED/Base state", baseState == null ? "NULL" : baseState.toString());
     SmartDashboard.putString("LED/Temp state", tempState == null ? "NULL" : tempState.toString());
 
+    /*
+     * if (enabled){
+     *  if (LoggedAlert.ERROR == True){
+     *    Flash.RED
+     *  }
+     *  if (LoggedAlert.WARNING == True){
+     *    Flash.YELLOW
+     *  }
+     *  if (isIntaking){
+     *    Flash.WHITE
+     *  }
+     *  if (goingForAlgae){
+     *    Flash.ElevatorLevel.HighTideTeal
+     *  }
+     *  if (movingElevatorForScoringCoral){
+     *    DripUp.ElevatorLevel.WHITE
+     *    DeadLEDs.BLACK
+     *  }
+     *  if (hasCoral.inIndex){
+     *    Solid.WHITE
+     *  }
+     *  if (){
+     *  }
+     * }
+     */
     // If the temporary state is active...
     if (tempState != null) {
       if (tempState == lastTempState) {
