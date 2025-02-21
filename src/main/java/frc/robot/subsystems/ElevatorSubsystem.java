@@ -149,19 +149,26 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Command Move(Stop stop) {
         return IfNotBlocked(LoggedCommands.sequence("Move Elevator to " + stop,
-            Commands.runOnce(() -> setHeight(stop.height + bonusHeight(stop)), this),
+            Commands.runOnce(() -> {
+                RobotState.updateActiveStop(stop);
+                setHeight(stop.height + bonusHeight(stop));
+            }, this),
             LoggedCommands.idle("Idle to hold elevator", this)));
     }
 
     public Command GoToNext() {
         return IfNotBlocked(LoggedCommands.sequence("Move Elevator to stop",
             LoggedCommands.log(() -> "Next stop: " + nextStop),
-            Commands.runOnce(() -> setHeight(nextStop.height + bonusHeight(nextStop)), this),
+            Commands.runOnce(() -> {
+                RobotState.updateActiveStop(nextStop);
+                setHeight(nextStop.height + bonusHeight(nextStop));
+            }, this),
             LoggedCommands.idle("Idle to hold elevator", this)));
     }
 
     public void setNextStop(Stop stop) {
         DogLog.log("Elevator/Status", "Next stop = " + stop);
+        RobotState.updateNextStop(stop);
         nextStop = stop;
     }
 
@@ -178,7 +185,9 @@ public class ElevatorSubsystem extends SubsystemBase {
             () -> autoUp = false,
             () -> {
                 if (!autoUp && PoseSubsystem.distanceTo(target) <= Constants.Pose.autoUpDistance) {
-                    setHeight(stopSupplier.get().height + bonusHeight(stopSupplier.get()));
+                    Stop stop = stopSupplier.get();
+                    RobotState.updateActiveStop(stop);
+                    setHeight(stop.height + bonusHeight(stop));
                     autoUp = true;
                 }
             },
@@ -248,7 +257,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         return Math.abs(stop.height + bonusHeight(stop) - getHeight());
     }
 
-    private boolean atStop(Stop stop) {
+    public boolean atStop(Stop stop) {
         double stopError = stopError(stop);
         // The safe stop is just a guideline, and has a wider margin for error
         double allowableError = stop == Stop.SAFE ? 3 * Constants.Elevator.positionError : Constants.Elevator.positionError;
@@ -256,7 +265,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         return stopError <= allowableError;
     }
 
-    private boolean nearStop(Stop stop) {
+    public boolean nearStop(Stop stop) {
         double stopError = stopError(stop);
         // The safe stop is just a guideline, and has a wider margin for error
         double allowableError = stop == Stop.SAFE ? 3 * Constants.Elevator.positionError : Constants.Elevator.positionCloseError;
