@@ -190,7 +190,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command WaitForNext() {
-        return LoggedCommands.waitUntil("Wait for Elevator to reach next stop", () -> atStop(nextStop));
+        return LoggedCommands.waitUntil("Wait for Elevator to reach next stop", () -> atNextStop());
     }
 
     private boolean isStalled() {
@@ -246,6 +246,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         double allowableError = stop == Stop.SAFE ? 3 * Constants.Elevator.positionError : Constants.Elevator.positionError;
 
         return stopError <= allowableError;
+    }
+
+    public boolean atNextStop() {
+        return atStop(nextStop);
     }
 
     private double getHeight(double position) {
