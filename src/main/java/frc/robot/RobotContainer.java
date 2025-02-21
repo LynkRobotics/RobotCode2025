@@ -273,7 +273,8 @@ public class RobotContainer {
             LoggedCommands.proxy(PathCommand("C to CS")),
             RobotState.WaitForCoral(),
             LoggedCommands.proxy(PathCommand("CS to near D")),
-            LoggedCommands.proxy(ScoreCoral(ReefFace.CD, false)));
+            LoggedCommands.proxy(ScoreCoral(ReefFace.CD, false)),
+            LoggedCommands.proxy(PathCommand("D to CS")));
 
         driver.povUp().whileTrue(autoCommand);
         addAutoCommand(chooser, autoCommand);
