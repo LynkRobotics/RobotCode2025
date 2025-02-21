@@ -272,11 +272,8 @@ public class RobotContainer {
     }
 
     private Command BackUpCommand() {
-        Pose2d pose = s_Pose.getPose();
-        // TODO Move to constant
-        Transform2d transform = new Transform2d(-Units.inchesToMeters(4.0), 0.0, Rotation2d.kZero); 
-        Pose2d newPose = pose.transformBy(transform);
-        return new PIDSwerve(s_Swerve, s_Pose, newPose, true);
+        Transform2d transform = new Transform2d(-Constants.AutoConstants.backUpPushDistance, 0.0, Rotation2d.kZero); 
+        return new PIDSwerve(s_Swerve, s_Pose, s_Pose.getPose().transformBy(transform), true);
     }
 
     private void buildAutos(SendableChooser<Command> chooser) {
