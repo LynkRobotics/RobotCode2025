@@ -141,27 +141,30 @@ public class RobotContainer {
     }
 
     private Command ScoreCoral(ReefFace face, boolean left) {
-        return LoggedCommands.sequence("Auto Align " + (left ? "Left " : "Right ") + face.toString() + " & Score",
-            LoggedCommands.parallel("PID Align " + (left ? "Left " : "Right ") + face.toString(),
-                Commands.sequence(
-                    new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, false),
-                    Commands.either(
-                        LoggedCommands.log("Elevator reached stop in time"),
-                        LoggedCommands.sequence("Pause to wait for elevator to catch up",
-                            s_Swerve.Stop(),
-                            s_Elevator.WaitForNearNext()),
-                        s_Elevator::nearNextStop),
-                    Commands.either(
-                        new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true),
-                        new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true),
-                        optBonusCoralStandoff::get),
-                    s_Swerve.Stop()),
-                Commands.sequence(
-                    RobotState.WaitForCoralReady(),
-                    LoggedCommands.deadline("Wait for auto up",
-                        s_Elevator.WaitForNext(),
-                        s_Elevator.AutoElevatorUp(left ? face.alignLeft.getTranslation() : face.alignRight.getTranslation())))),
-            RobotState.ScoreGamePiece());
+        return Commands.either(
+            LoggedCommands.sequence("Auto Align " + (left ? "Left " : "Right ") + face.toString() + " & Score",
+                LoggedCommands.parallel("PID Align " + (left ? "Left " : "Right ") + face.toString(),
+                    Commands.sequence(
+                        new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, false),
+                        Commands.either(
+                            LoggedCommands.log("Elevator reached stop in time"),
+                            LoggedCommands.sequence("Pause to wait for elevator to catch up",
+                                s_Swerve.Stop(),
+                                s_Elevator.WaitForNearNext()),
+                            s_Elevator::nearNextStop),
+                        Commands.either(
+                            new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true),
+                            new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true),
+                            optBonusCoralStandoff::get),
+                        s_Swerve.Stop()),
+                    Commands.sequence(
+                        RobotState.WaitForCoralReady(),
+                        LoggedCommands.deadline("Wait for auto up",
+                            s_Elevator.WaitForNext(),
+                            s_Elevator.AutoElevatorUp(left ? face.alignLeft.getTranslation() : face.alignRight.getTranslation())))),
+                RobotState.ScoreGamePiece()),
+            LoggedCommands.log("Cannot score coral without coral"),
+            RobotState::haveCoral);
     }
 
     private Command DeAlgaefy(ReefFace face) {
