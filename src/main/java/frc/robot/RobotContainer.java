@@ -9,11 +9,14 @@ import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.events.EventTrigger;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
@@ -261,8 +264,18 @@ public class RobotContainer {
         chooser.addOption(command.getName(), command);
     }
 
+    private Command BackUpCommand() {
+        Pose2d pose = s_Pose.getPose();
+        // TODO Move to constant
+        Transform2d transform = new Transform2d(-Units.inchesToMeters(4.0), 0.0, Rotation2d.kZero); 
+        Pose2d newPose = pose.transformBy(transform);
+        return new PIDSwerve(s_Swerve, s_Pose, newPose, true);
+    }
+
     private void buildAutos(SendableChooser<Command> chooser) {
         Command autoCommand = LoggedCommands.sequence("Auto Test",
+            // TODO Make optional
+            LoggedCommands.deferredProxy("Back up", this::BackUpCommand),
             SetStop(Stop.L4),
             LoggedCommands.proxy(PathCommand("Start to near E")),
             LoggedCommands.proxy(ScoreCoral(ReefFace.EF, true)),
