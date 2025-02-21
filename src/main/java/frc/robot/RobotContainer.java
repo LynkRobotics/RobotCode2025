@@ -1,6 +1,7 @@
 package frc.robot;
 
 import static frc.robot.Options.optAutoReefAiming;
+import static frc.robot.Options.optBackupPush;
 import static frc.robot.Options.optBonusCoralStandoff;
 
 import java.util.EnumMap;
@@ -280,8 +281,10 @@ public class RobotContainer {
 
     private void buildAutos(SendableChooser<Command> chooser) {
         Command autoECD = LoggedCommands.sequence("ECD",
-            // TODO Make optional
-            // LoggedCommands.deferredProxy("Back up", this::BackUpCommand),
+            Commands.either(
+                LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
+                LoggedCommands.log("Skip back up option"),
+                optBackupPush::get),
             SetStop(Stop.L4),
             LoggedCommands.proxy(PathCommand("Start to near E")),
             LoggedCommands.proxy(ScoreCoral(ReefFace.EF, true)),
@@ -298,8 +301,10 @@ public class RobotContainer {
         addAutoCommand(chooser, autoECD);
 
         Command autoBA = LoggedCommands.sequence("BA",
-            // TODO Make optional
-            // LoggedCommands.deferredProxy("Back up", this::BackUpCommand),
+            Commands.either(
+                LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
+                LoggedCommands.log("Skip back up option"),
+                optBackupPush::get),
             SetStop(Stop.L4),
             LoggedCommands.proxy(PathCommand("Start to near B")),
             LoggedCommands.proxy(ScoreCoral(ReefFace.AB, false)),
