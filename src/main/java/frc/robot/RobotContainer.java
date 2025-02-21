@@ -3,6 +3,7 @@ package frc.robot;
 import static frc.robot.Options.optAutoReefAiming;
 import static frc.robot.Options.optBackupPush;
 import static frc.robot.Options.optBonusCoralStandoff;
+import static frc.robot.Options.optMirrorAuto;
 
 import java.util.EnumMap;
 import java.util.Set;
@@ -16,6 +17,7 @@ import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
@@ -167,6 +169,15 @@ public class RobotContainer {
             RobotState::haveCoral);
     }
 
+    private Command ScoreCoralMaybeMirror(ReefFace face, boolean left) {
+        ReefFace mirroredFace = Constants.Pose.mirroredFaces.get(face);
+
+        return Commands.either(
+            ScoreCoral(mirroredFace, face == mirroredFace ? !left : left),
+            ScoreCoral(face, left),
+            this::shouldMirror);
+    }
+
     private Command DeAlgaefy(ReefFace face) {
         Stop algaeStop = face.algaeHigh ? Stop.L3_ALGAE: Stop.L2_ALGAE;
 
@@ -199,18 +210,25 @@ public class RobotContainer {
             Commands.runOnce(() -> s_Elevator.setNextStop(stop)));
     }
 
+    private boolean shouldMirror() {
+        return optMirrorAuto.get() && DriverStation.isAutonomousEnabled();
+    }
+
     private Command PathCommand(String pathName) {
-        Command pathCommand;
+        Command pathCommand, mirrorCommand;
         
         try {
             PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
             pathCommand = AutoBuilder.followPath(path);
+            pathCommand.setName("Follow PathPlanner path \"" + pathName + "\"");
+            mirrorCommand = AutoBuilder.followPath(path.mirrorPath());
+            mirrorCommand.setName("Follow Mirrored PathPlanner path \"" + pathName + "\"");
         } catch (Exception exception) {
             LoggedAlert.Error("PathPlanner", "Failed to load path \"" + pathName + "\"", exception.getMessage());
-            pathCommand = LoggedCommands.log("Missing PathPlanner path due to failure to load \"" + pathName + "\": " + exception.getMessage());
+            return LoggedCommands.log("Missing PathPlanner path due to failure to load \"" + pathName + "\": " + exception.getMessage());
         }
 
-        return pathCommand;
+        return Commands.either(mirrorCommand, pathCommand,this::shouldMirror);
     }
 
     /**
@@ -285,15 +303,15 @@ public class RobotContainer {
                 optBackupPush::get),
             SetStop(Stop.L4),
             LoggedCommands.proxy(PathCommand("Start to near E")),
-            LoggedCommands.proxy(ScoreCoral(ReefFace.EF, true)),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
             LoggedCommands.proxy(PathCommand("E to CS")),
             RobotState.WaitForCoral(),
             LoggedCommands.proxy(PathCommand("CS to near C")),
-            LoggedCommands.proxy(ScoreCoral(ReefFace.CD, true)),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, true)),
             LoggedCommands.proxy(PathCommand("C to CS")),
             RobotState.WaitForCoral(),
             LoggedCommands.proxy(PathCommand("CS to near D")),
-            LoggedCommands.proxy(ScoreCoral(ReefFace.CD, false)),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false)),
             LoggedCommands.proxy(PathCommand("D to CS")));
 
         addAutoCommand(chooser, autoECD);
@@ -305,11 +323,11 @@ public class RobotContainer {
                 optBackupPush::get),
             SetStop(Stop.L4),
             LoggedCommands.proxy(PathCommand("Start to near B")),
-            LoggedCommands.proxy(ScoreCoral(ReefFace.AB, false)),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
             LoggedCommands.proxy(PathCommand("B to CS2")),
             RobotState.WaitForCoral(),
             LoggedCommands.proxy(PathCommand("CS2 to near A")),
-            LoggedCommands.proxy(ScoreCoral(ReefFace.AB, true)),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, true)),
             LoggedCommands.proxy(PathCommand("A backup")));
 
         addAutoCommand(chooser, autoBA);
