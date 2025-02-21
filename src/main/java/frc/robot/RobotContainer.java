@@ -150,8 +150,8 @@ public class RobotContainer {
                         LoggedCommands.log("Elevator reached stop in time"),
                         LoggedCommands.sequence("Pause to wait for elevator to catch up",
                             s_Swerve.Stop(),
-                            s_Elevator.WaitForNext()),
-                        s_Elevator::atNextStop),
+                            s_Elevator.WaitForNearNext()),
+                        s_Elevator::nearNextStop),
                     Commands.either(
                         new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true),
                         new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true),

@@ -193,6 +193,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         return LoggedCommands.waitUntil("Wait for Elevator to reach next stop", () -> atNextStop());
     }
 
+    public Command WaitForNearNext() {
+        return LoggedCommands.waitUntil("Wait for Elevator to near next stop", () -> nearNextStop());
+    }
+
     private boolean isStalled() {
         return stallCount >= stallMax;
     }
@@ -240,16 +244,32 @@ public class ElevatorSubsystem extends SubsystemBase {
         return isSafe(getHeight());
     }
 
+    private double stopError(Stop stop) {
+        return Math.abs(stop.height + bonusHeight(stop) - getHeight());
+    }
+
     private boolean atStop(Stop stop) {
-        double stopError = Math.abs(stop.height + bonusHeight(stop) - getHeight());
+        double stopError = stopError(stop);
         // The safe stop is just a guideline, and has a wider margin for error
         double allowableError = stop == Stop.SAFE ? 3 * Constants.Elevator.positionError : Constants.Elevator.positionError;
 
         return stopError <= allowableError;
     }
 
+    private boolean nearStop(Stop stop) {
+        double stopError = stopError(stop);
+        // The safe stop is just a guideline, and has a wider margin for error
+        double allowableError = stop == Stop.SAFE ? 3 * Constants.Elevator.positionError : Constants.Elevator.positionCloseError;
+
+        return stopError <= allowableError;
+    }
+
     public boolean atNextStop() {
         return atStop(nextStop);
+    }
+
+    public boolean nearNextStop() {
+        return nearStop(nextStop);
     }
 
     private double getHeight(double position) {
