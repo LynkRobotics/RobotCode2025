@@ -279,9 +279,9 @@ public class RobotContainer {
     }
 
     private void buildAutos(SendableChooser<Command> chooser) {
-        Command autoCommand = LoggedCommands.sequence("Auto Test",
+        Command autoECD = LoggedCommands.sequence("ECD",
             // TODO Make optional
-            LoggedCommands.deferredProxy("Back up", this::BackUpCommand),
+            // LoggedCommands.deferredProxy("Back up", this::BackUpCommand),
             SetStop(Stop.L4),
             LoggedCommands.proxy(PathCommand("Start to near E")),
             LoggedCommands.proxy(ScoreCoral(ReefFace.EF, true)),
@@ -295,9 +295,22 @@ public class RobotContainer {
             LoggedCommands.proxy(ScoreCoral(ReefFace.CD, false)),
             LoggedCommands.proxy(PathCommand("D to CS")));
 
-        driver.povUp().whileTrue(autoCommand);
-        addAutoCommand(chooser, autoCommand);
-    }
+        addAutoCommand(chooser, autoECD);
+
+        Command autoBA = LoggedCommands.sequence("BA",
+            // TODO Make optional
+            // LoggedCommands.deferredProxy("Back up", this::BackUpCommand),
+            SetStop(Stop.L4),
+            LoggedCommands.proxy(PathCommand("Start to near B")),
+            LoggedCommands.proxy(ScoreCoral(ReefFace.AB, false)),
+            LoggedCommands.proxy(PathCommand("B to CS2")),
+            RobotState.WaitForCoral(),
+            LoggedCommands.proxy(PathCommand("CS2 to near A")),
+            LoggedCommands.proxy(ScoreCoral(ReefFace.AB, true)),
+            LoggedCommands.proxy(PathCommand("A backup")));
+
+        addAutoCommand(chooser, autoBA);
+        }
 
     public void teleopInit() {
     }

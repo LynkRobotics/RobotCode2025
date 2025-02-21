@@ -1,0 +1,55 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Start to near B"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score Right"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "B to CS2"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CS2 to near A"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score Left"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "A backup"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
