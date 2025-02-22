@@ -174,6 +174,8 @@ public class LEDSubsystem extends SubsystemBase {
      */
     // If the temporary state is active...
     if (tempState != null) {
+      // Clear current animation
+      clearAnimation();
       if (tempState == lastTempState) {
         // Temporary state unchanged
         if (tempStateExpiry > 0.0 && tempStateTimer.hasElapsed(tempStateExpiry)) {
@@ -192,8 +194,6 @@ public class LEDSubsystem extends SubsystemBase {
           }
         }
       } else {
-        // Clear current animation
-        clearAnimation();
         // Start new temporary state
         setColor(tempStateColor(tempState));
         blinkOff = false;
@@ -206,7 +206,6 @@ public class LEDSubsystem extends SubsystemBase {
           blinkInterval = 0.20;
           tempStateExpiry = 0.0;
         }
-        animate(new RainbowAnimation(0.50, 0.5, 68, false, 8));
       }
     }
 
