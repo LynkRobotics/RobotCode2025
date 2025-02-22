@@ -5,7 +5,9 @@ import static frc.robot.Options.optBackupPush;
 import static frc.robot.Options.optBonusCoralStandoff;
 import static frc.robot.Options.optMirrorAuto;
 
+import java.util.Collections;
 import java.util.EnumMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -169,8 +171,16 @@ public class RobotContainer {
             RobotState::haveCoral);
     }
 
+    private static final Map<ReefFace, ReefFace> mirroredFaces = Collections.unmodifiableMap(Map.ofEntries(
+        Map.entry(ReefFace.AB, ReefFace.AB),
+        Map.entry(ReefFace.CD, ReefFace.KL),
+        Map.entry(ReefFace.EF, ReefFace.IJ),
+        Map.entry(ReefFace.GH, ReefFace.GH),
+        Map.entry(ReefFace.IJ, ReefFace.EF),
+        Map.entry(ReefFace.KL, ReefFace.CD)));
+
     private Command ScoreCoralMaybeMirror(ReefFace face, boolean left) {
-        ReefFace mirroredFace = Constants.Pose.mirroredFaces.get(face);
+        ReefFace mirroredFace = mirroredFaces.get(face);
 
         return Commands.either(
             ScoreCoral(mirroredFace, !left),
