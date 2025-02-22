@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.logging.Logger;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -11,6 +13,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.LoggedAlert;
 import frc.robot.Constants;
 import frc.robot.subsystems.RobotState.GamePieceState;
 
@@ -52,6 +55,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         GamePieceState gamePieceState = RobotState.getGamePieceState();
+        double motorTemp = motor.getDeviceTemp().getValueAsDouble();
 
         if (gamePieceState != lastState) {
             if (gamePieceState == GamePieceState.NONE) {
@@ -101,5 +105,15 @@ public class EndEffectorSubsystem extends SubsystemBase {
                 RobotState.setNoAlgae();
             }
         }
+
+        DogLog.log("EndEffector/Motor Temp", motorTemp);
+
+        if (motorTemp > 70){ //TODO tune and put in constants
+            LoggedAlert.Warning("EndEffector", "TEMP WARNING", "End Effector Motor is approaching hot temperatures");
+        }
+        if (motorTemp > 90){
+            LoggedAlert.Warning("EndEffector", "TEMP WARNING", "End Effector Motor is approaching temperature max");
+        }
+
     }
 }

@@ -4,24 +4,22 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
+import com.ctre.phoenix.led.CANdleConfiguration;
 import com.ctre.phoenix.led.FireAnimation;
 import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 
 import dev.doglog.DogLog;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.util.LoggedCommands;
 
 public class LEDSubsystem extends SubsystemBase {
   /** Creates a new LEDSubsystem. */
-  private CANdle candleLeft = new CANdle(0, "rio");
-  private CANdle candleRight = new CANdle(1, "rio"); //todo make this a constants
+  private final CANdle candle;
+  private final CandleSelection which;
   private static BaseState baseState = BaseState.DISABLED;
   private static TempState tempState = null;
   private static BaseState lastBaseState = null;
@@ -47,7 +45,13 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   public enum TempState {
-    ERROR
+    ERROR,
+    WARNING
+  }
+
+  public enum CandleSelection {
+    LEFT,
+    RIGHT
   }
 
   public static final class Colors {
@@ -63,21 +67,24 @@ public class LEDSubsystem extends SubsystemBase {
     public static final Color disabled = new LEDSubsystem.Color(200, 0, 0);
   }
 
-  public LEDSubsystem() {
-    candleLeft.configBrightnessScalar(1.0);
-    candleLeft.configLEDType(LEDStripType.GRB);
-    candleLeft.configV5Enabled(true);
-    candleLeft.configLOSBehavior(false); // TODO: true -- why is this triggering?
+  public LEDSubsystem(CandleSelection which) {
+    this.which = which;
+    candle = new CANdle(which == CandleSelection.LEFT ? 0 : 1, "rio");
+    applyConfigs();
 
-
-    candleRight.configBrightnessScalar(1.0);
-    candleRight.configLEDType(LEDStripType.GRB);
-    candleRight.configV5Enabled(true);
-    candleRight.configLOSBehavior(false); // TODO: true -- why is this triggering?
-    // m_candle.animate(new RainbowAnimation(1,0.4, 94));
-    candleLeft.animate(new FireAnimation(1.0, 0.38, 94, 0.8, 0.2, false, 8));
-    candleRight.animate(new FireAnimation(1.0, 0.38, 94, 0.8, 0.2, false, 8));
+    // candle.animate(new RainbowAnimation(1,0.4, 94));
+    animate(new FireAnimation(1.0, 0.38, 94, 0.8, 0.2, false, 8));
     // setBaseState(BaseState.READY);
+  }
+
+  private void applyConfigs() {
+    CANdleConfiguration config = new CANdleConfiguration();
+    config.brightnessScalar = 1.0;
+    config.stripType = LEDStripType.GRB;
+    config.v5Enabled = true;
+    config.disableWhenLOS = false; //TODO: verify // TODO: true -- why is this triggering?
+
+    candle.configAllSettings(config);
   }
 
   public static void setBaseState(BaseState newState) {
@@ -87,6 +94,10 @@ public class LEDSubsystem extends SubsystemBase {
   public static void setTempState(TempState newState) {
     tempState = newState;
   }
+
+  public void animate(Animation animation) {
+    candle.animate(animation);
+  }
   
   public static void clearTempState() {
     tempState = null;
@@ -94,25 +105,24 @@ public class LEDSubsystem extends SubsystemBase {
   
   public void setColor(Color color) {
     //System.out.printf("Setting color (%d, %d, %d)%n", color.R, color.G, color.B);
-    candleLeft.setLEDs(color.R, color.G, color.B);
-    candleRight.setLEDs(color.R, color.G, color.B);
+    candle.setLEDs(color.R, color.G, color.B);
   }
 
   public void setRainbow(){
-    candleLeft.clearAnimation(0);
-    candleLeft.animate(new RainbowAnimation(0.50, 0.5, 68, false, 8));
-    candleRight.clearAnimation(0);
-    candleRight.animate(new RainbowAnimation(0.50, 0.5, 68, false, 8));
+    candle.clearAnimation(0);
+    candle.animate(new RainbowAnimation(0.50, 0.5, 68, false, 8)); //TODO: make this fire animation a constant
   }
 
   public void clearAnimation(){
-    candleLeft.clearAnimation(0);
-    candleRight.clearAnimation(0);
+    candle.clearAnimation(0);
   }
 
   private Color tempStateColor(TempState state) {
     if (state == TempState.ERROR) {
       return Colors.red;
+    } 
+    if (state == TempState.WARNING) {
+      return Colors.yellow;
     } else {
       DogLog.log("LED/Status", "tempStateColor: Unknown state: " + state);
       return Colors.off;
@@ -164,6 +174,8 @@ public class LEDSubsystem extends SubsystemBase {
      */
     // If the temporary state is active...
     if (tempState != null) {
+      // Clear current animation
+      clearAnimation();
       if (tempState == lastTempState) {
         // Temporary state unchanged
         if (tempStateExpiry > 0.0 && tempStateTimer.hasElapsed(tempStateExpiry)) {
@@ -186,7 +198,7 @@ public class LEDSubsystem extends SubsystemBase {
         setColor(tempStateColor(tempState));
         blinkOff = false;
         blinkTimer.restart();
-        if (tempState == TempState.ERROR) {
+        if (tempState == TempState.ERROR || tempState == TempState.WARNING) {
           blinkInterval = 0.10;
           tempStateExpiry = 0.80;
           tempStateTimer.restart();
