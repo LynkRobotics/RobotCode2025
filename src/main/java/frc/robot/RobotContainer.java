@@ -322,6 +322,7 @@ public class RobotContainer {
             RobotState.WaitForCoral(),
             LoggedCommands.proxy(PathCommand("CS to near D")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false)),
+            LoggedCommands.proxy(Commands.runOnce(() -> s_Swerve.setDriveMotorsToCoast())),
             LoggedCommands.proxy(PathCommand("D to CS")));
 
         addAutoCommand(chooser, autoECD);
@@ -344,6 +345,7 @@ public class RobotContainer {
         }
 
     public void teleopInit() {
+        LoggedCommands.runOnce("Braked Drive Motors", () -> s_Swerve.setDriveMotorsToBrake(), s_Swerve);
     }
 
     public void teleopExit() {
