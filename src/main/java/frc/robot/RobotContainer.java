@@ -355,6 +355,7 @@ public class RobotContainer {
         }
 
     public void teleopInit() {
+        s_Swerve.stopSwerve();
         s_Swerve.setDriveMotorsToBrake();
     }
 
