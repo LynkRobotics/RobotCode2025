@@ -12,13 +12,9 @@ import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 
 import dev.doglog.DogLog;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.util.LoggedCommands;
 
 public class LEDSubsystem extends SubsystemBase {
   /** Creates a new LEDSubsystem. */
@@ -49,7 +45,8 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   public enum TempState {
-    ERROR
+    ERROR,
+    WARNING
   }
 
   public enum CandleSelection {
@@ -113,7 +110,7 @@ public class LEDSubsystem extends SubsystemBase {
 
   public void setRainbow(){
     candle.clearAnimation(0);
-    candle.animate(new RainbowAnimation(0.50, 0.5, 68, false, 8));
+    candle.animate(new RainbowAnimation(0.50, 0.5, 68, false, 8)); //TODO: make this fire animation a constant
   }
 
   public void clearAnimation(){
@@ -123,6 +120,9 @@ public class LEDSubsystem extends SubsystemBase {
   private Color tempStateColor(TempState state) {
     if (state == TempState.ERROR) {
       return Colors.red;
+    } 
+    if (state == TempState.WARNING) {
+      return Colors.yellow;
     } else {
       DogLog.log("LED/Status", "tempStateColor: Unknown state: " + state);
       return Colors.off;
@@ -192,11 +192,13 @@ public class LEDSubsystem extends SubsystemBase {
           }
         }
       } else {
+        // Clear current animation
+        clearAnimation();
         // Start new temporary state
         setColor(tempStateColor(tempState));
         blinkOff = false;
         blinkTimer.restart();
-        if (tempState == TempState.ERROR) {
+        if (tempState == TempState.ERROR || tempState == TempState.WARNING) {
           blinkInterval = 0.10;
           tempStateExpiry = 0.80;
           tempStateTimer.restart();
@@ -204,6 +206,7 @@ public class LEDSubsystem extends SubsystemBase {
           blinkInterval = 0.20;
           tempStateExpiry = 0.0;
         }
+        animate(new RainbowAnimation(0.50, 0.5, 68, false, 8));
       }
     }
 
