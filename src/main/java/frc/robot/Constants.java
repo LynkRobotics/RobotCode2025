@@ -19,9 +19,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.*;
 
-import java.util.EnumMap;
-import java.util.Map;
-
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.wpilibj.RobotController;
@@ -363,14 +360,6 @@ public final class Constants {
             public final Pose2d alignBonusLeft, alignBonusRight;
             public final boolean algaeHigh;
         }
-
-        public static final EnumMap<ReefFace, ReefFace> mirroredFaces = new EnumMap<>(Map.of(
-            ReefFace.AB, ReefFace.AB,
-            ReefFace.CD, ReefFace.KL,
-            ReefFace.EF, ReefFace.IJ,
-            ReefFace.GH, ReefFace.GH,
-            ReefFace.IJ, ReefFace.EF,
-            ReefFace.KL, ReefFace.CD));
     }
 
     public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
