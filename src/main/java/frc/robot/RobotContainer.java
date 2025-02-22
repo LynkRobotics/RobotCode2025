@@ -173,7 +173,7 @@ public class RobotContainer {
         ReefFace mirroredFace = Constants.Pose.mirroredFaces.get(face);
 
         return Commands.either(
-            ScoreCoral(mirroredFace, face == mirroredFace ? !left : left),
+            ScoreCoral(mirroredFace, !left),
             ScoreCoral(face, left),
             this::shouldMirror);
     }
