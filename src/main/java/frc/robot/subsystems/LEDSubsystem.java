@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.led.CANdle;
+import com.ctre.phoenix.led.CANdleConfiguration;
 import com.ctre.phoenix.led.FireAnimation;
 import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
@@ -64,16 +65,15 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   public LEDSubsystem() {
-    candleLeft.configBrightnessScalar(1.0);
-    candleLeft.configLEDType(LEDStripType.GRB);
-    candleLeft.configV5Enabled(true);
-    candleLeft.configLOSBehavior(false); // TODO: true -- why is this triggering?
+    CANdleConfiguration config = new CANdleConfiguration();
+    config.brightnessScalar = 1.0;
+    config.stripType = LEDStripType.GRB;
+    config.v5Enabled = true;
+    config.disableWhenLOS = false; //TODO: verify // TODO: true -- why is this triggering?
 
-
-    candleRight.configBrightnessScalar(1.0);
-    candleRight.configLEDType(LEDStripType.GRB);
-    candleRight.configV5Enabled(true);
-    candleRight.configLOSBehavior(false); // TODO: true -- why is this triggering?
+    candleLeft.configAllSettings(config);
+    candleRight.configAllSettings(config);
+    
     // m_candle.animate(new RainbowAnimation(1,0.4, 94));
     candleLeft.animate(new FireAnimation(1.0, 0.38, 94, 0.8, 0.2, false, 8));
     candleRight.animate(new FireAnimation(1.0, 0.38, 94, 0.8, 0.2, false, 8));
