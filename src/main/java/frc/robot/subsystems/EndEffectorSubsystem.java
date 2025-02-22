@@ -9,6 +9,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.RobotState.GamePieceState;
@@ -30,6 +31,8 @@ public class EndEffectorSubsystem extends SubsystemBase {
         motor = new TalonFX(Constants.EndEffector.motorID, Constants.EndEffector.canBus);
 
         applyConfigs();
+
+        SmartDashboard.putNumber("Algae voltage", Constants.EndEffector.algaeVoltage);
     }
 
     public void applyConfigs() {
@@ -56,11 +59,11 @@ public class EndEffectorSubsystem extends SubsystemBase {
                 motor.stopMotor();
             } else if (gamePieceState == GamePieceState.INTAKING_ALGAE) {
                 DogLog.log("EndEffector/Control", "Intaking algae");
-                motor.setControl(algaeControl);
+                motor.setControl(algaeControl.withOutput(SmartDashboard.getNumber("Algae voltage", Constants.EndEffector.algaeVoltage)));
             } else if (gamePieceState == GamePieceState.HOLDING_ALGAE) {
                 // No change currently, but issue it anyway, for kicks
                 DogLog.log("EndEffector/Control", "Holding algae");
-                motor.setControl(algaeControl);
+                motor.setControl(algaeControl.withOutput(SmartDashboard.getNumber("Algae voltage", Constants.EndEffector.algaeVoltage)));
             } else if (gamePieceState == GamePieceState.SCORING_ALGAE) {
                 motor.setControl(algaeOutControl);
                 // TODO How to persist?
