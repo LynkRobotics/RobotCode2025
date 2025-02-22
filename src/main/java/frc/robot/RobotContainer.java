@@ -17,6 +17,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -36,6 +37,7 @@ import frc.robot.Constants.Pose.ReefFace;
 import frc.robot.Constants.Elevator.Stop;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.LEDSubsystem.TempState;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -285,9 +287,17 @@ public class RobotContainer {
                 RobotState::haveCoral));
 
         alignmentToggle.onTrue(LoggedCommands.runOnce("Toggle Alignment", optAutoReefAiming::toggle));
+
+        driver.povUp().whileTrue(
+            Commands.sequence(
+                new PIDSwerve(s_Swerve, s_Pose, new Pose2d(4.48, 1.67, Rotation2d.fromDegrees(91)), false),
+                s_Swerve.Stop(),
+                Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached Debug Position")),
+                Commands.runOnce(() -> LEDSubsystem.setTempState(TempState.ERROR))
+                ));
     }
 
-    /**
+    /** 
      * Use this to pass the autonomous command to the main {@link Robot} class.
      *
      * @return the command to run in autonomous
