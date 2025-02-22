@@ -64,13 +64,13 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   public LEDSubsystem() {
-    candleLeft.configBrightnessScalar(0.50);
+    candleLeft.configBrightnessScalar(1.0);
     candleLeft.configLEDType(LEDStripType.GRB);
     candleLeft.configV5Enabled(true);
     candleLeft.configLOSBehavior(false); // TODO: true -- why is this triggering?
 
 
-    candleRight.configBrightnessScalar(0.50);
+    candleRight.configBrightnessScalar(1.0);
     candleRight.configLEDType(LEDStripType.GRB);
     candleRight.configV5Enabled(true);
     candleRight.configLOSBehavior(false); // TODO: true -- why is this triggering?
