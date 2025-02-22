@@ -105,6 +105,11 @@ public class LEDSubsystem extends SubsystemBase {
     candleRight.animate(new RainbowAnimation(0.50, 0.5, 68, false, 8));
   }
 
+  public void clearAnimation(){
+    candleLeft.clearAnimation(0);
+    candleRight.clearAnimation(0);
+  }
+
   private Color tempStateColor(TempState state) {
     if (state == TempState.ERROR) {
       return Colors.red;
