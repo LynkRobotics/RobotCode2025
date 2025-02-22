@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import java.util.logging.Logger;
-
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
