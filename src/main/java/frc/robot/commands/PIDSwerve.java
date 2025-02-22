@@ -36,6 +36,9 @@ public class PIDSwerve extends LoggedCommandBase {
     public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean precise) {
         super();
 
+        // TODO Make configurable?
+        targetPose = PoseSubsystem.flipIfRed(targetPose);
+
         this.s_Swerve = s_Swerve;
         this.s_Pose = s_Pose;
         this.targetPose = targetPose;

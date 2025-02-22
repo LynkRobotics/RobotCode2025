@@ -192,7 +192,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         return IfNotBlocked(LoggedCommands.startRun("Auto Elevator Up",
             () -> autoUp = false,
             () -> {
-                if (!autoUp && PoseSubsystem.distanceTo(target) <= Constants.Pose.autoUpDistance) {
+                // TODO Always flip?
+                if (!autoUp && PoseSubsystem.distanceTo(PoseSubsystem.flipIfRed(target)) <= Constants.Pose.autoUpDistance) {
                     Stop stop = stopSupplier.get();
                     RobotState.updateActiveStop(stop);
                     setHeight(stopHeight(stop));

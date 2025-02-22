@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.util.FlippingUtil;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import dev.doglog.DogLog;
@@ -190,13 +191,16 @@ public class PoseSubsystem extends SubsystemBase {
         }
     }
 
-    public static Translation2d otherAlliance(Translation2d position) {
-        // Rotationally symmetric this year
-        return new Translation2d(Constants.Pose.fieldLength - position.getX(), Constants.Pose.fieldWidth - position.getY());
+    public static Translation2d flipIfRed(Translation2d position) {
+        return Robot.isRed() ? FlippingUtil.flipFieldPosition(position) : position;
     }
 
-    public static Translation2d flipIfRed(Translation2d position) {
-        return Robot.isRed() ? otherAlliance(position) : position;
+    public static Pose2d flipIfRed(Pose2d pose) {
+        return Robot.isRed() ? FlippingUtil.flipFieldPose(pose) : pose;
+    }
+
+    public static Rotation2d flipIfRed(Rotation2d rotation) {
+        return Robot.isRed() ? FlippingUtil.flipFieldRotation(rotation) : rotation;
     }
 
     public static Rotation2d reefBearing(Translation2d position) {
@@ -207,10 +211,7 @@ public class PoseSubsystem extends SubsystemBase {
     }
 
     public static ReefFace nearestFace(Translation2d position) {
-        Rotation2d reefBearing = reefBearing(position);
-        if (Robot.isRed()) {
-            reefBearing.plus(Rotation2d.k180deg);
-        }
+        Rotation2d reefBearing = flipIfRed(reefBearing(position));
         double bearingAngle = MathUtil.inputModulus(reefBearing.getDegrees(), -180, 180);
 
         if (bearingAngle > 150 || bearingAngle < -150) {
@@ -229,6 +230,8 @@ public class PoseSubsystem extends SubsystemBase {
     }
 
     public static Rotation2d facePerpendicular(ReefFace face) {
+        // TODO Fix for red
+        // Or removed as unused
         if (face == ReefFace.CD) {
             return Rotation2d.fromDegrees(60);
         } else if (face == ReefFace.EF) {

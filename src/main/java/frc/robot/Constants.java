@@ -5,6 +5,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -300,8 +301,10 @@ public final class Constants {
         public static final double tiltWarning = 10.0;
         public static final double tiltError = 30.0;
 
-        public static final double fieldWidth = Units.inchesToMeters(26*12 + 5);
-        public static final double fieldLength = Units.inchesToMeters(57*12 + 6.875);
+        // TODO What about AndyMark field?
+        // NOTE That FlippingUtil might need to be impacted
+        public static final double fieldWidth = FlippingUtil.fieldSizeY; // Units.inchesToMeters(26*12 + 5);
+        public static final double fieldLength = FlippingUtil.fieldSizeX; // Units.inchesToMeters(57*12 + 6.875);
 
         public static final double reefElevatorZoneRadius = Units.inchesToMeters(80.0); // TODO Revisit
         public static final double autoUpDistance = Units.inchesToMeters(44.0);
