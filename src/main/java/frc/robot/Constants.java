@@ -240,10 +240,10 @@ public final class Constants {
             L1       (27.0  - Constants.Elevator.endEffectorHeight),
             L2       (34.5  - Constants.Elevator.endEffectorHeight),
             L2_ALGAE (38.0  - Constants.Elevator.endEffectorHeight),
-            L3       (50.0  - Constants.Elevator.endEffectorHeight),
+            L3       (50.5  - Constants.Elevator.endEffectorHeight),
             L3_ALGAE (53.5  - Constants.Elevator.endEffectorHeight),
             L4       (75.0  - Constants.Elevator.endEffectorHeight),
-            L4_SCORE (77.75 - Constants.Elevator.endEffectorHeight);
+            L4_SCORE (78.0 - Constants.Elevator.endEffectorHeight);
     
             Stop(double height) {
                 this.height = height;
@@ -252,7 +252,7 @@ public final class Constants {
             public final double height;
         }
 
-        public static final double standoffBoost = Units.inchesToMeters(2.0);
+        public static final double standoffBoost = 2.0; // In inches
     }
 
     public static final class EndEffector {

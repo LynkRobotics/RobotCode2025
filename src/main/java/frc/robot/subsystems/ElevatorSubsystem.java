@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import static frc.robot.Options.optBonusCoralStandoff;
+
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -143,15 +145,21 @@ public class ElevatorSubsystem extends SubsystemBase {
         leftMotor.setControl(voltageOut.withOutput(voltage));
     }
 
-    public double bonusHeight(Stop stop) {
-        return (stop == Stop.L1 || stop == Stop.L2 || stop == Stop.L3 || stop == Stop.L4) ? Constants.Elevator.standoffBoost : 0.0;
+    private double stopHeight(Stop stop) {
+        double height = stop.height;
+
+        if (optBonusCoralStandoff.get() && (stop == Stop.L1 || stop == Stop.L2 || stop == Stop.L3 || stop == Stop.L4)) {
+            height += Constants.Elevator.standoffBoost;
+        }
+
+        return height;
     }
 
     public Command Move(Stop stop) {
         return IfNotBlocked(LoggedCommands.sequence("Move Elevator to " + stop,
             Commands.runOnce(() -> {
                 RobotState.updateActiveStop(stop);
-                setHeight(stop.height + bonusHeight(stop));
+                setHeight(stopHeight(stop));
             }, this),
             LoggedCommands.idle("Idle to hold elevator", this)));
     }
@@ -161,7 +169,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             LoggedCommands.log(() -> "Next stop: " + nextStop),
             Commands.runOnce(() -> {
                 RobotState.updateActiveStop(nextStop);
-                setHeight(nextStop.height + bonusHeight(nextStop));
+                setHeight(stopHeight(nextStop));
             }, this),
             LoggedCommands.idle("Idle to hold elevator", this)));
     }
@@ -187,7 +195,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 if (!autoUp && PoseSubsystem.distanceTo(target) <= Constants.Pose.autoUpDistance) {
                     Stop stop = stopSupplier.get();
                     RobotState.updateActiveStop(stop);
-                    setHeight(stop.height + bonusHeight(stop));
+                    setHeight(stopHeight(stop));
                     autoUp = true;
                 }
             },
@@ -220,6 +228,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             LoggedAlert.Warning("Elevator", "Elevator Range", "Requested elevator height too low");
             height = Constants.Elevator.baseHeight;
         }
+        DogLog.log("Elevator/Status", "Move to height " + String.format("%1.1f", height));
 
         double position = (height - Constants.Elevator.baseHeight) * Constants.Elevator.rotPerInch;
         setPosition(position);
@@ -254,7 +263,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     private double stopError(Stop stop) {
-        return Math.abs(stop.height + bonusHeight(stop) - getHeight());
+        return Math.abs(stopHeight(stop) - getHeight());
     }
 
     public boolean atStop(Stop stop) {
