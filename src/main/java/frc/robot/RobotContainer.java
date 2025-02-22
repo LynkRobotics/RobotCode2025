@@ -37,6 +37,7 @@ import frc.robot.Constants.Pose.ReefFace;
 import frc.robot.Constants.Elevator.Stop;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.LEDSubsystem.CandleSelection;
 import frc.robot.subsystems.LEDSubsystem.TempState;
 
 /**
@@ -62,7 +63,9 @@ public class RobotContainer {
     private final RobotState s_RobotState;
     private final Swerve s_Swerve;
     @SuppressWarnings ("unused")
-    private final LEDSubsystem s_Led;
+    private final LEDSubsystem s_rLED;
+    @SuppressWarnings ("unused")
+    private final LEDSubsystem s_lLED;
     private final VisionSubsystem s_Vision;
     private final PoseSubsystem s_Pose;
     private final ElevatorSubsystem s_Elevator;
@@ -106,7 +109,8 @@ public class RobotContainer {
         s_RobotState = new RobotState();
         s_Elevator = new ElevatorSubsystem();
         s_EndEffector = new EndEffectorSubsystem();
-        s_Led = new LEDSubsystem();
+        s_rLED = new LEDSubsystem(CandleSelection.RIGHT);
+        s_lLED = new LEDSubsystem(CandleSelection.LEFT);
         s_Index = new IndexSubsystem();
 
         s_Swerve.setDefaultCommand(
