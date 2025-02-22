@@ -20,7 +20,8 @@ import frc.lib.util.LoggedCommands;
 
 public class LEDSubsystem extends SubsystemBase {
   /** Creates a new LEDSubsystem. */
-  private CANdle m_candle = new CANdle(0, "rio");
+  private CANdle candleLeft = new CANdle(0, "rio");
+  private CANdle candleRight = new CANdle(1, "rio"); //todo make this a constants
   private static BaseState baseState = BaseState.DISABLED;
   private static TempState tempState = null;
   private static BaseState lastBaseState = null;
@@ -63,12 +64,19 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   public LEDSubsystem() {
-    m_candle.configBrightnessScalar(0.50);
-    m_candle.configLEDType(LEDStripType.GRB);
-    m_candle.configV5Enabled(true);
-    m_candle.configLOSBehavior(false); // TODO: true -- why is this triggering?
+    candleLeft.configBrightnessScalar(0.50);
+    candleLeft.configLEDType(LEDStripType.GRB);
+    candleLeft.configV5Enabled(true);
+    candleLeft.configLOSBehavior(false); // TODO: true -- why is this triggering?
+
+
+    candleRight.configBrightnessScalar(0.50);
+    candleRight.configLEDType(LEDStripType.GRB);
+    candleRight.configV5Enabled(true);
+    candleRight.configLOSBehavior(false); // TODO: true -- why is this triggering?
     // m_candle.animate(new RainbowAnimation(1,0.4, 94));
-    m_candle.animate(new FireAnimation(1.0, 0.38, 94, 0.8, 0.2, false, 8));
+    candleLeft.animate(new FireAnimation(1.0, 0.38, 94, 0.8, 0.2, false, 8));
+    candleRight.animate(new FireAnimation(1.0, 0.38, 94, 0.8, 0.2, false, 8));
     // setBaseState(BaseState.READY);
   }
 
@@ -86,12 +94,15 @@ public class LEDSubsystem extends SubsystemBase {
   
   public void setColor(Color color) {
     //System.out.printf("Setting color (%d, %d, %d)%n", color.R, color.G, color.B);
-    m_candle.setLEDs(color.R, color.G, color.B);
+    candleLeft.setLEDs(color.R, color.G, color.B);
+    candleRight.setLEDs(color.R, color.G, color.B);
   }
 
   public void setRainbow(){
-    m_candle.clearAnimation(0);
-    m_candle.animate(new RainbowAnimation(0.50, 0.5, 68, false, 8));
+    candleLeft.clearAnimation(0);
+    candleLeft.animate(new RainbowAnimation(0.50, 0.5, 68, false, 8));
+    candleRight.clearAnimation(0);
+    candleRight.animate(new RainbowAnimation(0.50, 0.5, 68, false, 8));
   }
 
   private Color tempStateColor(TempState state) {
