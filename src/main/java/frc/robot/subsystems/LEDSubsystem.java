@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdleConfiguration;
 import com.ctre.phoenix.led.FireAnimation;
@@ -73,10 +74,9 @@ public class LEDSubsystem extends SubsystemBase {
 
     candleLeft.configAllSettings(config);
     candleRight.configAllSettings(config);
-    
+
     // m_candle.animate(new RainbowAnimation(1,0.4, 94));
-    candleLeft.animate(new FireAnimation(1.0, 0.38, 94, 0.8, 0.2, false, 8));
-    candleRight.animate(new FireAnimation(1.0, 0.38, 94, 0.8, 0.2, false, 8));
+    animate(new FireAnimation(1.0, 0.38, 94, 0.8, 0.2, false, 8));
     // setBaseState(BaseState.READY);
   }
 
@@ -86,6 +86,11 @@ public class LEDSubsystem extends SubsystemBase {
   
   public static void setTempState(TempState newState) {
     tempState = newState;
+  }
+
+  public void animate(Animation animation) {
+    candleLeft.animate(animation);
+    candleRight.animate(animation);
   }
   
   public static void clearTempState() {
