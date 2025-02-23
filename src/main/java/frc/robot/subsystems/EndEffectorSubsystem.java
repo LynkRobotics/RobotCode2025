@@ -24,8 +24,8 @@ public class EndEffectorSubsystem extends SubsystemBase {
     private final VoltageOut scoreControl = new VoltageOut(Constants.EndEffector.scoreVoltage).withEnableFOC(true);
     private final VoltageOut algaeControl = new VoltageOut(Constants.EndEffector.algaeVoltage).withEnableFOC(true);
     private final VoltageOut algaeOutControl = new VoltageOut(Constants.EndEffector.algaeOutVoltage).withEnableFOC(true);
-    
-    GamePieceState lastState = GamePieceState.NONE;
+
+    private GamePieceState lastState = GamePieceState.NONE;
 
     public EndEffectorSubsystem() {
         /* Devices */
@@ -68,7 +68,6 @@ public class EndEffectorSubsystem extends SubsystemBase {
                 motor.setControl(algaeControl.withOutput(SmartDashboard.getNumber("Algae voltage", Constants.EndEffector.algaeVoltage)));
             } else if (gamePieceState == GamePieceState.SCORING_ALGAE) {
                 motor.setControl(algaeOutControl);
-                // TODO How to persist?
             } else if (gamePieceState == GamePieceState.INTAKING_CORAL) {
                 DogLog.log("EndEffector/Control", "Stop (intaking coral)");
                 motor.stopMotor();
@@ -94,14 +93,11 @@ public class EndEffectorSubsystem extends SubsystemBase {
         double current = motor.getTorqueCurrent().getValueAsDouble();
         DogLog.log("EndEffector/TorqueCurrent", motor.getTorqueCurrent().getValueAsDouble());
 
-        if (gamePieceState == GamePieceState.INTAKING_ALGAE && current > 80.0 && !RobotState.getFinalSensor()) {
+        if (gamePieceState == GamePieceState.INTAKING_ALGAE && current > Constants.EndEffector.minimumAlgaeAcquireCurrent && !RobotState.getFinalSensor()) {
             RobotState.setHaveAlgae();
         }
-        if (gamePieceState == GamePieceState.HOLDING_ALGAE || gamePieceState == GamePieceState.SCORING_ALGAE) {
-            // TODO Hold scoring state longer?
-            if (current < 60.0) {
-                RobotState.setNoAlgae();
-            }
+        if (gamePieceState == GamePieceState.HOLDING_ALGAE && current < Constants.EndEffector.minimumAlgaeHoldCurrent) {
+            RobotState.setNoAlgae();
         }
 
         DogLog.log("EndEffector/Motor Temp", motorTemp);

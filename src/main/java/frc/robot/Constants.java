@@ -272,8 +272,11 @@ public final class Constants {
         public static final double scoreVoltage = -3.00;
         public static final double algaeVoltage = 3.00;
         public static final double algaeOutVoltage = -2.00;
+        public static final double minimumAlgaeAcquireCurrent = 80.0;
+        public static final double minimumAlgaeHoldCurrent = 60.0;
 
         public static final double L1RunTime = 1.0;
+        public static final double algaeRunTime = 1.0;
     }
 
     public static final class Index {

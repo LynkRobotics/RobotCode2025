@@ -25,9 +25,10 @@ public class RobotState extends SubsystemBase {
     private static final DigitalInput indexSensor;
     private static boolean elevatorAtZero = false;
     private static GamePieceState gamePieceState = GamePieceState.NONE;
-    private static Timer L1Timer = new Timer();
+    private static final Timer L1Timer = new Timer();
     private static Stop activeStop = Stop.SAFE;
     private static Stop nextStop = Stop.SAFE;
+    private static final Timer algaeScoreTimer = new Timer();
 
     private static final TunableOption optOverrideElevatorPathBlocked = new TunableOption("Override Elevator Path Blocked", false);
     private static final TunableOption optOverrideReefElevatorZone = new TunableOption("Override Reef Safe Elevator Zone", true);
@@ -211,7 +212,13 @@ public class RobotState extends SubsystemBase {
         SmartDashboard.putString("State/Active Game Piece", haveAlgae() ? "#48B6AB" : haveCoral() ? "#FFFFFF" : "#888888");
 
         if (!haveAlgae() && gamePieceState != GamePieceState.INTAKING_ALGAE) {
-            if (intakeSensor && flipperSensor && finalSensor) {
+            if (gamePieceState == GamePieceState.SCORING_ALGAE) {
+                if (!algaeScoreTimer.isRunning()) {
+                    algaeScoreTimer.restart();
+                } else if (algaeScoreTimer.get() > Constants.EndEffector.algaeRunTime) {
+                    gamePieceState = GamePieceState.NONE;
+                }
+            } else if (intakeSensor && flipperSensor && finalSensor) {
                 // No Coral is present
                 if (gamePieceState == GamePieceState.SCORING_CORAL && activeStop == Stop.L1) {
                     if (!L1Timer.isRunning()) {
