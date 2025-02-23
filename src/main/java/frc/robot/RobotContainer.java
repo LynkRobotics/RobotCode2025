@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import dev.doglog.DogLog;
@@ -356,7 +357,9 @@ public class RobotContainer {
             LoggedCommands.proxy(PathCommand("A backup")));
 
         addAutoCommand(chooser, autoBA);
-        }
+
+        FollowPathCommand.warmupCommand().schedule();
+    }
 
     public void teleopInit() {
         s_Swerve.stopSwerve();
