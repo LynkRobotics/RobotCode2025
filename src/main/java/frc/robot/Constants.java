@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.ctre.phoenix.led.FireAnimation;
+import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -403,5 +405,16 @@ public final class Constants {
             new Translation2d(Swerve.wheelBase / 2.0, -Swerve.trackWidth / 2.0),
             new Translation2d(-Swerve.wheelBase / 2.0, Swerve.trackWidth / 2.0),
             new Translation2d(-Swerve.wheelBase / 2.0, -Swerve.trackWidth / 2.0));
+    }
+
+    public static final class LEDs {
+        /* IDs */
+        public static final int leftCandle = 0;
+        public static final int rightCandle = 1;
+        /* CANbus */
+        public static final String canBus = "rio";
+        /* Animations */
+        public static final FireAnimation fireAnimation = new FireAnimation(1.0, 0.38, 94, 0.8, 0.2, false, 8);
+        public static final RainbowAnimation rainbowAnimation = new RainbowAnimation(1,0.4, 94);
     }
 }

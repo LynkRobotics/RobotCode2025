@@ -5,13 +5,12 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.led.Animation;
-import com.ctre.phoenix.led.FireAnimation;
-import com.ctre.phoenix.led.RainbowAnimation;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LED;
+import frc.robot.Constants;
 
 public class LEDSubsystem extends SubsystemBase {
   /** Creates a new LEDSubsystem. */
@@ -63,15 +62,12 @@ public class LEDSubsystem extends SubsystemBase {
 
   public LEDSubsystem() {
     mLeds = new LED[] {
-      new LED(0),
-      new LED(1)
+      new LED(Constants.LEDs.leftCandle, Constants.LEDs.canBus),
+      new LED(Constants.LEDs.rightCandle, Constants.LEDs.canBus)
     };
 
-    // candle.animate(new RainbowAnimation(1,0.4, 94));
-    animate(new FireAnimation(1.0, 0.38, 94, 0.8, 0.2, false, 8));
-    // setBaseState(BaseState.READY);
+    animate(Constants.LEDs.fireAnimation);
   }
-
 
   public static void setBaseState(BaseState newState) {
     baseState = newState;
@@ -100,7 +96,7 @@ public class LEDSubsystem extends SubsystemBase {
   public void setRainbow(){
     for (LED led : mLeds) {
       led.clearAnimation();
-      led.setAnimation(new RainbowAnimation(0.50, 0.5, 68, false, 8)); //TODO: make this rainbow animation a constant;
+      led.setAnimation(Constants.LEDs.rainbowAnimation); 
     }
   }
 
@@ -132,8 +128,6 @@ public class LEDSubsystem extends SubsystemBase {
       return Colors.off;
     }
   }
-
-
 
   @Override
   public void periodic() {

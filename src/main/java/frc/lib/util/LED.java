@@ -10,11 +10,11 @@ public class LED {
 
     private CANdle mCandle;
     
-    public LED(int candleNumber) {
+    public LED(int candleNumber, String canBus) {
         this.candleNumber = candleNumber;
         
         /* CANdle Config */
-        mCandle = new CANdle(candleNumber);
+        mCandle = new CANdle(candleNumber, canBus);
         applyConfigs();
     }
 
