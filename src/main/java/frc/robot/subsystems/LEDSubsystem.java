@@ -252,7 +252,6 @@ public class LEDSubsystem extends SubsystemBase {
       if (RobotState.getNextStop().equals(Stop.L4) || RobotState.getNextStop().equals(Stop.L4_SCORE)) {
         setLarson(Colors.white, 94);
       }
-      // setLEDs(Colors.white, 48); //TODO: make this dynamic to the elevator postiong
     }
     if (RobotState.haveAlgae()) {
       setTempState(TempState.ALGAE);      
