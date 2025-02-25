@@ -238,7 +238,7 @@ public class LEDSubsystem extends SubsystemBase {
       setTempState(TempState.INTAKING);
     }
     if (RobotState.coralReady()) {
-      setLEDs(Colors.white, 48); //TODO: make this dynamic to the elevator postiong
+      // setLEDs(Colors.white, 48); //TODO: make this dynamic to the elevator postiong
     }
     if (RobotState.haveAlgae()) {
       setTempState(TempState.ALGAE);      
