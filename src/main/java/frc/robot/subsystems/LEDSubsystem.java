@@ -5,12 +5,16 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.led.Animation;
+import com.ctre.phoenix.led.LarsonAnimation;
+
 import dev.doglog.DogLog;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LED;
 import frc.robot.Constants;
+import frc.robot.Constants.Elevator.Stop;
 
 public class LEDSubsystem extends SubsystemBase {
   /** Creates a new LEDSubsystem. */
@@ -104,6 +108,17 @@ public class LEDSubsystem extends SubsystemBase {
     for (LED led : mLeds) {
       led.clearAnimation();
     }
+  }
+
+  public void setLEDs(Color color, int count) {
+    for (LED led : mLeds) {
+      led.setLEDs(color.R, color.G, color.B, Constants.LEDs.startIdx, count);
+    }
+  }
+
+  public void setLarson(Color color) {
+    clearAnimation();
+    animate(new LarsonAnimation(color.R, color.G, color.B, 255, 0.5, 94, LarsonAnimation.BounceMode.Front, 7, 8));
   }
 
   private Color tempStateColor(TempState state) {

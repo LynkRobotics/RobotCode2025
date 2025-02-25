@@ -416,5 +416,7 @@ public final class Constants {
         /* Animations */
         public static final FireAnimation fireAnimation = new FireAnimation(1.0, 0.38, 94, 0.8, 0.2, false, 8);
         public static final RainbowAnimation rainbowAnimation = new RainbowAnimation(1,0.4, 94);
+        /* Misc */
+        public static final int startIdx = 8;
     }
 }
