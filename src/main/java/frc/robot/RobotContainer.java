@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.Elastic;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
 import frc.robot.Constants.Pose.ReefFace;
@@ -364,6 +365,7 @@ public class RobotContainer {
     public void teleopInit() {
         s_Swerve.stopSwerve();
         s_Swerve.setDriveMotorsToBrake();
+        Elastic.selectTab("Primary"); //TODO: test
     }
 
     public void teleopExit() {
