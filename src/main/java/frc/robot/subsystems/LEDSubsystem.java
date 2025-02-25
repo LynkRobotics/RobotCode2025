@@ -54,7 +54,9 @@ public class LEDSubsystem extends SubsystemBase {
     public static final Color off = new LEDSubsystem.Color(0, 0, 0);
     public static final Color red = new LEDSubsystem.Color(255, 0, 0);
     public static final Color green = new LEDSubsystem.Color(0, 255, 0);
+    public static final Color teal = new LEDSubsystem.Color(44,162,165); //i wonder who that could be
     public static final Color blue = new LEDSubsystem.Color(0, 0, 255);
+    public static final Color cheesyBlue = new LEDSubsystem.Color(0, 112, 255);
     public static final Color cyan = new LEDSubsystem.Color(0, 255, 255);
     public static final Color magenta = new LEDSubsystem.Color(255, 0, 255);
     public static final Color yellow = new LEDSubsystem.Color(255, 255, 0);
