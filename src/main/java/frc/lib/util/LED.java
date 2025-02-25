@@ -1,7 +1,5 @@
 package frc.lib.util;
 
-import java.net.http.WebSocket;
-
 import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
