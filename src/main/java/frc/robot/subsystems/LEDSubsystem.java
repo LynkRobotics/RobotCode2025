@@ -45,10 +45,6 @@ public class LEDSubsystem extends SubsystemBase {
     WARNING
   }
 
-  public enum CandleSelection {
-    LEFT,
-    RIGHT
-  }
 
   public static final class Colors {
     public static final Color off = new LEDSubsystem.Color(0, 0, 0);
