@@ -1,16 +1,18 @@
 package frc.lib.util;
 
+import java.net.http.WebSocket;
+
 import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdleConfiguration;
 
-public class LynkCandle {
+public class LED {
     public int candleNumber;
 
     private CANdle mCandle;
     
-    public LynkCandle(int candleNumber) {
+    public LED(int candleNumber) {
         this.candleNumber = candleNumber;
         
         /* CANdle Config */
@@ -28,16 +30,20 @@ public class LynkCandle {
         mCandle.configAllSettings(config);
     }
 
-    public void setLynkAnimation(Animation animation) {
+    public void setAnimation(Animation animation) {
         mCandle.animate(animation);
     }
 
-    public void clearLynkAnimation() {
+    public void clearAnimation() {
         mCandle.clearAnimation(0);
     }
 
-    public void setLynkLEDs(int r, int g, int b) {
+    public void setLEDs(int r, int g, int b) {
         mCandle.setLEDs(r, g, b);
+    }
+
+    public void setLEDs(int r, int g, int b, int w, int startIdx, int count) {
+        mCandle.setLEDs(r, g, b, w, startIdx, count);
     }
 
 }
