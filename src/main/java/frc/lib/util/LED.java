@@ -40,10 +40,6 @@ public class LED {
         mCandle.setLEDs(r, g, b);
     }
 
-    public void setLEDs(int r, int g, int b, int startIdx, int count) {
-        mCandle.setLEDs(r, g, b, 255, startIdx, count);
-    }
-
     public void setLEDs(int r, int g, int b, int w, int startIdx, int count) {
         mCandle.setLEDs(r, g, b, w, startIdx, count);
     }

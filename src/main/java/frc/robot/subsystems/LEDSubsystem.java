@@ -8,13 +8,11 @@ import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.LarsonAnimation;
 
 import dev.doglog.DogLog;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LED;
 import frc.robot.Constants;
-import frc.robot.Constants.Elevator.Stop;
 
 public class LEDSubsystem extends SubsystemBase {
   /** Creates a new LEDSubsystem. */
@@ -45,7 +43,9 @@ public class LEDSubsystem extends SubsystemBase {
 
   public enum TempState {
     ERROR,
-    WARNING
+    WARNING,
+    INTAKING,
+    ALGAE
   }
 
 
@@ -112,7 +112,13 @@ public class LEDSubsystem extends SubsystemBase {
 
   public void setLEDs(Color color, int count) {
     for (LED led : mLeds) {
-      led.setLEDs(color.R, color.G, color.B, Constants.LEDs.startIdx, count);
+      led.setLEDs(color.R, color.G, color.B, 255, Constants.LEDs.startIdx, count);
+    }
+  }
+
+  public void setLEDs(Color color) {
+    for (LED led : mLeds) {
+      led.setLEDs(0, 0, 0);
     }
   }
 
@@ -124,9 +130,12 @@ public class LEDSubsystem extends SubsystemBase {
   private Color tempStateColor(TempState state) {
     if (state == TempState.ERROR) {
       return Colors.red;
-    } 
-    if (state == TempState.WARNING) {
+    } if (state == TempState.WARNING) {
       return Colors.yellow;
+    } if (state == TempState.INTAKING) {
+      return Colors.white;
+    } if (state == TempState.ALGAE) {
+      return Colors.teal;
     } else {
       DogLog.log("LED/Status", "tempStateColor: Unknown state: " + state);
       return Colors.off;
@@ -143,6 +152,7 @@ public class LEDSubsystem extends SubsystemBase {
       return Colors.off;
     }
   }
+
 
   @Override
   public void periodic() {
@@ -223,6 +233,17 @@ public class LEDSubsystem extends SubsystemBase {
         }
       }
     }
+
+    if (RobotState.haveCoral() && !RobotState.coralReady()) {
+      setTempState(TempState.INTAKING);
+    }
+    if (RobotState.coralReady()) {
+      setLEDs(Colors.white, 48); //TODO: make this dynamic to the elevator postiong
+    }
+    if (RobotState.haveAlgae()) {
+      setTempState(TempState.ALGAE);      
+    }
+    
 
     // Update the last states processed for reference in the next iteration
     lastTempState = tempState;
