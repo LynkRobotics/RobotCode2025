@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LED;
 import frc.robot.Constants;
+import frc.robot.Constants.Elevator.Stop;
 
 public class LEDSubsystem extends SubsystemBase {
   /** Creates a new LEDSubsystem. */
@@ -82,6 +83,7 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   public void animate(Animation animation) {
+    clearAnimation();
     for (LED led : mLeds) {
       led.setAnimation(animation);
     }
@@ -122,9 +124,9 @@ public class LEDSubsystem extends SubsystemBase {
     }
   }
 
-  public void setLarson(Color color) {
+  public void setLarson(Color color, int count) {
     clearAnimation();
-    animate(new LarsonAnimation(color.R, color.G, color.B, 255, 0.5, 94, LarsonAnimation.BounceMode.Front, 7, 8));
+    animate(new LarsonAnimation(color.R, color.G, color.B, 255, 0.5, count, LarsonAnimation.BounceMode.Front, 7, 8));
   }
 
   private Color tempStateColor(TempState state) {
@@ -238,6 +240,18 @@ public class LEDSubsystem extends SubsystemBase {
       setTempState(TempState.INTAKING);
     }
     if (RobotState.coralReady()) {
+      if (RobotState.getNextStop().equals(Stop.L1)) {
+        setLarson(Colors.white, 24);
+      }
+      if (RobotState.getNextStop().equals(Stop.L2)) {
+        setLarson(Colors.white, 48);
+      }
+      if (RobotState.getNextStop().equals(Stop.L3)) {
+        setLarson(Colors.white, 72);
+      }
+      if (RobotState.getNextStop().equals(Stop.L4) || RobotState.getNextStop().equals(Stop.L4_SCORE)) {
+        setLarson(Colors.white, 94);
+      }
       // setLEDs(Colors.white, 48); //TODO: make this dynamic to the elevator postiong
     }
     if (RobotState.haveAlgae()) {
