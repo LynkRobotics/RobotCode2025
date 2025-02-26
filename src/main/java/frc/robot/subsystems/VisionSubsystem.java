@@ -82,6 +82,7 @@ public class VisionSubsystem extends SubsystemBase {
     lastEstTimestamp = latestTimestamp;
     lastPose = visionEst.estimatedPose.toPose2d();
     field.setRobotPose(lastPose);
+    DogLog.log("Vision/Pose Difference", PoseSubsystem.getInstance().getPose().getTranslation().getDistance(lastPose.getTranslation()));
     if (poseEstimator != null) {
       poseEstimator.addVisionMeasurement(lastPose, lastEstTimestamp);
     }
