@@ -191,75 +191,75 @@ public class LEDSubsystem extends SubsystemBase {
      * }
      * }
      */
-    if (DriverStation.isEnabled()) {
+    // if (DriverStation.isEnabled()) {
       // If the temporary state is active...
-      if (tempState != null) {
+      // if (tempState != null) {
         // Clear current animation
-        clearAnimation();
-        if (tempState == lastTempState) {
+        // clearAnimation();
+        // if (tempState == lastTempState) {
           // Temporary state unchanged
-          if (tempStateExpiry > 0.0 && tempStateTimer.hasElapsed(tempStateExpiry)) {
+          // if (tempStateExpiry > 0.0 && tempStateTimer.hasElapsed(tempStateExpiry)) {
             // Temporary state has expired, and base state should be shown
-            tempState = null;
-          } else {
+            // tempState = null;
+          // } else {
             // Temporary state is active, but might need to be blinked
-            if (blinkTimer.hasElapsed(blinkInterval)) {
-              blinkOff = !blinkOff;
-              if (blinkOff) {
-                setColor(Colors.off);
-              } else {
-                setColor(tempStateColor(tempState));
-              }
-              blinkTimer.restart();
-            }
-          }
-        } else {
+            // if (blinkTimer.hasElapsed(blinkInterval)) {
+              // blinkOff = !blinkOff;
+              // if (blinkOff) {
+                // setColor(Colors.off);
+              // } else {
+                // setColor(tempStateColor(tempState));
+              // }
+              // blinkTimer.restart();
+            // }
+          // }
+        // } else {
           // Start new temporary state
-          setColor(tempStateColor(tempState));
-          blinkOff = false;
-          blinkTimer.restart();
-          if (tempState == TempState.ERROR || tempState == TempState.WARNING) {
-            blinkInterval = 0.10;
-            tempStateExpiry = 0.80;
-            tempStateTimer.restart();
-          } else {
-            blinkInterval = 0.20;
-            tempStateExpiry = 0.0;
-          }
-        }
-      }
-
-      if (RobotState.getNextStop().equals(Stop.L1)) {
-        setBaseState(null);
-        setLEDs(Colors.white, 24);
-      } else if (RobotState.getNextStop().equals(Stop.L2)) {
-        setBaseState(null);
-        setLEDs(Colors.white, 48);
-      } else if (RobotState.getNextStop().equals(Stop.L3)) {
-        setBaseState(null);
-        setLEDs(Colors.white, 72);
-      } else if (RobotState.getNextStop().equals(Stop.L4) || RobotState.getNextStop().equals(Stop.L4_SCORE)) {
-        setBaseState(null);
-        setLEDs(Colors.white, 94);
-      } else {
-        setBaseState(BaseState.READY);
-      }
-
-      if (tempState == null) { // Check for a changed base state, or a dropped temporary state
+          // setColor(tempStateColor(tempState));
+          // blinkOff = false;
+          // blinkTimer.restart();
+          // if (tempState == TempState.ERROR || tempState == TempState.WARNING) {
+            // blinkInterval = 0.10;
+            // tempStateExpiry = 0.80;
+            // tempStateTimer.restart();
+          // } else {
+            // blinkInterval = 0.20;
+            // tempStateExpiry = 0.0;
+          // }
+        // }
+      // }
+// 
+      // if (RobotState.getNextStop().equals(Stop.L1)) {
+        // setBaseState(null);
+        // setLEDs(Colors.white, 24);
+      // } else if (RobotState.getNextStop().equals(Stop.L2)) {
+        // setBaseState(null);
+        // setLEDs(Colors.white, 48);
+      // } else if (RobotState.getNextStop().equals(Stop.L3)) {
+        // setBaseState(null);
+        // setLEDs(Colors.white, 72);
+      // } else if (RobotState.getNextStop().equals(Stop.L4) || RobotState.getNextStop().equals(Stop.L4_SCORE)) {
+        // setBaseState(null);
+        // setLEDs(Colors.white, 94);
+      // } else {
+        // setBaseState(BaseState.READY);
+      // }
+// 
+      // if (tempState == null) { // Check for a changed base state, or a dropped temporary state
         // Check for possible temporary startup condition, and skip it
-        if (baseState == null) {
-          DogLog.log("LED/Status", "LEDSubsystem::periodic: Base State NULL");
-        } else {
-          if (baseState != lastBaseState || lastTempState != null) {
-            setColor(baseStateColor(baseState));
-            lastBaseState = baseState;
-          }
-        }
-      }
-
+        // if (baseState == null) {
+          // DogLog.log("LED/Status", "LEDSubsystem::periodic: Base State NULL");
+        // } else {
+          // if (baseState != lastBaseState || lastTempState != null) {
+            // setColor(baseStateColor(baseState));
+            // lastBaseState = baseState;
+          // }
+        // }
+      // }
+// 
       // Update the last states processed for reference in the next iteration
-      lastTempState = tempState;
-      lastBaseState = baseState;
-    }
+      // lastTempState = tempState;
+      // lastBaseState = baseState;
+    // }
   }
 }
