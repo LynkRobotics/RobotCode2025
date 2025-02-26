@@ -238,35 +238,38 @@ public class LEDSubsystem extends SubsystemBase {
     }
 
     if (DriverStation.isEnabled()) {
+      if (tempState == null) {
+        if (RobotState.coralReady()) {
+          if (RobotState.getNextStop().equals(Stop.L1)) {
+            if (RobotState.getActiveStop().equals(Stop.L1)) {
+              setLarson(Colors.white, 24);
+            }
+            setLEDs(Colors.white, 24);
+          }
+          if (RobotState.getNextStop().equals(Stop.L2)) {
+            if (RobotState.getActiveStop().equals(Stop.L2)) {
+              setLarson(Colors.white, 48);
+            }
+            setLEDs(Colors.white, 48);
+          }
+          if (RobotState.getNextStop().equals(Stop.L3)) {
+            if (RobotState.getActiveStop().equals(Stop.L3)) {
+              setLarson(Colors.white, 72);
+            }
+            setLEDs(Colors.white, 72);
+          }
+          if (RobotState.getNextStop().equals(Stop.L4) || RobotState.getNextStop().equals(Stop.L4_SCORE)) {
+            if (RobotState.getActiveStop().equals(Stop.L4) || RobotState.getActiveStop().equals(Stop.L4_SCORE)) {
+              setLarson(Colors.white, 94);
+            }
+            setLEDs(Colors.white, 94);
+          }
+        }
+      }
       if (RobotState.haveCoral() && !RobotState.coralReady()) {
         setTempState(TempState.INTAKING);
       }
-      if (RobotState.coralReady()) {
-        if (RobotState.getNextStop().equals(Stop.L1)) {
-          if (RobotState.getActiveStop().equals(Stop.L1)) {
-            setLarson(Colors.white, 24);
-          }
-          setLEDs(Colors.white, 24);
-        }
-        if (RobotState.getNextStop().equals(Stop.L2)) {
-          if (RobotState.getActiveStop().equals(Stop.L2)) {
-            setLarson(Colors.white, 48);
-          }
-          setLEDs(Colors.white, 48);
-        }
-        if (RobotState.getNextStop().equals(Stop.L3)) {
-          if (RobotState.getActiveStop().equals(Stop.L3)) {
-            setLarson(Colors.white, 72);
-          }
-          setLEDs(Colors.white, 72);
-        }
-        if (RobotState.getNextStop().equals(Stop.L4) || RobotState.getNextStop().equals(Stop.L4_SCORE)) {
-          if (RobotState.getActiveStop().equals(Stop.L4) || RobotState.getActiveStop().equals(Stop.L4_SCORE)) {
-            setLarson(Colors.white, 94);
-          }
-          setLEDs(Colors.white, 94);
-        }
-      }
+      
       if (RobotState.haveAlgae()) {
         setTempState(TempState.ALGAE);      
       }
