@@ -333,20 +333,24 @@ public class RobotContainer {
                 LoggedCommands.log("Skip back up option"),
                 optBackupPush::get),
             SetStop(Stop.L4),
-            LoggedCommands.proxy(PathCommand("Start to near E")),
+            // LoggedCommands.proxy(PathCommand("Start to near E")),
+            LoggedCommands.proxy(PathCommand("Start towards EF")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
             LoggedCommands.proxy(PathCommand("E to CS")),
             RobotState.WaitForCoral(),
-            LoggedCommands.proxy(PathCommand("CS to near C")),
+            // LoggedCommands.proxy(PathCommand("CS to near C")),
+            LoggedCommands.proxy(PathCommand("CS towards CD")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, true)),
             LoggedCommands.proxy(PathCommand("C to CS")),
             RobotState.WaitForCoral(),
-            LoggedCommands.proxy(PathCommand("CS to near D")),
+            // LoggedCommands.proxy(PathCommand("CS to near D")),
+            LoggedCommands.proxy(PathCommand("CS towards CD")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false)),
             LoggedCommands.runOnce("Set Swerve Drive to Coast", () -> s_Swerve.setDriveMotorsToCoast()),
             LoggedCommands.proxy(PathCommand("D to CS")));
 
-        startingPaths.put(autoECD, "Start to near E");
+        // startingPaths.put(autoECD, "Start to near E");
+        startingPaths.put(autoECD, "Start towards EF");
         addAutoCommand(chooser, autoECD);
 
         Command autoBA = LoggedCommands.sequence("BA",
