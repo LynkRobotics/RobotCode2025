@@ -8,6 +8,7 @@ import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.LarsonAnimation;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -236,25 +237,39 @@ public class LEDSubsystem extends SubsystemBase {
       }
     }
 
-    if (RobotState.haveCoral() && !RobotState.coralReady()) {
-      setTempState(TempState.INTAKING);
-    }
-    if (RobotState.coralReady()) {
-      if (RobotState.getNextStop().equals(Stop.L1)) {
-        setLarson(Colors.white, 24);
+    if (DriverStation.isEnabled()) {
+      if (RobotState.haveCoral() && !RobotState.coralReady()) {
+        setTempState(TempState.INTAKING);
       }
-      if (RobotState.getNextStop().equals(Stop.L2)) {
-        setLarson(Colors.white, 48);
+      if (RobotState.coralReady()) {
+        if (RobotState.getNextStop().equals(Stop.L1)) {
+          if (RobotState.getActiveStop().equals(Stop.L1)) {
+            setLarson(Colors.white, 24);
+          }
+          setLEDs(Colors.white, 24);
+        }
+        if (RobotState.getNextStop().equals(Stop.L2)) {
+          if (RobotState.getActiveStop().equals(Stop.L2)) {
+            setLarson(Colors.white, 48);
+          }
+          setLEDs(Colors.white, 48);
+        }
+        if (RobotState.getNextStop().equals(Stop.L3)) {
+          if (RobotState.getActiveStop().equals(Stop.L3)) {
+            setLarson(Colors.white, 72);
+          }
+          setLEDs(Colors.white, 72);
+        }
+        if (RobotState.getNextStop().equals(Stop.L4) || RobotState.getNextStop().equals(Stop.L4_SCORE)) {
+          if (RobotState.getActiveStop().equals(Stop.L4) || RobotState.getActiveStop().equals(Stop.L4_SCORE)) {
+            setLarson(Colors.white, 94);
+          }
+          setLEDs(Colors.white, 94);
+        }
       }
-      if (RobotState.getNextStop().equals(Stop.L3)) {
-        setLarson(Colors.white, 72);
+      if (RobotState.haveAlgae()) {
+        setTempState(TempState.ALGAE);      
       }
-      if (RobotState.getNextStop().equals(Stop.L4) || RobotState.getNextStop().equals(Stop.L4_SCORE)) {
-        setLarson(Colors.white, 94);
-      }
-    }
-    if (RobotState.haveAlgae()) {
-      setTempState(TempState.ALGAE);      
     }
     
 
