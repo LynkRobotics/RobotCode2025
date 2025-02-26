@@ -297,6 +297,7 @@ public class RobotContainer {
                 Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached Debug Position")),
                 Commands.runOnce(() -> LEDSubsystem.setTempState(TempState.ERROR))
                 ));
+        driver.povDown().whileTrue(RobotState.UnjamCoral());
     }
 
     /** 

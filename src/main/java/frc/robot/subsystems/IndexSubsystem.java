@@ -19,6 +19,7 @@ public class IndexSubsystem extends SubsystemBase {
     /* Control Requests */
     private final VoltageOut intakeControl = new VoltageOut(Constants.Index.intakeVoltage).withEnableFOC(true);
     private final VoltageOut rejectControl = new VoltageOut(Constants.Index.rejectVoltage).withEnableFOC(true);
+    private final VoltageOut unjamControl = new VoltageOut(Constants.Index.unjamVoltage).withEnableFOC(true);
     private boolean intaking = false;
 
     public IndexSubsystem() {
@@ -52,6 +53,10 @@ public class IndexSubsystem extends SubsystemBase {
                 motor.setControl(intakeControl);
                 intaking = true;
             }
+        } else if (gamePieceState == GamePieceState.UNJAMMING_CORAL) {
+            DogLog.log("Index/Control", "Unjamming");
+            motor.setControl(unjamControl);
+            intaking = false;
         } else {
             if (intaking) {
                 DogLog.log("Index/Control", "Rejecting");

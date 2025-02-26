@@ -293,7 +293,10 @@ public final class Constants {
         public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
         /* Motor Control Values */
         public static final double intakeVoltage = -2.00;
+        public static final double unjamVoltage = 1.50;
         public static final double rejectVoltage = 0.50;
+        
+        public static final double unjamTime = 0.50;
     }
 
     public static final class Pose {

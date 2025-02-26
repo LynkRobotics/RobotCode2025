@@ -29,6 +29,8 @@ public class RobotState extends SubsystemBase {
     private static Stop activeStop = Stop.SAFE;
     private static Stop nextStop = Stop.SAFE;
     private static final Timer algaeScoreTimer = new Timer();
+    private static final Timer unjamTimer = new Timer();
+    
 
     private static final TunableOption optOverrideElevatorPathBlocked = new TunableOption("Override Elevator Path Blocked", false);
     private static final TunableOption optOverrideReefElevatorZone = new TunableOption("Override Reef Safe Elevator Zone", true);
@@ -40,6 +42,7 @@ public class RobotState extends SubsystemBase {
         HOLDING_ALGAE,
         SCORING_ALGAE,
         INTAKING_CORAL,
+        UNJAMMING_CORAL,
         FEEDING_CORAL,
         ADVANCING_CORAL,
         HOLDING_CORAL,
@@ -196,6 +199,14 @@ public class RobotState extends SubsystemBase {
         return nextStop;
     }
 
+    private static void unjamCoral() {
+        gamePieceState = GamePieceState.UNJAMMING_CORAL;
+    }
+
+    public static Command UnjamCoral() {
+        return LoggedCommands.runOnce("Unjam Coral", () -> unjamCoral());
+    }
+
     @Override
     public void periodic() {
         boolean intakeSensor = getIntakeSensor();
@@ -216,6 +227,13 @@ public class RobotState extends SubsystemBase {
                 if (!algaeScoreTimer.isRunning()) {
                     algaeScoreTimer.restart();
                 } else if (algaeScoreTimer.get() > Constants.EndEffector.algaeRunTime) {
+                    gamePieceState = GamePieceState.NONE;
+                }
+            } else if (gamePieceState == GamePieceState.UNJAMMING_CORAL) {
+                if (!unjamTimer.isRunning()) {
+                    unjamTimer.reset();
+                } else if (unjamTimer.hasElapsed(Constants.Index.unjamTime)) {
+                    unjamTimer.stop();
                     gamePieceState = GamePieceState.NONE;
                 }
             } else if (intakeSensor && flipperSensor && finalSensor) {
