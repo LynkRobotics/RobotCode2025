@@ -244,35 +244,42 @@ public class LEDSubsystem extends SubsystemBase {
             if (RobotState.getActiveStop().equals(Stop.L1)) {
               setLarson(Colors.white, 24);
             }
+            clearAnimation();
             setLEDs(Colors.white, 24);
           }
           if (RobotState.getNextStop().equals(Stop.L2)) {
             if (RobotState.getActiveStop().equals(Stop.L2)) {
               setLarson(Colors.white, 48);
             }
+            clearAnimation();
             setLEDs(Colors.white, 48);
           }
           if (RobotState.getNextStop().equals(Stop.L3)) {
             if (RobotState.getActiveStop().equals(Stop.L3)) {
               setLarson(Colors.white, 72);
             }
+            clearAnimation();
             setLEDs(Colors.white, 72);
           }
           if (RobotState.getNextStop().equals(Stop.L4) || RobotState.getNextStop().equals(Stop.L4_SCORE)) {
             if (RobotState.getActiveStop().equals(Stop.L4) || RobotState.getActiveStop().equals(Stop.L4_SCORE)) {
               setLarson(Colors.white, 94);
             }
+            clearAnimation();
             setLEDs(Colors.white, 94);
           }
         }
       }
       if (RobotState.haveCoral() && !RobotState.coralReady()) {
+        clearAnimation();
         setTempState(TempState.INTAKING);
       }
       if (RobotState.getActiveStop().equals(Stop.L2_ALGAE) || RobotState.getActiveStop().equals(Stop.L3_ALGAE)) {
+        clearAnimation();
         setLarson(Colors.teal, 94);
       }
       if (RobotState.haveAlgae()) {
+        clearAnimation();
         setTempState(TempState.ALGAE);      
       }
     }
