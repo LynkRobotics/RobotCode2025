@@ -87,31 +87,31 @@ public class LEDSubsystem extends SubsystemBase {
     tempState = null;
   }
 
-  public void setColor(Color color) {
+  public static void setColor(Color color) {
     leds.setLEDs(color.R, color.G, color.B);
   }
 
-  public void setRainbow() {
+  public static void setRainbow() {
     leds.clearAnimation();
     leds.animate(Constants.LEDs.rainbowAnimation);
   }
 
-  public void setLEDs(Color color, int count) {
+  public static void setLEDs(Color color, int count) {
     leds.clearAnimation();
     leds.setLEDs(color.R, color.G, color.B, 255, Constants.LEDs.startIdx, count);
   }
 
-  public void setLEDs(Color color) {
+  public static void setLEDs(Color color) {
     leds.clearAnimation();
     leds.setLEDs(0, 0, 0);
   }
 
-  public void setLarson(Color color, int count) {
+  public static void setLarson(Color color, int count) {
     leds.clearAnimation();
     leds.animate(new LarsonAnimation(color.R, color.G, color.B, 255, 0.5, count, LarsonAnimation.BounceMode.Front, 7, 8));
   }
 
-  private Color tempStateColor(TempState state) {
+  private static Color tempStateColor(TempState state) {
     if (state == TempState.ERROR) {
       return Colors.red;
     }
@@ -129,7 +129,7 @@ public class LEDSubsystem extends SubsystemBase {
     }
   }
 
-  private Color baseStateColor(BaseState state) {
+  private static Color baseStateColor(BaseState state) {
     if (state == BaseState.DISABLED) {
       return Colors.disabled;
     } else if (state == BaseState.READY) {
