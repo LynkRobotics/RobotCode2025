@@ -269,7 +269,9 @@ public class LEDSubsystem extends SubsystemBase {
       if (RobotState.haveCoral() && !RobotState.coralReady()) {
         setTempState(TempState.INTAKING);
       }
-      
+      if (RobotState.getActiveStop().equals(Stop.L2_ALGAE) || RobotState.getActiveStop().equals(Stop.L3_ALGAE)) {
+        setLarson(Colors.teal, 94);
+      }
       if (RobotState.haveAlgae()) {
         setTempState(TempState.ALGAE);      
       }
