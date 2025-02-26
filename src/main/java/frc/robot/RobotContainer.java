@@ -300,12 +300,14 @@ public class RobotContainer {
 
         alignmentToggle.onTrue(LoggedCommands.runOnce("Toggle Alignment", optAutoReefAiming::toggle));
 
-        driver.povUp().whileTrue(
-            Commands.sequence(
-                new PIDSwerve(s_Swerve, s_Pose, new Pose2d(4.48, 1.67, Rotation2d.fromDegrees(91)), false),
-                s_Swerve.Stop(),
-                Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached Debug Position")),
-                Commands.runOnce(() -> LEDSubsystem.setTempState(TempState.ERROR))));
+        if (Constants.atHQ) {
+            driver.povUp().whileTrue(
+                Commands.sequence(
+                    new PIDSwerve(s_Swerve, s_Pose, new Pose2d(4.48, 1.67, Rotation2d.fromDegrees(91)), false),
+                    s_Swerve.Stop(),
+                    Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached Debug Position")),
+                    Commands.runOnce(() -> LEDSubsystem.setTempState(TempState.ERROR))));
+        }
         driver.povDown().whileTrue(RobotState.UnjamCoral());
     }
 
