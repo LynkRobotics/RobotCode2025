@@ -5,16 +5,11 @@ import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdleConfiguration;
 
-public class LED {
-    public int candleNumber;
-
-    private CANdle mCandle;
+public class CANdleGroup {
+    private CANdle[] candles;
     
-    public LED(int candleNumber, String canBus) {
-        this.candleNumber = candleNumber;
-        
-        /* CANdle Config */
-        mCandle = new CANdle(candleNumber, canBus);
+    public CANdleGroup(CANdle... candles) {
+        this.candles = candles;
         applyConfigs();
     }
 
@@ -25,23 +20,32 @@ public class LED {
         config.v5Enabled = true;
         config.disableWhenLOS = false; //TODO: verify // TODO: true -- why is this triggering?
 
-        mCandle.configAllSettings(config);
+        for (CANdle candle : candles) {
+            candle.configAllSettings(config);
+        }
     }
 
-    public void setAnimation(Animation animation) {
-        mCandle.animate(animation);
+    public void animate(Animation animation) {
+        for (CANdle candle : candles) {
+            candle.animate(animation);
+        }
     }
 
     public void clearAnimation() {
-        mCandle.clearAnimation(0);
+        for (CANdle candle : candles) {
+            candle.clearAnimation(0);
+        }
     }
 
     public void setLEDs(int r, int g, int b) {
-        mCandle.setLEDs(r, g, b);
+        for (CANdle candle : candles) {
+            candle.setLEDs(r, g, b);
+        }
     }
 
     public void setLEDs(int r, int g, int b, int w, int startIdx, int count) {
-        mCandle.setLEDs(r, g, b, w, startIdx, count);
+        for (CANdle candle : candles) {
+            candle.setLEDs(r, g, b, w, startIdx, count);
+        }
     }
-
 }

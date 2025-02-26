@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.led.Animation;
+import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.LarsonAnimation;
 
 import dev.doglog.DogLog;
@@ -12,13 +12,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.util.LED;
+import frc.lib.util.CANdleGroup;
 import frc.robot.Constants;
 import frc.robot.Constants.Elevator.Stop;
 
 public class LEDSubsystem extends SubsystemBase {
   /** Creates a new LEDSubsystem. */
-  public LED[] mLeds;
+  private static CANdleGroup leds;
   private static BaseState baseState = BaseState.DISABLED;
   private static TempState tempState = null;
   private static BaseState lastBaseState = null;
@@ -67,12 +67,12 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   public LEDSubsystem() {
-    mLeds = new LED[] {
-        new LED(Constants.LEDs.leftCandle, Constants.LEDs.canBus),
-        new LED(Constants.LEDs.rightCandle, Constants.LEDs.canBus)
-    };
+    leds = new CANdleGroup(
+        new CANdle(Constants.LEDs.leftCandle, Constants.LEDs.canBus),
+        new CANdle(Constants.LEDs.rightCandle, Constants.LEDs.canBus));
 
-    animate(Constants.LEDs.fireAnimation);
+    leds.clearAnimation();
+    leds.animate(Constants.LEDs.fireAnimation);
   }
 
   public static void setBaseState(BaseState newState) {
@@ -83,53 +83,32 @@ public class LEDSubsystem extends SubsystemBase {
     tempState = newState;
   }
 
-  public void animate(Animation animation) {
-    clearAnimation();
-    for (LED led : mLeds) {
-      led.setAnimation(animation);
-    }
-  }
-
   public static void clearTempState() {
     tempState = null;
   }
 
   public void setColor(Color color) {
-    for (LED led : mLeds) {
-      led.setLEDs(color.R, color.G, color.B);
-    }
+    leds.setLEDs(color.R, color.G, color.B);
   }
 
   public void setRainbow() {
-    for (LED led : mLeds) {
-      led.clearAnimation();
-      led.setAnimation(Constants.LEDs.rainbowAnimation);
-    }
-  }
-
-  public void clearAnimation() {
-    for (LED led : mLeds) {
-      led.clearAnimation();
-    }
+    leds.clearAnimation();
+    leds.animate(Constants.LEDs.rainbowAnimation);
   }
 
   public void setLEDs(Color color, int count) {
-    clearAnimation();
-    for (LED led : mLeds) {
-      led.setLEDs(color.R, color.G, color.B, 255, Constants.LEDs.startIdx, count);
-    }
+    leds.clearAnimation();
+    leds.setLEDs(color.R, color.G, color.B, 255, Constants.LEDs.startIdx, count);
   }
 
   public void setLEDs(Color color) {
-    clearAnimation();
-    for (LED led : mLeds) {
-      led.setLEDs(0, 0, 0);
-    }
+    leds.clearAnimation();
+    leds.setLEDs(0, 0, 0);
   }
 
   public void setLarson(Color color, int count) {
-    clearAnimation();
-    animate(new LarsonAnimation(color.R, color.G, color.B, 255, 0.5, count, LarsonAnimation.BounceMode.Front, 7, 8));
+    leds.clearAnimation();
+    leds.animate(new LarsonAnimation(color.R, color.G, color.B, 255, 0.5, count, LarsonAnimation.BounceMode.Front, 7, 8));
   }
 
   private Color tempStateColor(TempState state) {
