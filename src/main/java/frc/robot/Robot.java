@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.lib.util.Elastic;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.LEDSubsystem.BaseState;
 
@@ -87,6 +88,8 @@ public class Robot extends TimedRobot {
       DogLog.log("Misc/Robot Status", "Running auto command " + m_autonomousCommand.getName());
       m_autonomousCommand.schedule();
     }
+
+    Elastic.selectTab("Primary");
   }
 
   /** This function is called periodically during autonomous. */
@@ -106,6 +109,8 @@ public class Robot extends TimedRobot {
       LEDSubsystem.setBaseState(BaseState.READY);
     }
     DogLog.log("Misc/Robot Status", "Tele-Op has begun");
+
+    Elastic.selectTab("Primary");
   }
 
   /** This function is called periodically during operator control. */
