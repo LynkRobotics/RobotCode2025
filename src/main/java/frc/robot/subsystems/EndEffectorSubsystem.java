@@ -22,8 +22,8 @@ public class EndEffectorSubsystem extends SubsystemBase {
     private final VoltageOut feedControl = new VoltageOut(Constants.EndEffector.feedVoltage).withEnableFOC(true);
     private final VoltageOut advanceControl = new VoltageOut(Constants.EndEffector.advanceVoltage).withEnableFOC(true);
     private final VoltageOut scoreControl = new VoltageOut(Constants.EndEffector.scoreVoltage).withEnableFOC(true);
-    private final VoltageOut algaeControl = new VoltageOut(Constants.EndEffector.algaeVoltage).withEnableFOC(true);
-    private final VoltageOut algaeOutControl = new VoltageOut(Constants.EndEffector.algaeOutVoltage).withEnableFOC(true);
+    private final VoltageOut algaeControl = new VoltageOut(Constants.EndEffector.algaeVoltage).withEnableFOC(false);
+    private final VoltageOut algaeOutControl = new VoltageOut(Constants.EndEffector.algaeOutVoltage).withEnableFOC(false);
 
     private GamePieceState lastState = GamePieceState.NONE;
 
@@ -90,8 +90,12 @@ public class EndEffectorSubsystem extends SubsystemBase {
             lastState = gamePieceState;
         }
         
-        double current = motor.getTorqueCurrent().getValueAsDouble();
+        double current = motor.getStatorCurrent().getValueAsDouble();
+        // double current = motor.getTorqueCurrent().getValueAsDouble();
         DogLog.log("EndEffector/TorqueCurrent", motor.getTorqueCurrent().getValueAsDouble());
+        DogLog.log("EndEffector/StatorCurrent", motor.getStatorCurrent().getValueAsDouble());
+        DogLog.log("EndEffector/Velocity", motor.getVelocity().getValueAsDouble());
+        DogLog.log("EndEffector/RotorVelocity", motor.getRotorVelocity().getValueAsDouble());
 
         if (gamePieceState == GamePieceState.INTAKING_ALGAE && current > Constants.EndEffector.minimumAlgaeAcquireCurrent && !RobotState.getFinalSensor()) {
             RobotState.setHaveAlgae();

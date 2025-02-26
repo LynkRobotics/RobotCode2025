@@ -222,16 +222,16 @@ public class RobotState extends SubsystemBase {
 
         SmartDashboard.putString("State/Active Game Piece", haveAlgae() ? "#48B6AB" : haveCoral() ? "#FFFFFF" : "#888888");
 
-        if (!haveAlgae() && gamePieceState != GamePieceState.INTAKING_ALGAE) {
-            if (gamePieceState == GamePieceState.SCORING_ALGAE) {
-                if (!algaeScoreTimer.isRunning()) {
-                    algaeScoreTimer.restart();
-                } else if (algaeScoreTimer.get() > Constants.EndEffector.algaeRunTime) {
-                    gamePieceState = GamePieceState.NONE;
-                }
-            } else if (gamePieceState == GamePieceState.UNJAMMING_CORAL) {
+        if (gamePieceState == GamePieceState.SCORING_ALGAE) {
+            if (!algaeScoreTimer.isRunning()) {
+                algaeScoreTimer.restart();
+            } else if (algaeScoreTimer.get() > Constants.EndEffector.algaeRunTime) {
+                gamePieceState = GamePieceState.NONE;
+            }
+        } else if (gamePieceState != GamePieceState.HOLDING_ALGAE && gamePieceState != GamePieceState.INTAKING_ALGAE) {
+            if (gamePieceState == GamePieceState.UNJAMMING_CORAL) {
                 if (!unjamTimer.isRunning()) {
-                    unjamTimer.reset();
+                    unjamTimer.restart();
                 } else if (unjamTimer.hasElapsed(Constants.Index.unjamTime)) {
                     unjamTimer.stop();
                     gamePieceState = GamePieceState.NONE;
