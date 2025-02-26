@@ -251,20 +251,20 @@
             "title": "Startup delay",
             "x": 0.0,
             "y": 128.0,
-            "width": 672.0,
+            "width": 192.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
               "topic": "/SmartDashboard/auto/Startup delay",
               "period": 0.06,
               "data_type": "double",
-              "show_submit_button": false
+              "show_submit_button": true
             }
           },
           {
             "title": "Swerve Module Alignment",
-            "x": 0.0,
-            "y": 256.0,
+            "x": 192.0,
+            "y": 128.0,
             "width": 224.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -289,6 +289,50 @@
               "topic": "/SmartDashboard/TunableOptions/Mirror Auto to Left",
               "period": 0.06,
               "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Back Up in Auto",
+            "x": 896.0,
+            "y": 0.0,
+            "width": 224.0,
+            "height": 128.0,
+            "type": "Toggle Button",
+            "properties": {
+              "topic": "/SmartDashboard/TunableOptions/Back Up in Auto",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Starting Pose Error",
+            "x": 416.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/autoSetup/Starting Pose Error",
+              "period": 0.06,
+              "data_type": "string",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Starting Pose OK",
+            "x": 672.0,
+            "y": 128.0,
+            "width": 224.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/autoSetup/Starting Pose OK",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           }
         ]
@@ -611,7 +655,7 @@
           {
             "title": "Lower",
             "x": 0.0,
-            "y": 160.0,
+            "y": 128.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Command",
@@ -636,7 +680,7 @@
           },
           {
             "title": "Zero",
-            "x": 448.0,
+            "x": 480.0,
             "y": 160.0,
             "width": 256.0,
             "height": 128.0,
@@ -649,8 +693,8 @@
           },
           {
             "title": "Stop",
-            "x": 672.0,
-            "y": 416.0,
+            "x": 0.0,
+            "y": 256.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Command",
@@ -675,8 +719,8 @@
           },
           {
             "title": "Set Voltage",
-            "x": 160.0,
-            "y": 288.0,
+            "x": 256.0,
+            "y": 416.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Command",
@@ -688,9 +732,9 @@
           },
           {
             "title": "Direct Voltage",
-            "x": 32.0,
-            "y": 288.0,
-            "width": 128.0,
+            "x": 64.0,
+            "y": 416.0,
+            "width": 192.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -702,7 +746,7 @@
           },
           {
             "title": "Set Position",
-            "x": 672.0,
+            "x": 736.0,
             "y": 288.0,
             "width": 256.0,
             "height": 128.0,
@@ -717,7 +761,7 @@
             "title": "Direct Position",
             "x": 544.0,
             "y": 288.0,
-            "width": 128.0,
+            "width": 192.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -729,7 +773,7 @@
           },
           {
             "title": "Set Height",
-            "x": 416.0,
+            "x": 736.0,
             "y": 416.0,
             "width": 256.0,
             "height": 128.0,
@@ -742,9 +786,9 @@
           },
           {
             "title": "Direct Height",
-            "x": 288.0,
+            "x": 544.0,
             "y": 416.0,
-            "width": 128.0,
+            "width": 192.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -1004,7 +1048,7 @@
           {
             "title": "Algae voltage",
             "x": 0.0,
-            "y": 128.0,
+            "y": 0.0,
             "width": 416.0,
             "height": 128.0,
             "type": "Text Display",

@@ -241,11 +241,11 @@ public class RobotContainer {
 
             pathCommand = AutoBuilder.followPath(path);
             pathCommand.setName("Follow PathPlanner path \"" + pathName + "\"");
-            startingPoses.put(pathName, path.getPathPoses().get(0));
+            startingPoses.put(pathName, new Pose2d(path.getPathPoses().get(0).getTranslation(), path.getIdealStartingState().rotation()));
 
             mirrorCommand = AutoBuilder.followPath(mirror);
             mirrorCommand.setName("Follow Mirrored PathPlanner path \"" + pathName + "\"");
-            startingPoses.put(pathName + " - Mirror", mirror.getPathPoses().get(0));
+            startingPoses.put(pathName + " - Mirror", new Pose2d(mirror.getPathPoses().get(0).getTranslation(), mirror.getIdealStartingState().rotation()));
         } catch (Exception exception) {
             LoggedAlert.Error("PathPlanner", "Failed to load path \"" + pathName + "\"", exception.getMessage());
             return LoggedCommands.log("Missing PathPlanner path due to failure to load \"" + pathName + "\": " + exception.getMessage());
@@ -304,8 +304,7 @@ public class RobotContainer {
                 new PIDSwerve(s_Swerve, s_Pose, new Pose2d(4.48, 1.67, Rotation2d.fromDegrees(91)), false),
                 s_Swerve.Stop(),
                 Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached Debug Position")),
-                Commands.runOnce(() -> LEDSubsystem.setTempState(TempState.ERROR))
-                ));
+                Commands.runOnce(() -> LEDSubsystem.setTempState(TempState.ERROR))));
         driver.povDown().whileTrue(RobotState.UnjamCoral());
     }
 
@@ -381,6 +380,7 @@ public class RobotContainer {
     public void disabledPeriodic() {
         Command autoCommand = getAutonomousCommand();
         String poseDifference = "N/A";
+        boolean differenceOK = false;
 
         if (autoCommand != null) {
             String firstPath = startingPaths.get(autoCommand);
@@ -390,16 +390,24 @@ public class RobotContainer {
 
                 if (startingPose != null) {
                     Pose2d currentPose = s_Pose.getPose();
+                    DogLog.log("Robot/Debug0", PoseSubsystem.prettyPose(currentPose));
+                    DogLog.log("Robot/Debug1", PoseSubsystem.prettyPose(startingPose));
                    
-                    // TODO Highlight if difference exceeds expected threshold
-                    poseDifference = String.format("(%1.1f, %1.1f) @ %1f deg",
-                        Units.metersToInches(startingPose.getX() - currentPose.getX()),
-                        Units.metersToInches(startingPose.getY() - currentPose.getY()),
+                    poseDifference = String.format("(%1.1f, %1.1f) @ %1.0f deg",
+                        Units.metersToInches(currentPose.getX() - startingPose.getX()),
+                        Units.metersToInches(currentPose.getY() - startingPose.getY()),
                         startingPose.getRotation().minus(currentPose.getRotation()).getDegrees());
+
+                    if (Math.abs(currentPose.getX() - startingPose.getX()) < Constants.AutoConstants.maxSetupXError &&
+                        Math.abs(currentPose.getY() - startingPose.getY()) < Constants.AutoConstants.maxSetupYError &&
+                        Math.abs(startingPose.getRotation().minus(currentPose.getRotation()).getDegrees()) < Constants.AutoConstants.maxSetupDegError) {
+                        differenceOK = true;
+                    }
                 }
             }
         }
 
-        SmartDashboard.putString("autoSetup/Pose Error", poseDifference);
+        SmartDashboard.putString("autoSetup/Starting Pose Error", poseDifference);
+        SmartDashboard.putBoolean("autoSetup/Starting Pose OK", differenceOK);
     }
 }
