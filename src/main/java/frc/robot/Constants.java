@@ -385,9 +385,9 @@ public final class Constants {
 
         public static final double backUpPushDistance = Units.inchesToMeters(4.0);
 
-        public static final double maxSetupXError = Units.inchesToMeters(3.0);
-        public static final double maxSetupYError = Units.inchesToMeters(6.0);
-        public static final double maxSetupDegError = 10.0;
+        public static final double maxSetupXError = Units.inchesToMeters(4.0);
+        public static final double maxSetupYError = Units.inchesToMeters(8.0);
+        public static final double maxSetupDegError = 15.0;
     
         /* Constraint for the motion profilied robot angle controller */
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
