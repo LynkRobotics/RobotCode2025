@@ -31,7 +31,8 @@ public class LEDSubsystem extends SubsystemBase {
 
   public static class Color {
     private final int R, G, B;
-    public Color(int r,  int g, int b) {
+
+    public Color(int r, int g, int b) {
       R = r;
       G = g;
       B = b;
@@ -50,12 +51,11 @@ public class LEDSubsystem extends SubsystemBase {
     ALGAE
   }
 
-
   public static final class Colors {
     public static final Color off = new LEDSubsystem.Color(0, 0, 0);
     public static final Color red = new LEDSubsystem.Color(255, 0, 0);
     public static final Color green = new LEDSubsystem.Color(0, 255, 0);
-    public static final Color teal = new LEDSubsystem.Color(44,162,165); //i wonder who that could be
+    public static final Color teal = new LEDSubsystem.Color(44, 162, 165); // i wonder who that could be
     public static final Color blue = new LEDSubsystem.Color(0, 0, 255);
     public static final Color cheesyBlue = new LEDSubsystem.Color(0, 112, 255);
     public static final Color cyan = new LEDSubsystem.Color(0, 255, 255);
@@ -68,8 +68,8 @@ public class LEDSubsystem extends SubsystemBase {
 
   public LEDSubsystem() {
     mLeds = new LED[] {
-      new LED(Constants.LEDs.leftCandle, Constants.LEDs.canBus),
-      new LED(Constants.LEDs.rightCandle, Constants.LEDs.canBus)
+        new LED(Constants.LEDs.leftCandle, Constants.LEDs.canBus),
+        new LED(Constants.LEDs.rightCandle, Constants.LEDs.canBus)
     };
 
     animate(Constants.LEDs.fireAnimation);
@@ -78,7 +78,7 @@ public class LEDSubsystem extends SubsystemBase {
   public static void setBaseState(BaseState newState) {
     baseState = newState;
   }
-  
+
   public static void setTempState(TempState newState) {
     tempState = newState;
   }
@@ -89,37 +89,39 @@ public class LEDSubsystem extends SubsystemBase {
       led.setAnimation(animation);
     }
   }
-  
+
   public static void clearTempState() {
     tempState = null;
   }
-  
+
   public void setColor(Color color) {
     for (LED led : mLeds) {
       led.setLEDs(color.R, color.G, color.B);
     }
   }
 
-  public void setRainbow(){
+  public void setRainbow() {
     for (LED led : mLeds) {
       led.clearAnimation();
-      led.setAnimation(Constants.LEDs.rainbowAnimation); 
+      led.setAnimation(Constants.LEDs.rainbowAnimation);
     }
   }
 
-  public void clearAnimation(){
+  public void clearAnimation() {
     for (LED led : mLeds) {
       led.clearAnimation();
     }
   }
 
   public void setLEDs(Color color, int count) {
+    clearAnimation();
     for (LED led : mLeds) {
       led.setLEDs(color.R, color.G, color.B, 255, Constants.LEDs.startIdx, count);
     }
   }
 
   public void setLEDs(Color color) {
+    clearAnimation();
     for (LED led : mLeds) {
       led.setLEDs(0, 0, 0);
     }
@@ -133,11 +135,14 @@ public class LEDSubsystem extends SubsystemBase {
   private Color tempStateColor(TempState state) {
     if (state == TempState.ERROR) {
       return Colors.red;
-    } if (state == TempState.WARNING) {
+    }
+    if (state == TempState.WARNING) {
       return Colors.yellow;
-    } if (state == TempState.INTAKING) {
+    }
+    if (state == TempState.INTAKING) {
       return Colors.white;
-    } if (state == TempState.ALGAE) {
+    }
+    if (state == TempState.ALGAE) {
       return Colors.teal;
     } else {
       DogLog.log("LED/Status", "tempStateColor: Unknown state: " + state);
@@ -156,7 +161,6 @@ public class LEDSubsystem extends SubsystemBase {
     }
   }
 
-
   @Override
   public void periodic() {
     SmartDashboard.putString("LED/Base state", baseState == null ? "NULL" : baseState.toString());
@@ -164,110 +168,84 @@ public class LEDSubsystem extends SubsystemBase {
 
     /*
      * if (enabled){
-     *  if (LoggedAlert.ERROR == True){
-     *    Flash.RED
-     *  }
-     *  if (LoggedAlert.WARNING == True){
-     *    Flash.YELLOW
-     *  }
-     *  if (isIntaking){
-     *    Flash.WHITE
-     *  }
-     *  if (goingForAlgae){
-     *    Flash.ElevatorLevel.HighTideTeal
-     *  }
-     *  if (movingElevatorForScoringCoral){
-     *    DripUp.ElevatorLevel.WHITE
-     *    DeadLEDs.BLACK
-     *  }
-     *  if (hasCoral.inIndex){
-     *    Solid.WHITE
-     *  }
-     *  if (){
-     *  }
+     * if (LoggedAlert.ERROR == True){
+     * Flash.RED
+     * }
+     * if (LoggedAlert.WARNING == True){
+     * Flash.YELLOW
+     * }
+     * if (isIntaking){
+     * Flash.WHITE
+     * }
+     * if (goingForAlgae){
+     * Flash.ElevatorLevel.HighTideTeal
+     * }
+     * if (movingElevatorForScoringCoral){
+     * DripUp.ElevatorLevel.WHITE
+     * DeadLEDs.BLACK
+     * }
+     * if (hasCoral.inIndex){
+     * Solid.WHITE
+     * }
+     * if (){
+     * }
      * }
      */
-    // If the temporary state is active...
-    if (tempState != null) {
-      // Clear current animation
-      clearAnimation();
-      if (tempState == lastTempState) {
-        // Temporary state unchanged
-        if (tempStateExpiry > 0.0 && tempStateTimer.hasElapsed(tempStateExpiry)) {
-          // Temporary state has expired, and base state should be shown
-          tempState = null;
-        } else {
-          // Temporary state is active, but might need to be blinked
-          if (blinkTimer.hasElapsed(blinkInterval)) {
-            blinkOff = !blinkOff;
-            if (blinkOff) {
-              setColor(Colors.off);
-            } else {
-              setColor(tempStateColor(tempState));
+    if (DriverStation.isEnabled()) {
+      // If the temporary state is active...
+      if (tempState != null) {
+        // Clear current animation
+        clearAnimation();
+        if (tempState == lastTempState) {
+          // Temporary state unchanged
+          if (tempStateExpiry > 0.0 && tempStateTimer.hasElapsed(tempStateExpiry)) {
+            // Temporary state has expired, and base state should be shown
+            tempState = null;
+          } else {
+            // Temporary state is active, but might need to be blinked
+            if (blinkTimer.hasElapsed(blinkInterval)) {
+              blinkOff = !blinkOff;
+              if (blinkOff) {
+                setColor(Colors.off);
+              } else {
+                setColor(tempStateColor(tempState));
+              }
+              blinkTimer.restart();
             }
-            blinkTimer.restart();
           }
-        }
-      } else {
-        // Start new temporary state
-        setColor(tempStateColor(tempState));
-        blinkOff = false;
-        blinkTimer.restart();
-        if (tempState == TempState.ERROR || tempState == TempState.WARNING) {
-          blinkInterval = 0.10;
-          tempStateExpiry = 0.80;
-          tempStateTimer.restart();
         } else {
-          blinkInterval = 0.20;
-          tempStateExpiry = 0.0;
+          // Start new temporary state
+          setColor(tempStateColor(tempState));
+          blinkOff = false;
+          blinkTimer.restart();
+          if (tempState == TempState.ERROR || tempState == TempState.WARNING) {
+            blinkInterval = 0.10;
+            tempStateExpiry = 0.80;
+            tempStateTimer.restart();
+          } else {
+            blinkInterval = 0.20;
+            tempStateExpiry = 0.0;
+          }
         }
       }
-    }
 
-    
+      if (RobotState.getNextStop().equals(Stop.L1)) {
+        setBaseState(null);
+        setLEDs(Colors.white, 24);
+      } else if (RobotState.getNextStop().equals(Stop.L2)) {
+        setBaseState(null);
+        setLEDs(Colors.white, 48);
+      } else if (RobotState.getNextStop().equals(Stop.L3)) {
+        setBaseState(null);
+        setLEDs(Colors.white, 72);
+      } else if (RobotState.getNextStop().equals(Stop.L4) || RobotState.getNextStop().equals(Stop.L4_SCORE)) {
+        setBaseState(null);
+        setLEDs(Colors.white, 94);
+      } else {
+        setBaseState(BaseState.READY);
+      }
 
-    if (DriverStation.isEnabled()) {
-      if (tempState == null) {
-        if (RobotState.coralReady()) {
-          if (RobotState.getNextStop().equals(Stop.L1)) {
-            if (RobotState.getActiveStop().equals(Stop.L1)) {
-              setLarson(Colors.white, 24);
-            }
-            clearAnimation();
-            setLEDs(Colors.white, 24);
-          }
-          if (RobotState.getNextStop().equals(Stop.L2)) {
-            if (RobotState.getActiveStop().equals(Stop.L2)) {
-              setLarson(Colors.white, 48);
-            }
-            clearAnimation();
-            setLEDs(Colors.white, 48);
-          }
-          if (RobotState.getNextStop().equals(Stop.L3)) {
-            if (RobotState.getActiveStop().equals(Stop.L3)) {
-              setLarson(Colors.white, 72);
-            }
-            clearAnimation();
-            setLEDs(Colors.white, 72);
-          }
-          if (RobotState.getNextStop().equals(Stop.L4) || RobotState.getNextStop().equals(Stop.L4_SCORE)) {
-            if (RobotState.getActiveStop().equals(Stop.L4) || RobotState.getActiveStop().equals(Stop.L4_SCORE)) {
-              setLarson(Colors.white, 94);
-            }
-            clearAnimation();
-            setLEDs(Colors.white, 94);
-          }
-        }
-      } else if (RobotState.haveCoral() && !RobotState.coralReady()) {
-        clearAnimation();
-        setTempState(TempState.INTAKING);
-      } else if (RobotState.getActiveStop().equals(Stop.L2_ALGAE) || RobotState.getActiveStop().equals(Stop.L3_ALGAE)) {
-        clearAnimation();
-        setLarson(Colors.teal, 94);
-      } else if (RobotState.haveAlgae()) {
-        clearAnimation();
-        setTempState(TempState.ALGAE);      
-      } else if (tempState == null) { // Check for a changed base state, or a dropped temporary state
+      if (tempState == null) { // Check for a changed base state, or a dropped temporary state
         // Check for possible temporary startup condition, and skip it
         if (baseState == null) {
           DogLog.log("LED/Status", "LEDSubsystem::periodic: Base State NULL");
@@ -278,12 +256,10 @@ public class LEDSubsystem extends SubsystemBase {
           }
         }
       }
-      
-    }
-    
 
-    // Update the last states processed for reference in the next iteration
-    lastTempState = tempState;
-    lastBaseState = baseState;
+      // Update the last states processed for reference in the next iteration
+      lastTempState = tempState;
+      lastBaseState = baseState;
+    }
   }
 }
