@@ -221,7 +221,7 @@ public final class Constants {
         public static final double positionError = rotPerInch * 0.5; // Allowable rotation error to be considered in position
         public static final double positionCloseError = rotPerInch * 6.0; // Allowable rotation error to be considered in position
         public static final double stopError = 0.5;      // Allowable inches of error to be considered at a stop
-        public static final double slowVoltage = 1.0;    // Volts to move slowly to zero
+        public static final double slowVoltage = 1.5;    // Volts to move slowly to zero
 
         // TODO Tune PID / FF
         public static final double RPSperVolt = 7.9; // RPS increase with every volt
