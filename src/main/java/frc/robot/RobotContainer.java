@@ -147,7 +147,8 @@ public class RobotContainer {
         configureButtonBindings();
 
         // Build an autoChooser (defaults to none)
-        autoChooser = AutoBuilder.buildAutoChooser();
+        autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
+            (stream) -> stream.filter(auto -> !auto.getName().startsWith("Dummy")));
         SmartDashboard.putData("auto/Auto Chooser", autoChooser);
         buildAutos(autoChooser);
     }
