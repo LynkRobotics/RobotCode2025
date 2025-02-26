@@ -7,6 +7,7 @@ import static frc.robot.Options.optMirrorAuto;
 
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -21,6 +22,7 @@ import dev.doglog.DogLogOptions;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotController;
@@ -80,6 +82,9 @@ public class RobotContainer {
     EnumMap<ReefFace, Command> alignRightCommands = new EnumMap<>(ReefFace.class);
     EnumMap<ReefFace, Command> deAlgaefyLeftCommands = new EnumMap<>(ReefFace.class);
     EnumMap<ReefFace, Command> deAlgaefyRightCommands = new EnumMap<>(ReefFace.class);
+
+    private final HashMap<Command, String> startingPaths = new HashMap<>();
+    private final HashMap<String, Pose2d> startingPoses = new HashMap<>();
 
     private static void autoNamedCommand(String name, Command command) {
         NamedCommands.registerCommand(name, LoggedCommands.logWithName(name + " (auto)", command));
@@ -233,16 +238,21 @@ public class RobotContainer {
         
         try {
             PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
+            PathPlannerPath mirror = path.mirrorPath();
+
             pathCommand = AutoBuilder.followPath(path);
             pathCommand.setName("Follow PathPlanner path \"" + pathName + "\"");
-            mirrorCommand = AutoBuilder.followPath(path.mirrorPath());
+            startingPoses.put(pathName, path.getPathPoses().get(0));
+
+            mirrorCommand = AutoBuilder.followPath(mirror);
             mirrorCommand.setName("Follow Mirrored PathPlanner path \"" + pathName + "\"");
+            startingPoses.put(pathName + " - Mirror", mirror.getPathPoses().get(0));
         } catch (Exception exception) {
             LoggedAlert.Error("PathPlanner", "Failed to load path \"" + pathName + "\"", exception.getMessage());
             return LoggedCommands.log("Missing PathPlanner path due to failure to load \"" + pathName + "\": " + exception.getMessage());
         }
 
-        return Commands.either(mirrorCommand, pathCommand,this::shouldMirror);
+        return Commands.either(mirrorCommand, pathCommand, this::shouldMirror);
     }
 
     /**
@@ -338,6 +348,7 @@ public class RobotContainer {
             LoggedCommands.runOnce("Set Swerve Drive to Coast", () -> s_Swerve.setDriveMotorsToCoast()),
             LoggedCommands.proxy(PathCommand("D to CS")));
 
+        startingPaths.put(autoECD, "Start to near E");
         addAutoCommand(chooser, autoECD);
 
         Command autoBA = LoggedCommands.sequence("BA",
@@ -354,7 +365,8 @@ public class RobotContainer {
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, true)),
             LoggedCommands.proxy(PathCommand("A backup")));
 
-        addAutoCommand(chooser, autoBA);
+            startingPaths.put(autoBA, "Start to near B");
+            addAutoCommand(chooser, autoBA);
 
         FollowPathCommand.warmupCommand().schedule();
     }
@@ -366,5 +378,30 @@ public class RobotContainer {
     }
 
     public void teleopExit() {
+    }
+
+    public void disabledPeriodic() {
+        Command autoCommand = getAutonomousCommand();
+        String poseDifference = "N/A";
+
+        if (autoCommand != null) {
+            String firstPath = startingPaths.get(autoCommand);
+
+            if (firstPath != null) {
+                Pose2d startingPose = startingPoses.get(firstPath + (shouldMirror() ? " - Mirror" : ""));
+
+                if (startingPose != null) {
+                    Pose2d currentPose = s_Pose.getPose();
+                   
+                    // TODO Highlight if difference exceeds expected threshold
+                    poseDifference = String.format("(%1.1f, %1.1f) @ %1f deg",
+                        Units.metersToInches(startingPose.getX() - currentPose.getX()),
+                        Units.metersToInches(startingPose.getY() - currentPose.getY()),
+                        startingPose.getRotation().minus(currentPose.getRotation()).getDegrees());
+                }
+            }
+        }
+
+        SmartDashboard.putString("autoSetup/Pose Error", poseDifference);
     }
 }
