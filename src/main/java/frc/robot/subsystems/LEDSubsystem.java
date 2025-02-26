@@ -224,18 +224,7 @@ public class LEDSubsystem extends SubsystemBase {
       }
     }
 
-    // Check for a changed base state, or a dropped temporary state
-    if (tempState == null) {
-      // Check for possible temporary startup condition, and skip it
-      if (baseState == null) {
-        DogLog.log("LED/Status", "LEDSubsystem::periodic: Base State NULL");
-      } else {
-        if (baseState != lastBaseState || lastTempState != null) {
-          setColor(baseStateColor(baseState));
-          lastBaseState = baseState;
-        }
-      }
-    }
+    
 
     if (DriverStation.isEnabled()) {
       if (tempState == null) {
@@ -244,37 +233,52 @@ public class LEDSubsystem extends SubsystemBase {
             if (RobotState.getActiveStop().equals(Stop.L1)) {
               setLarson(Colors.white, 24);
             }
+            clearAnimation();
             setLEDs(Colors.white, 24);
           }
           if (RobotState.getNextStop().equals(Stop.L2)) {
             if (RobotState.getActiveStop().equals(Stop.L2)) {
               setLarson(Colors.white, 48);
             }
+            clearAnimation();
             setLEDs(Colors.white, 48);
           }
           if (RobotState.getNextStop().equals(Stop.L3)) {
             if (RobotState.getActiveStop().equals(Stop.L3)) {
               setLarson(Colors.white, 72);
             }
+            clearAnimation();
             setLEDs(Colors.white, 72);
           }
           if (RobotState.getNextStop().equals(Stop.L4) || RobotState.getNextStop().equals(Stop.L4_SCORE)) {
             if (RobotState.getActiveStop().equals(Stop.L4) || RobotState.getActiveStop().equals(Stop.L4_SCORE)) {
               setLarson(Colors.white, 94);
             }
+            clearAnimation();
             setLEDs(Colors.white, 94);
           }
         }
-      }
-      if (RobotState.haveCoral() && !RobotState.coralReady()) {
+      } else if (RobotState.haveCoral() && !RobotState.coralReady()) {
+        clearAnimation();
         setTempState(TempState.INTAKING);
-      }
-      if (RobotState.getActiveStop().equals(Stop.L2_ALGAE) || RobotState.getActiveStop().equals(Stop.L3_ALGAE)) {
+      } else if (RobotState.getActiveStop().equals(Stop.L2_ALGAE) || RobotState.getActiveStop().equals(Stop.L3_ALGAE)) {
+        clearAnimation();
         setLarson(Colors.teal, 94);
-      }
-      if (RobotState.haveAlgae()) {
+      } else if (RobotState.haveAlgae()) {
+        clearAnimation();
         setTempState(TempState.ALGAE);      
+      } else if (tempState == null) { // Check for a changed base state, or a dropped temporary state
+        // Check for possible temporary startup condition, and skip it
+        if (baseState == null) {
+          DogLog.log("LED/Status", "LEDSubsystem::periodic: Base State NULL");
+        } else {
+          if (baseState != lastBaseState || lastTempState != null) {
+            setColor(baseStateColor(baseState));
+            lastBaseState = baseState;
+          }
+        }
       }
+      
     }
     
 
