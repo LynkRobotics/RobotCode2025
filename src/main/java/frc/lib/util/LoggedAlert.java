@@ -17,7 +17,8 @@ public class LoggedAlert {
      */
     public static void Error(String subsystem, String title, String msg) {
         Elastic.sendNotification(new Notification(NotificationLevel.ERROR, title, msg, Constants.errorTime));
-        DogLog.logFault(subsystem + ": " + msg, AlertType.kError);
+        DogLog.log("Fault/Error" + subsystem, title + " " + msg);
+        DogLog.log("Fault/All Faults" + subsystem, "Error: " + title + " " + msg);
         LEDSubsystem.triggerError(); //TODO: i dont really like subsystem calls in util classes
     }
 
@@ -30,7 +31,8 @@ public class LoggedAlert {
      */
     public static void Warning(String subsystem, String title, String msg) {
         Elastic.sendNotification(new Notification(NotificationLevel.WARNING, title, msg, Constants.warningTime));
-        DogLog.logFault(subsystem + ": " + msg, AlertType.kWarning);
+        DogLog.log("Fault/Warning", subsystem + ": " + title + " " + msg);
+        DogLog.log("Fault/All Faults", subsystem + ": " + "Warning: " + title + " " + msg);
         LEDSubsystem.triggerWarning();
     }
 
@@ -43,6 +45,7 @@ public class LoggedAlert {
      */
     public static void Info(String subsystem, String title, String msg) {
         Elastic.sendNotification(new Notification(NotificationLevel.INFO, title, msg));
-        DogLog.logFault(subsystem + ": " + msg, AlertType.kInfo);
+        DogLog.log("Fault/Info/", subsystem + ": " + title + " " + msg);
+        DogLog.log("Fault/All Faults",  subsystem + ": " + "Info: " + title + " " + msg);
     }
 }
