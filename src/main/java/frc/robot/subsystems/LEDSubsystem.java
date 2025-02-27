@@ -42,13 +42,13 @@ public class LEDSubsystem extends SubsystemBase {
     public enum BaseState {
         DISABLED,
         READY,
+        INTAKING,
+        ALGAE
     }
 
     public enum TempState {
         ERROR,
-        WARNING,
-        INTAKING,
-        ALGAE
+        WARNING
     }
 
     public static final class Colors {
@@ -112,29 +112,28 @@ public class LEDSubsystem extends SubsystemBase {
                 7, 8));
     }
 
+    // TODO Make part of enum class?
     private static Color tempStateColor(TempState state) {
         if (state == TempState.ERROR) {
             return Colors.red;
-        }
-        if (state == TempState.WARNING) {
+        } else if (state == TempState.WARNING) {
             return Colors.yellow;
-        }
-        if (state == TempState.INTAKING) {
-            return Colors.white;
-        }
-        if (state == TempState.ALGAE) {
-            return Colors.teal;
         } else {
             DogLog.log("LED/Status", "tempStateColor: Unknown state: " + state);
             return Colors.off;
         }
     }
 
+    // TODO Make part of enum class?
     private static Color baseStateColor(BaseState state) {
         if (state == BaseState.DISABLED) {
             return Colors.disabled;
         } else if (state == BaseState.READY) {
             return Colors.lynk;
+        } else if (state == BaseState.INTAKING) {
+            return Colors.white;
+        } else if (state == BaseState.ALGAE) {
+            return Colors.teal;    
         } else {
             DogLog.log("LED/Status", "baseStateColor: Unknown state: " + state);
             return Colors.off;
@@ -172,7 +171,12 @@ public class LEDSubsystem extends SubsystemBase {
          * }
          */
 
-        if (DriverStation.isEnabled()) {
+        if (DriverStation.isDisabled()) {
+            if (baseState != BaseState.DISABLED) {
+                baseState = BaseState.DISABLED;
+                setColor(Colors.red);
+            }
+        } else {
             // If the temporary state is active...
             if (tempState != null) {
                 // Clear current animation
