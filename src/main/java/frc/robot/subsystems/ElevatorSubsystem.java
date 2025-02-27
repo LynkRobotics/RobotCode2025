@@ -354,7 +354,9 @@ public class ElevatorSubsystem extends SubsystemBase {
                 safetyDeferred = false;
             }),
             Commands.either(
-                Move(Stop.L1),
+                LoggedCommands.deadline("Move to L1 with Coral",
+                    LoggedCommands.waitUntil("Wait for no Coral", () -> !RobotState.haveCoral()),
+                    Move(Stop.L1)),
                 LoggedCommands.sequence("Zero and Idle",
                     Commands.either(
                         Zero(),
