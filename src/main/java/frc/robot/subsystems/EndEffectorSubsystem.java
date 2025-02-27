@@ -56,37 +56,48 @@ public class EndEffectorSubsystem extends SubsystemBase {
         double motorTemp = motor.getDeviceTemp().getValueAsDouble();
 
         if (gamePieceState != lastState) {
-            // TODO Make a switch statement
-            if (gamePieceState == GamePieceState.NONE) {
-                DogLog.log("EndEffector/Control", "Stopping (no game piece)");
-                motor.stopMotor();
-            } else if (gamePieceState == GamePieceState.INTAKING_ALGAE) {
-                DogLog.log("EndEffector/Control", "Intaking algae");
-                motor.setControl(algaeControl.withOutput(SmartDashboard.getNumber("Algae voltage", Constants.EndEffector.algaeVoltage)));
-            } else if (gamePieceState == GamePieceState.HOLDING_ALGAE) {
-                // No change currently, but issue it anyway, for kicks
-                DogLog.log("EndEffector/Control", "Holding algae");
-                motor.setControl(algaeControl.withOutput(SmartDashboard.getNumber("Algae voltage", Constants.EndEffector.algaeVoltage)));
-            } else if (gamePieceState == GamePieceState.SCORING_ALGAE) {
-                motor.setControl(algaeOutControl);
-            } else if (gamePieceState == GamePieceState.INTAKING_CORAL) {
-                DogLog.log("EndEffector/Control", "Stop (intaking coral)");
-                motor.stopMotor();
-            } else if (gamePieceState == GamePieceState.FEEDING_CORAL) {
-                DogLog.log("EndEffector/Control", "Feeding coral");
-                motor.setControl(feedControl);
-            } else if (gamePieceState == GamePieceState.ADVANCING_CORAL) {
-                DogLog.log("EndEffector/Control", "Advancing coral");
-                motor.setControl(advanceControl);
-            } else if (gamePieceState == GamePieceState.HOLDING_CORAL) {
-                DogLog.log("EndEffector/Control", "Stopping (coral ready)");
-                motor.stopMotor();
-            } else if (gamePieceState == GamePieceState.SCORING_CORAL) {
-                DogLog.log("EndEffector/Control", "Scoring coral");
-                motor.setControl(scoreControl);
-            } else {
-                DogLog.log("EndEffector/Control", "Stopping (unhandled state)");
-                motor.stopMotor();
+            switch (gamePieceState) {
+                case NONE:
+                    DogLog.log("EndEffector/Control", "Stopping (no game piece)");
+                    motor.stopMotor();
+                    break;
+                case INTAKING_ALGAE:
+                    DogLog.log("EndEffector/Control", "Intaking algae");
+                    motor.setControl(algaeControl
+                            .withOutput(SmartDashboard.getNumber("Algae voltage", Constants.EndEffector.algaeVoltage)));
+                    break;
+                case HOLDING_ALGAE:
+                    // No change currently, but issue it anyway, for kicks
+                    DogLog.log("EndEffector/Control", "Holding algae");
+                    motor.setControl(algaeControl
+                            .withOutput(SmartDashboard.getNumber("Algae voltage", Constants.EndEffector.algaeVoltage)));
+                    break;
+                case SCORING_ALGAE:
+                    DogLog.log("EndEffector/Control", "Scoring algae");
+                    motor.setControl(algaeOutControl);
+                    break;
+                case INTAKING_CORAL:
+                    DogLog.log("EndEffector/Control", "Stop (intaking coral)");
+                    motor.stopMotor();
+                case FEEDING_CORAL:
+                    DogLog.log("EndEffector/Control", "Feeding coral");
+                    motor.setControl(feedControl);
+                    break;
+                case ADVANCING_CORAL:
+                    DogLog.log("EndEffector/Control", "Advancing coral");
+                    motor.setControl(advanceControl);
+                    break;
+                case HOLDING_CORAL:
+                    DogLog.log("EndEffector/Control", "Stopping (coral ready)");
+                    motor.stopMotor();
+                    break;
+                case SCORING_CORAL:
+                    DogLog.log("EndEffector/Control", "Scoring coral");
+                    motor.setControl(scoreControl);
+                    break;
+                default:
+                    DogLog.log("EndEffector/Control", "Stopping (unhandled state)");
+                    motor.stopMotor();
             }
             lastState = gamePieceState;
         }
