@@ -378,8 +378,7 @@ public class RobotContainer {
             LoggedCommands.proxy(PathCommand("D to CS")),
             RobotState.WaitForCoral(),
             LoggedCommands.proxy(PathCommand("CS towards AB")),
-            SetStop(Stop.L3), //Same face just a level lower to reduce time going to a different face 
-            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false)));
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)));
 
         // startingPaths.put(autoECD, "Start to near E");
         startingPaths.put(autoECDD, "Start towards EF");
