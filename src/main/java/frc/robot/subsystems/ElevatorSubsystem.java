@@ -32,6 +32,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final TalonFX leftMotor;
     private final TalonFX rightMotor;
     private final VoltageOut voltageOut = new VoltageOut(0).withEnableFOC(true);
+    // TODO Use MotionMagicVoltage?
     private final PositionVoltage positionVoltage = new PositionVoltage(0.0).withEnableFOC(true);
     private final MechanismLigament2d mechanism;
 
@@ -73,6 +74,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         MechanismLigament2d offset = origin.append(new MechanismLigament2d("elevator-offset", canvasWidth / 2.0  - Units.inchesToMeters(Constants.Elevator.setback), 0.0, 1.0, new Color8Bit()));
         mechanism = offset.append(new MechanismLigament2d("elevator", Units.inchesToMeters(Constants.Elevator.baseHeight), 90.0, Units.inchesToMeters(Constants.Elevator.thickness), new Color8Bit(0xBF, 0x57, 0x00)));
 
+        // TODO Get mechanism working
         SmartDashboard.putData("Elevator/mechanism", canvas);
         initDefaultCommand();
     }
@@ -243,6 +245,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             return;
         }
         DogLog.log("Elevator/Status", "Move to position " + String.format("%1.2f", position));
+        DogLog.log("Elevator/Set Position", position);
         RobotState.setElevatorAtZero(false);
         leftMotor.setControl(positionVoltage.withPosition(position));
     }
@@ -329,9 +332,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         motorConfig.Slot0.kG = Constants.Elevator.kG;
     
         // Set Motion Magic settings
-        var motionMagicConfigs = motorConfig.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = Constants.Elevator.cruiseVelocity;
-        motionMagicConfigs.MotionMagicAcceleration = Constants.Elevator.acceleration;
+        // var motionMagicConfigs = motorConfig.MotionMagic;
+        // motionMagicConfigs.MotionMagicCruiseVelocity = Constants.Elevator.cruiseVelocity;
+        // motionMagicConfigs.MotionMagicAcceleration = Constants.Elevator.acceleration;
         // motionMagicConfigs.MotionMagicJerk = Constants.Elevator.jerk;
     
         // Apply motor config

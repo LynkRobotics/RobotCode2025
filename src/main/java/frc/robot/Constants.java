@@ -221,31 +221,30 @@ public final class Constants {
         public static final double positionError = rotPerInch * 0.5; // Allowable rotation error to be considered in position
         public static final double positionCloseError = rotPerInch * 6.0; // Allowable rotation error to be considered in position
         public static final double stopError = 0.5;      // Allowable inches of error to be considered at a stop
-        public static final double slowVoltage = 1.5;    // Volts to move slowly to zero
+        public static final double slowVoltage = 2.0;    // Volts to move slowly to zero
 
-        // TODO Tune PID / FF
         public static final double RPSperVolt = 7.9; // RPS increase with every volt
-        public static final double kP = 0.8; // output per unit of error in position (output/rotation)
+        public static final double kP = 2.2; // output per unit of error in position (output/rotation)
         public static final double kI = 0.0; // output per unit of integrated error in position (output/(rotation*s))
         public static final double kD = 0.0; // output per unit of error in velocity (output/rps)
         public static final double kS = 0.0; // output to overcome static friction (output)
         public static final double kV = 1.0 / RPSperVolt; // output per unit of target velocity (output/rps)
         public static final double kA = 0.0; // output per unit of target acceleration (output/(rps/s))
         public static final double kG = 0.4; // output to overcome gravity
-        public static final double cruiseVelocity = 20.0; // RPS
-        public static final double acceleration = cruiseVelocity * 0.25; // Accelerate in 0.25 seconds
+        public static final double cruiseVelocity = 100.0; // RPS
+        public static final double acceleration = cruiseVelocity / 0.3; // Accelerate in 0.3 seconds
 
         public static final double speedLimitAtMax = 0.30;
 
         public enum Stop {
             // Intake occurs at zero
             SAFE     (Constants.Elevator.baseHeight + 5.0),
-            L1       (27.0  - Constants.Elevator.endEffectorHeight),
-            L2       (34.5  - Constants.Elevator.endEffectorHeight),
-            L2_ALGAE (38.0  - Constants.Elevator.endEffectorHeight),
-            L3       (50.5  - Constants.Elevator.endEffectorHeight),
-            L3_ALGAE (53.5  - Constants.Elevator.endEffectorHeight),
-            L4       (75.0  - Constants.Elevator.endEffectorHeight),
+            L1       (27.0 - Constants.Elevator.endEffectorHeight),
+            L2       (34.5 - Constants.Elevator.endEffectorHeight),
+            L2_ALGAE (38.0 - Constants.Elevator.endEffectorHeight),
+            L3       (50.5 - Constants.Elevator.endEffectorHeight),
+            L3_ALGAE (53.5 - Constants.Elevator.endEffectorHeight),
+            L4       (75.0 - Constants.Elevator.endEffectorHeight),
             L4_SCORE (78.0 - Constants.Elevator.endEffectorHeight);
     
             Stop(double height) {
