@@ -221,6 +221,7 @@ public class RobotState extends SubsystemBase {
         DogLog.log("State/Have algae", haveAlgae());
 
         SmartDashboard.putString("State/Active Game Piece", haveAlgae() ? "#48B6AB" : haveCoral() ? "#FFFFFF" : "#888888");
+        SmartDashboard.putBoolean("State/Coral Ready", coralReady());
 
         if (gamePieceState == GamePieceState.SCORING_ALGAE) {
             if (!algaeScoreTimer.isRunning()) {

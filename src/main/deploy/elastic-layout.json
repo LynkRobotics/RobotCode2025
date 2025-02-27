@@ -11,7 +11,7 @@
             "title": "FMSInfo",
             "x": 0.0,
             "y": 576.0,
-            "width": 384.0,
+            "width": 448.0,
             "height": 128.0,
             "type": "FMSInfo",
             "properties": {
@@ -230,7 +230,7 @@
       }
     },
     {
-      "name": "Autonomous",
+      "name": "Auto Setup",
       "grid_layout": {
         "layouts": [],
         "containers": [
@@ -344,6 +344,23 @@
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/vision/New result",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Coral Ready",
+            "x": 1120.0,
+            "y": 128.0,
+            "width": 224.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/State/Coral Ready",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -974,8 +991,8 @@
         "containers": [
           {
             "title": "Reef Elevator Zone",
-            "x": 928.0,
-            "y": 0.0,
+            "x": 416.0,
+            "y": 384.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -991,8 +1008,8 @@
           },
           {
             "title": "In Wing",
-            "x": 928.0,
-            "y": 128.0,
+            "x": 672.0,
+            "y": 384.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -1074,6 +1091,45 @@
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
+            }
+          },
+          {
+            "title": "Override Elevator Down Allowed",
+            "x": 0.0,
+            "y": 128.0,
+            "width": 416.0,
+            "height": 128.0,
+            "type": "Toggle Button",
+            "properties": {
+              "topic": "/SmartDashboard/TunableOptions/Override Elevator Down Allowed",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Override Elevator Path Blocked",
+            "x": 0.0,
+            "y": 256.0,
+            "width": 416.0,
+            "height": 128.0,
+            "type": "Toggle Button",
+            "properties": {
+              "topic": "/SmartDashboard/TunableOptions/Override Elevator Path Blocked",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Override Reef Safe Elevator Zone",
+            "x": 0.0,
+            "y": 384.0,
+            "width": 416.0,
+            "height": 128.0,
+            "type": "Toggle Button",
+            "properties": {
+              "topic": "/SmartDashboard/TunableOptions/Override Reef Safe Elevator Zone",
+              "period": 0.06,
+              "data_type": "boolean"
             }
           }
         ]
