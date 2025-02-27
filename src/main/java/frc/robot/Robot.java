@@ -89,7 +89,9 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.schedule();
     }
 
-    Elastic.selectTab("Primary");
+    if (!Constants.atHQ) {
+      Elastic.selectTab("Primary");
+    }
   }
 
   /** This function is called periodically during autonomous. */
@@ -110,7 +112,9 @@ public class Robot extends TimedRobot {
     }
     DogLog.log("Misc/Robot Status", "Tele-Op has begun");
 
-    Elastic.selectTab("Primary");
+    if (!Constants.atHQ) {
+      Elastic.selectTab("Primary");
+    }
   }
 
   /** This function is called periodically during operator control. */
