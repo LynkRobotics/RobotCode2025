@@ -377,7 +377,7 @@ public class RobotContainer {
             // LoggedCommands.runOnce("Set Swerve Drive to Coast", () -> s_Swerve.setDriveMotorsToCoast()),
             LoggedCommands.proxy(PathCommand("D to CS")),
             RobotState.WaitForCoral(),
-            LoggedCommands.proxy(PathCommand("CS to near D")),
+            LoggedCommands.proxy(PathCommand("CS towards CD")),
             SetStop(Stop.L3), //Same face just a level lower to reduce time going to a different face 
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false)));
 
