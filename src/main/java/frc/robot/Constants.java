@@ -419,10 +419,16 @@ public final class Constants {
         public static final int rightCandle = 1;
         /* CANbus */
         public static final String canBus = "rio";
-        /* Animations */
-        public static final FireAnimation fireAnimation = new FireAnimation(0.6, 0.38, 94, 0.8, 0.2, false, 8);
-        public static final RainbowAnimation rainbowAnimation = new RainbowAnimation(0.6, 0.4, 94);
-        /* Misc */
+        /* LED arrangement */
         public static final int startIdx = 8;
+        public static final int numLEDs = 86;
+        public static final int totalLEDs = startIdx + numLEDs;
+        /* Animations */
+        public static final FireAnimation fireAnimation = new FireAnimation(0.75, 0.38, numLEDs, 0.8, 0.2, false, startIdx);
+        public static final RainbowAnimation rainbowAnimation = new RainbowAnimation(0.75, 0.4, numLEDs, false, startIdx);
+        /* Misc */
+        public static final double blinkRate = 0.2; // Regular blink rate
+        public static final double errorBlinkRate = 0.1; // Blink rate for errors and warnings
+        public static final double tempStateTime = 0.70; // How long for warnings and errors
     }
 }

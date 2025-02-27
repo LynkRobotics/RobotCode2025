@@ -56,6 +56,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
         double motorTemp = motor.getDeviceTemp().getValueAsDouble();
 
         if (gamePieceState != lastState) {
+            // TODO Make a switch statement
             if (gamePieceState == GamePieceState.NONE) {
                 DogLog.log("EndEffector/Control", "Stopping (no game piece)");
                 motor.stopMotor();

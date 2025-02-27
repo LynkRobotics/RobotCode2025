@@ -26,6 +26,7 @@ public class CANdleGroup {
     }
 
     public void animate(Animation animation) {
+        clearAnimation();
         for (CANdle candle : candles) {
             candle.animate(animation);
         }
@@ -38,12 +39,14 @@ public class CANdleGroup {
     }
 
     public void setLEDs(int r, int g, int b) {
+        clearAnimation();
         for (CANdle candle : candles) {
             candle.setLEDs(r, g, b);
         }
     }
 
     public void setLEDs(int r, int g, int b, int w, int startIdx, int count) {
+        clearAnimation();
         for (CANdle candle : candles) {
             candle.setLEDs(r, g, b, w, startIdx, count);
         }

@@ -40,7 +40,6 @@ import frc.robot.Constants.Pose.ReefFace;
 import frc.robot.Constants.Elevator.Stop;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.LEDSubsystem.TempState;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -306,7 +305,7 @@ public class RobotContainer {
                     new PIDSwerve(s_Swerve, s_Pose, new Pose2d(4.48, 1.67, Rotation2d.fromDegrees(91)), false),
                     s_Swerve.Stop(),
                     Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached Debug Position")),
-                    Commands.runOnce(() -> LEDSubsystem.setTempState(TempState.ERROR))));
+                    Commands.runOnce(() -> LEDSubsystem.triggerError())));
         }
         driver.povDown().whileTrue(RobotState.UnjamCoral());
     }
@@ -397,8 +396,6 @@ public class RobotContainer {
 
                 if (startingPose != null) {
                     Pose2d currentPose = s_Pose.getPose();
-                    DogLog.log("Robot/Debug0", PoseSubsystem.prettyPose(currentPose));
-                    DogLog.log("Robot/Debug1", PoseSubsystem.prettyPose(startingPose));
                    
                     poseDifference = String.format("(%1.1f, %1.1f) @ %1.0f deg",
                         Units.metersToInches(currentPose.getX() - startingPose.getX()),

@@ -6,7 +6,6 @@ import frc.lib.util.Elastic.Notification;
 import frc.lib.util.Elastic.Notification.NotificationLevel;
 import frc.robot.Constants;
 import frc.robot.subsystems.LEDSubsystem;
-import frc.robot.subsystems.LEDSubsystem.TempState;
 
 public class LoggedAlert {
     /**
@@ -19,7 +18,7 @@ public class LoggedAlert {
     public static void Error(String subsystem, String title, String msg) {
         Elastic.sendNotification(new Notification(NotificationLevel.ERROR, title, msg, Constants.errorTime));
         DogLog.logFault(subsystem + ": " + msg, AlertType.kError);
-        LEDSubsystem.setTempState(TempState.ERROR); //TODO: i dont really like subsystem calls in util classes
+        LEDSubsystem.triggerError(); //TODO: i dont really like subsystem calls in util classes
     }
 
     /**
@@ -32,7 +31,7 @@ public class LoggedAlert {
     public static void Warning(String subsystem, String title, String msg) {
         Elastic.sendNotification(new Notification(NotificationLevel.WARNING, title, msg, Constants.warningTime));
         DogLog.logFault(subsystem + ": " + msg, AlertType.kWarning);
-        LEDSubsystem.setTempState(TempState.WARNING);
+        LEDSubsystem.triggerWarning();
     }
 
     /**

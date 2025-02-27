@@ -163,6 +163,10 @@ public class RobotState extends SubsystemBase {
         return gamePieceState == GamePieceState.HOLDING_ALGAE || gamePieceState == GamePieceState.SCORING_ALGAE;
     }
 
+    public static boolean intakingAlgae() {
+        return gamePieceState == GamePieceState.INTAKING_ALGAE;
+    }
+
     public static void setHaveAlgae() {
         if (gamePieceState == GamePieceState.NONE || gamePieceState == GamePieceState.INTAKING_ALGAE) {
             gamePieceState = GamePieceState.HOLDING_ALGAE;
