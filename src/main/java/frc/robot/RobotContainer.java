@@ -355,7 +355,7 @@ public class RobotContainer {
         startingPaths.put(autoECD, "Start towards EF");
         addAutoCommand(chooser, autoECD);
 
-        Command autoECDD = LoggedCommands.sequence("ECDD",
+        Command autoECDB = LoggedCommands.sequence("ECDB",
             Commands.either(
                 LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
                 LoggedCommands.log("Skip back up option"),
@@ -381,8 +381,8 @@ public class RobotContainer {
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)));
 
         // startingPaths.put(autoECD, "Start to near E");
-        startingPaths.put(autoECDD, "Start towards EF");
-        addAutoCommand(chooser, autoECDD);
+        startingPaths.put(autoECDB, "Start towards EF");
+        addAutoCommand(chooser, autoECDB);
 
         Command autoBA = LoggedCommands.sequence("BA",
             Commands.either(
