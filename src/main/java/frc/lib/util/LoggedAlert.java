@@ -1,7 +1,6 @@
 package frc.lib.util;
 
 import dev.doglog.DogLog;
-import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.lib.util.Elastic.Notification;
 import frc.lib.util.Elastic.Notification.NotificationLevel;
 import frc.robot.Constants;
@@ -45,7 +44,7 @@ public class LoggedAlert {
      */
     public static void Info(String subsystem, String title, String msg) {
         Elastic.sendNotification(new Notification(NotificationLevel.INFO, title, msg));
-        DogLog.log("Fault/Info/", subsystem + ": " + title + " " + msg);
+        DogLog.log("Fault/Info", subsystem + ": " + title + " " + msg);
         DogLog.log("Fault/All Faults",  subsystem + ": " + "Info: " + title + " " + msg);
     }
 }
