@@ -380,8 +380,22 @@ public class RobotContainer {
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, true)),
             LoggedCommands.proxy(PathCommand("A backup")));
 
-            startingPaths.put(autoBA, "Start to near B");
-            addAutoCommand(chooser, autoBA);
+        startingPaths.put(autoBA, "Start to near B");
+        addAutoCommand(chooser, autoBA);
+
+        Command autoG = LoggedCommands.sequence("G",
+            LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
+            Commands.either(
+                LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
+                LoggedCommands.log("Skip back up option"),
+                optBackupPush::get),
+            SetStop(Stop.L4),
+            LoggedCommands.proxy(PathCommand("Start to near G")),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.GH, true)),
+            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.GH.approachLeft, true)));
+
+        startingPaths.put(autoG, "Start to near G");
+        addAutoCommand(chooser, autoG);
 
         FollowPathCommand.warmupCommand().schedule();
     }
