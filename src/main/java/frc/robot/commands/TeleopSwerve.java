@@ -63,11 +63,8 @@ public class TeleopSwerve extends LoggedCommandBase {
         }
 
         // Automatically aim at reef when applicable
-        // TODO Add manual override ability to disable automatic reef aiming
-        if (optAutoReefAiming.get() && Math.abs(rotationVal) < Constants.aimingOverride && !RobotState.haveAlgae()) {
+        if (optAutoReefAiming.get() && Math.abs(rotationVal) < Constants.aimingOverride && !RobotState.haveAlgae() && !RobotState.scoredAlgaeRecently()) {
             Pose2d pose = s_Pose.getPose();
-
-            // TODO Add override when working with algae
             Translation2d position = pose.getTranslation();
             Rotation2d rotation = pose.getRotation();
             if (PoseSubsystem.inWing(position)) {

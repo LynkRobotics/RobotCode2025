@@ -30,7 +30,7 @@ public class RobotState extends SubsystemBase {
     private static Stop nextStop = Stop.SAFE;
     private static final Timer algaeScoreTimer = new Timer();
     private static final Timer unjamTimer = new Timer();
-    
+    private static final Timer algaeScoredTimer = new Timer();
 
     private static final TunableOption optOverrideElevatorPathBlocked = new TunableOption("Override Elevator Path Blocked", false);
     private static final TunableOption optOverrideReefElevatorZone = new TunableOption("Override Reef Safe Elevator Zone", true);
@@ -163,6 +163,10 @@ public class RobotState extends SubsystemBase {
         return gamePieceState == GamePieceState.HOLDING_ALGAE || gamePieceState == GamePieceState.SCORING_ALGAE;
     }
 
+    public static boolean scoredAlgaeRecently() {
+        return algaeScoredTimer.isRunning() && !algaeScoredTimer.hasElapsed(Constants.algaeScoredTimeout);
+    }
+
     public static boolean intakingAlgae() {
         return gamePieceState == GamePieceState.INTAKING_ALGAE;
     }
@@ -217,21 +221,13 @@ public class RobotState extends SubsystemBase {
         boolean flipperSensor = getFlipperSensor();
         boolean finalSensor = getFinalSensor();
 
-        DogLog.log("State/Index sensor", intakeSensor);
-        DogLog.log("State/Flipper sensor", flipperSensor);
-        DogLog.log("State/Final sensor", finalSensor);
-        DogLog.log("State/Game Piece State", gamePieceState);
-        DogLog.log("State/Have coral", haveCoral());
-        DogLog.log("State/Have algae", haveAlgae());
-
-        SmartDashboard.putString("State/Active Game Piece", haveAlgae() ? "#48B6AB" : haveCoral() ? "#FFFFFF" : "#888888");
-        SmartDashboard.putBoolean("State/Coral Ready", coralReady());
-
         if (gamePieceState == GamePieceState.SCORING_ALGAE) {
             if (!algaeScoreTimer.isRunning()) {
                 algaeScoreTimer.restart();
+                algaeScoredTimer.restart();
             } else if (algaeScoreTimer.get() > Constants.EndEffector.algaeRunTime) {
                 gamePieceState = GamePieceState.NONE;
+                algaeScoreTimer.stop();
             }
         } else if (gamePieceState != GamePieceState.HOLDING_ALGAE && gamePieceState != GamePieceState.INTAKING_ALGAE) {
             if (gamePieceState == GamePieceState.UNJAMMING_CORAL) {
@@ -264,5 +260,15 @@ public class RobotState extends SubsystemBase {
                 }
             }
         }
+
+        DogLog.log("State/Index sensor", intakeSensor);
+        DogLog.log("State/Flipper sensor", flipperSensor);
+        DogLog.log("State/Final sensor", finalSensor);
+        DogLog.log("State/Game Piece State", gamePieceState);
+        DogLog.log("State/Have coral", haveCoral());
+        DogLog.log("State/Have algae", haveAlgae());
+
+        SmartDashboard.putString("State/Active Game Piece", haveAlgae() ? "#48B6AB" : haveCoral() ? "#FFFFFF" : "#888888");
+        SmartDashboard.putBoolean("State/Coral Ready", coralReady());
     }
 }
