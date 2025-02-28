@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import frc.lib.util.LoggedCommandBase;
-import frc.robot.Constants;
 import frc.robot.Constants.Pose;
 import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.subsystems.Swerve;
@@ -13,25 +12,15 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 
+import static frc.robot.Constants.PIDSwerve.*;
+
 public class PIDSwerve extends LoggedCommandBase {
     private final Swerve s_Swerve;
     private final PoseSubsystem s_Pose;
     private final Pose2d targetPose;
     private final boolean precise;
-
-    private final double translationKP = 0.09;
-    private final PIDController xPID = new PIDController(translationKP, 0, 0); //TODO Make Constants
-    private final PIDController yPID = new PIDController(translationKP, 0, 0);
-    private final double positionTolerance = 1.0; // inches
-    private final double roughPositionTolerance = 2.5; // inches
-    private final double maxSpeed = Constants.Swerve.maxSpeed / 3.0;
-    private final double positionKS = 0.02;
-    private final double positionIZone = 4.0;
-
-    private final PIDController rotationPID = new PIDController(0.010, 0, 0); // Small overshoot at 0.015, more noticeable with 0.020, but still functional
-    private final double rotationTolerance = 0.5; // degrees
-    private final double roughRotatationTolerance = 1.5; // degrees
-    private final double maxAngularVelocity = Constants.Swerve.maxAngularVelocity / 2.0;
+    private final PIDController xPID, yPID;
+    private final PIDController rotationPID = new PIDController(rotationKP, 0, 0);
 
     public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean precise) {
         super();
@@ -44,6 +33,9 @@ public class PIDSwerve extends LoggedCommandBase {
         this.targetPose = targetPose;
         this.precise = precise;
         addRequirements(s_Swerve);
+
+        xPID = new PIDController(precise ? translationKP : roughTranslationKP, 0, 0);
+        yPID = new PIDController(precise ? translationKP : roughTranslationKP, 0, 0);
 
         xPID.setIZone(positionIZone); // Only use Integral term within this range
         xPID.setIntegratorRange(-positionKS * 2, positionKS * 2);

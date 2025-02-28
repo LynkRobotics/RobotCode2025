@@ -29,7 +29,7 @@ public class LEDSubsystem extends SubsystemBase {
         off(0, 0, 0),
         red(255, 0, 0),
         green(0, 255, 0),
-        teal(44, 162, 165), // i wonder who that could be
+        hightideTeal(44, 162, 165),
         blue(0, 0, 255),
         cheesyBlue(0, 112, 255),
         cyan(0, 255, 255),
@@ -83,8 +83,8 @@ public class LEDSubsystem extends SubsystemBase {
         CORAL_L3(new LEDConfig(Color.white, 0.75)),
         CORAL_L4(new LEDConfig(Color.white, 1.00)),
         CORAL_UNKNOWN(new LEDConfig(Color.dim)),
-        ALGAE_INTAKING(new LEDConfig(Color.teal, true)),
-        ALGAE(new LEDConfig(Color.teal)),
+        ALGAE_INTAKING(new LEDConfig(Color.cheesyBlue, true)),
+        ALGAE(new LEDConfig(Color.cheesyBlue)),
         ERROR(new LEDConfig(Color.red, true)),
         WARNING(new LEDConfig(Color.yellow, true));
 
@@ -110,7 +110,7 @@ public class LEDSubsystem extends SubsystemBase {
     }
 
     private static void setColor(Color color, int count) {
-        setColor(color, Constants.LEDs.startIdx);
+        setColor(color, Constants.LEDs.startIdx, count);
     }
 
     private static void setColor(Color color) {
@@ -149,7 +149,7 @@ public class LEDSubsystem extends SubsystemBase {
         } else {
             // Check if the temporary state should be cleared
             if (tempStateTimer.isRunning() && tempStateTimer.hasElapsed(Constants.LEDs.tempStateTime)) {
-                    tempStateTimer.stop();
+                tempStateTimer.stop();
             }
             // Compute the proper state if's not temporarily overridden
             if (!tempStateTimer.isRunning()) {
@@ -184,10 +184,17 @@ public class LEDSubsystem extends SubsystemBase {
 
         // Change the LEDs if the state has changed
         if (state != lastState) {
+            if (lastState != null && lastState.config.animation != null) {
+                leds.clearAnimation();
+            }
             if (state.config.animation != null) {
                 leds.animate(state.config.animation);
             } else {
-                setColor(state.config.color, state.config.pct);
+                if (state.config.pct == 1.0) {
+                    setColor(state.config.color);
+                } else {
+                    setColor(state.config.color, state.config.pct);
+                }
             }
 
             if (state.config.blink) {

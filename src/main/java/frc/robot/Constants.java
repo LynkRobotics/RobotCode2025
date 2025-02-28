@@ -183,6 +183,21 @@ public final class Constants {
         }
     }
 
+    public static final class PIDSwerve {
+        public static final double translationKP = 0.05;
+        public static final double roughTranslationKP = 0.09;
+        public static final double positionTolerance = 1.0; // inches
+        public static final double roughPositionTolerance = 2.5; // inches
+        public static final double maxSpeed = Constants.Swerve.maxSpeed / 3.0;
+        public static final double positionKS = 0.02;
+        public static final double positionIZone = 4.0;
+    
+        public static final double rotationKP = 0.010; // Small overshoot at 0.015, more noticeable with 0.020, but still functional
+        public static final double rotationTolerance = 0.5; // degrees
+        public static final double roughRotatationTolerance = 1.5; // degrees
+        public static final double maxAngularVelocity = Constants.Swerve.maxAngularVelocity / 2.0;    
+    }
+
     public static final class Vision {
         public static final String cameraName = "AprilTagCam";
         public static final Transform3d robotToCam =
@@ -220,7 +235,7 @@ public final class Constants {
         public static final double safetyMargin = 1.5;   // How many inches away from safe mark to still be considered safe
         public static final double positionError = rotPerInch * 0.5; // Allowable rotation error to be considered in position
         public static final double positionCloseError = rotPerInch * 6.0; // Allowable rotation error to be considered in position
-        public static final double stopError = 0.5;      // Allowable inches of error to be considered at a stop
+        public static final double stopError = 0.25;      // Allowable inches of error to be considered at a stop
         public static final double slowVoltage = 2.0;    // Volts to move slowly to zero
 
         public static final double RPSperVolt = 7.9; // RPS increase with every volt
@@ -244,8 +259,8 @@ public final class Constants {
             L2_ALGAE (38.0 - Constants.Elevator.endEffectorHeight),
             L3       (50.5 - Constants.Elevator.endEffectorHeight),
             L3_ALGAE (53.5 - Constants.Elevator.endEffectorHeight),
-            L4       (75.0 - Constants.Elevator.endEffectorHeight),
-            L4_SCORE (78.0 - Constants.Elevator.endEffectorHeight);
+            L4       (74.5 - Constants.Elevator.endEffectorHeight),
+            L4_SCORE (77.0 - Constants.Elevator.endEffectorHeight);
     
             Stop(double height) {
                 this.height = height;
@@ -265,12 +280,12 @@ public final class Constants {
         /* Motor Config Values */
         public static final double peakForwardVoltage = 12.0; 
         public static final double peakReverseVoltage = -12.0; 
-        public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
+        public static final InvertedValue motorOutputInverted = InvertedValue.Clockwise_Positive;
         public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
         /* Motor Control Values */
-        public static final double feedVoltage = -2.00;
-        public static final double advanceVoltage = -0.77;
-        public static final double scoreVoltage = -3.00;
+        public static final double feedVoltage = -3.80;
+        public static final double advanceVoltage = -1.20;
+        public static final double scoreVoltage = -4.6;
         public static final double algaeVoltage = 3.00;
         public static final double algaeOutVoltage = -2.00;
         public static final double minimumAlgaeAcquireCurrent = 80.0;
@@ -423,9 +438,10 @@ public final class Constants {
         public static final int startIdx = 8;
         public static final int numLEDs = 86;
         public static final int totalLEDs = startIdx + numLEDs;
+        public static final double brightness = Constants.atHQ ? 0.60 : 1.00;
         /* Animations */
-        public static final FireAnimation fireAnimation = new FireAnimation(0.75, 0.38, numLEDs, 0.8, 0.2, false, startIdx);
-        public static final RainbowAnimation rainbowAnimation = new RainbowAnimation(0.75, 0.4, numLEDs, false, startIdx);
+        public static final FireAnimation fireAnimation = new FireAnimation(1.0, 0.38, numLEDs, 0.8, 0.2, false, startIdx);
+        public static final RainbowAnimation rainbowAnimation = new RainbowAnimation(1.0, 0.4, numLEDs, false, startIdx);
         /* Misc */
         public static final double blinkRate = 0.2; // Regular blink rate
         public static final double errorBlinkRate = 0.1; // Blink rate for errors and warnings
