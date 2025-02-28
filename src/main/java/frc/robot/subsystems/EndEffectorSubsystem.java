@@ -112,18 +112,17 @@ public class EndEffectorSubsystem extends SubsystemBase {
         if (gamePieceState == GamePieceState.INTAKING_ALGAE && current > Constants.EndEffector.minimumAlgaeAcquireCurrent && !RobotState.getFinalSensor()) {
             RobotState.setHaveAlgae();
         }
-        if (gamePieceState == GamePieceState.HOLDING_ALGAE && current < Constants.EndEffector.minimumAlgaeHoldCurrent) {
+        if (gamePieceState == GamePieceState.HOLDING_ALGAE && current < Constants.EndEffector.minimumAlgaeHoldCurrent && RobotState.getFinalSensor()) {
             RobotState.setNoAlgae();
         }
 
         DogLog.log("EndEffector/Motor Temp", motorTemp);
 
-        if (motorTemp > 70){ //TODO tune and put in constants
-            LoggedAlert.Warning("EndEffector", "TEMP WARNING", "End Effector Motor is approaching hot temperatures");
-        }
-        if (motorTemp > 90){
-            LoggedAlert.Warning("EndEffector", "TEMP WARNING", "End Effector Motor is approaching temperature max");
-        }
-
+        // if (motorTemp > 70){ //TODO tune and put in constants
+        //     LoggedAlert.Warning("EndEffector", "TEMP WARNING", "End Effector Motor is approaching hot temperatures");
+        // }
+        // if (motorTemp > 90){
+        //     LoggedAlert.Warning("EndEffector", "TEMP WARNING", "End Effector Motor is approaching temperature max");
+        // }
     }
 }
