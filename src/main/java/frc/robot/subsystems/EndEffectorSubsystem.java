@@ -79,6 +79,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
                 case INTAKING_CORAL:
                     DogLog.log("EndEffector/Control", "Stop (intaking coral)");
                     motor.stopMotor();
+                    break;
                 case FEEDING_CORAL:
                     DogLog.log("EndEffector/Control", "Feeding coral");
                     motor.setControl(feedControl);
