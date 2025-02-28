@@ -278,6 +278,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         return stopError <= allowableError;
     }
 
+    public boolean aboveStop(Stop stop) {
+        return getHeight() > stopHeight(stop);
+    }
+
     public boolean nearStop(Stop stop) {
         double stopError = stopError(stop);
         // The safe stop is just a guideline, and has a wider margin for error

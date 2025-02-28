@@ -308,6 +308,17 @@ public class RobotContainer {
                     Commands.runOnce(() -> LEDSubsystem.triggerError())));
         }
         driver.povDown().whileTrue(RobotState.UnjamCoral());
+
+        if (Constants.atHQ) {
+            driver.povRight().whileTrue(
+                LoggedCommands.deadline("Toss Algae",
+                    s_Elevator.WaitForStop(Stop.L4),
+                    s_Elevator.Move(Stop.L4),
+                    LoggedCommands.sequence("Wait to release Algae",
+                        LoggedCommands.waitUntil("Wait for Algae Release Point", () -> s_Elevator.aboveStop(Stop.ALGAE_RELEASE)),
+                        RobotState.ScoreGamePiece())
+                    ));
+        }
     }
 
     /** 
