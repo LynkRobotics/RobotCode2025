@@ -274,8 +274,8 @@
               "data_type": "boolean",
               "true_color": 4283215696,
               "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
+              "true_icon": "Checkmark",
+              "false_icon": "X"
             }
           },
           {
@@ -331,8 +331,8 @@
               "data_type": "boolean",
               "true_color": 4283215696,
               "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
+              "true_icon": "Checkmark",
+              "false_icon": "X"
             }
           },
           {
@@ -348,8 +348,8 @@
               "data_type": "boolean",
               "true_color": 4283215696,
               "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
+              "true_icon": "Checkmark",
+              "false_icon": "X"
             }
           },
           {
@@ -365,6 +365,23 @@
               "data_type": "boolean",
               "true_color": 4283215696,
               "false_color": 4294198070,
+              "true_icon": "Checkmark",
+              "false_icon": "X"
+            }
+          },
+          {
+            "title": "Alliance",
+            "x": 1120.0,
+            "y": 0.0,
+            "width": 224.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/autoSetup/Red Alliance?",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4290522427,
+              "false_color": 4279070461,
               "true_icon": "None",
               "false_icon": "None"
             }

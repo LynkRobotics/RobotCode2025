@@ -441,5 +441,6 @@ public class RobotContainer {
 
         SmartDashboard.putString("autoSetup/Starting Pose Error", poseDifference);
         SmartDashboard.putBoolean("autoSetup/Starting Pose OK", differenceOK);
+        SmartDashboard.putBoolean("autoSetup/Red Alliance?", Robot.isRed());
     }
 }
