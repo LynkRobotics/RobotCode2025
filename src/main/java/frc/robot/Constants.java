@@ -34,7 +34,7 @@ public final class Constants {
     public static final double driveStickSensitivity = 1.00; 
     public static final double turnStickSensitivity = 1.00;
     public static final double aimingOverride = 0.001;
-    public static final double algaeScoredTimeout = 1.3; // How long (in seconds) we should prevent auto-aiming after scoring algae
+    public static final double algaeScoredTimeout = 1.0; // How long (in seconds) we should prevent auto-aiming after scoring algae
 
     public static final int indexSensorID = 7;
     public static final int candiID = 0;
@@ -294,7 +294,7 @@ public final class Constants {
         public static final double minimumAlgaeHoldCurrent = 60.0;
 
         public static final double L1RunTime = 1.0;
-        public static final double algaeRunTime = 0.7;
+        public static final double algaeRunTime = 0.5;
     }
 
     public static final class Index {
