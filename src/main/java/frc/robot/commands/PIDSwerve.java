@@ -22,11 +22,12 @@ public class PIDSwerve extends LoggedCommandBase {
     private final PIDController xPID, yPID;
     private final PIDController rotationPID = new PIDController(rotationKP, 0, 0);
 
-    public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean precise) {
+    public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise) {
         super();
 
-        // TODO Make configurable?
-        targetPose = PoseSubsystem.flipIfRed(targetPose);
+        if (flipIfRed) {
+            targetPose = PoseSubsystem.flipIfRed(targetPose);
+        }
 
         this.s_Swerve = s_Swerve;
         this.s_Pose = s_Pose;

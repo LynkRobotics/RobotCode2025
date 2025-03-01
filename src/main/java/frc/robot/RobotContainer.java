@@ -157,7 +157,7 @@ public class RobotContainer {
             LoggedCommands.sequence("Auto Align " + (left ? "Left " : "Right ") + face.toString() + " & Score",
                 LoggedCommands.parallel("PID Align " + (left ? "Left " : "Right ") + face.toString(),
                     Commands.sequence(
-                        new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, false),
+                        new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, true, false),
                         Commands.either(
                             LoggedCommands.log("Elevator reached stop in time"),
                             LoggedCommands.sequence("Pause to wait for elevator to catch up",
@@ -165,8 +165,8 @@ public class RobotContainer {
                                 s_Elevator.WaitForNearNext()),
                             s_Elevator::nearNextStop),
                         Commands.either(
-                            new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true),
-                            new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true),
+                            new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true, true),
+                            new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true, true),
                             optBonusCoralStandoff::get),
                         s_Swerve.Stop()),
                     Commands.sequence(
@@ -203,8 +203,8 @@ public class RobotContainer {
             RobotState.IntakeAlgae(),
             LoggedCommands.parallel("PID Align Middle " + face.toString(),
                 Commands.sequence(
-                    new PIDSwerve(s_Swerve, s_Pose, face.approachMiddle, false),
-                    new PIDSwerve(s_Swerve, s_Pose, face.alignMiddle, true),
+                    new PIDSwerve(s_Swerve, s_Pose, face.approachMiddle, true, false),
+                    new PIDSwerve(s_Swerve, s_Pose, face.alignMiddle, true, true),
                     s_Swerve.Stop()),
                 LoggedCommands.deadline("Wait for auto up",
                     s_Elevator.WaitForStop(algaeStop),
@@ -302,7 +302,7 @@ public class RobotContainer {
         if (Constants.atHQ) {
             driver.povUp().whileTrue(
                 Commands.sequence(
-                    new PIDSwerve(s_Swerve, s_Pose, new Pose2d(4.48, 1.67, Rotation2d.fromDegrees(91)), false),
+                    new PIDSwerve(s_Swerve, s_Pose, new Pose2d(4.48, 1.67, Rotation2d.fromDegrees(91)), false, false),
                     s_Swerve.Stop(),
                     Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached Debug Position")),
                     Commands.runOnce(() -> LEDSubsystem.triggerError())));
@@ -339,7 +339,7 @@ public class RobotContainer {
         return
             LoggedCommands.race("Backup with timeout",
                 LoggedCommands.waitSeconds("Backup timeout", 3), // TODO Make constant
-                new PIDSwerve(s_Swerve, s_Pose, s_Pose.getPose().transformBy(transform), true));
+                new PIDSwerve(s_Swerve, s_Pose, s_Pose.getPose().transformBy(transform), false, true));
     }
 
     private void buildAutos(SendableChooser<Command> chooser) {
@@ -395,7 +395,7 @@ public class RobotContainer {
             SetStop(Stop.L4),
             LoggedCommands.proxy(PathCommand("Start to near G")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.GH, true)),
-            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.GH.approachLeft, true)));
+            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.GH.approachLeft, true, true)));
 
         startingPaths.put(autoG, "Start to near G");
         addAutoCommand(chooser, autoG);
