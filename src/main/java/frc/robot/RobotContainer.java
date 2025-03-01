@@ -335,6 +335,7 @@ public class RobotContainer {
     }
 
     private Command BackUpCommand() {
+        // TODO This doesn't work from Red, because PIDSwerve will flip it!
         Transform2d transform = new Transform2d(-Constants.AutoConstants.backUpPushDistance, 0.0, Rotation2d.kZero); 
         return
             LoggedCommands.race("Backup with timeout",
