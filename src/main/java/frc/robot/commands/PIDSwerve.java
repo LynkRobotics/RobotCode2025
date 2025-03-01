@@ -76,7 +76,7 @@ public class PIDSwerve extends LoggedCommandBase {
         double xCorrection = xPID.calculate(Units.metersToInches(position.getX()));
         double xFeedForward = positionKS * Math.signum(xCorrection);
         double xVal = MathUtil.clamp(xCorrection + xFeedForward, -1.0, 1.0);
-        DogLog.log("PIDSwerve/X position", Units.metersToInches(position.getX()));
+        DogLog.log("PIDSwerve/X position", position.getX());
         DogLog.log("PIDSwerve/X correction", xCorrection);
         DogLog.log("PIDSwerve/X feedforward", xFeedForward);
         DogLog.log("PIDSwerve/X value", xVal);
@@ -84,7 +84,7 @@ public class PIDSwerve extends LoggedCommandBase {
         double yCorrection = yPID.calculate(Units.metersToInches(position.getY()));
         double yFeedForward = positionKS * Math.signum(yCorrection);
         double yVal = MathUtil.clamp(yCorrection + yFeedForward, -1.0, 1.0);
-        DogLog.log("PIDSwerve/Y position", Units.metersToInches(position.getY()));
+        DogLog.log("PIDSwerve/Y position", position.getY());
         DogLog.log("PIDSwerve/Y correction", yCorrection);
         DogLog.log("PIDSwerve/Y feedforward", yFeedForward);
         DogLog.log("PIDSwerve/Y value", yVal);
