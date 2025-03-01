@@ -287,7 +287,7 @@ public final class Constants {
         /* Motor Control Values */
         public static final double feedVoltage = -3.80;
         public static final double advanceVoltage = -1.20;
-        public static final double scoreVoltage = -4.6;
+        public static final double scoreVoltage = -3.5;
         public static final double algaeVoltage = 3.00;
         public static final double algaeOutVoltage = -10.00;
         public static final double minimumAlgaeAcquireCurrent = 80.0;
