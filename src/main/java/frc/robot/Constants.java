@@ -193,7 +193,7 @@ public final class Constants {
         public static final double positionKS = 0.02;
         public static final double positionIZone = 4.0;
     
-        public static final double rotationKP = 0.010; // Small overshoot at 0.015, more noticeable with 0.020, but still functional
+        public static final double rotationKP = 0.015; // Small overshoot at 0.015, more noticeable with 0.020, but still functional
         public static final double rotationTolerance = 0.5; // degrees
         public static final double roughRotatationTolerance = 1.5; // degrees
         public static final double maxAngularVelocity = Constants.Swerve.maxAngularVelocity / 2.0;    
