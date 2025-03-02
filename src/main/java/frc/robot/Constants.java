@@ -400,6 +400,7 @@ public final class Constants {
         public static final double kPThetaController = 1;
 
         public static final double backUpPushDistance = Units.inchesToMeters(4.0);
+        public static final double backUpCSDistance = Units.inchesToMeters(12.0);
 
         public static final double maxSetupXError = Units.inchesToMeters(4.0);
         public static final double maxSetupYError = Units.inchesToMeters(8.0);

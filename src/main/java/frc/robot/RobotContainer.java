@@ -342,6 +342,13 @@ public class RobotContainer {
                 new PIDSwerve(s_Swerve, s_Pose, s_Pose.getPose().transformBy(transform), false, true));
     }
 
+    private Command BackUpAndWaitForCoral() {
+        Transform2d transform = new Transform2d(-Constants.AutoConstants.backUpCSDistance, 0.0, Rotation2d.kZero); 
+        return LoggedCommands.deadline("Backup and wait for Coral",
+            RobotState.WaitForCoral(),
+            Commands.defer(() -> new PIDSwerve(s_Swerve, s_Pose, s_Pose.getPose().transformBy(transform), false, false), Set.of(s_Swerve)));
+    }
+
     private void buildAutos(SendableChooser<Command> chooser) {
         Command autoECD = LoggedCommands.sequence("ECD",
             Commands.either(
@@ -353,12 +360,12 @@ public class RobotContainer {
             LoggedCommands.proxy(PathCommand("Start towards EF")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
             LoggedCommands.proxy(PathCommand("E to CS")),
-            RobotState.WaitForCoral(),
+            LoggedCommands.proxy(BackUpAndWaitForCoral()),
             // LoggedCommands.proxy(PathCommand("CS to near C")),
             LoggedCommands.proxy(PathCommand("CS towards CD")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, true)),
             LoggedCommands.proxy(PathCommand("C to CS")),
-            RobotState.WaitForCoral(),
+            LoggedCommands.proxy(BackUpAndWaitForCoral()),
             // LoggedCommands.proxy(PathCommand("CS to near D")),
             LoggedCommands.proxy(PathCommand("CS towards CD")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false)),
@@ -378,7 +385,7 @@ public class RobotContainer {
             LoggedCommands.proxy(PathCommand("Start to near B")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
             LoggedCommands.proxy(PathCommand("B to CS2")),
-            RobotState.WaitForCoral(),
+            LoggedCommands.proxy(BackUpAndWaitForCoral()),
             LoggedCommands.proxy(PathCommand("CS2 to near A")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, true)),
             LoggedCommands.proxy(PathCommand("A backup")));
