@@ -219,8 +219,8 @@ public final class Constants {
         /* CANBus */
         public static final String canBus = "rio";
         /* Motor Config Values */
-        public static final double peakForwardVoltage = 12;
-        public static final double peakReverseVoltage = -12;
+        public static final double peakForwardVoltage = 14;
+        public static final double peakReverseVoltage = -14;
         public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
         public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
 
