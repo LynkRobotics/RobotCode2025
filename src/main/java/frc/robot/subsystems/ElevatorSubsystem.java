@@ -326,7 +326,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         motorConfig.Voltage.PeakForwardVoltage = Constants.Elevator.peakForwardVoltage;
         motorConfig.Voltage.PeakReverseVoltage = Constants.Elevator.peakReverseVoltage;
         motorConfig.CurrentLimits.StatorCurrentLimit = 80; //TODO: Test 
-        motorConfig.CurrentLimits.SupplyCurrentLimit = 80; //TODO: Make these constants
+        motorConfig.CurrentLimits.SupplyCurrentLimit = 120; //TODO: Make these constants
         motorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         motorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
