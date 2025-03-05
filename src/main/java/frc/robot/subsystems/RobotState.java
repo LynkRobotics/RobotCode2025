@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import static frc.robot.Options.optAlgaeBargeOnly;
+
 import com.ctre.phoenix6.configs.CANdiConfiguration;
 import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.signals.S1CloseStateValue;
@@ -132,13 +134,17 @@ public class RobotState extends SubsystemBase {
         return LoggedCommands.race("Wait for Coral with timeout", WaitForCoral(), Commands.waitSeconds(timeout));
     }
 
+    private static boolean algaeToProcessor() {
+        return !optAlgaeBargeOnly.get() && PoseSubsystem.getInstance().nearProcessor();
+    }
+
     public static Command ScoreGamePiece() {
         return LoggedCommands.either("Score Game Piece",
             Commands.either(
                 Commands.either(
                     LoggedCommands.runOnce("Score Algae into Processor", () -> gamePieceState = GamePieceState.SCORING_PROCESSOR_ALGAE),
                     LoggedCommands.runOnce("Score Algae into Barge", () -> gamePieceState = GamePieceState.SCORING_BARGE_ALGAE),
-                    () -> false), // TODO Make based on position
+                    RobotState::algaeToProcessor),
                 LoggedCommands.runOnce("Cannot Score Algae", () -> LoggedAlert.Warning("Robot State", "Cannot Score", "Cannot score algae without holding algae")),
                 () -> gamePieceState == GamePieceState.HOLDING_ALGAE),
             Commands.either(

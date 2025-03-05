@@ -1097,20 +1097,6 @@
             }
           },
           {
-            "title": "Algae voltage",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 416.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/Algae voltage",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
             "title": "Override Elevator Down Allowed",
             "x": 0.0,
             "y": 128.0,
@@ -1215,6 +1201,19 @@
               "false_color": 4294198070,
               "true_icon": "None",
               "false_icon": "None"
+            }
+          },
+          {
+            "title": "Algae into Barge Only",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 416.0,
+            "height": 128.0,
+            "type": "Toggle Button",
+            "properties": {
+              "topic": "/SmartDashboard/TunableOptions/Algae into Barge Only",
+              "period": 0.06,
+              "data_type": "boolean"
             }
           }
         ]

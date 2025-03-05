@@ -282,6 +282,25 @@ public class PoseSubsystem extends SubsystemBase {
         return (Math.abs(roll) < Pose.tiltError && Math.abs(pitch) < Pose.tiltError);
     }
 
+    public boolean nearProcessor() {
+        Translation2d position = flipIfRed(getPose().getTranslation());
+
+        return position.getY() < Constants.Pose.processorAreaY;
+    }
+
+    public Pose2d bargeShotPose() {
+        Pose2d currentPose = flipIfRed(getPose());
+        Pose2d targetPose;
+
+        if (currentPose.getX() > Constants.Pose.fieldLength / 2.0) {
+            targetPose = new Pose2d(Constants.Pose.fieldLength - Constants.Pose.bargeShotX, currentPose.getY(), Rotation2d.k180deg);
+        } else {
+            targetPose = new Pose2d(Constants.Pose.bargeShotX, currentPose.getY(), Rotation2d.kZero);
+        }
+
+        return flipIfRed(targetPose);
+    }
+
     @Override
     public void periodic() {
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());

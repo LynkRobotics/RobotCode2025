@@ -8,4 +8,5 @@ public final class Options {
     public static final TunableOption optMirrorAuto = new TunableOption("Mirror Auto to Left", false);
     public static final TunableOption optAutoReefAiming = new TunableOption("Automatically Aim at Reef", true);
     public static final TunableOption optBonusCoralStandoff = new TunableOption("Bonus Coral Standoff", false);
+    public static final TunableOption optAlgaeBargeOnly = new TunableOption("Algae into Barge Only", Constants.atHQ);
 }
