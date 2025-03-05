@@ -260,7 +260,7 @@ public final class Constants {
             L2_ALGAE (38.0 - Constants.Elevator.endEffectorHeight),
             L3       (50.5 - Constants.Elevator.endEffectorHeight),
             L3_ALGAE (53.5 - Constants.Elevator.endEffectorHeight),
-            ALGAE_RELEASE(64.0 - Constants.Elevator.endEffectorHeight),
+            ALGAE_RELEASE(63.5 - Constants.Elevator.endEffectorHeight),
             L4       (74.5 - Constants.Elevator.endEffectorHeight),
             L4_SCORE (77.0 - Constants.Elevator.endEffectorHeight);
     
@@ -289,7 +289,9 @@ public final class Constants {
         public static final double advanceVoltage = -1.20;
         public static final double scoreVoltage = -3.5;
         public static final double algaeVoltage = 3.00;
-        public static final double algaeOutVoltage = -12.00;
+        public static final double algaeHoldVoltage = 1.00;
+        public static final double algaeBargeVoltage = -12.00;
+        public static final double algaeOutVoltage = -3.00;
         public static final double minimumAlgaeAcquireCurrent = 80.0;
         public static final double minimumAlgaeHoldCurrent = 60.0;
 

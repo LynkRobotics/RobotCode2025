@@ -9,9 +9,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.util.LoggedAlert;
 import frc.robot.Constants;
 import frc.robot.subsystems.RobotState.GamePieceState;
 
@@ -24,6 +22,8 @@ public class EndEffectorSubsystem extends SubsystemBase {
     private final VoltageOut scoreControl = new VoltageOut(Constants.EndEffector.scoreVoltage).withEnableFOC(true);
     private final VoltageOut algaeControl = new VoltageOut(Constants.EndEffector.algaeVoltage).withEnableFOC(false);
     private final VoltageOut algaeOutControl = new VoltageOut(Constants.EndEffector.algaeOutVoltage).withEnableFOC(false);
+    private final VoltageOut algaeHoldControl = new VoltageOut(Constants.EndEffector.algaeHoldVoltage).withEnableFOC(false);
+    private final VoltageOut algaeBargeControl = new VoltageOut(Constants.EndEffector.algaeBargeVoltage).withEnableFOC(false);
 
     private GamePieceState lastState = GamePieceState.NONE;
 
@@ -32,8 +32,6 @@ public class EndEffectorSubsystem extends SubsystemBase {
         motor = new TalonFX(Constants.EndEffector.motorID, Constants.EndEffector.canBus);
 
         applyConfigs();
-
-        SmartDashboard.putNumber("Algae voltage", Constants.EndEffector.algaeVoltage);
     }
 
     public void applyConfigs() {
@@ -63,18 +61,19 @@ public class EndEffectorSubsystem extends SubsystemBase {
                     break;
                 case INTAKING_ALGAE:
                     DogLog.log("EndEffector/Control", "Intaking algae");
-                    motor.setControl(algaeControl
-                            .withOutput(SmartDashboard.getNumber("Algae voltage", Constants.EndEffector.algaeVoltage)));
+                    motor.setControl(algaeControl);
                     break;
                 case HOLDING_ALGAE:
-                    // No change currently, but issue it anyway, for kicks
                     DogLog.log("EndEffector/Control", "Holding algae");
-                    motor.setControl(algaeControl
-                            .withOutput(SmartDashboard.getNumber("Algae voltage", Constants.EndEffector.algaeVoltage)));
+                    motor.setControl(algaeHoldControl);
                     break;
-                case SCORING_ALGAE:
-                    DogLog.log("EndEffector/Control", "Scoring algae");
+                case SCORING_PROCESSOR_ALGAE:
+                    DogLog.log("EndEffector/Control", "Scoring algae into processor");
                     motor.setControl(algaeOutControl);
+                    break;
+                case SCORING_BARGE_ALGAE:
+                    DogLog.log("EndEffector/Control", "Scoring algae into barge");
+                    motor.setControl(algaeBargeControl);
                     break;
                 case INTAKING_CORAL:
                     DogLog.log("EndEffector/Control", "Stop (intaking coral)");

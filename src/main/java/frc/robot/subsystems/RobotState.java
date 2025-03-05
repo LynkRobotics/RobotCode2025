@@ -40,7 +40,8 @@ public class RobotState extends SubsystemBase {
         NONE,
         INTAKING_ALGAE,
         HOLDING_ALGAE,
-        SCORING_ALGAE,
+        SCORING_BARGE_ALGAE,
+        SCORING_PROCESSOR_ALGAE,
         INTAKING_CORAL,
         UNJAMMING_CORAL,
         FEEDING_CORAL,
@@ -134,7 +135,10 @@ public class RobotState extends SubsystemBase {
     public static Command ScoreGamePiece() {
         return LoggedCommands.either("Score Game Piece",
             Commands.either(
-                LoggedCommands.runOnce("Score Algae", () -> gamePieceState = GamePieceState.SCORING_ALGAE),
+                Commands.either(
+                    LoggedCommands.runOnce("Score Algae into Processor", () -> gamePieceState = GamePieceState.SCORING_PROCESSOR_ALGAE),
+                    LoggedCommands.runOnce("Score Algae into Barge", () -> gamePieceState = GamePieceState.SCORING_BARGE_ALGAE),
+                    () -> false), // TODO Make based on position
                 LoggedCommands.runOnce("Cannot Score Algae", () -> LoggedAlert.Warning("Robot State", "Cannot Score", "Cannot score algae without holding algae")),
                 () -> gamePieceState == GamePieceState.HOLDING_ALGAE),
             Commands.either(
@@ -160,7 +164,7 @@ public class RobotState extends SubsystemBase {
     }
 
     public static boolean haveAlgae() {
-        return gamePieceState == GamePieceState.HOLDING_ALGAE || gamePieceState == GamePieceState.SCORING_ALGAE;
+        return gamePieceState == GamePieceState.HOLDING_ALGAE || gamePieceState == GamePieceState.SCORING_BARGE_ALGAE || gamePieceState == GamePieceState.SCORING_PROCESSOR_ALGAE;
     }
 
     public static boolean scoredAlgaeRecently() {
@@ -221,7 +225,7 @@ public class RobotState extends SubsystemBase {
         boolean flipperSensor = getFlipperSensor();
         boolean finalSensor = getFinalSensor();
 
-        if (gamePieceState == GamePieceState.SCORING_ALGAE) {
+        if (gamePieceState == GamePieceState.SCORING_BARGE_ALGAE || gamePieceState == GamePieceState.SCORING_PROCESSOR_ALGAE) {
             if (!algaeScoreTimer.isRunning()) {
                 algaeScoreTimer.restart();
                 algaeScoredTimer.restart();
