@@ -35,8 +35,9 @@ public class LEDSubsystem extends SubsystemBase {
         cyan(0, 255, 255),
         magenta(255, 0, 255),
         yellow(255, 255, 0),
-        white(255, 255, 255),
-        dim(50, 50, 50),
+        white(250, 250, 250),
+        brightWhite(255, 255, 255),
+        dim(10, 10, 10),
         lynk(255, 64, 0),
         disabled(200, 0, 0);
 
