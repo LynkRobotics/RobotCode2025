@@ -393,7 +393,7 @@ public final class Constants {
         }
     }
 
-    public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
+    public static final class Auto { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
         public static final double kMaxSpeedMetersPerSecond = 3;
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
         public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
@@ -409,6 +409,9 @@ public final class Constants {
         public static final double maxSetupXError = Units.inchesToMeters(4.0);
         public static final double maxSetupYError = Units.inchesToMeters(8.0);
         public static final double maxSetupDegError = 15.0;
+
+        public static final double scoreCoralTimeout = 3.5;
+        public static final double scoreCoralTimeLeft = 4.0;
     
         /* Constraint for the motion profilied robot angle controller */
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints =

@@ -157,17 +157,26 @@ public class RobotContainer {
             LoggedCommands.sequence("Auto Align " + (left ? "Left " : "Right ") + face.toString() + " & Score",
                 LoggedCommands.parallel("PID Align " + (left ? "Left " : "Right ") + face.toString(),
                     Commands.sequence(
-                        new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, true, false),
-                        Commands.either(
-                            LoggedCommands.log("Elevator reached stop in time"),
-                            LoggedCommands.sequence("Pause to wait for elevator to catch up",
-                                s_Swerve.Stop(),
-                                s_Elevator.WaitForNearNext()),
-                            s_Elevator::nearNextStop),
-                        Commands.either(
-                            new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true, true),
-                            new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true, true),
-                            optBonusCoralStandoff::get),
+                        Commands.race(
+                            Commands.sequence(
+                                new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, true, false),
+                                Commands.either(
+                                    LoggedCommands.log("Elevator reached stop in time"),
+                                    LoggedCommands.sequence("Pause to wait for elevator to catch up",
+                                        s_Swerve.Stop(),
+                                        s_Elevator.WaitForNearNext()),
+                                    s_Elevator::nearNextStop),
+                                Commands.either(
+                                    new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true, true),
+                                    new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true, true),
+                                    optBonusCoralStandoff::get)),
+                            Commands.either(
+                                Commands.sequence(
+                                    LoggedCommands.waitSeconds("Score coral watchdog", Constants.Auto.scoreCoralTimeout),
+                                    Commands.runOnce(() -> LoggedAlert.Error("Auto", "Timed out", "Timed out moving to score coral"))
+                                ),
+                                Commands.idle(),
+                                () -> DriverStation.isAutonomousEnabled() && DriverStation.getMatchTime() >= (Constants.Auto.scoreCoralTimeout + Constants.Auto.scoreCoralTimeLeft))),
                         s_Swerve.Stop()),
                     Commands.sequence(
                         RobotState.WaitForCoralReady(),
@@ -338,7 +347,7 @@ public class RobotContainer {
     }
 
     private Command BackUpCommand() {
-        Transform2d transform = new Transform2d(-Constants.AutoConstants.backUpPushDistance, 0.0, Rotation2d.kZero); 
+        Transform2d transform = new Transform2d(-Constants.Auto.backUpPushDistance, 0.0, Rotation2d.kZero); 
         return
             LoggedCommands.race("Backup with timeout",
                 LoggedCommands.waitSeconds("Backup timeout", 3), // TODO Make constant
@@ -346,7 +355,7 @@ public class RobotContainer {
     }
 
     private Command BackUpAndWaitForCoral() {
-        Transform2d transform = new Transform2d(-Constants.AutoConstants.backUpCSDistance, 0.0, Rotation2d.kZero); 
+        Transform2d transform = new Transform2d(-Constants.Auto.backUpCSDistance, 0.0, Rotation2d.kZero); 
         return LoggedCommands.deadline("Backup and wait for Coral",
             RobotState.WaitForCoral(),
             Commands.defer(() -> new PIDSwerve(s_Swerve, s_Pose, s_Pose.getPose().transformBy(transform), false, false), Set.of(s_Swerve)));
@@ -440,9 +449,9 @@ public class RobotContainer {
                         Units.metersToInches(currentPose.getY() - startingPose.getY()),
                         startingPose.getRotation().minus(currentPose.getRotation()).getDegrees());
 
-                    if (Math.abs(currentPose.getX() - startingPose.getX()) < Constants.AutoConstants.maxSetupXError &&
-                        Math.abs(currentPose.getY() - startingPose.getY()) < Constants.AutoConstants.maxSetupYError &&
-                        Math.abs(startingPose.getRotation().minus(currentPose.getRotation()).getDegrees()) < Constants.AutoConstants.maxSetupDegError) {
+                    if (Math.abs(currentPose.getX() - startingPose.getX()) < Constants.Auto.maxSetupXError &&
+                        Math.abs(currentPose.getY() - startingPose.getY()) < Constants.Auto.maxSetupYError &&
+                        Math.abs(startingPose.getRotation().minus(currentPose.getRotation()).getDegrees()) < Constants.Auto.maxSetupDegError) {
                         differenceOK = true;
                     }
                 }
