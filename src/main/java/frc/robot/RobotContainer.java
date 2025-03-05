@@ -286,8 +286,22 @@ public class RobotContainer {
 
         // Only used in case of automation failure
         moveElevator.whileTrue(s_Elevator.GoToNext());
-        score.onTrue(RobotState.ScoreGamePiece());
         zero.onTrue(s_Elevator.Zero());
+
+        score.whileTrue(Commands.either(
+            LoggedCommands.sequence("Score Algae into Barge",
+                Commands.defer(() -> new PIDSwerve(s_Swerve, s_Pose, s_Pose.bargeShotPose(), false, true), Set.of(s_Swerve)),
+                s_Swerve.Stop(),
+                LoggedCommands.deadline("Toss Algae",
+                    Commands.sequence(
+                        s_Elevator.WaitForStop(Stop.L4_SCORE),
+                        Commands.waitSeconds(0.5)), // TODO Remove delay?
+                    s_Elevator.Move(Stop.L4_SCORE),
+                    LoggedCommands.sequence("Wait to release Algae",
+                        LoggedCommands.waitUntil("Wait for Algae Release Point", () -> s_Elevator.aboveStop(Stop.ALGAE_RELEASE)),
+                        RobotState.ScoreGamePiece()))),
+            RobotState.ScoreGamePiece(),
+            () -> RobotState.haveAlgae() && !RobotState.algaeToProcessor()));
 
         L4.onTrue(SetStop(Stop.L4));
         L3.onTrue(SetStop(Stop.L3));
@@ -317,20 +331,6 @@ public class RobotContainer {
                     Commands.runOnce(() -> LEDSubsystem.triggerError())));
         }
         driver.povDown().whileTrue(RobotState.UnjamCoral());
-
-        if (Constants.atHQ) {
-            driver.povRight().onTrue(
-                LoggedCommands.deadline("Toss Algae",
-                    Commands.sequence(
-                        s_Elevator.WaitForStop(Stop.L4_SCORE),
-                        Commands.waitSeconds(1.5)),
-                    s_Elevator.Move(Stop.L4_SCORE),
-                    LoggedCommands.sequence("Wait to release Algae",
-                        LoggedCommands.waitUntil("Wait for Algae Release Point", () -> s_Elevator.aboveStop(Stop.ALGAE_RELEASE)),
-                        Commands.runOnce(() -> LEDSubsystem.triggerError()),
-                        RobotState.ScoreGamePiece())
-                    ));
-        }
     }
 
     /** 

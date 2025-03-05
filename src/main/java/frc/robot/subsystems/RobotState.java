@@ -134,8 +134,11 @@ public class RobotState extends SubsystemBase {
         return LoggedCommands.race("Wait for Coral with timeout", WaitForCoral(), Commands.waitSeconds(timeout));
     }
 
-    private static boolean algaeToProcessor() {
-        return !optAlgaeBargeOnly.get() && PoseSubsystem.getInstance().nearProcessor();
+    public static boolean algaeToProcessor() {
+        if (pose == null) pose = PoseSubsystem.getInstance();
+        if (pose == null) return false;
+
+        return !optAlgaeBargeOnly.get() && pose.nearProcessor();
     }
 
     public static Command ScoreGamePiece() {
