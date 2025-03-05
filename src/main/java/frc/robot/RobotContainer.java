@@ -353,27 +353,27 @@ public class RobotContainer {
     }
 
     private void buildAutos(SendableChooser<Command> chooser) {
-        Command autoECD = LoggedCommands.sequence("ECD",
+        Command autoECD = LoggedCommands.sequence("ECDB",
             Commands.either(
                 LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
                 LoggedCommands.log("Skip back up option"),
                 optBackupPush::get),
             SetStop(Stop.L4),
-            // LoggedCommands.proxy(PathCommand("Start to near E")),
             LoggedCommands.proxy(PathCommand("Start towards EF")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
             LoggedCommands.proxy(PathCommand("E to CS")),
             LoggedCommands.proxy(BackUpAndWaitForCoral()),
-            // LoggedCommands.proxy(PathCommand("CS to near C")),
             LoggedCommands.proxy(PathCommand("CS towards CD")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, true)),
             LoggedCommands.proxy(PathCommand("C to CS")),
             LoggedCommands.proxy(BackUpAndWaitForCoral()),
-            // LoggedCommands.proxy(PathCommand("CS to near D")),
             LoggedCommands.proxy(PathCommand("CS towards CD")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false)),
             LoggedCommands.runOnce("Set Swerve Drive to Coast", () -> s_Swerve.setDriveMotorsToCoast()),
-            LoggedCommands.proxy(PathCommand("D to CS")));
+            LoggedCommands.proxy(PathCommand("D to CS")),
+            LoggedCommands.proxy(BackUpAndWaitForCoral()),
+            LoggedCommands.proxy(PathCommand("CS to near B")),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)));
 
         // startingPaths.put(autoECD, "Start to near E");
         startingPaths.put(autoECD, "Start towards EF");
