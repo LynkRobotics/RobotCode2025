@@ -29,7 +29,7 @@ import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 
 public final class Constants {
-    public static final boolean atHQ = false;
+    public static final boolean atHQ = true;
     public static final double stickDeadband = 0.1;
     public static final double driveStickSensitivity = 1.00; 
     public static final double turnStickSensitivity = 1.00;
@@ -260,7 +260,7 @@ public final class Constants {
             L2_ALGAE (38.0 - Constants.Elevator.endEffectorHeight),
             L3       (50.5 - Constants.Elevator.endEffectorHeight),
             L3_ALGAE (53.5 - Constants.Elevator.endEffectorHeight),
-            ALGAE_RELEASE(60.0 - Constants.Elevator.endEffectorHeight),
+            ALGAE_RELEASE(64.0 - Constants.Elevator.endEffectorHeight),
             L4       (74.5 - Constants.Elevator.endEffectorHeight),
             L4_SCORE (77.0 - Constants.Elevator.endEffectorHeight);
     
@@ -289,7 +289,7 @@ public final class Constants {
         public static final double advanceVoltage = -1.20;
         public static final double scoreVoltage = -3.5;
         public static final double algaeVoltage = 3.00;
-        public static final double algaeOutVoltage = -10.00;
+        public static final double algaeOutVoltage = -12.00;
         public static final double minimumAlgaeAcquireCurrent = 80.0;
         public static final double minimumAlgaeHoldCurrent = 60.0;
 
