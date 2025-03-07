@@ -1,12 +1,8 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.CANdiConfiguration;
-import com.ctre.phoenix6.hardware.CANdi;
-import com.ctre.phoenix6.signals.S1CloseStateValue;
-import com.ctre.phoenix6.signals.S2CloseStateValue;
-
+import com.ctre.phoenix6.configs.CANrangeConfiguration;
+import com.ctre.phoenix6.hardware.CANrange;
 import dev.doglog.DogLog;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,8 +17,10 @@ import frc.robot.Constants.Elevator.Stop;
 public class RobotState extends SubsystemBase {
     private static RobotState instance;
     private static PoseSubsystem pose;
-    private static final CANdi candi;
-    private static final DigitalInput indexSensor;
+    private static final CANrange indexSensor;
+    private static final CANrange flipperSensor;
+    private static final CANrange finalSensor;
+    // private static final DigitalInput indexSensor;
     private static boolean elevatorAtZero = false;
     private static GamePieceState gamePieceState = GamePieceState.NONE;
     private static final Timer L1Timer = new Timer();
@@ -50,9 +48,10 @@ public class RobotState extends SubsystemBase {
     }
 
     static {
-        indexSensor = new DigitalInput(Constants.indexSensorID);
-        candi = new CANdi(Constants.candiID, Constants.candiBus);
-
+        indexSensor = new CANrange(0, "rio");
+        flipperSensor = new CANrange(1, "rio");
+        finalSensor = new CANrange(2, "rio");
+        
         applyConfigs();
     }
     
@@ -70,24 +69,26 @@ public class RobotState extends SubsystemBase {
     }
 
     public static void applyConfigs() {
-        var CANdiConfig = new CANdiConfiguration();
+        var CANrangeConfig = new CANrangeConfiguration(); //should there be different configs for different canranges
+        CANrangeConfig.ProximityParams.MinSignalStrengthForValidMeasurement = 2500; //TODO: tune
+        CANrangeConfig.ProximityParams.ProximityThreshold = 0.4;
+        CANrangeConfig.ProximityParams.ProximityHysteresis = 0.01;
 
-        CANdiConfig.DigitalInputs.S1CloseState = S1CloseStateValue.CloseWhenNotLow;
-        CANdiConfig.DigitalInputs.S2CloseState = S2CloseStateValue.CloseWhenNotLow;
-
-        candi.getConfigurator().apply(CANdiConfig);
+        indexSensor.getConfigurator().apply(CANrangeConfig);
+        flipperSensor.getConfigurator().apply(CANrangeConfig); //should these be different configs?
+        finalSensor.getConfigurator().apply(CANrangeConfig); //should these be different configs?
     }
 
     public static boolean getIntakeSensor() {
-        return indexSensor.get();
+        return indexSensor.getIsDetected().getValue();
     }
 
     public static boolean getFinalSensor() {
-        return candi.getS1Closed().getValue();
+        return finalSensor.getIsDetected().getValue();
     }
     
     public static boolean getFlipperSensor() {
-        return candi.getS2Closed().getValue();
+        return flipperSensor.getIsDetected().getValue();
     }
 
     public static boolean haveCoral() {
