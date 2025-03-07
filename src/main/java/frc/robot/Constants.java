@@ -13,6 +13,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -365,6 +366,8 @@ public final class Constants {
         private static final Translation2d bonusOffset = new Translation2d(bonusStandoff, 0.0);
         private static final Translation2d leftBonusOffset = leftOffset.plus(bonusOffset);
         private static final Translation2d rightBonusOffset = rightOffset.plus(bonusOffset);
+        private static final Transform2d leftL1Transform = new Transform2d(Units.inchesToMeters(-3.0), Units.inchesToMeters(-6.0), Rotation2d.fromDegrees(10));
+        private static final Transform2d rightL1Transform = new Transform2d(Units.inchesToMeters(-3.0), Units.inchesToMeters(6.0), Rotation2d.fromDegrees(-10));
 
         public static final double elevatorNoDownDistance = reefToFaceDistance + reefOffset + Units.inchesToMeters(12.0);
 
@@ -380,7 +383,9 @@ public final class Constants {
                 directionFromCenter = Rotation2d.fromDegrees(directionDegrees);
                 alignMiddle = new Pose2d(reefCenter.plus(centerOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
                 alignLeft = new Pose2d(reefCenter.plus(leftOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
+                leftL1 = alignLeft.transformBy(leftL1Transform);
                 alignRight = new Pose2d(reefCenter.plus(rightOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
+                rightL1 = alignRight.transformBy(rightL1Transform);
                 approachMiddle = new Pose2d(reefCenter.plus(centerApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
                 approachLeft = new Pose2d(reefCenter.plus(leftApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
                 approachRight = new Pose2d(reefCenter.plus(rightApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
@@ -391,6 +396,7 @@ public final class Constants {
 
             public final Rotation2d directionFromCenter;
             public final Pose2d alignLeft, alignMiddle, alignRight;
+            public final Pose2d leftL1, rightL1;
             public final Pose2d approachLeft, approachMiddle, approachRight;
             public final Pose2d alignBonusLeft, alignBonusRight;
             public final boolean algaeHigh;

@@ -168,7 +168,11 @@ public class RobotContainer {
                                     s_Elevator::nearNextStop),
                                 Commands.either(
                                     new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true, true),
-                                    new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true, true),
+                                    Commands.either(
+                                        new PIDSwerve(s_Swerve, s_Pose, left ? face.leftL1 : face.rightL1, true, true),
+                                        new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true, true),
+                                        () -> RobotState.getNextStop() == Stop.L1
+                                    ),
                                     optBonusCoralStandoff::get)),
                             Commands.either(
                                 Commands.sequence(
@@ -182,7 +186,10 @@ public class RobotContainer {
                         RobotState.WaitForCoralReady(),
                         LoggedCommands.deadline("Wait for auto up",
                             s_Elevator.WaitForNext(),
-                            s_Elevator.AutoElevatorUp(left ? face.alignLeft.getTranslation() : face.alignRight.getTranslation())))),
+                            Commands.either(
+                                s_Elevator.AutoElevatorUp(left ? face.leftL1.getTranslation() : face.rightL1.getTranslation()),
+                                s_Elevator.AutoElevatorUp(left ? face.alignLeft.getTranslation() : face.alignRight.getTranslation()),
+                                () -> RobotState.getNextStop() == Stop.L1)))),
                 RobotState.ScoreGamePiece()),
             LoggedCommands.log("Cannot score coral without coral"),
             RobotState::haveCoral);
