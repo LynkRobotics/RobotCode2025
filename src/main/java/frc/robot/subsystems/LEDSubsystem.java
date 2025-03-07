@@ -80,9 +80,9 @@ public class LEDSubsystem extends SubsystemBase {
         DISABLED(new LEDConfig(Color.disabled)),
         NORMAL(new LEDConfig(Color.lynk)),
         CORAL_L1(new LEDConfig(Color.magenta, 0.25)),
-        CORAL_L2(new LEDConfig(Color.white, 0.50)),
+        CORAL_L2(new LEDConfig(Color.green, 0.50)),
         CORAL_L3(new LEDConfig(Color.magenta, 0.75)),
-        CORAL_L4(new LEDConfig(Color.white, 1.00)),
+        CORAL_L4(new LEDConfig(Color.green, 1.00)),
         CORAL_UNKNOWN(new LEDConfig(Color.dim)),
         ALGAE_INTAKING(new LEDConfig(Color.cheesyBlue, true)),
         ALGAE(new LEDConfig(Color.cheesyBlue)),
@@ -161,6 +161,7 @@ public class LEDSubsystem extends SubsystemBase {
                 } else if (RobotState.haveCoral()) {
                     switch (RobotState.getNextStop()) {
                         case L1:
+                        case L1_SCORE:
                             state = LEDState.CORAL_L1;
                             break;
                         case L2:

@@ -256,6 +256,7 @@ public final class Constants {
             // Intake occurs at zero
             SAFE     (Constants.Elevator.baseHeight + 5.0),
             L1       (27.0 - Constants.Elevator.endEffectorHeight),
+            L1_SCORE (29.5 - Constants.Elevator.endEffectorHeight),
             L2       (34.5 - Constants.Elevator.endEffectorHeight),
             L2_ALGAE (38.0 - Constants.Elevator.endEffectorHeight),
             L3       (50.5 - Constants.Elevator.endEffectorHeight),
@@ -314,7 +315,9 @@ public final class Constants {
         public static final double unjamVoltage = 1.00;
         public static final double rejectVoltage = 0.50;
         
-        public static final double unjamTime = 0.5;
+        public static final double minIntakeVelocity = 12.0;
+        public static final int maxStallCount = 15;
+        public static final double unjamTime = 0.4;
     }
 
     public static final class Pose {
@@ -348,7 +351,7 @@ public final class Constants {
         public static final Translation2d reefCenter = new Translation2d(Units.inchesToMeters(176.75), fieldWidth / 2.0);
         public static final double reefToFaceDistance = reefCenter.getX() - Units.inchesToMeters(144.0);
         public static final double branchSeparation = Units.inchesToMeters(12.0 + 15.0 / 16.0);
-        public static final double bargeShotDistanceFromCenter = Units.inchesToMeters(60.0);
+        public static final double bargeShotDistanceFromCenter = Units.inchesToMeters(54.0);
         public static final double bargeShotX = fieldLength / 2.0 - bargeShotDistanceFromCenter - robotFrameLength / 2.0 - bumperWidth;
 
         // Offset to the reef face, not at the branches, but on the faces directly in front

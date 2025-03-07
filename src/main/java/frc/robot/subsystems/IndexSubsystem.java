@@ -22,6 +22,8 @@ public class IndexSubsystem extends SubsystemBase {
     private final VoltageOut unjamControl = new VoltageOut(Constants.Index.unjamVoltage).withEnableFOC(true);
     private boolean intaking = false;
 
+    private int stallCount = 0;
+
     public IndexSubsystem() {
         /* Devices */
         motor = new TalonFX(Constants.Index.motorID, Constants.Index.canBus);
@@ -46,6 +48,16 @@ public class IndexSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         GamePieceState gamePieceState = RobotState.getGamePieceState();
+        double velocity = motor.getVelocity().getValueAsDouble();
+
+        if (gamePieceState == GamePieceState.INTAKING_CORAL && Math.abs(velocity) < Constants.Index.minIntakeVelocity) {
+            stallCount++;
+            if (stallCount > Constants.Index.maxStallCount) {
+                RobotState.UnjamCoral().schedule();
+            }
+        } else {
+            stallCount = 0;
+        }
 
         if (gamePieceState == GamePieceState.INTAKING_CORAL || gamePieceState == GamePieceState.FEEDING_CORAL) {
             if (!intaking) {
@@ -64,5 +76,8 @@ public class IndexSubsystem extends SubsystemBase {
                 intaking = false;
             }
         }
+
+        DogLog.log("Index/TorqueCurrent", motor.getTorqueCurrent().getValueAsDouble());
+        DogLog.log("Index/Velocity", velocity);
     }
 }
