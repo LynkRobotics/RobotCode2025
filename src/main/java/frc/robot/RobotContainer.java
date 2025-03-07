@@ -25,6 +25,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -212,19 +213,44 @@ public class RobotContainer {
             this::shouldMirror);
     }
 
+    private Command Rumble() {
+        return Commands.deadline(
+            Commands.waitSeconds(0.5),
+            LoggedCommands.startEnd("Rumble",
+                () -> {
+                    driver.setRumble(RumbleType.kLeftRumble, 1.0);
+                    driver.setRumble(RumbleType.kRightRumble, 1.0);
+                },
+                () -> {
+                    driver.setRumble(RumbleType.kLeftRumble, 0.0);
+                    driver.setRumble(RumbleType.kRightRumble, 0.0);
+                }));
+    }
+
+    private Command TriggerRumble() {
+        Command rumbleCommmand = Rumble();
+
+        return Commands.runOnce(() -> rumbleCommmand.schedule());
+    }
+
     private Command DeAlgaefy(ReefFace face) {
         Stop algaeStop = face.algaeHigh ? Stop.L3_ALGAE: Stop.L2_ALGAE;
 
-        return LoggedCommands.sequence("Auto Align Middle " + face.toString(),
-            RobotState.IntakeAlgae(),
-            LoggedCommands.parallel("PID Align Middle " + face.toString(),
-                Commands.sequence(
-                    new PIDSwerve(s_Swerve, s_Pose, face.approachMiddle, true, false),
-                    new PIDSwerve(s_Swerve, s_Pose, face.alignMiddle, true, true),
-                    s_Swerve.Stop()),
-                LoggedCommands.deadline("Wait for auto up",
-                    s_Elevator.WaitForStop(algaeStop),
-                    s_Elevator.AutoElevatorUp(face.alignMiddle.getTranslation(), algaeStop))));
+        return LoggedCommands.deadline("Acquire Algae from " + face.toString(),
+            Commands.sequence(
+                LoggedCommands.waitUntil("Wait for Algae", RobotState::haveAlgae),
+                TriggerRumble()),
+            LoggedCommands.sequence("Auto Align Middle " + face.toString(),
+                RobotState.IntakeAlgae(),
+                LoggedCommands.parallel("PID Align Middle " + face.toString(),
+                    Commands.sequence(
+                        new PIDSwerve(s_Swerve, s_Pose, face.approachMiddle, true, false),
+                        new PIDSwerve(s_Swerve, s_Pose, face.alignMiddle, true, true),
+                        s_Swerve.Stop()),
+                    LoggedCommands.deadline("Wait for auto up",
+                        s_Elevator.WaitForStop(algaeStop),
+                        s_Elevator.AutoElevatorUp(face.alignMiddle.getTranslation(), algaeStop)))))
+            .handleInterrupt(() -> { if (!RobotState.haveAlgae()) RobotState.setNoAlgae(); });
     }
     
     private void setFaceCommands(ReefFace face) {
