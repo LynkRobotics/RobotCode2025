@@ -213,6 +213,15 @@ public class RobotContainer {
             this::shouldMirror);
     }
 
+    private Command DealgaefyMaybeMirror(ReefFace face) {
+        ReefFace mirroredFace = mirroredFaces.get(face);
+
+        return Commands.either(
+            DealgaefyMaybeMirror(mirroredFace),
+            DealgaefyMaybeMirror(face),
+            this::shouldMirror);
+    }
+
     private Command Rumble() {
         return Commands.deadline(
             Commands.waitSeconds(0.5),
@@ -417,6 +426,7 @@ public class RobotContainer {
 
     private void buildAutos(SendableChooser<Command> chooser) {
         Command autoECD = LoggedCommands.sequence("ECDB",
+            LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
             Commands.either(
                 LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
                 LoggedCommands.log("Skip back up option"),
@@ -443,6 +453,7 @@ public class RobotContainer {
         addAutoCommand(chooser, autoECD);
 
         Command autoBA = LoggedCommands.sequence("BA",
+            LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
             Commands.either(
                 LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
                 LoggedCommands.log("Skip back up option"),
@@ -459,7 +470,7 @@ public class RobotContainer {
         startingPaths.put(autoBA, "Start to near B");
         addAutoCommand(chooser, autoBA);
 
-        Command autoG = LoggedCommands.sequence("G",
+        Command autoG = LoggedCommands.sequence("G + Barge Shots",
             LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
             Commands.either(
                 LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
@@ -468,7 +479,14 @@ public class RobotContainer {
             SetStop(Stop.L4),
             LoggedCommands.proxy(PathCommand("Start to near G")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.GH, true)),
-            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.GH.approachLeft, true, true)));
+            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.GH.approachMiddle, true, false)),
+            LoggedCommands.proxy(DealgaefyMaybeMirror(ReefFace.GH)),
+            LoggedCommands.proxy(PathCommand("GH to Barge Shot")),
+            BargeShot(),
+            LoggedCommands.proxy(PathCommand("Barge Shot to near IJ")),
+            LoggedCommands.proxy(DealgaefyMaybeMirror(ReefFace.IJ)), 
+            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.IJ.approachMiddle, true, false)),
+            BargeShot());
 
         startingPaths.put(autoG, "Start to near G");
         addAutoCommand(chooser, autoG);
