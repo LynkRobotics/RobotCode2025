@@ -263,6 +263,20 @@ public class RobotContainer {
         return Commands.either(mirrorCommand, pathCommand, this::shouldMirror);
     }
 
+    private Command BargeShot() {
+        return LoggedCommands.sequence("Score Algae into Barge",
+                Commands.defer(() -> new PIDSwerve(s_Swerve, s_Pose, s_Pose.bargeShotPose(), false, true), Set.of(s_Swerve)),
+                s_Swerve.Stop(),
+                LoggedCommands.deadline("Toss Algae",
+                    Commands.sequence(
+                        s_Elevator.WaitForStop(Stop.L4_SCORE),
+                        Commands.waitSeconds(0.5)), // TODO Remove delay?
+                    s_Elevator.Move(Stop.L4_SCORE),
+                    LoggedCommands.sequence("Wait to release Algae",
+                        LoggedCommands.waitUntil("Wait for Algae Release Point", () -> s_Elevator.aboveStop(Stop.ALGAE_RELEASE)),
+                        RobotState.ScoreGamePiece())));
+    }
+
     /**
      * Use this method to define your button->command mappings. Buttons can be
      * created by
@@ -287,21 +301,7 @@ public class RobotContainer {
         // Only used in case of automation failure
         moveElevator.whileTrue(s_Elevator.GoToNext());
         zero.onTrue(s_Elevator.Zero());
-
-        score.whileTrue(Commands.either(
-            LoggedCommands.sequence("Score Algae into Barge",
-                Commands.defer(() -> new PIDSwerve(s_Swerve, s_Pose, s_Pose.bargeShotPose(), false, true), Set.of(s_Swerve)),
-                s_Swerve.Stop(),
-                LoggedCommands.deadline("Toss Algae",
-                    Commands.sequence(
-                        s_Elevator.WaitForStop(Stop.L4_SCORE),
-                        Commands.waitSeconds(0.5)), // TODO Remove delay?
-                    s_Elevator.Move(Stop.L4_SCORE),
-                    LoggedCommands.sequence("Wait to release Algae",
-                        LoggedCommands.waitUntil("Wait for Algae Release Point", () -> s_Elevator.aboveStop(Stop.ALGAE_RELEASE)),
-                        RobotState.ScoreGamePiece()))),
-            RobotState.ScoreGamePiece(),
-            () -> RobotState.haveAlgae() && !RobotState.algaeToProcessor()));
+        score.whileTrue(RobotState.ScoreGamePiece()); // Also useful to dump Algae or put it into Processor
 
         L4.onTrue(SetStop(Stop.L4));
         L3.onTrue(SetStop(Stop.L3));
@@ -311,13 +311,19 @@ public class RobotContainer {
         goLeft.whileTrue(
             Commands.either(
                 Commands.select(alignLeftCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation())),
-                Commands.select(deAlgaefyLeftCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation())),
+                Commands.either(
+                    BargeShot(),
+                    Commands.select(deAlgaefyLeftCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation())),
+                    RobotState::haveAlgae),
                 RobotState::haveCoral));
 
         goRight.whileTrue(
             Commands.either(
                 Commands.select(alignRightCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation())),
-                Commands.select(deAlgaefyRightCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation())),
+                Commands.either(
+                    BargeShot(),
+                    Commands.select(deAlgaefyRightCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation())),
+                    RobotState::haveAlgae),
                 RobotState::haveCoral));
 
         alignmentToggle.onTrue(LoggedCommands.runOnce("Toggle Alignment", optAutoReefAiming::toggle));
