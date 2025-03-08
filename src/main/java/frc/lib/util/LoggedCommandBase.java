@@ -8,17 +8,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 // Wraps a command with logging
 public class LoggedCommandBase extends Command {
-  public LoggedCommandBase() {
-    super();
-  }
+    public LoggedCommandBase() {
+        super();
+    }
 
-  @Override
-  public void initialize() {
-    LoggedCommands.logInit(this);
-  }
+    @Override
+    public void initialize() {
+        LoggedCommands.logInit(this);
+    }
 
-  @Override
-  public void end(boolean interrupted) {
-    LoggedCommands.logFinish(this, interrupted);
-  }
+    @Override
+    public void end(boolean interrupted) {
+        LoggedCommands.logFinish(this, interrupted);
+    }
 }

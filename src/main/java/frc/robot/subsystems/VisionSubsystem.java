@@ -28,78 +28,80 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import dev.doglog.DogLog;
 
 public class VisionSubsystem extends SubsystemBase {
-  private static VisionSubsystem instance;
-  private final PhotonCamera camera;
-  private final PhotonPoseEstimator photonEstimator;
-  private AprilTagFieldLayout kTagLayout;
-  private final Field2d field = new Field2d();
-  private Pose2d lastPose  = new Pose2d();
-  private PhotonPipelineResult lastResult = null;
-  private boolean updateDashboard = true;
-  private static final TunableOption optUpdateVisionDashboard = new TunableOption("Update vision dashboard", false);
+    private static VisionSubsystem instance;
+    private final PhotonCamera camera;
+    private final PhotonPoseEstimator photonEstimator;
+    private AprilTagFieldLayout kTagLayout;
+    private final Field2d field = new Field2d();
+    private Pose2d lastPose = new Pose2d();
+    private PhotonPipelineResult lastResult = null;
+    private boolean updateDashboard = true;
+    private static final TunableOption optUpdateVisionDashboard = new TunableOption("Update vision dashboard", false);
 
-  public VisionSubsystem() {
-    assert(instance == null);
-    instance = this;
+    public VisionSubsystem() {
+        assert (instance == null);
+        instance = this;
 
-    camera = new PhotonCamera(Constants.Vision.cameraName);
+        camera = new PhotonCamera(Constants.Vision.cameraName);
 
-    kTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
-    
-    photonEstimator = new PhotonPoseEstimator(kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Constants.Vision.robotToCam);
-    photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        kTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
 
-    SmartDashboard.putData("Vision/Field", field);
-  }
-  public static VisionSubsystem getInstance() {
-    return instance;
-  }
+        photonEstimator = new PhotonPoseEstimator(kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                Constants.Vision.robotToCam);
+        photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
-  public boolean updatePoseEstimate(PoseEstimator<SwerveModulePosition[]> poseEstimator) {
-    List<PhotonPipelineResult> results = camera.getAllUnreadResults();
-    boolean newResult = !results.isEmpty();
-    boolean updated = false;
-    
-    // TODO Consider updating standard deviations
-
-    for (PhotonPipelineResult result : results) {
-      lastResult = result;
-
-      Optional<EstimatedRobotPose> optRobotPose = photonEstimator.update(result);
-
-      if (!optRobotPose.isPresent()) {
-        continue;
-      }
-
-      EstimatedRobotPose robotPose = optRobotPose.get();
-      lastPose = robotPose.estimatedPose.toPose2d();
-      field.setRobotPose(lastPose);
-      DogLog.log("Vision/Pose Difference", PoseSubsystem.getInstance().getPose().getTranslation().getDistance(lastPose.getTranslation()));
-      if (poseEstimator != null) {
-        poseEstimator.addVisionMeasurement(lastPose, robotPose.timestampSeconds);
-        updated = true;
-      }
+        SmartDashboard.putData("Vision/Field", field);
     }
 
-    if (updateDashboard) {
-      SmartDashboard.putBoolean("Vision/New result", newResult);
+    public static VisionSubsystem getInstance() {
+        return instance;
     }
 
-    return updated;
-  }
+    public boolean updatePoseEstimate(PoseEstimator<SwerveModulePosition[]> poseEstimator) {
+        List<PhotonPipelineResult> results = camera.getAllUnreadResults();
+        boolean newResult = !results.isEmpty();
+        boolean updated = false;
 
-  @Override
-  public void periodic() {
-    boolean haveTarget = lastResult.hasTargets();
+        // TODO Consider updating standard deviations
 
-    DogLog.log("Vision/Result", lastResult.toString());
-    DogLog.log("Vision/Have target(s)", haveTarget);
-    DogLog.log("Vision/Pose", lastPose);
+        for (PhotonPipelineResult result : results) {
+            lastResult = result;
 
-    if (optUpdateVisionDashboard.get()) {
-      SmartDashboard.putString("Vision/Result", lastResult.toString());
-      SmartDashboard.putBoolean("Vision/Have target(s)", haveTarget);
-      SmartDashboard.putString("Vision/Last pose", PoseSubsystem.prettyPose(lastPose));
+            Optional<EstimatedRobotPose> optRobotPose = photonEstimator.update(result);
+
+            if (!optRobotPose.isPresent()) {
+                continue;
+            }
+
+            EstimatedRobotPose robotPose = optRobotPose.get();
+            lastPose = robotPose.estimatedPose.toPose2d();
+            field.setRobotPose(lastPose);
+            DogLog.log("Vision/Pose Difference", PoseSubsystem.getInstance().getPose().getTranslation().getDistance(lastPose.getTranslation()));
+            if (poseEstimator != null) {
+                poseEstimator.addVisionMeasurement(lastPose, robotPose.timestampSeconds);
+                updated = true;
+            }
+        }
+
+        if (updateDashboard) {
+            SmartDashboard.putBoolean("Vision/New result", newResult);
+        }
+
+        return updated;
     }
-  }
+
+    @Override
+    public void periodic() {
+        boolean haveTarget = lastResult.hasTargets();
+
+        DogLog.log("Vision/Result", lastResult.toString());
+        DogLog.log("Vision/Have target(s)", haveTarget);
+        DogLog.log("Vision/Pose", lastPose);
+
+        if (optUpdateVisionDashboard.get()) {
+            SmartDashboard.putString("Vision/Result", lastResult.toString());
+            SmartDashboard.putBoolean("Vision/Have target(s)", haveTarget);
+            SmartDashboard.putString("Vision/Last pose", PoseSubsystem.prettyPose(lastPose));
+        }
+    }
 }
