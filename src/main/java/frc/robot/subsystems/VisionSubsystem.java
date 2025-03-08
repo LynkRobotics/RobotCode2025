@@ -16,6 +16,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
@@ -32,12 +33,8 @@ public class VisionSubsystem extends SubsystemBase {
   private final PhotonPoseEstimator photonEstimator;
   private AprilTagFieldLayout kTagLayout;
   private final Field2d field = new Field2d();
-  private double lastEstTimestamp = 0.0;
-  private boolean haveTarget = false;
-  private boolean haveSpeakerTarget = false;
-  private boolean haveAmpTarget = false;
-  private boolean haveSourceTarget = false;
   private Pose2d lastPose  = new Pose2d();
+  private PhotonPipelineResult lastResult = null;
   private boolean updateDashboard = true;
   private static final TunableOption optUpdateVisionDashboard = new TunableOption("Update vision dashboard", false);
 
@@ -52,64 +49,57 @@ public class VisionSubsystem extends SubsystemBase {
     photonEstimator = new PhotonPoseEstimator(kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Constants.Vision.robotToCam);
     photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
-    SmartDashboard.putData("vision/Field", field);
+    SmartDashboard.putData("Vision/Field", field);
   }
   public static VisionSubsystem getInstance() {
     return instance;
   }
 
   public boolean updatePoseEstimate(PoseEstimator<SwerveModulePosition[]> poseEstimator) {
-    PhotonPipelineResult result = camera.getLatestResult(); // TODO Switch to getAllUnreadResults(), but need to revisit periodic(), too
-    Optional<EstimatedRobotPose> optVisionEst = photonEstimator.update(result);
-    EstimatedRobotPose visionEst;
-    double latestTimestamp;
-    boolean newResult;
+    List<PhotonPipelineResult> results = camera.getAllUnreadResults();
+    boolean newResult = !results.isEmpty();
+    boolean updated = false;
     
     // TODO Consider updating standard deviations
 
-    if (!optVisionEst.isPresent()) {
-      return false;
-    }
-    visionEst = optVisionEst.get();
-    latestTimestamp = visionEst.timestampSeconds;
-    newResult = Math.abs(latestTimestamp - lastEstTimestamp) > 1e-5;
-    if (updateDashboard) {
-      SmartDashboard.putBoolean("vision/New result", newResult);
-    }
-    if (!newResult) {
-      return false;
-    }
-    lastEstTimestamp = latestTimestamp;
-    lastPose = visionEst.estimatedPose.toPose2d();
-    field.setRobotPose(lastPose);
-    DogLog.log("Vision/Pose Difference", PoseSubsystem.getInstance().getPose().getTranslation().getDistance(lastPose.getTranslation()));
-    if (poseEstimator != null) {
-      poseEstimator.addVisionMeasurement(lastPose, lastEstTimestamp);
-    }
-    return true;
-  }
+    for (PhotonPipelineResult result : results) {
+      lastResult = result;
 
-  public Pose2d lastPose() {
-    return lastPose;
+      Optional<EstimatedRobotPose> optRobotPose = photonEstimator.update(result);
+
+      if (!optRobotPose.isPresent()) {
+        continue;
+      }
+
+      EstimatedRobotPose robotPose = optRobotPose.get();
+      lastPose = robotPose.estimatedPose.toPose2d();
+      field.setRobotPose(lastPose);
+      DogLog.log("Vision/Pose Difference", PoseSubsystem.getInstance().getPose().getTranslation().getDistance(lastPose.getTranslation()));
+      if (poseEstimator != null) {
+        poseEstimator.addVisionMeasurement(lastPose, robotPose.timestampSeconds);
+        updated = true;
+      }
+    }
+
+    if (updateDashboard) {
+      SmartDashboard.putBoolean("Vision/New result", newResult);
+    }
+
+    return updated;
   }
 
   @Override
   public void periodic() {
-    PhotonPipelineResult result = camera.getLatestResult();
+    boolean haveTarget = lastResult.hasTargets();
 
-    haveTarget = result.hasTargets();
-
-    DogLog.log("Vision/Result", result.toString());
+    DogLog.log("Vision/Result", lastResult.toString());
     DogLog.log("Vision/Have target(s)", haveTarget);
     DogLog.log("Vision/Pose", lastPose);
 
     if (optUpdateVisionDashboard.get()) {
-      SmartDashboard.putString("vision/Result", result.toString());
-      SmartDashboard.putBoolean("vision/Have target(s)", haveTarget);
-      SmartDashboard.putBoolean("vision/Have speaker target", haveSpeakerTarget);
-      SmartDashboard.putBoolean("vision/Have amp target", haveAmpTarget);
-      SmartDashboard.putBoolean("vision/Have source target", haveSourceTarget);
-      SmartDashboard.putString("vision/Last pose", String.format("%01.2f, %01.2f @ %01.1f", lastPose.getX(), lastPose.getY(), lastPose.getRotation().getDegrees()));
+      SmartDashboard.putString("Vision/Result", lastResult.toString());
+      SmartDashboard.putBoolean("Vision/Have target(s)", haveTarget);
+      SmartDashboard.putString("Vision/Last pose", PoseSubsystem.prettyPose(lastPose));
     }
   }
 }

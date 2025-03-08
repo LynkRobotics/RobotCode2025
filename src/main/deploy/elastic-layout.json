@@ -27,7 +27,7 @@
             "height": 320.0,
             "type": "Field",
             "properties": {
-              "topic": "/SmartDashboard/vision/Field",
+              "topic": "/SmartDashboard/Vision/Field",
               "period": 0.06,
               "field_game": "Reefscape",
               "robot_width": 0.81,
