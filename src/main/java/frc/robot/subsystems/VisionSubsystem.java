@@ -92,7 +92,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        boolean haveTarget = lastResult.hasTargets();
+        boolean haveTarget = lastResult != null && lastResult.hasTargets();
 
         DogLog.log("Vision/Result", lastResult.toString());
         DogLog.log("Vision/Have target(s)", haveTarget);
