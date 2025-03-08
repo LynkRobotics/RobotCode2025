@@ -217,8 +217,8 @@ public class RobotContainer {
         ReefFace mirroredFace = mirroredFaces.get(face);
 
         return Commands.either(
-            DealgaefyMaybeMirror(mirroredFace),
-            DealgaefyMaybeMirror(face),
+            DeAlgaefy(mirroredFace),
+            DeAlgaefy(face),
             this::shouldMirror);
     }
 
