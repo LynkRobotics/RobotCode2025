@@ -150,8 +150,8 @@
           },
           {
             "title": "Automatically Aim at Reef",
-            "x": 448.0,
-            "y": 544.0,
+            "x": 544.0,
+            "y": 672.0,
             "width": 192.0,
             "height": 128.0,
             "type": "Toggle Button",
@@ -224,6 +224,19 @@
               "topic": "/SmartDashboard/Pose/Nearest Face",
               "period": 0.06,
               "data_type": "string"
+            }
+          },
+          {
+            "title": "Override Climber Timing",
+            "x": 448.0,
+            "y": 544.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Toggle Button",
+            "properties": {
+              "topic": "/SmartDashboard/TunableOptions/Override Climber Timing",
+              "period": 0.06,
+              "data_type": "boolean"
             }
           }
         ]

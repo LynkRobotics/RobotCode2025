@@ -332,11 +332,13 @@ public final class Constants {
         public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
         public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
         /* Motor Control Values */
-        public static final double deployVoltage = -1.00;
+        public static final double deployVoltage = 1.00;
         public static final double retractVoltage = -1.50;
 
         public static final double deployedPosition = 10.0;
-        public static final double retractedPosition = 0.0;
+        public static final double retractedPosition = -2.0;
+
+        public static final int timeCutoff = 30;
     }
 
     public static final class Pose {
