@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.Constants.Elevator.Stop;
 
 public class ElevatorSubsystem extends SubsystemBase {
@@ -44,8 +45,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double lastPosition = 0.0;
     private double desiredPosition = -1.0;
     private boolean zeroing = false;
-    private boolean movingToSafety = false;
-    private boolean safetyDeferred = false;
     private boolean autoUp = false;
     private Timer scoreTimer = new Timer();
     
@@ -235,6 +234,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             height = Constants.Elevator.baseHeight;
         }
         DogLog.log("Elevator/Status", "Move to height " + String.format("%1.1f", height));
+        targetHeight = height;
 
         double position = (height - Constants.Elevator.baseHeight) * Constants.Elevator.rotPerInch;
         setPosition(position);
@@ -380,6 +380,39 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
     
     public void initDefaultCommand() {
+        Commands.startRun(
+            () -> {
+                lastTargetHeight = targetHeight = currentHeight;
+            },
+            () -> {
+                Stop coralStop = Stop.L1;
+                double lastTargetHeight;
+                double targetHeight;
+                double currentHeight = getHeight(leftMotor.getPosition().getValueAsDouble());
+
+                // Hold at a raised position
+                if (RobotState.coralReady()) {
+                    if (lastTargetHeight < safeStop.height || RobotState.elevatorDownAllowed()) {
+                            targetHeight = safeStop.height;
+                        } else {
+                            targetHeight = currentHeight;
+                        }
+                    }
+                    if (lastTargetHeight != targetHeight) {
+                        setHeight(targetHeight);
+                    }
+                } else { // Hold at Zero
+                    if (!atZero && !zeroing) {
+                            if (targetHeight != Stop.SAFE.height) {
+                                targetHeight = Stop.SAFE.height;
+                                setHeight(targetHeight);
+                            } else if (currentHeight <= (Stop.SAFE.height + safeStopError)) {
+                                zero(); zeroing = true;
+                            }
+                        }
+                    }
+                }
+            }, this);
         setDefaultCommand(LoggedCommands.either("Elevator Default Command",
             MoveToSafety(),
             LoggedCommands.sequence("Defer Elevator Safety",
