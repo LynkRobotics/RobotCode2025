@@ -94,7 +94,10 @@ public class VisionSubsystem extends SubsystemBase {
     public void periodic() {
         boolean haveTarget = lastResult != null && lastResult.hasTargets();
 
-        DogLog.log("Vision/Result", lastResult.toString());
+        // TODO Belongs in periodic() or elsewhere?
+        if (lastResult != null) {
+            DogLog.log("Vision/Result", lastResult.toString());
+        }
         DogLog.log("Vision/Have target(s)", haveTarget);
         DogLog.log("Vision/Pose", lastPose);
 
