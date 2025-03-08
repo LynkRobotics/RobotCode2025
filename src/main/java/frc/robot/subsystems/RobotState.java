@@ -50,9 +50,9 @@ public class RobotState extends SubsystemBase {
     }
 
     static {
-        indexSensor = new CANrange(0, "rio");
-        flipperSensor = new CANrange(1, "rio");
-        finalSensor = new CANrange(2, "rio");
+        indexSensor = new CANrange(1, "rio");
+        flipperSensor = new CANrange(2, "rio");
+        finalSensor = new CANrange(3, "rio");
         
         applyConfigs();
     }
