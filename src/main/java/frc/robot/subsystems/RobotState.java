@@ -21,7 +21,6 @@ public class RobotState extends SubsystemBase {
     private static final CANrange indexSensor;
     private static final CANrange flipperSensor;
     private static final CANrange finalSensor;
-    // private static final DigitalInput indexSensor;
     private static boolean elevatorAtZero = false;
     private static GamePieceState gamePieceState = GamePieceState.NONE;
     private static final Timer L1Timer = new Timer();
@@ -81,16 +80,21 @@ public class RobotState extends SubsystemBase {
         finalSensor.getConfigurator().apply(CANrangeConfig); //should these be different configs?
     }
 
+    /*
+     * NOTE: For compatibility, we invert the sensor results
+     * TODO Revisit
+     */
+
     public static boolean getIntakeSensor() {
-        return indexSensor.getIsDetected().getValue();
+        return !indexSensor.getIsDetected().getValue();
     }
 
     public static boolean getFinalSensor() {
-        return finalSensor.getIsDetected().getValue();
+        return !finalSensor.getIsDetected().getValue();
     }
     
     public static boolean getFlipperSensor() {
-        return flipperSensor.getIsDetected().getValue();
+        return !flipperSensor.getIsDetected().getValue();
     }
 
     public static boolean haveCoral() {
