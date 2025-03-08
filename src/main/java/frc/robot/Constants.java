@@ -321,6 +321,24 @@ public final class Constants {
         public static final double unjamTime = 0.4;
     }
 
+    public static final class Climber {
+        /* IDs */
+        public static final int motorID = 46;
+        /* CANbus */
+        public static final String canBus = "rio";
+        /* Motor Config Values */
+        public static final double peakForwardVoltage = 12.0; 
+        public static final double peakReverseVoltage = -12.0; 
+        public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
+        public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
+        /* Motor Control Values */
+        public static final double deployVoltage = -1.00;
+        public static final double retractVoltage = -1.50;
+
+        public static final double deployedPosition = 10.0;
+        public static final double retractedPosition = 0.0;
+    }
+
     public static final class Pose {
         public static final int pigeonID = 1;
 

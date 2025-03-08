@@ -73,6 +73,7 @@ public class RobotContainer {
     private final EndEffectorSubsystem s_EndEffector;
     @SuppressWarnings ("unused")
     private final IndexSubsystem s_Index;
+    private final ClimberSubsystem s_Climber;
 
     /* Autonomous Control */
     private final SendableChooser<Command> autoChooser;
@@ -114,6 +115,7 @@ public class RobotContainer {
         s_EndEffector = new EndEffectorSubsystem();
         s_LED = new LEDSubsystem();
         s_Index = new IndexSubsystem();
+        s_Climber = new ClimberSubsystem();
 
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
@@ -371,29 +373,31 @@ public class RobotContainer {
         alignmentToggle.onTrue(LoggedCommands.runOnce("Toggle Alignment", optAutoReefAiming::toggle));
 
         if (Constants.atHQ) {
-            driver.povUp().whileTrue(
-                Commands.sequence(
-                    new PIDSwerve(s_Swerve, s_Pose, new Pose2d(4.48, 1.67, Rotation2d.fromDegrees(91)), false, false),
-                    s_Swerve.Stop(),
-                    Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached Debug Position")),
-                    Commands.runOnce(() -> LEDSubsystem.triggerError())));
-            driver.povRight().onTrue(
-                LoggedCommands.sequence("Test Drive -- 5 meters",
-                    Commands.runOnce(() -> s_Pose.setPose(new Pose2d(2.0, 7.0, Rotation2d.kZero))),
-                    PathCommand("Test Drive - 5m"),
-                    s_Swerve.Stop(),
-                    Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached End of Path")),
-                    Commands.runOnce(() -> LEDSubsystem.triggerError())));
-            driver.povLeft().onTrue(
-                LoggedCommands.sequence("Test Drive -- 2.5 meters",
-                    Commands.runOnce(() -> s_Pose.setPose(new Pose2d(2.0, 7.0, Rotation2d.kZero))),
-                    LoggedCommands.logWithName("2.5 m path", PathCommand("Test Drive - 2.5m")),
-                    LoggedCommands.logWithName("Stop", s_Swerve.Stop()),
-                    Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached End of Path")),
-                    LoggedCommands.runOnce("Test End", () -> LEDSubsystem.triggerError())));
+            // driver.povUp().whileTrue(
+            //     Commands.sequence(
+            //         new PIDSwerve(s_Swerve, s_Pose, new Pose2d(4.48, 1.67, Rotation2d.fromDegrees(91)), false, false),
+            //         s_Swerve.Stop(),
+            //         Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached Debug Position")),
+            //         Commands.runOnce(() -> LEDSubsystem.triggerError())));
+            // driver.povRight().onTrue(
+            //     LoggedCommands.sequence("Test Drive -- 5 meters",
+            //         Commands.runOnce(() -> s_Pose.setPose(new Pose2d(2.0, 7.0, Rotation2d.kZero))),
+            //         PathCommand("Test Drive - 5m"),
+            //         s_Swerve.Stop(),
+            //         Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached End of Path")),
+            //         Commands.runOnce(() -> LEDSubsystem.triggerError())));
+            // driver.povLeft().onTrue(
+            //     LoggedCommands.sequence("Test Drive -- 2.5 meters",
+            //         Commands.runOnce(() -> s_Pose.setPose(new Pose2d(2.0, 7.0, Rotation2d.kZero))),
+            //         LoggedCommands.logWithName("2.5 m path", PathCommand("Test Drive - 2.5m")),
+            //         LoggedCommands.logWithName("Stop", s_Swerve.Stop()),
+            //         Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached End of Path")),
+            //         LoggedCommands.runOnce("Test End", () -> LEDSubsystem.triggerError())));
         }
 
-        driver.povDown().whileTrue(RobotState.UnjamCoral());
+        driver.povLeft().onTrue(RobotState.UnjamCoral());
+        driver.povDown().onTrue(s_Climber.Deploy());
+        driver.povUp().whileTrue(s_Climber.Retract());
     }
 
     /** 
