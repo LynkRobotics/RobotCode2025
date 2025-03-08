@@ -11,7 +11,6 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -65,6 +64,7 @@ public class VisionSubsystem extends SubsystemBase {
         // TODO Consider updating standard deviations
 
         for (PhotonPipelineResult result : results) {
+            DogLog.log("Vision/Targets", result.getTargets().stream().mapToInt(tgt -> tgt.getFiducialId()).toArray());
             lastResult = result;
 
             Optional<EstimatedRobotPose> optRobotPose = photonEstimator.update(result);
