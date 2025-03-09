@@ -757,9 +757,9 @@
           },
           {
             "title": "Stop",
-            "x": 0.0,
-            "y": 256.0,
-            "width": 512.0,
+            "x": 256.0,
+            "y": 0.0,
+            "width": 256.0,
             "height": 128.0,
             "type": "Command",
             "properties": {
@@ -784,7 +784,7 @@
           {
             "title": "Set Voltage",
             "x": 256.0,
-            "y": 416.0,
+            "y": 288.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Command",
@@ -797,7 +797,7 @@
           {
             "title": "Direct Voltage",
             "x": 64.0,
-            "y": 416.0,
+            "y": 288.0,
             "width": 192.0,
             "height": 128.0,
             "type": "Text Display",
@@ -945,7 +945,7 @@
           },
           {
             "title": "Moving",
-            "x": 256.0,
+            "x": 544.0,
             "y": 0.0,
             "width": 128.0,
             "height": 128.0,
@@ -979,7 +979,7 @@
           },
           {
             "title": "In Range",
-            "x": 512.0,
+            "x": 864.0,
             "y": 0.0,
             "width": 128.0,
             "height": 128.0,
@@ -996,7 +996,7 @@
           },
           {
             "title": "Stalled",
-            "x": 384.0,
+            "x": 704.0,
             "y": 0.0,
             "width": 128.0,
             "height": 128.0,

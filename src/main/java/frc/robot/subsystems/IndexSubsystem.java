@@ -32,7 +32,7 @@ public class IndexSubsystem extends SubsystemBase {
     }
 
     public void applyConfigs() {
-        /* Configure the EndAffector Motor */
+        /* Configure the motor */
         var indexMotorConfig = new TalonFXConfiguration();
         /* Set motor to brake control */
         indexMotorConfig.MotorOutput.NeutralMode = Constants.Index.motorNeutralValue;
