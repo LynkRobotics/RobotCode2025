@@ -65,7 +65,7 @@ public class VisionSubsystem extends SubsystemBase {
         // TODO Consider updating standard deviations
 
         for (PhotonPipelineResult result : results) {
-            DogLog.log("Vision/Targets", (Transform3d[])result.getTargets().stream().map(tgt -> tgt.getBestCameraToTarget()).toArray());
+            DogLog.log("Vision/Targets", (Transform3d[])result.getTargets().stream().map(tgt -> tgt.getBestCameraToTarget()).toArray(size -> new Transform3d[size]));
             lastResult = result;
 
             Optional<EstimatedRobotPose> optRobotPose = photonEstimator.update(result);
