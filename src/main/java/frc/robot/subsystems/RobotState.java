@@ -2,7 +2,10 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.hardware.CANrange;
+import com.ctre.phoenix6.signals.UpdateModeValue;
+
 import dev.doglog.DogLog;
+import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -71,13 +74,18 @@ public class RobotState extends SubsystemBase {
 
     public static void applyConfigs() {
         var CANrangeConfig = new CANrangeConfiguration(); //should there be different configs for different canranges
-        CANrangeConfig.ProximityParams.MinSignalStrengthForValidMeasurement = 2500; //TODO: tune
-        CANrangeConfig.ProximityParams.ProximityThreshold = 0.4;
-        CANrangeConfig.ProximityParams.ProximityHysteresis = 0.01;
+        CANrangeConfig.ToFParams.UpdateMode = UpdateModeValue.ShortRangeUserFreq;
+        CANrangeConfig.FovParams.FOVRangeX = 6.75; // Minimum
+        CANrangeConfig.FovParams.FOVRangeY = 6.75; // Minimum
+        CANrangeConfig.ProximityParams.ProximityThreshold = 0.30;
+        // CANrangeConfig.ProximityParams.ProximityHysteresis = 0.01;
 
-        indexSensor.getConfigurator().apply(CANrangeConfig);
         flipperSensor.getConfigurator().apply(CANrangeConfig); //should these be different configs?
         finalSensor.getConfigurator().apply(CANrangeConfig); //should these be different configs?
+
+        CANrangeConfig.ProximityParams.ProximityThreshold = 0.10;
+        // CANrangeConfig.ProximityParams.ProximityHysteresis = 0.01;
+        indexSensor.getConfigurator().apply(CANrangeConfig);
     }
 
     /*
