@@ -453,7 +453,8 @@ public class RobotContainer {
             LoggedCommands.proxy(PathCommand("D to CS")),
             LoggedCommands.proxy(BackUpAndWaitForCoral()),
             LoggedCommands.proxy(PathCommand("CS to near B")),
-            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)));
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
+            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachRight, true, false)));
 
         // startingPaths.put(autoECD, "Start to near E");
         startingPaths.put(autoECD, "Start towards EF");
