@@ -3,6 +3,7 @@ package frc.robot;
 import static frc.robot.Options.optAutoReefAiming;
 import static frc.robot.Options.optBackupPush;
 import static frc.robot.Options.optBonusCoralStandoff;
+import static frc.robot.Options.optInvertAlgae;
 import static frc.robot.Options.optMirrorAuto;
 
 import java.util.Collections;
@@ -243,6 +244,7 @@ public class RobotContainer {
 
     private Command DeAlgaefy(ReefFace face) {
         Stop algaeStop = face.algaeHigh ? Stop.L3_ALGAE: Stop.L2_ALGAE;
+        Stop algaeInvertStop = face.algaeHigh ? Stop.L2_ALGAE : Stop.L3_ALGAE;
 
         return LoggedCommands.deadline("Acquire Algae from " + face.toString(),
             Commands.sequence(
@@ -256,6 +258,10 @@ public class RobotContainer {
                         new PIDSwerve(s_Swerve, s_Pose, face.alignMiddle, true, true),
                         s_Swerve.Stop()),
                     LoggedCommands.deadline("Wait for auto up",
+                        Commands.either(
+                            s_Elevator.WaitForStop(algaeInvertStop),
+                            s_Elevator.WaitForStop(algaeStop),
+                            optInvertAlgae),
                         s_Elevator.WaitForStop(algaeStop),
                         s_Elevator.AutoElevatorUp(face.alignMiddle.getTranslation(), algaeStop)))))
             .handleInterrupt(() -> { if (!RobotState.haveAlgae()) RobotState.setNoAlgae(); });

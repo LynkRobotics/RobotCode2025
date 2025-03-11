@@ -1254,6 +1254,18 @@
               "period": 0.06,
               "show_type": true
             }
+          },
+          {
+            "title": "Invert Algae Location",
+            "x": 0.0,
+            "y": 512.0,
+            "width": 416.0,
+            "height": 128.0,
+            "type": "Toggle Button",
+            "properties": {
+              "topic": "/SmartDashboard/TunableOptions/Invert Algae Location",
+              "period": 0.06
+            }
           }
         ]
       }
