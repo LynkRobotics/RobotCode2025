@@ -161,7 +161,6 @@ public class LEDSubsystem extends SubsystemBase {
                 } else if (RobotState.haveCoral()) {
                     switch (RobotState.getNextStop()) {
                         case L1:
-                        case L1_SCORE:
                             state = LEDState.CORAL_L1;
                             break;
                         case L2:

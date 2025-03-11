@@ -11,6 +11,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.Elevator.Stop;
 import frc.robot.subsystems.RobotState.GamePieceState;
 
 public class EndEffectorSubsystem extends SubsystemBase {
@@ -20,6 +21,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
     private final VoltageOut feedControl = new VoltageOut(Constants.EndEffector.feedVoltage).withEnableFOC(true);
     private final VoltageOut advanceControl = new VoltageOut(Constants.EndEffector.advanceVoltage).withEnableFOC(true);
     private final VoltageOut scoreControl = new VoltageOut(Constants.EndEffector.scoreVoltage).withEnableFOC(true);
+    private final VoltageOut scoreL1Control = new VoltageOut(Constants.EndEffector.scoreL1Voltage).withEnableFOC(true);
     private final VoltageOut algaeControl = new VoltageOut(Constants.EndEffector.algaeVoltage).withEnableFOC(false);
     private final VoltageOut algaeOutControl = new VoltageOut(Constants.EndEffector.algaeOutVoltage).withEnableFOC(false);
     private final VoltageOut algaeHoldControl = new VoltageOut(Constants.EndEffector.algaeHoldVoltage).withEnableFOC(false);
@@ -92,8 +94,13 @@ public class EndEffectorSubsystem extends SubsystemBase {
                     motor.stopMotor();
                     break;
                 case SCORING_CORAL:
-                    DogLog.log("EndEffector/Control", "Scoring coral");
-                    motor.setControl(scoreControl);
+                    if (RobotState.getNextStop() == Stop.L1) {
+                        DogLog.log("EndEffector/Control", "Scoring L1 coral");
+                        motor.setControl(scoreL1Control);
+                    } else {
+                        DogLog.log("EndEffector/Control", "Scoring coral");
+                        motor.setControl(scoreControl);
+                    }
                     break;
                 default:
                     DogLog.log("EndEffector/Control", "Stopping (unhandled state)");
