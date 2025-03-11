@@ -11,7 +11,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -65,11 +65,9 @@ public class VisionSubsystem extends SubsystemBase {
         // TODO Consider updating standard deviations
 
         for (PhotonPipelineResult result : results) {
-            DogLog.log("Vision/Targets", (Transform3d[])result.getTargets().stream().map(tgt -> tgt.getBestCameraToTarget()).toArray(size -> new Transform3d[size]));
             lastResult = result;
 
             Optional<EstimatedRobotPose> optRobotPose = photonEstimator.update(result);
-
             if (!optRobotPose.isPresent()) {
                 continue;
             }
@@ -77,7 +75,10 @@ public class VisionSubsystem extends SubsystemBase {
             EstimatedRobotPose robotPose = optRobotPose.get();
             lastPose = robotPose.estimatedPose.toPose2d();
             field.setRobotPose(lastPose);
+
+            DogLog.log("Vision/TargetPoses", (Pose3d[])result.getTargets().stream().map(tgt -> robotPose.estimatedPose.plus(Constants.Vision.robotToCam).plus(tgt.getBestCameraToTarget())).toArray(size -> new Pose3d[size]));
             DogLog.log("Vision/Pose Difference", PoseSubsystem.getInstance().getPose().getTranslation().getDistance(lastPose.getTranslation()));
+            
             if (poseEstimator != null) {
                 poseEstimator.addVisionMeasurement(lastPose, robotPose.timestampSeconds);
                 updated = true;
