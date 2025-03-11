@@ -126,8 +126,6 @@ public class RobotContainer {
                 this::speedLimitFactor
             ));
 
-        SmartDashboard.putData("Command scheduler", CommandScheduler.getInstance());
-
         // Default named commands for PathPlanner
         SmartDashboard.putNumber("auto/Startup delay", 0.0);
         autoNamedCommand("Startup delay", Commands.defer(() -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()));

@@ -77,7 +77,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         mechanism = offset.append(new MechanismLigament2d("elevator", Units.inchesToMeters(Constants.Elevator.baseHeight), 90.0, Units.inchesToMeters(Constants.Elevator.thickness), new Color8Bit(0xBF, 0x57, 0x00)));
 
         // TODO Get mechanism working
-        SmartDashboard.putData("Elevator/mechanism", canvas);
+        // SmartDashboard.putData("Elevator/mechanism", canvas);
         initDefaultCommand();
     }
 
