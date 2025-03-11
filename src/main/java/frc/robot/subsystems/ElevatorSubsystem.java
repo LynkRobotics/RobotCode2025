@@ -35,7 +35,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final VoltageOut voltageOut = new VoltageOut(0).withEnableFOC(true);
     // TODO Use MotionMagicVoltage?
     private final PositionVoltage positionVoltage = new PositionVoltage(0.0).withEnableFOC(true);
-    private final MechanismLigament2d mechanism;
+    // private final MechanismLigament2d mechanism;
 
     private Stop nextStop = Stop.SAFE;
 
@@ -69,12 +69,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putData("Elevator/SetZero", SetZero());
         SmartDashboard.putData("Elevator/FastZero", FastZero());
 
-        double canvasWidth = Constants.Swerve.wheelBase * 1.5;
-        double canvasHeight = Units.inchesToMeters(Constants.Elevator.maxHeight) * 1.25;
-        Mechanism2d canvas = new Mechanism2d(canvasWidth, canvasHeight, new Color8Bit(Color.kLightGray));
-        MechanismRoot2d origin = canvas.getRoot("elevator-root", canvasWidth / 2.0, 0);
-        MechanismLigament2d offset = origin.append(new MechanismLigament2d("elevator-offset", canvasWidth / 2.0  - Units.inchesToMeters(Constants.Elevator.setback), 0.0, 1.0, new Color8Bit()));
-        mechanism = offset.append(new MechanismLigament2d("elevator", Units.inchesToMeters(Constants.Elevator.baseHeight), 90.0, Units.inchesToMeters(Constants.Elevator.thickness), new Color8Bit(0xBF, 0x57, 0x00)));
+        // double canvasWidth = Constants.Swerve.wheelBase * 1.5;
+        // double canvasHeight = Units.inchesToMeters(Constants.Elevator.maxHeight) * 1.25;
+        // Mechanism2d canvas = new Mechanism2d(canvasWidth, canvasHeight, new Color8Bit(Color.kLightGray));
+        // MechanismRoot2d origin = canvas.getRoot("elevator-root", canvasWidth / 2.0, 0);
+        // MechanismLigament2d offset = origin.append(new MechanismLigament2d("elevator-offset", canvasWidth / 2.0  - Units.inchesToMeters(Constants.Elevator.setback), 0.0, 1.0, new Color8Bit()));
+        // mechanism = offset.append(new MechanismLigament2d("elevator", Units.inchesToMeters(Constants.Elevator.baseHeight), 90.0, Units.inchesToMeters(Constants.Elevator.thickness), new Color8Bit(0xBF, 0x57, 0x00)));
 
         // TODO Get mechanism working
         // SmartDashboard.putData("Elevator/mechanism", canvas);
@@ -475,6 +475,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Elevator/L4", atStop(Stop.L4));
         SmartDashboard.putString("Elevator/Next Stop", nextStop.toString());
 
-        mechanism.setLength(Units.inchesToMeters(height));
+        // mechanism.setLength(Units.inchesToMeters(height));
     }
 }
