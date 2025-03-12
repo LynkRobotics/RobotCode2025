@@ -259,7 +259,7 @@ public final class Constants {
             L1       (29.0 - Constants.Elevator.endEffectorHeight),
             L2       (34.5 - Constants.Elevator.endEffectorHeight),
             L2_ALGAE (38.0 - Constants.Elevator.endEffectorHeight),
-            L3       (50.5 - Constants.Elevator.endEffectorHeight),
+            L3       (49.5 - Constants.Elevator.endEffectorHeight),
             L3_ALGAE (53.5 - Constants.Elevator.endEffectorHeight),
             ALGAE_RELEASE(63.5 - Constants.Elevator.endEffectorHeight),
             L4       (74.5 - Constants.Elevator.endEffectorHeight),
@@ -365,7 +365,7 @@ public final class Constants {
         public static final double bumperWidth = Units.inchesToMeters(3.2);
         public static final double reefStandoff = Units.inchesToMeters(2.0);
         public static final double reefOffset = robotFrameLength / 2.0 + bumperWidth + reefStandoff;
-        public static final double reefExtraOffset = Units.inchesToMeters(6.0);
+        public static final double reefExtraOffset = Units.inchesToMeters(9.0);
         public static final double bonusStandoff = Units.inchesToMeters(4.0);
 
         // Locations from the Blue Alliance perspective
