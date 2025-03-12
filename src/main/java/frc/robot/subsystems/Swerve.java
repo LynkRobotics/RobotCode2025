@@ -131,7 +131,7 @@ public class Swerve extends SubsystemBase {
 
     public void setDriveMotorsToCoast(){
         for(SwerveModule mod : mSwerveMods){
-            mod.setCoastMode();  
+            mod.setDriveCoastMode();  
         }
         DogLog.log("Swerve/Status", "Coasted Swerve Drive Motors");
     }
@@ -145,7 +145,7 @@ public class Swerve extends SubsystemBase {
 
     public void setDriveMotorsToBrake(){
         for(SwerveModule mod : mSwerveMods){
-            mod.setBrakeMode();  
+            mod.setDriveBrakeMode();
         }
         DogLog.log("Swerve/Status", "Braked Swerve Drive Motors");
     }

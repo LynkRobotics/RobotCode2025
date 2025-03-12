@@ -114,6 +114,10 @@ public class SwerveModule {
         mAngleMotor.setNeutralMode(NeutralModeValue.Brake);
     }
 
+    public void setDriveBrakeMode(){
+        mDriveMotor.setNeutralMode(NeutralModeValue.Brake);
+    }
+
     public SwerveModuleState getState(){
         return new SwerveModuleState(
             Conversions.RPSToMPS(mDriveMotor.getVelocity().getValueAsDouble(), Constants.Swerve.wheelCircumference), 
