@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.Options.optIndexEnabled;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -50,30 +52,32 @@ public class IndexSubsystem extends SubsystemBase {
         GamePieceState gamePieceState = RobotState.getGamePieceState();
         double velocity = motor.getVelocity().getValueAsDouble();
 
-        if (gamePieceState == GamePieceState.INTAKING_CORAL && Math.abs(velocity) < Constants.Index.minIntakeVelocity) {
-            stallCount++;
-            if (stallCount > Constants.Index.maxStallCount) {
-                RobotState.UnjamCoral().schedule();
+        if (optIndexEnabled.get()) {
+            if (gamePieceState == GamePieceState.INTAKING_CORAL && Math.abs(velocity) < Constants.Index.minIntakeVelocity) {
+                stallCount++;
+                if (stallCount > Constants.Index.maxStallCount) {
+                    RobotState.UnjamCoral().schedule();
+                }
+            } else {
+                stallCount = 0;
             }
-        } else {
-            stallCount = 0;
-        }
 
-        if (gamePieceState == GamePieceState.INTAKING_CORAL || gamePieceState == GamePieceState.FEEDING_CORAL) {
-            if (!intaking) {
-                DogLog.log("Index/Control", "Intaking");
-                motor.setControl(intakeControl);
-                intaking = true;
-            }
-        } else if (gamePieceState == GamePieceState.UNJAMMING_CORAL) {
-            DogLog.log("Index/Control", "Unjamming");
-            motor.setControl(unjamControl);
-            intaking = false;
-        } else {
-            if (intaking) {
-                DogLog.log("Index/Control", "Rejecting");
-                motor.setControl(rejectControl);
+            if (gamePieceState == GamePieceState.INTAKING_CORAL || gamePieceState == GamePieceState.FEEDING_CORAL) {
+                if (!intaking) {
+                    DogLog.log("Index/Control", "Intaking");
+                    motor.setControl(intakeControl);
+                    intaking = true;
+                }
+            } else if (gamePieceState == GamePieceState.UNJAMMING_CORAL) {
+                DogLog.log("Index/Control", "Unjamming");
+                motor.setControl(unjamControl);
                 intaking = false;
+            } else {
+                if (intaking) {
+                    DogLog.log("Index/Control", "Rejecting");
+                    motor.setControl(rejectControl);
+                    intaking = false;
+                }
             }
         }
 
