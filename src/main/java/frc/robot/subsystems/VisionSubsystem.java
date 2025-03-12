@@ -76,8 +76,8 @@ public class VisionSubsystem extends SubsystemBase {
             lastPose = robotPose.estimatedPose.toPose2d();
             field.setRobotPose(lastPose);
 
-            DogLog.log("Vision/TargetPoses", (Pose3d[])result.getTargets().stream().map(tgt -> robotPose.estimatedPose.plus(Constants.Vision.robotToCam).plus(tgt.getBestCameraToTarget())).toArray(size -> new Pose3d[size]));
-            DogLog.log("Vision/Pose Difference", PoseSubsystem.getInstance().getPose().getTranslation().getDistance(lastPose.getTranslation()));
+            // DogLog.log("Vision/TargetPoses", (Pose3d[])result.getTargets().stream().map(tgt -> robotPose.estimatedPose.plus(Constants.Vision.robotToCam).plus(tgt.getBestCameraToTarget())).toArray(size -> new Pose3d[size]));
+            // DogLog.log("Vision/Pose Difference", PoseSubsystem.getInstance().getPose().getTranslation().getDistance(lastPose.getTranslation()));
             
             if (poseEstimator != null) {
                 poseEstimator.addVisionMeasurement(lastPose, robotPose.timestampSeconds);
@@ -98,15 +98,15 @@ public class VisionSubsystem extends SubsystemBase {
 
         // TODO Belongs in periodic() or elsewhere?
         if (lastResult != null) {
-            DogLog.log("Vision/Result", lastResult.toString());
+            // DogLog.log("Vision/Result", lastResult.toString());
         }
         DogLog.log("Vision/Have target(s)", haveTarget);
         DogLog.log("Vision/Pose", lastPose);
 
         if (optUpdateVisionDashboard.get()) {
-            SmartDashboard.putString("Vision/Result", lastResult.toString());
+            // SmartDashboard.putString("Vision/Result", lastResult.toString());
             SmartDashboard.putBoolean("Vision/Have target(s)", haveTarget);
-            SmartDashboard.putString("Vision/Last pose", PoseSubsystem.prettyPose(lastPose));
+            // SmartDashboard.putString("Vision/Last pose", PoseSubsystem.prettyPose(lastPose));
         }
     }
 }

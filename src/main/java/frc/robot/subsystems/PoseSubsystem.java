@@ -93,21 +93,21 @@ public class PoseSubsystem extends SubsystemBase {
             DogLog.log("Pose/PP Current Pose", currentPose);
         });
 
-        SmartDashboard.putData("Pose/Heading", new Sendable() {
-            @Override
-            public void initSendable(SendableBuilder builder) {
-                builder.setSmartDashboardType("Gyro");
-                builder.addDoubleProperty("Value", () -> getHeading().getDegrees(), null);
-            }
-        });
+        // SmartDashboard.putData("Pose/Heading", new Sendable() {
+        //     @Override
+        //     public void initSendable(SendableBuilder builder) {
+        //         builder.setSmartDashboardType("Gyro");
+        //         builder.addDoubleProperty("Value", () -> getHeading().getDegrees(), null);
+        //     }
+        // });
 
-        SmartDashboard.putData("Pose/Reef Bearing", new Sendable() {
-            @Override
-            public void initSendable(SendableBuilder builder) {
-                builder.setSmartDashboardType("Gyro");
-                builder.addDoubleProperty("Value", () -> reefBearing(getPose().getTranslation()).getDegrees(), null);
-            }
-        });
+        // SmartDashboard.putData("Pose/Reef Bearing", new Sendable() {
+        //     @Override
+        //     public void initSendable(SendableBuilder builder) {
+        //         builder.setSmartDashboardType("Gyro");
+        //         builder.addDoubleProperty("Value", () -> reefBearing(getPose().getTranslation()).getDegrees(), null);
+        //     }
+        // });
     }
 
     public static PoseSubsystem getInstance() {
@@ -313,8 +313,8 @@ public class PoseSubsystem extends SubsystemBase {
         Pose2d pose = getPose();
         field.setRobotPose(pose);
 
-        SmartDashboard.putString("Pose/Pose", prettyPose(pose));
-        SmartDashboard.putData("Pose/Gyro (raw)", gyro);
+        // SmartDashboard.putString("Pose/Pose", prettyPose(pose));
+        // SmartDashboard.putData("Pose/Gyro (raw)", gyro);
  
         double roll = getGyroRoll().getDegrees();
         double pitch = getGyroPitch().getDegrees();
