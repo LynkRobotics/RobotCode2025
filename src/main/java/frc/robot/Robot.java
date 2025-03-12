@@ -161,11 +161,10 @@ public class Robot extends TimedRobot {
 
     public static boolean isRed() {
         var alliance = DriverStation.getAlliance();
-        if (alliance.isPresent()) {
-            DogLog.log("DriverStation/Status", "Alliance recorded as " + alliance.toString());
-            return alliance.get() == DriverStation.Alliance.Red;
-        }
-        DogLog.log("DriverStation/Status", "Driver Station not Connected, Defaulting to Blue");
-        return false;
+
+        assert alliance.isPresent() : "Cannot determine Alliance color";
+
+        DogLog.log("DriverStation/Status", "Alliance recorded as " + alliance.toString());
+        return alliance.get() == DriverStation.Alliance.Red;
     }
 }

@@ -13,14 +13,14 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
+// import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+// import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+// import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+// import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
+// import edu.wpi.first.wpilibj.util.Color;
+// import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -36,7 +36,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final VoltageOut voltageOut = new VoltageOut(0).withEnableFOC(true);
     // TODO Use MotionMagicVoltage?
     private final PositionVoltage positionVoltage = new PositionVoltage(0.0).withEnableFOC(true);
-    private final MechanismLigament2d mechanism;
+    // private final MechanismLigament2d mechanism;
 
     private Stop nextStop = Stop.SAFE;
 
@@ -68,15 +68,15 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putData("Elevator/SetZero", SetZero());
         SmartDashboard.putData("Elevator/FastZero", FastZero());
 
-        double canvasWidth = Constants.Swerve.wheelBase * 1.5;
-        double canvasHeight = Units.inchesToMeters(Constants.Elevator.maxHeight) * 1.25;
-        Mechanism2d canvas = new Mechanism2d(canvasWidth, canvasHeight, new Color8Bit(Color.kLightGray));
-        MechanismRoot2d origin = canvas.getRoot("elevator-root", canvasWidth / 2.0, 0);
-        MechanismLigament2d offset = origin.append(new MechanismLigament2d("elevator-offset", canvasWidth / 2.0  - Units.inchesToMeters(Constants.Elevator.setback), 0.0, 1.0, new Color8Bit()));
-        mechanism = offset.append(new MechanismLigament2d("elevator", Units.inchesToMeters(Constants.Elevator.baseHeight), 90.0, Units.inchesToMeters(Constants.Elevator.thickness), new Color8Bit(0xBF, 0x57, 0x00)));
+        // double canvasWidth = Constants.Swerve.wheelBase * 1.5;
+        // double canvasHeight = Units.inchesToMeters(Constants.Elevator.maxHeight) * 1.25;
+        // Mechanism2d canvas = new Mechanism2d(canvasWidth, canvasHeight, new Color8Bit(Color.kLightGray));
+        // MechanismRoot2d origin = canvas.getRoot("elevator-root", canvasWidth / 2.0, 0);
+        // MechanismLigament2d offset = origin.append(new MechanismLigament2d("elevator-offset", canvasWidth / 2.0  - Units.inchesToMeters(Constants.Elevator.setback), 0.0, 1.0, new Color8Bit()));
+        // mechanism = offset.append(new MechanismLigament2d("elevator", Units.inchesToMeters(Constants.Elevator.baseHeight), 90.0, Units.inchesToMeters(Constants.Elevator.thickness), new Color8Bit(0xBF, 0x57, 0x00)));
 
         // TODO Get mechanism working
-        SmartDashboard.putData("Elevator/mechanism", canvas);
+        // SmartDashboard.putData("Elevator/mechanism", canvas);
         initDefaultCommand();
     }
 
@@ -471,14 +471,6 @@ public class ElevatorSubsystem extends SubsystemBase {
             setHeight(Stop.L4_SCORE.height); // TODO Avoid repeatedly calling ... even though it might not be an issue?
         }
 
-        if (RobotState.coralScoring() && atStop(Stop.L1)) {
-            // if (!scoreTimer.isRunning()) {
-            //     scoreTimer.restart();
-            // } else if (scoreTimer.hasElapsed(0.25)) {
-                setHeight(Stop.L1_SCORE.height); // TODO Avoid repeatedly calling ... even though it might not be an issue?
-            // }
-        }
-
         // If we have Coral ready, and the Elevator is still at zero, cancel the current default command so that it runs again with the L1 default
         if (RobotState.coralReady() && RobotState.getElevatorAtZero()) {
             Command currentCommand = getCurrentCommand();
@@ -516,6 +508,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Elevator/L4", atStop(Stop.L4));
         SmartDashboard.putString("Elevator/Next Stop", nextStop.toString());
 
-        mechanism.setLength(Units.inchesToMeters(height));
+        // mechanism.setLength(Units.inchesToMeters(height));
     }
 }

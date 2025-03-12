@@ -3,6 +3,7 @@ package frc.robot;
 import static frc.robot.Options.optAutoReefAiming;
 import static frc.robot.Options.optBackupPush;
 import static frc.robot.Options.optBonusCoralStandoff;
+import static frc.robot.Options.optInvertAlgae;
 import static frc.robot.Options.optMirrorAuto;
 
 import java.util.Collections;
@@ -31,7 +32,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -73,6 +73,7 @@ public class RobotContainer {
     private final EndEffectorSubsystem s_EndEffector;
     @SuppressWarnings ("unused")
     private final IndexSubsystem s_Index;
+    private final ClimberSubsystem s_Climber;
 
     /* Autonomous Control */
     private final SendableChooser<Command> autoChooser;
@@ -114,6 +115,7 @@ public class RobotContainer {
         s_EndEffector = new EndEffectorSubsystem();
         s_LED = new LEDSubsystem();
         s_Index = new IndexSubsystem();
+        s_Climber = new ClimberSubsystem();
 
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
@@ -123,8 +125,6 @@ public class RobotContainer {
                 () -> -rotation.get() * Constants.turnStickSensitivity,
                 this::speedLimitFactor
             ));
-
-        SmartDashboard.putData("Command scheduler", CommandScheduler.getInstance());
 
         // Default named commands for PathPlanner
         SmartDashboard.putNumber("auto/Startup delay", 0.0);
@@ -217,8 +217,8 @@ public class RobotContainer {
         ReefFace mirroredFace = mirroredFaces.get(face);
 
         return Commands.either(
-            DealgaefyMaybeMirror(mirroredFace),
-            DealgaefyMaybeMirror(face),
+            DeAlgaefy(mirroredFace),
+            DeAlgaefy(face),
             this::shouldMirror);
     }
 
@@ -244,6 +244,7 @@ public class RobotContainer {
 
     private Command DeAlgaefy(ReefFace face) {
         Stop algaeStop = face.algaeHigh ? Stop.L3_ALGAE: Stop.L2_ALGAE;
+        Stop algaeInvertStop = face.algaeHigh ? Stop.L2_ALGAE : Stop.L3_ALGAE;
 
         return LoggedCommands.deadline("Acquire Algae from " + face.toString(),
             Commands.sequence(
@@ -257,6 +258,10 @@ public class RobotContainer {
                         new PIDSwerve(s_Swerve, s_Pose, face.alignMiddle, true, true),
                         s_Swerve.Stop()),
                     LoggedCommands.deadline("Wait for auto up",
+                        Commands.either(
+                            s_Elevator.WaitForStop(algaeInvertStop),
+                            s_Elevator.WaitForStop(algaeStop),
+                            optInvertAlgae),
                         s_Elevator.WaitForStop(algaeStop),
                         s_Elevator.AutoElevatorUp(face.alignMiddle.getTranslation(), algaeStop)))))
             .handleInterrupt(() -> { if (!RobotState.haveAlgae()) RobotState.setNoAlgae(); });
@@ -371,29 +376,31 @@ public class RobotContainer {
         alignmentToggle.onTrue(LoggedCommands.runOnce("Toggle Alignment", optAutoReefAiming::toggle));
 
         if (Constants.atHQ) {
-            driver.povUp().whileTrue(
-                Commands.sequence(
-                    new PIDSwerve(s_Swerve, s_Pose, new Pose2d(4.48, 1.67, Rotation2d.fromDegrees(91)), false, false),
-                    s_Swerve.Stop(),
-                    Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached Debug Position")),
-                    Commands.runOnce(() -> LEDSubsystem.triggerError())));
-            driver.povRight().onTrue(
-                LoggedCommands.sequence("Test Drive -- 5 meters",
-                    Commands.runOnce(() -> s_Pose.setPose(new Pose2d(2.0, 7.0, Rotation2d.kZero))),
-                    PathCommand("Test Drive - 5m"),
-                    s_Swerve.Stop(),
-                    Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached End of Path")),
-                    Commands.runOnce(() -> LEDSubsystem.triggerError())));
-            driver.povLeft().onTrue(
-                LoggedCommands.sequence("Test Drive -- 2.5 meters",
-                    Commands.runOnce(() -> s_Pose.setPose(new Pose2d(2.0, 7.0, Rotation2d.kZero))),
-                    LoggedCommands.logWithName("2.5 m path", PathCommand("Test Drive - 2.5m")),
-                    LoggedCommands.logWithName("Stop", s_Swerve.Stop()),
-                    Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached End of Path")),
-                    LoggedCommands.runOnce("Test End", () -> LEDSubsystem.triggerError())));
+            // driver.povUp().whileTrue(
+            //     Commands.sequence(
+            //         new PIDSwerve(s_Swerve, s_Pose, new Pose2d(4.48, 1.67, Rotation2d.fromDegrees(91)), false, false),
+            //         s_Swerve.Stop(),
+            //         Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached Debug Position")),
+            //         Commands.runOnce(() -> LEDSubsystem.triggerError())));
+            // driver.povRight().onTrue(
+            //     LoggedCommands.sequence("Test Drive -- 5 meters",
+            //         Commands.runOnce(() -> s_Pose.setPose(new Pose2d(2.0, 7.0, Rotation2d.kZero))),
+            //         PathCommand("Test Drive - 5m"),
+            //         s_Swerve.Stop(),
+            //         Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached End of Path")),
+            //         Commands.runOnce(() -> LEDSubsystem.triggerError())));
+            // driver.povLeft().onTrue(
+            //     LoggedCommands.sequence("Test Drive -- 2.5 meters",
+            //         Commands.runOnce(() -> s_Pose.setPose(new Pose2d(2.0, 7.0, Rotation2d.kZero))),
+            //         LoggedCommands.logWithName("2.5 m path", PathCommand("Test Drive - 2.5m")),
+            //         LoggedCommands.logWithName("Stop", s_Swerve.Stop()),
+            //         Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached End of Path")),
+            //         LoggedCommands.runOnce("Test End", () -> LEDSubsystem.triggerError())));
         }
 
-        driver.povDown().whileTrue(RobotState.UnjamCoral());
+        driver.povLeft().onTrue(RobotState.UnjamCoral());
+        driver.povDown().onTrue(s_Climber.Deploy());
+        driver.povUp().whileTrue(s_Climber.Retract());
     }
 
     /** 
@@ -446,7 +453,8 @@ public class RobotContainer {
             LoggedCommands.proxy(PathCommand("D to CS")),
             LoggedCommands.proxy(BackUpAndWaitForCoral()),
             LoggedCommands.proxy(PathCommand("CS to near B")),
-            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)));
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
+            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachRight, true, false)));
 
         // startingPaths.put(autoECD, "Start to near E");
         startingPaths.put(autoECD, "Start towards EF");

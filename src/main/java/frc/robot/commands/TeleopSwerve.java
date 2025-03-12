@@ -49,6 +49,7 @@ public class TeleopSwerve extends LoggedCommandBase {
         double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.stickDeadband);
         double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband);
 
+        // TODO Get *every* time?
         double teleOpMult = SmartDashboard.getNumber("TeleOp Speed Governor", 1.0);
         translationVal *= teleOpMult;
 
