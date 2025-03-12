@@ -258,13 +258,14 @@ public class RobotContainer {
                         new PIDSwerve(s_Swerve, s_Pose, face.approachMiddle, true, false),
                         new PIDSwerve(s_Swerve, s_Pose, face.alignMiddle, true, true),
                         s_Swerve.Stop()),
-                    LoggedCommands.deadline("Wait for auto up",
-                        Commands.either(
+                    Commands.either(
+                        LoggedCommands.deadline("Wait for auto up to " + algaeInvertStop,
                             s_Elevator.WaitForStop(algaeInvertStop),
+                            s_Elevator.AutoElevatorUp(face.alignMiddle.getTranslation(), algaeInvertStop)),
+                        LoggedCommands.deadline("Wait for auto up to " + algaeStop,
                             s_Elevator.WaitForStop(algaeStop),
-                            optInvertAlgae),
-                        s_Elevator.WaitForStop(algaeStop),
-                        s_Elevator.AutoElevatorUp(face.alignMiddle.getTranslation(), algaeStop)))))
+                            s_Elevator.AutoElevatorUp(face.alignMiddle.getTranslation(), algaeStop)),
+                        optInvertAlgae))))
             .handleInterrupt(() -> { if (!RobotState.haveAlgae()) RobotState.setNoAlgae(); });
     }
     
