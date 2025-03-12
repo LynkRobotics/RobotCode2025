@@ -136,6 +136,10 @@ public class Swerve extends SubsystemBase {
         DogLog.log("Swerve/Status", "Coasted Swerve Drive Motors");
     }
 
+    public Command CoastDriveMotors() {
+        return LoggedCommands.runOnce("Set Swerve Drive to Coast", this::setDriveMotorsToCoast);
+    }
+
     public void setMotorsToBrake(){
         for(SwerveModule mod : mSwerveMods){
             mod.setBrakeMode();  
@@ -148,6 +152,10 @@ public class Swerve extends SubsystemBase {
             mod.setDriveBrakeMode();
         }
         DogLog.log("Swerve/Status", "Braked Swerve Drive Motors");
+    }
+
+    public Command BrakeDriveMotors() {
+        return LoggedCommands.runOnce("Set Swerve Drive to Brake", this::setDriveMotorsToBrake);
     }
 
     public void stopSwerve(){

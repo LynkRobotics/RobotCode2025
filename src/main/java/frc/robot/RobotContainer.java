@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -449,7 +450,7 @@ public class RobotContainer {
             LoggedCommands.proxy(BackUpAndWaitForCoral()),
             LoggedCommands.proxy(PathCommand("CS towards CD")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false)),
-            LoggedCommands.runOnce("Set Swerve Drive to Coast", () -> s_Swerve.setDriveMotorsToCoast()),
+            s_Swerve.CoastDriveMotors(),
             LoggedCommands.proxy(PathCommand("D to CS")),
             LoggedCommands.proxy(BackUpAndWaitForCoral()),
             LoggedCommands.proxy(PathCommand("CS to near B")),
@@ -504,7 +505,7 @@ public class RobotContainer {
 
     public void teleopInit() {
         s_Swerve.stopSwerve();
-        s_Swerve.setDriveMotorsToBrake();
+        CommandScheduler.getInstance().schedule(s_Swerve.BrakeDriveMotors());
     }
 
     public void teleopExit() {
