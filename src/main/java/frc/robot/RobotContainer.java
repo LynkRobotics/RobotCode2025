@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
+import frc.robot.Constants.Pose.Cage;
 import frc.robot.Constants.Pose.ReefFace;
 import frc.robot.Constants.Elevator.Stop;
 import frc.robot.commands.*;
@@ -326,6 +327,19 @@ public class RobotContainer {
                         RobotState.ScoreGamePiece())));
     }
 
+    private Command AlignToCage(Cage cage) {
+        Pose2d cageAlignPose = new Pose2d(cage.location, Rotation2d.k180deg).transformBy(Constants.Pose.cageOffset);
+
+        return LoggedCommands.sequence("Align to cage " + cage,
+            LoggedCommands.runOnce("Disable reef aiming", optAutoReefAiming::disable),
+            new PIDSwerve(s_Swerve, s_Pose, cageAlignPose.transformBy(Constants.Pose.cageApproachOffset), true, false, false),
+            new PIDSwerve(s_Swerve, s_Pose, cageAlignPose, true, true, true));
+    }
+
+    private Command AlignToNearestCage() {
+        return Commands.defer(() -> AlignToCage(s_Pose.nearestCage()), Set.of(s_Swerve));
+    }
+
     /**
      * Use this method to define your button->command mappings. Buttons can be
      * created by
@@ -345,11 +359,13 @@ public class RobotContainer {
         final Trigger L2 = driver.b();
         final Trigger L1 = driver.a();
         final Trigger zero = driver.start();
+        final Trigger unjam = driver.back();
         final Trigger alignmentToggle = driver.rightStick();
 
         // Only used in case of automation failure
         moveElevator.whileTrue(s_Elevator.GoToNext());
         zero.onTrue(s_Elevator.Zero());
+        unjam.onTrue(RobotState.UnjamCoral());
         score.whileTrue(RobotState.ScoreGamePiece()); // Also useful to dump Algae or put it into Processor
 
         L4.onTrue(SetStop(Stop.L4));
@@ -400,9 +416,11 @@ public class RobotContainer {
             //         LoggedCommands.runOnce("Test End", () -> LEDSubsystem.triggerError())));
         }
 
-        driver.povLeft().onTrue(RobotState.UnjamCoral());
         driver.povDown().onTrue(s_Climber.Deploy());
         driver.povUp().whileTrue(s_Climber.Retract());
+        driver.povRight().whileTrue(LoggedCommands.parallel("Deploy and Align",
+            s_Climber.Deploy(),
+            AlignToNearestCage()));
     }
 
     /** 

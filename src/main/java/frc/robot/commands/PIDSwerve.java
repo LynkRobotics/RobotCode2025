@@ -21,8 +21,9 @@ public class PIDSwerve extends LoggedCommandBase {
     private final boolean precise;
     private final PIDController xPID, yPID;
     private final PIDController rotationPID = new PIDController(rotationKP, 0, 0);
+    private final boolean slow;
 
-    public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise) {
+    public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise, boolean slow) {
         super();
 
         if (flipIfRed) {
@@ -33,6 +34,7 @@ public class PIDSwerve extends LoggedCommandBase {
         this.s_Pose = s_Pose;
         this.targetPose = targetPose;
         this.precise = precise;
+        this.slow = slow;
         addRequirements(s_Swerve);
 
         xPID = new PIDController(precise ? translationKP : roughTranslationKP, 0, 0);
@@ -53,6 +55,10 @@ public class PIDSwerve extends LoggedCommandBase {
         rotationPID.setIntegratorRange(-Pose.rotationKS * 2, Pose.rotationKS * 2);
         rotationPID.setSetpoint(targetPose.getRotation().getDegrees());
         rotationPID.setTolerance(precise ? rotationTolerance : roughRotatationTolerance); // TODO Set derivative, too
+    }
+
+    public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise) {
+        this(s_Swerve, s_Pose, targetPose, flipIfRed, precise, false);
     }
 
     @Override
@@ -100,7 +106,7 @@ public class PIDSwerve extends LoggedCommandBase {
 
         /* Drive */
         s_Swerve.drive(
-            new Translation2d(xVal, yVal).times(maxSpeed),
+            new Translation2d(xVal, yVal).times(slow ? slowSpeed : maxSpeed),
             rotationVal * maxAngularVelocity,
             true
         );

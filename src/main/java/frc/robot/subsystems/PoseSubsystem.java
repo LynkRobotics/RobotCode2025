@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.TunableOption;
 import frc.robot.Constants;
 import frc.robot.Constants.Pose;
+import frc.robot.Constants.Pose.Cage;
 import frc.robot.Constants.Pose.ReefFace;
 import frc.robot.Robot;
 
@@ -299,6 +300,33 @@ public class PoseSubsystem extends SubsystemBase {
         }
 
         return flipIfRed(targetPose);
+    }
+
+    public Cage nearestCage() {
+        Translation2d location = flipIfRed(getPose().getTranslation());
+        Cage cage;
+        double bestDistance, distance;
+        
+        if (Constants.atHQ) {
+            cage = Cage.HQ;
+            bestDistance = location.getDistance(cage.location);
+        } else {
+            cage = Cage.CLOSE;
+            bestDistance = location.getDistance(cage.location);
+            distance = location.getDistance(Cage.MIDDLE.location);
+            if (distance < bestDistance) {
+                cage = Cage.MIDDLE;
+                bestDistance = distance;
+            }
+            distance = location.getDistance(Cage.FAR.location);
+            if (distance < bestDistance) {
+                cage = Cage.FAR;
+                bestDistance = distance;
+            }
+        }
+
+        DogLog.log("Pose/Cage", "Closest cage is " + cage + " at distance of " + String.format("%1.2f", bestDistance));
+        return cage;
     }
 
     @Override

@@ -25,6 +25,9 @@ public class LEDSubsystem extends SubsystemBase {
     private static LEDState lastState = null;
     private static boolean blinkOff = false;
 
+    private static boolean climbStarted = false;
+    private static boolean climbCompleted = false;
+
     private enum Color {
         off(0, 0, 0),
         red(255, 0, 0),
@@ -86,6 +89,8 @@ public class LEDSubsystem extends SubsystemBase {
         CORAL_UNKNOWN(new LEDConfig(Color.dim)),
         ALGAE_INTAKING(new LEDConfig(Color.cheesyBlue, true)),
         ALGAE(new LEDConfig(Color.cheesyBlue)),
+        CLIMBING(new LEDConfig(Constants.LEDs.larsonAnimation)),
+        CLIMBED(new LEDConfig(Constants.LEDs.rainbowAnimation)),
         ERROR(new LEDConfig(Color.red, true)),
         WARNING(new LEDConfig(Color.yellow, true));
 
@@ -140,6 +145,16 @@ public class LEDSubsystem extends SubsystemBase {
         tempStateTimer.restart();
     }
 
+    public static void notifyClimbStarted() {
+        climbStarted = true;
+        climbCompleted = false;
+    }
+
+    public static void notifyClimbCompleted() {
+        climbStarted = false;
+        climbCompleted = true;
+    }
+
     @Override
     public void periodic() {
         // Determine the proper LED state
@@ -154,7 +169,11 @@ public class LEDSubsystem extends SubsystemBase {
             }
             // Compute the proper state if's not temporarily overridden
             if (!tempStateTimer.isRunning()) {
-                if (RobotState.haveAlgae()) {
+                if (climbStarted) {
+                    state = LEDState.CLIMBING;
+                } else if (climbCompleted) {
+                    state = LEDState.CLIMBED;
+                } else if (RobotState.haveAlgae()) {
                     state = LEDState.ALGAE;
                 } else if (RobotState.intakingAlgae()) {
                     state = LEDState.ALGAE_INTAKING;

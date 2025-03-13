@@ -1,7 +1,9 @@
 package frc.robot;
 
 import com.ctre.phoenix.led.FireAnimation;
+import com.ctre.phoenix.led.LarsonAnimation;
 import com.ctre.phoenix.led.RainbowAnimation;
+import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -191,6 +193,7 @@ public final class Constants {
         public static final double positionTolerance = 1.0; // inches
         public static final double roughPositionTolerance = 2.5; // inches
         public static final double maxSpeed = Constants.Swerve.maxSpeed / 3.0;
+        public static final double slowSpeed = Constants.Swerve.maxSpeed / 6.0;
         public static final double positionKS = 0.02;
         public static final double positionIZone = 4.0;
     
@@ -332,11 +335,18 @@ public final class Constants {
         public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
         public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
         /* Motor Control Values */
-        public static final double deployVoltage = 1.00;
-        public static final double retractVoltage = -1.50;
+        public static final double fastDeployVoltage = 12.0;
+        public static final double slowDeployVoltage = 3.0;
+        public static final double engageRetractVoltage = -4.0;
+        public static final double fastRetractVoltage = -8.0;
+        public static final double slowRetractVoltage = -3.0;
+        public static final double holdVoltage = -0.5;
 
-        public static final double deployedPosition = 10.0;
-        public static final double retractedPosition = -2.0;
+        public static final double fastDeployedPosition = 110.0;
+        public static final double fullyDeployedPosition = 135.5;
+        public static final double engageRetractedPosition = 85.0;
+        public static final double fastRetractedPosition = -1.0;
+        public static final double fullyRetractedPosition = -30.0;
 
         public static final int timeCutoff = 30;
     }
@@ -421,6 +431,27 @@ public final class Constants {
             public final Pose2d alignBonusLeft, alignBonusRight;
             public final boolean algaeHigh;
         }
+
+        // Cage locations from 6328
+        public static enum Cage {
+            CLOSE(199.947),
+            MIDDLE(242.855),
+            FAR(286.779),
+            HQ(8.16, 2.37);
+
+            Cage(double yInches) {
+                location = new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(yInches));
+            }
+
+            Cage(double xMeters, double yMeters) {
+                location = new Translation2d(xMeters, yMeters);
+            }
+
+            public final Translation2d location;
+        }
+
+        public static final Transform2d cageOffset = new Transform2d(robotFrameLength / 2.0 + bumperWidth - Units.inchesToMeters(2.0), 0, Rotation2d.kZero);
+        public static final Transform2d cageApproachOffset = new Transform2d(Units.inchesToMeters(16.0), 0, Rotation2d.kZero);
     }
 
     public static final class Auto { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
@@ -481,7 +512,8 @@ public final class Constants {
         public static final double brightness = Constants.atHQ ? 0.60 : 1.00;
         /* Animations */
         public static final FireAnimation fireAnimation = new FireAnimation(1.0, 0.38, numLEDs, 0.8, 0.2, false, startIdx);
-        public static final RainbowAnimation rainbowAnimation = new RainbowAnimation(1.0, 0.4, numLEDs, false, startIdx);
+        public static final RainbowAnimation rainbowAnimation = new RainbowAnimation(1.0, 0.7, numLEDs, false, startIdx);
+        public static final LarsonAnimation larsonAnimation = new LarsonAnimation(255, 64, 0, 0, 0.7, numLEDs, BounceMode.Front, 7, startIdx);
         /* Misc */
         public static final double blinkRate = 0.2; // Regular blink rate
         public static final double errorBlinkRate = 0.1; // Blink rate for errors and warnings

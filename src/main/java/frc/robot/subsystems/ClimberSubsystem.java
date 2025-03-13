@@ -26,8 +26,12 @@ public class ClimberSubsystem extends SubsystemBase {
 
     /* Control Requests */
     // TODO Use PositionVoltage
-    private final VoltageOut deployControl = new VoltageOut(Constants.Climber.deployVoltage).withEnableFOC(true);
-    private final VoltageOut retractControl = new VoltageOut(Constants.Climber.retractVoltage).withEnableFOC(true);
+    private final VoltageOut fastDeployControl = new VoltageOut(Constants.Climber.fastDeployVoltage).withEnableFOC(true);
+    private final VoltageOut slowDeployControl = new VoltageOut(Constants.Climber.slowDeployVoltage).withEnableFOC(true);
+    private final VoltageOut engageRetractControl = new VoltageOut(Constants.Climber.engageRetractVoltage).withEnableFOC(true);
+    private final VoltageOut fastRetractControl = new VoltageOut(Constants.Climber.fastRetractVoltage).withEnableFOC(true);
+    private final VoltageOut slowRetractControl = new VoltageOut(Constants.Climber.slowRetractVoltage).withEnableFOC(true);
+    private final VoltageOut holdControl = new VoltageOut(Constants.Climber.holdVoltage).withEnableFOC(true);
 
     private boolean deployed = false;
 
@@ -56,13 +60,32 @@ public class ClimberSubsystem extends SubsystemBase {
         motor.getConfigurator().apply(motorConfig);
     }
 
+    private boolean climberPartiallyDeployed() {
+        return motor.getPosition().getValueAsDouble() >= Constants.Climber.fastDeployedPosition;
+    }
+
+    private boolean climberFullyDeployed() {
+        return motor.getPosition().getValueAsDouble() >= Constants.Climber.fullyDeployedPosition;
+    }
+
     public Command Deploy() {
         return LoggedCommands.either("Deploy Climber",
             Commands.sequence(
                 Commands.runOnce(() -> deployed = true),
-                LoggedCommands.runOnce("Set deploy voltage", () -> motor.setControl(deployControl)),
-                LoggedCommands.waitUntil("Wait for climber deployment", () -> motor.getPosition().getValueAsDouble() >= Constants.Climber.deployedPosition),
-                LoggedCommands.runOnce("Stop climber (deploy)", motor::stopMotor)),
+                Commands.either(
+                    LoggedCommands.log("Climber already partially deployed"),
+                    Commands.sequence(
+                        LoggedCommands.runOnce("Set fast deploy voltage", () -> motor.setControl(fastDeployControl), this),
+                        LoggedCommands.waitUntil("Wait for climber partial deployment", this::climberPartiallyDeployed)),
+                    this::climberPartiallyDeployed),
+                Commands.either(
+                    LoggedCommands.log("Climber already fully deployed"),
+                    Commands.sequence(
+                        LoggedCommands.runOnce("Set slow deploy voltage", () -> motor.setControl(slowDeployControl), this),
+                        LoggedCommands.waitUntil("Wait for climber full deployment", this::climberFullyDeployed)),
+                    this::climberFullyDeployed),
+                LoggedCommands.runOnce("Stop climber (deploy)", motor::stopMotor, this))
+                .handleInterrupt(motor::stopMotor),
             Commands.sequence(
                 LoggedCommands.log("Cannot deploy before cutoff time (" + Constants.Climber.timeCutoff + ")"),
                 Commands.runOnce(() -> LoggedAlert.Error("Climber", "Too Early", "Cannot deploy before cutoff time"))
@@ -70,17 +93,47 @@ public class ClimberSubsystem extends SubsystemBase {
             () -> optOverrideClimberTiming.get() || DriverStation.getMatchTime() <= Constants.Climber.timeCutoff);
     }
 
+    private boolean climberEngaged() {
+        return motor.getPosition().getValueAsDouble() <= Constants.Climber.engageRetractedPosition;
+    }
+
+    private boolean climberPartiallyRetracted() {
+        return motor.getPosition().getValueAsDouble() <= Constants.Climber.fastRetractedPosition;
+    }
+
+    private boolean climberFullyRetracted() {
+        return motor.getPosition().getValueAsDouble() <= Constants.Climber.fullyRetractedPosition;
+    }
+
     public Command Retract() {
         return LoggedCommands.either("Retract Climber",
             Commands.sequence(
-                LoggedCommands.runOnce("Set retract voltage", () -> motor.setControl(retractControl)),
-                LoggedCommands.waitUntil("Wait for climber retraction", () -> motor.getPosition().getValueAsDouble() <= Constants.Climber.retractedPosition),
-                // TODO Hold position
-                LoggedCommands.runOnce("Stop climber (retract)", motor::stopMotor)),
+                Commands.runOnce(LEDSubsystem::notifyClimbStarted),
+                Commands.either(
+                    LoggedCommands.log("Climber already engaged"),
+                    Commands.sequence(
+                        LoggedCommands.runOnce("Set engagement retract voltage", () -> motor.setControl(engageRetractControl), this),
+                        LoggedCommands.waitUntil("Wait for climber engagement", this::climberEngaged)),
+                    this::climberEngaged),
+                Commands.either(
+                    LoggedCommands.log("Climber already partially retracted"),
+                    Commands.sequence(
+                        LoggedCommands.runOnce("Set fast retract voltage", () -> motor.setControl(fastRetractControl), this),
+                        LoggedCommands.waitUntil("Wait for partial climber retraction", this::climberPartiallyRetracted)),
+                    this::climberPartiallyRetracted),
+                Commands.either(
+                    LoggedCommands.log("Climber already fully retracted"),
+                    Commands.sequence(
+                        LoggedCommands.runOnce("Set slow retract voltage", () -> motor.setControl(slowRetractControl), this),
+                        LoggedCommands.waitUntil("Wait for full climber retraction", this::climberFullyRetracted)),
+                    this::climberFullyRetracted),
+                LoggedCommands.runOnce("Set hold voltage", () -> motor.setControl(holdControl), this),
+                Commands.runOnce(LEDSubsystem::notifyClimbCompleted),
+                LoggedCommands.idle("Hold climb", this))
+                .handleInterrupt(motor::stopMotor),
             Commands.sequence(
                 LoggedCommands.log("Cannot retract prior to deployment"),
-                Commands.runOnce(() -> LoggedAlert.Error("Climber", "Not Deployed", "Cannot retract before deploy"))
-            ),
+                Commands.runOnce(() -> LoggedAlert.Error("Climber", "Not Deployed", "Cannot retract before deploy"))),
             () -> deployed);
     }
 
