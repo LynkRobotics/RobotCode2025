@@ -329,6 +329,16 @@ public class PoseSubsystem extends SubsystemBase {
         return cage;
     }
 
+    public double visionDifference() {
+        Pose2d visionPose = s_Vision.lastPose();
+
+        if (visionPose == null) {
+            return Double.POSITIVE_INFINITY;
+        }
+
+        return getPose().getTranslation().getDistance(visionPose.getTranslation());
+    }
+
     @Override
     public void periodic() {
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());

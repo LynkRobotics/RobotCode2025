@@ -22,8 +22,9 @@ public class PIDSwerve extends LoggedCommandBase {
     private final PIDController xPID, yPID;
     private final PIDController rotationPID = new PIDController(rotationKP, 0, 0);
     private final boolean slow;
+    private final double maxVisionDiff;
 
-    public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise, boolean slow) {
+    public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise, boolean slow, double maxVisionDiff) {
         super();
 
         if (flipIfRed) {
@@ -35,6 +36,7 @@ public class PIDSwerve extends LoggedCommandBase {
         this.targetPose = targetPose;
         this.precise = precise;
         this.slow = slow;
+        this.maxVisionDiff = maxVisionDiff;
         addRequirements(s_Swerve);
 
         xPID = new PIDController(precise ? translationKP : roughTranslationKP, 0, 0);
@@ -55,6 +57,10 @@ public class PIDSwerve extends LoggedCommandBase {
         rotationPID.setIntegratorRange(-Pose.rotationKS * 2, Pose.rotationKS * 2);
         rotationPID.setSetpoint(targetPose.getRotation().getDegrees());
         rotationPID.setTolerance(precise ? rotationTolerance : roughRotatationTolerance); // TODO Set derivative, too
+    }
+
+    public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise, boolean slow) {
+        this(s_Swerve, s_Pose, targetPose, flipIfRed, precise, false, Double.POSITIVE_INFINITY);
     }
 
     public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise) {
@@ -114,7 +120,7 @@ public class PIDSwerve extends LoggedCommandBase {
 
     @Override
     public boolean isFinished() {
-        return xPID.atSetpoint() && yPID.atSetpoint() && rotationPID.atSetpoint();
+        return xPID.atSetpoint() && yPID.atSetpoint() && rotationPID.atSetpoint() && s_Pose.visionDifference() <= maxVisionDiff;
     }
 
     @Override

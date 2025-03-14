@@ -92,6 +92,10 @@ public class VisionSubsystem extends SubsystemBase {
         return updated;
     }
 
+    public Pose2d lastPose() {
+        return lastPose;
+    }
+
     @Override
     public void periodic() {
         boolean haveTarget = lastResult != null && lastResult.hasTargets();

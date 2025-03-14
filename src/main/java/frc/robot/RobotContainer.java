@@ -162,7 +162,7 @@ public class RobotContainer {
                     Commands.sequence(
                         Commands.race(
                             Commands.sequence(
-                                new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, true, false),
+                                new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, true, false, false, Constants.maxVisionDiffCoral),
                                 Commands.either(
                                     LoggedCommands.log("Elevator reached stop in time"),
                                     LoggedCommands.sequence("Pause to wait for elevator to catch up",
