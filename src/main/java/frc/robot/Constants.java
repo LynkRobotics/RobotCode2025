@@ -291,6 +291,7 @@ public final class Constants {
         public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
         /* Motor Control Values */
         public static final double feedVoltage = -3.80;
+        public static final double unjamVoltage = 2.00;
         public static final double advanceVoltage = -1.20;
         public static final double scoreVoltage = -3.5;
         public static final double scoreL1Voltage = -2.0;

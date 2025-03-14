@@ -19,6 +19,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
     private final TalonFX motor;
     /* Control Requests */
     private final VoltageOut feedControl = new VoltageOut(Constants.EndEffector.feedVoltage).withEnableFOC(true);
+    private final VoltageOut unjamControl = new VoltageOut(Constants.EndEffector.unjamVoltage).withEnableFOC(true);
     private final VoltageOut advanceControl = new VoltageOut(Constants.EndEffector.advanceVoltage).withEnableFOC(true);
     private final VoltageOut scoreControl = new VoltageOut(Constants.EndEffector.scoreVoltage).withEnableFOC(true);
     private final VoltageOut scoreL1Control = new VoltageOut(Constants.EndEffector.scoreL1Voltage).withEnableFOC(true);
@@ -80,6 +81,10 @@ public class EndEffectorSubsystem extends SubsystemBase {
                 case INTAKING_CORAL:
                     DogLog.log("EndEffector/Control", "Stop (intaking coral)");
                     motor.stopMotor();
+                    break;
+                case UNJAMMING_CORAL:
+                    DogLog.log("EndEffector/Control", "Unjamming");
+                    motor.setControl(unjamControl);
                     break;
                 case FEEDING_CORAL:
                     DogLog.log("EndEffector/Control", "Feeding coral");
