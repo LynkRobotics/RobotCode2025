@@ -38,7 +38,7 @@ public final class Constants {
     public static final double turnStickSensitivity = 1.00;
     public static final double aimingOverride = 0.001;
     public static final double algaeScoredTimeout = 1.0; // How long (in seconds) we should prevent auto-aiming after scoring algae
-    public static final double maxVisionDiffCoral = Units.inchesToMeters(1.5);
+    public static final double maxVisionDiffCoral = Double.POSITIVE_INFINITY; // TODO Units.inchesToMeters(1.5);
 
     public static final int indexSensorID = 7;
     public static final int candiID = 0;
@@ -149,7 +149,7 @@ public final class Constants {
             public static final int angleMotorID = 1;
             public static final int canCoderID = 0;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? -143.3 : 33.9 + 180.0);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? -97.6 : 33.9 + 180.0);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
@@ -160,7 +160,7 @@ public final class Constants {
             public static final int angleMotorID = 19;
             public static final int canCoderID = 1;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? 148.40 : -72.2 + 180.0);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? -38.8 : -72.2 + 180.0);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
@@ -171,7 +171,7 @@ public final class Constants {
             public static final int angleMotorID = 9;
             public static final int canCoderID = 2;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? -39.4 : 162.6 + 180.0);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? -159.6 : 162.6 + 180.0);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
@@ -182,7 +182,7 @@ public final class Constants {
             public static final int angleMotorID = 11;
             public static final int canCoderID = 3;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? -23.9 : -25.4 + 180.0);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? 52.9 : -25.4 + 180.0);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
