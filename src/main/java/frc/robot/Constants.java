@@ -260,7 +260,7 @@ public final class Constants {
         public enum Stop {
             // Intake occurs at zero
             SAFE     (Constants.Elevator.baseHeight + 5.0),
-            L1       (29.0 - Constants.Elevator.endEffectorHeight),
+            L1       (28.5 - Constants.Elevator.endEffectorHeight),
             L2       (34.5 - Constants.Elevator.endEffectorHeight),
             L2_ALGAE (38.0 - Constants.Elevator.endEffectorHeight),
             L3       (49.5 - Constants.Elevator.endEffectorHeight),
