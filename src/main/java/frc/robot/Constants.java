@@ -294,7 +294,7 @@ public final class Constants {
         public static final double unjamVoltage = 2.00;
         public static final double advanceVoltage = -1.20;
         public static final double scoreVoltage = -3.5;
-        public static final double scoreL1Voltage = -2.0;
+        public static final double scoreL1Voltage = -2.0; // -2.0 pre-NCASH
         public static final double algaeVoltage = 3.00;
         public static final double algaeHoldVoltage = 1.00;
         public static final double algaeBargeVoltage = -12.00;
@@ -302,7 +302,7 @@ public final class Constants {
         public static final double minimumAlgaeAcquireCurrent = 80.0;
         public static final double minimumAlgaeHoldCurrent = 60.0;
 
-        public static final double L1RunTime = 1.0;
+        public static final double L1RunTime = 1.0; // 1.0 pre-NCASH
         public static final double algaeRunTime = 0.5;
     }
 
