@@ -32,7 +32,7 @@ public class RobotState extends SubsystemBase {
     private static final Timer unjamTimer = new Timer();
     private static final Timer algaeScoredTimer = new Timer();
 
-    private static final TunableOption optOverrideElevatorPathBlocked = new TunableOption("Override Elevator Path Blocked", false);
+    private static final TunableOption optOverrideElevatorPathBlocked = new TunableOption("Override Elevator Path Blocked", true);
     private static final TunableOption optOverrideReefElevatorZone = new TunableOption("Override Reef Safe Elevator Zone", true);
     private static final TunableOption optOverrideElevatorDownAllowed = new TunableOption("Override Elevator Down Allowed", false);
 
