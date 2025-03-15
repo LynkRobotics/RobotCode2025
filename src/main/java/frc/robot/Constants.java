@@ -441,6 +441,8 @@ public final class Constants {
             FAR(286.779), // 7.284 m
             HQ(8.16, 2.37);
 
+            private final Translation2d location;
+
             Cage(double yInches) {
                 // 8.774 m
                 location = new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(yInches));
@@ -450,7 +452,13 @@ public final class Constants {
                 location = new Translation2d(xMeters, yMeters);
             }
 
-            public final Translation2d location;
+            public Translation2d location() {
+                if (Robot.isRed()) {
+                    return location.plus(Constants.Pose.cageRedFudge);
+                } else {
+                    return location;
+                }        
+            }
         }
 
         // 30 in / 2 + 3.2 in - 2.0 in = 16.2 in = 0.4115 m

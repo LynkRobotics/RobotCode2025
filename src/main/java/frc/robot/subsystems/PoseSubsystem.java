@@ -302,14 +302,6 @@ public class PoseSubsystem extends SubsystemBase {
         return flipIfRed(targetPose);
     }
 
-    public static Translation2d cageLocation(Cage cage) {
-        if (Robot.isRed()) {
-            return cage.location.plus(Constants.Pose.cageRedFudge);
-        } else {
-            return cage.location;
-        }
-    }
-
     public Cage nearestCage() {
         Translation2d location = flipIfRed(getPose().getTranslation());
         Cage cage;
@@ -317,16 +309,16 @@ public class PoseSubsystem extends SubsystemBase {
         
         if (Constants.atHQ) {
             cage = Cage.HQ;
-            bestDistance = location.getDistance(cageLocation(cage));
+            bestDistance = location.getDistance(cage.location());
         } else {
             cage = Cage.CLOSE;
-            bestDistance = location.getDistance(cageLocation(cage));
-            distance = location.getDistance(cageLocation(Cage.MIDDLE));
+            bestDistance = location.getDistance(cage.location());
+            distance = location.getDistance(Cage.MIDDLE.location());
             if (distance < bestDistance) {
                 cage = Cage.MIDDLE;
                 bestDistance = distance;
             }
-            distance = location.getDistance(cageLocation(Cage.FAR));
+            distance = location.getDistance(Cage.FAR.location());
             if (distance < bestDistance) {
                 cage = Cage.FAR;
                 bestDistance = distance;
