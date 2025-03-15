@@ -389,7 +389,7 @@ public final class Constants {
         public static final double bargeShotX = fieldLength / 2.0 - bargeShotDistanceFromCenter - robotFrameLength / 2.0 - bumperWidth;
 
         // Offset to the reef face, not at the branches, but on the faces directly in front
-        public static final Translation2d centerOffset = new Translation2d(reefToFaceDistance + reefOffset, 0.0);
+        public static final Translation2d centerOffset = new Translation2d(reefToFaceDistance + reefOffset - reefStandoff, 0.0); // NOTE: Undo reef standoff for algae
         private static final Translation2d leftOffset = new Translation2d(reefToFaceDistance + reefOffset, -branchSeparation / 2.0);
         private static final Translation2d rightOffset = new Translation2d(reefToFaceDistance + reefOffset, branchSeparation / 2.0);
         private static final Translation2d extraOffset = new Translation2d(reefExtraOffset, 0.0);
