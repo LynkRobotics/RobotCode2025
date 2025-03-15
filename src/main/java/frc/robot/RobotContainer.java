@@ -248,25 +248,27 @@ public class RobotContainer {
         Stop algaeStop = face.algaeHigh ? Stop.L3_ALGAE: Stop.L2_ALGAE;
         Stop algaeInvertStop = face.algaeHigh ? Stop.L2_ALGAE : Stop.L3_ALGAE;
 
-        return LoggedCommands.deadline("Acquire Algae from " + face.toString(),
-            Commands.sequence(
-                LoggedCommands.waitUntil("Wait for Algae", RobotState::haveAlgae),
-                TriggerRumble()),
-            LoggedCommands.sequence("Auto Align Middle " + face.toString(),
-                RobotState.IntakeAlgae(),
-                LoggedCommands.parallel("PID Align Middle " + face.toString(),
-                    Commands.sequence(
-                        new PIDSwerve(s_Swerve, s_Pose, face.approachMiddle, true, false),
-                        new PIDSwerve(s_Swerve, s_Pose, face.alignMiddle, true, true),
-                        s_Swerve.Stop()),
-                    Commands.either(
-                        LoggedCommands.deadline("Wait for auto up to " + algaeInvertStop,
-                            s_Elevator.WaitForStop(algaeInvertStop),
-                            s_Elevator.AutoElevatorUp(face.alignMiddle.getTranslation(), algaeInvertStop)),
-                        LoggedCommands.deadline("Wait for auto up to " + algaeStop,
-                            s_Elevator.WaitForStop(algaeStop),
-                            s_Elevator.AutoElevatorUp(face.alignMiddle.getTranslation(), algaeStop)),
-                        optInvertAlgae))))
+        return LoggedCommands.sequence("Fully acquire Algae from " + face.toString(),
+            LoggedCommands.deadline("Acquire Algae from " + face.toString(),
+                Commands.sequence(
+                    LoggedCommands.waitUntil("Wait for Algae", RobotState::haveAlgae),
+                    TriggerRumble()),
+                LoggedCommands.sequence("Auto Align Middle " + face.toString(),
+                    RobotState.IntakeAlgae(),
+                    LoggedCommands.parallel("PID Align Middle " + face.toString(),
+                        Commands.sequence(
+                            new PIDSwerve(s_Swerve, s_Pose, face.approachMiddle, true, false),
+                            new PIDSwerve(s_Swerve, s_Pose, face.alignMiddle, true, true),
+                            s_Swerve.Stop()),
+                        Commands.either(
+                            LoggedCommands.deadline("Wait for auto up to " + algaeInvertStop,
+                                s_Elevator.WaitForStop(algaeInvertStop),
+                                s_Elevator.AutoElevatorUp(face.alignMiddle.getTranslation(), algaeInvertStop)),
+                            LoggedCommands.deadline("Wait for auto up to " + algaeStop,
+                                s_Elevator.WaitForStop(algaeStop),
+                                s_Elevator.AutoElevatorUp(face.alignMiddle.getTranslation(), algaeStop)),
+                            optInvertAlgae)))),
+            new PIDSwerve(s_Swerve, s_Pose, face.approachMiddle, true, false))
             .handleInterrupt(() -> { if (!RobotState.haveAlgae()) RobotState.setNoAlgae(); });
     }
     
@@ -513,7 +515,6 @@ public class RobotContainer {
             BargeShot(),
             LoggedCommands.proxy(PathCommand("Barge Shot to near IJ")),
             LoggedCommands.proxy(DealgaefyMaybeMirror(ReefFace.IJ)), 
-            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.IJ.approachMiddle, true, false)),
             BargeShot());
 
         startingPaths.put(autoG, "Start to near G");
