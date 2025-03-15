@@ -442,6 +442,7 @@ public final class Constants {
             HQ(8.16, 2.37);
 
             private final Translation2d location;
+            private static final Translation2d redFudge = new Translation2d(0.0, -0.05);
 
             Cage(double yInches) {
                 // 8.774 m
@@ -454,7 +455,7 @@ public final class Constants {
 
             public Translation2d location() {
                 if (Robot.isRed()) {
-                    return location.plus(Constants.Pose.cageRedFudge);
+                    return location.plus(redFudge);
                 } else {
                     return location;
                 }        
@@ -485,7 +486,6 @@ public final class Constants {
 
         // public static final Transform2d cageOffset = new Transform2d(robotFrameLength / 2.0 + bumperWidth - Units.inchesToMeters(2.0), 0, Rotation2d.kZero);
         public static final Transform2d cageOffset = new Transform2d(0.30, 0, Rotation2d.kZero);
-        public static final Translation2d cageRedFudge = new Translation2d(0.0, -0.05);
         public static final Transform2d cageApproachOffset = new Transform2d(Units.inchesToMeters(16.0), 0, Rotation2d.kZero);
     }
 
