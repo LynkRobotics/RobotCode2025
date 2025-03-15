@@ -436,12 +436,13 @@ public final class Constants {
 
         // Cage locations from 6328
         public static enum Cage {
-            CLOSE(199.947),
-            MIDDLE(242.855),
-            FAR(286.779),
+            CLOSE(199.947), // 5.079 m
+            MIDDLE(242.855), // 6.169 m
+            FAR(286.779), // 7.284 m
             HQ(8.16, 2.37);
 
             Cage(double yInches) {
+                // 8.774 m
                 location = new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(yInches));
             }
 
@@ -452,7 +453,31 @@ public final class Constants {
             public final Translation2d location;
         }
 
-        public static final Transform2d cageOffset = new Transform2d(robotFrameLength / 2.0 + bumperWidth - Units.inchesToMeters(2.0), 0, Rotation2d.kZero);
+        // 30 in / 2 + 3.2 in - 2.0 in = 16.2 in = 0.4115 m
+
+        // fieldSizeX = Units.feetToMeters(57.573); 17.548 m
+        // fieldSizeY = Units.feetToMeters(26.417); 8.052 m
+
+        // Hypothetical
+        // Blue CLOSE = 8.363, 5.08
+        // Blue MIDDLE = 8.363, 6.17
+        // Blue FAR = 8.363, 7.28
+        // Red CLOSE = 9.19, 2.97
+        // Red MIDDLE = 9.19, 1.883
+        // Red FAR = 9.19, 0.768
+
+        // Ashville
+        // Want X diff of 0.30 m?
+        // Blue CLOSE = 8.36 X 8.49, 5.23 X 5.09 
+        // Blue MIDDLE = 8.47, 6.16
+        // Blue FAR = 
+        // Red CLOSE = 9.11, 2.90
+        // Red MIDDLE = 9.07, 1.84
+        // Red FAR = X
+
+        // public static final Transform2d cageOffset = new Transform2d(robotFrameLength / 2.0 + bumperWidth - Units.inchesToMeters(2.0), 0, Rotation2d.kZero);
+        public static final Transform2d cageOffset = new Transform2d(0.30, 0, Rotation2d.kZero);
+        public static final Translation2d cageRedFudge = new Translation2d(0.0, -0.05);
         public static final Transform2d cageApproachOffset = new Transform2d(Units.inchesToMeters(16.0), 0, Rotation2d.kZero);
     }
 

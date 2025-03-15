@@ -328,7 +328,7 @@ public class RobotContainer {
     }
 
     private Command AlignToCage(Cage cage) {
-        Pose2d cageAlignPose = new Pose2d(cage.location, Rotation2d.k180deg).transformBy(Constants.Pose.cageOffset);
+        Pose2d cageAlignPose = new Pose2d(PoseSubsystem.cageLocation(cage), Rotation2d.k180deg).transformBy(Constants.Pose.cageOffset);
 
         return LoggedCommands.sequence("Align to cage " + cage,
             LoggedCommands.runOnce("Disable reef aiming", optAutoReefAiming::disable),
