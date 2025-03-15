@@ -375,7 +375,7 @@ public final class Constants {
 
         public static final double robotFrameLength = Units.inchesToMeters(30);
         public static final double bumperWidth = Units.inchesToMeters(3.2);
-        public static final double reefStandoff = Units.inchesToMeters(2.0);
+        public static final double reefStandoff = Units.inchesToMeters(1.5);
         public static final double reefOffset = robotFrameLength / 2.0 + bumperWidth + reefStandoff;
         public static final double reefExtraOffset = Units.inchesToMeters(9.0);
         public static final double bonusStandoff = Units.inchesToMeters(4.0);
@@ -384,7 +384,7 @@ public final class Constants {
         public static final Translation2d reefCenter = new Translation2d(Units.inchesToMeters(176.75), fieldWidth / 2.0);
         public static final double reefToFaceDistance = reefCenter.getX() - Units.inchesToMeters(144.0);
         public static final double branchSeparation = Units.inchesToMeters(12.0 + 15.0 / 16.0);
-        public static final double bargeShotDistanceFromCenter = Units.inchesToMeters(54.0);
+        public static final double bargeShotDistanceFromCenter = Units.inchesToMeters(52.0);
         public static final double bargeShotX = fieldLength / 2.0 - bargeShotDistanceFromCenter - robotFrameLength / 2.0 - bumperWidth;
 
         // Offset to the reef face, not at the branches, but on the faces directly in front
@@ -442,7 +442,7 @@ public final class Constants {
             HQ(8.16, 2.37);
 
             private final Translation2d location;
-            private static final Translation2d redFudge = new Translation2d(0.0, -0.05);
+            private static final Translation2d redFudge = new Translation2d(0.0, -0.10);
 
             Cage(double yInches) {
                 // 8.774 m
