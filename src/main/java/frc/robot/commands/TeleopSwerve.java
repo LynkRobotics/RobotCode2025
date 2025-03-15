@@ -89,7 +89,7 @@ public class TeleopSwerve extends LoggedCommandBase {
         /* Drive */
         s_Swerve.drive(
             new Translation2d(translationVal, strafeVal).times(speedLimitSupplier.getAsDouble()).times(Constants.Swerve.maxSpeed),
-            rotationVal * Constants.Swerve.maxAngularVelocity * speedLimitSupplier.getAsDouble(), 
+            rotationVal * Constants.Swerve.maxAngularVelocity * speedLimitSupplier.getAsDouble() * (RobotState.haveAlgae() ? Constants.algaeSlowRot : 1.0), 
             true
         );
     }
