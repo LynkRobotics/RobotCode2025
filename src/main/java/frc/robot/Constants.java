@@ -443,7 +443,7 @@ public final class Constants {
             HQ(8.16, 2.37);
 
             private final Translation2d location;
-            private static final Translation2d redFudge = new Translation2d(0.0, -0.10);
+            private static final Translation2d redFudge = new Translation2d(0.0, 0.05);
 
             Cage(double yInches) {
                 // 8.774 m
