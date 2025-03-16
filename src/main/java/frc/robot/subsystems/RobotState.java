@@ -276,9 +276,15 @@ public class RobotState extends SubsystemBase {
                     gamePieceState = elevatorAtZero ? GamePieceState.INTAKING_CORAL : GamePieceState.NONE;
                 }
             } else if (!intakeSensor && finalSensor) {
+                // Coral is in intake and not at final sensor
                 gamePieceState = elevatorAtZero ? GamePieceState.FEEDING_CORAL : GamePieceState.NONE;
             } else if (!flipperSensor) {
-                gamePieceState = GamePieceState.ADVANCING_CORAL;
+                // Coral is blocking flipper sensor -- could be either at intake or at final sensor)
+                if (intakeSensor && gamePieceState == GamePieceState.SCORING_CORAL) {
+                    // Just continue scoring, even if coral "slid back"
+                } else {
+                    gamePieceState = GamePieceState.ADVANCING_CORAL;
+                }
             } else {
                 assert(!finalSensor);
                 if (gamePieceState != GamePieceState.SCORING_CORAL) {
