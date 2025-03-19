@@ -1,0 +1,355 @@
+{
+  "hubs": [
+    {
+      "x": -8,
+      "y": -8,
+      "width": 1708,
+      "height": 1020,
+      "state": {
+        "sidebar": {
+          "width": 300,
+          "expanded": [
+            "/Robot",
+            "/Robot/Vision/Pose",
+            "/Robot/Alerts/errors",
+            "/Robot/Alerts/infos",
+            "/Robot/Alerts/warnings",
+            "/NT/Robot",
+            "/NT/LiveWindow/.status",
+            "/NT",
+            "/NT/SmartDashboard"
+          ]
+        },
+        "tabs": {
+          "selected": 2,
+          "tabs": [
+            {
+              "type": 0,
+              "title": "",
+              "controller": null,
+              "controllerUUID": "pzlq2walq7p9ymnuprdjz706bbo4bx1x",
+              "renderer": "#/",
+              "controlsHeight": 0
+            },
+            {
+              "type": 1,
+              "title": "Line Graph",
+              "controller": {
+                "leftSources": [],
+                "rightSources": [],
+                "discreteSources": [],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "rightUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "i1kotd4mpm9jooxqrpofhrjabdk9dfxu",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 2,
+              "title": "Odometry",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "robot",
+                    "logKey": "/Robot/Pose/Pose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/Robot/Pose/PP Current Pose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ffff"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/Robot/Vision/Pose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff8c00"
+                    }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "/Robot/Vision/TargetPoses",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/Robot/PIDSwerve/Pose target",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ffff00"
+                    }
+                  },
+                  {
+                    "type": "robot",
+                    "logKey": "NT:/Robot/Pose/Pose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Robot/Vision/Pose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff8c00"
+                    }
+                  }
+                ],
+                "game": "2025 Field (Welded)",
+                "bumpers": "auto",
+                "origin": "blue",
+                "orientation": 0,
+                "size": 30
+              },
+              "controllerUUID": "78pb9skb45b5cb0330ildjo3r46rbq99",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 3,
+              "title": "3D Field",
+              "controller": {
+                "sources": [],
+                "game": "2025 Field (Welded)",
+                "origin": "blue"
+              },
+              "controllerUUID": "tqq3v6kd1ryr67i2myagzbg8eplt4esy",
+              "renderer": {
+                "cameraIndex": -1,
+                "orbitFov": 50,
+                "cameraPosition": [
+                  1.4695761589768238e-15,
+                  5.999999999999999,
+                  -12
+                ],
+                "cameraTarget": [
+                  0,
+                  0.5,
+                  0
+                ]
+              },
+              "controlsHeight": 200
+            },
+            {
+              "type": 4,
+              "title": "Console",
+              "controller": [
+                "console"
+              ],
+              "controllerUUID": "o6kvg50n6ney7iblzn3kosybq27c0346",
+              "renderer": null,
+              "controlsHeight": 0
+            },
+            {
+              "type": 4,
+              "title": "Faults",
+              "controller": [
+                "/Robot/Fault/All FaultsElevator",
+                "/Robot/Fault/All Faults"
+              ],
+              "controllerUUID": "8t7e1tp5om00r4y60c9zdrk5rstzc2l6",
+              "renderer": null,
+              "controlsHeight": 0
+            },
+            {
+              "type": 4,
+              "title": "Robot Status",
+              "controller": [
+                "/Robot/Swerve/Status",
+                "/Robot/Misc/FMS Match Time",
+                "/Robot/Misc/Robot Status",
+                "/Robot/Robot/Status",
+                "/Robot/Elevator/Status",
+                "/Robot/State/Game Piece State",
+                "/Robot/EndEffector/Control",
+                "/Robot/Index/Control"
+              ],
+              "controllerUUID": "d7zxvv9rs1qn3fhfvz1ioj1d7cgi6d3w",
+              "renderer": null,
+              "controlsHeight": 0
+            },
+            {
+              "type": 4,
+              "title": "Coral",
+              "controller": [
+                "/Robot/Misc/FMS Match Time",
+                "/Robot/State/Game Piece State",
+                "/Robot/State/Have coral",
+                "/Robot/State/Index sensor",
+                "/Robot/State/Flipper sensor",
+                "/Robot/State/Final sensor"
+              ],
+              "controllerUUID": "jrj1u0btwr89pctwm9f3pf2999kl56ix",
+              "renderer": null,
+              "controlsHeight": 0
+            },
+            {
+              "type": 4,
+              "title": "Algae",
+              "controller": [
+                "/Robot/State/Game Piece State",
+                "/Robot/State/Have algae"
+              ],
+              "controllerUUID": "biqoienhdqd3bs9e3wpftumhwznyye8b",
+              "renderer": null,
+              "controlsHeight": 0
+            },
+            {
+              "type": 1,
+              "title": "Climber",
+              "controller": {
+                "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Robot/Climber/Velocity",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Robot/Climber/TorqueCurrent",
+                    "logType": "Number",
+                    "visible": false,
+                    "options": {
+                      "color": "#af2437",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "rightSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Robot/Climber/Position",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "discreteSources": [],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "rightUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "44mx07bd039rwy1uvhxpwsdnogygq9at",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 4,
+              "title": "Elevator",
+              "controller": [
+                "/Robot/Elevator/Status",
+                "/Robot/Elevator/height",
+                "/Robot/Elevator/leftPosition",
+                "/Robot/Elevator/leftVoltage"
+              ],
+              "controllerUUID": "g2f68r8poprg2s9szj7o1ormb1ak1sc6",
+              "renderer": null,
+              "controlsHeight": 0
+            },
+            {
+              "type": 1,
+              "title": "End Effector",
+              "controller": {
+                "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "/Robot/EndEffector/TorqueCurrent",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "rightSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "/Robot/EndEffector/Velocity",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#af2437",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "discreteSources": [
+                  {
+                    "type": "stripes",
+                    "logKey": "/Robot/EndEffector/Control",
+                    "logType": "String",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2"
+                    }
+                  }
+                ],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "rightUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "jycob06x9fgyuvwlmkbdgv004u66thn1",
+              "renderer": null,
+              "controlsHeight": 200
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "satellites": [],
+  "version": "4.1.5"
+}
