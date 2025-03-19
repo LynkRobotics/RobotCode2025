@@ -438,6 +438,14 @@ public class ElevatorSubsystem extends SubsystemBase {
             setHeight(Stop.L4_SCORE.height); // TODO Avoid repeatedly calling ... even though it might not be an issue?
         }
 
+        if (RobotState.coralScoring() && atStop(Stop.L1)) {
+            if (!scoreTimer.isRunning()) {
+                scoreTimer.restart();
+            } else if (scoreTimer.hasElapsed(Constants.Elevator.L1RaiseDelay)) {
+                setHeight(Stop.L1_SCORE.height);
+            }
+        }
+
         // If we have Coral ready, and the Elevator is still at zero, cancel the current default command so that it runs again with the L1 default
         if (RobotState.coralReady() && RobotState.getElevatorAtZero()) {
             Command currentCommand = getCurrentCommand();

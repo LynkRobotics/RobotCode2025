@@ -262,6 +262,7 @@ public final class Constants {
             // Intake occurs at zero
             SAFE     (Constants.Elevator.baseHeight + 5.0),
             L1       (28.5 - Constants.Elevator.endEffectorHeight),
+            L1_SCORE (31.0 - Constants.Elevator.endEffectorHeight),
             L2       (34.5 - Constants.Elevator.endEffectorHeight),
             L2_ALGAE (38.0 - Constants.Elevator.endEffectorHeight),
             L3       (49.5 - Constants.Elevator.endEffectorHeight),
@@ -277,6 +278,7 @@ public final class Constants {
             public final double height;
         }
 
+        public static final double L1RaiseDelay = 0.35;
         public static final double standoffBoost = 2.0; // In inches
     }
 
@@ -303,7 +305,7 @@ public final class Constants {
         public static final double minimumAlgaeAcquireCurrent = 80.0;
         public static final double minimumAlgaeHoldCurrent = 60.0;
 
-        public static final double L1RunTime = 1.0; // 1.0 pre-NCASH
+        public static final double L1RunTime = 1.5; // 1.0 pre-NCASH
         public static final double algaeRunTime = 0.5;
     }
 
@@ -399,8 +401,8 @@ public final class Constants {
         private static final Translation2d bonusOffset = new Translation2d(bonusStandoff, 0.0);
         private static final Translation2d leftBonusOffset = leftOffset.plus(bonusOffset);
         private static final Translation2d rightBonusOffset = rightOffset.plus(bonusOffset);
-        private static final Transform2d leftL1Transform = new Transform2d(Units.inchesToMeters(-1.0), Units.inchesToMeters(3.0), Rotation2d.kZero);
-        private static final Transform2d rightL1Transform = new Transform2d(Units.inchesToMeters(-1.0), Units.inchesToMeters(-3.0), Rotation2d.kZero);
+        private static final Transform2d leftL1Transform = new Transform2d(0, -branchSeparation / 2.0, Rotation2d.kZero);
+        private static final Transform2d rightL1Transform = new Transform2d(0, branchSeparation / 2.0, Rotation2d.kZero);
 
         public static final double elevatorNoDownDistance = reefToFaceDistance + reefOffset + Units.inchesToMeters(12.0);
 
@@ -517,7 +519,7 @@ public final class Constants {
     }
 
     public static final class PathPlanner {
-        // TODO Find out why this doesn't work  
+        // TODO Find out why this doesn't work
         public static final RobotConfig robotConfig = new RobotConfig(
             Mass.ofRelativeUnits(isRocky ? 145.0 : 132.0, Pounds),
             MomentOfInertia.ofRelativeUnits(isRocky ? 8.224 : 7.267, KilogramSquareMeters),
