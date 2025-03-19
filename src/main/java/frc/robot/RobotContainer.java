@@ -271,7 +271,16 @@ public class RobotContainer {
             new PIDSwerve(s_Swerve, s_Pose, face.approachMiddle, true, false))
             .handleInterrupt(() -> { if (!RobotState.haveAlgae()) RobotState.setNoAlgae(); });
     }
-    
+
+    private Command DeLollipop() {
+        return LoggedCommands.deadline("Acquire Algae from lollipop",
+                Commands.sequence(
+                    LoggedCommands.waitUntil("Wait for Algae", RobotState::haveAlgae),
+                    TriggerRumble()),
+                RobotState.IntakeAlgae())
+            .handleInterrupt(() -> { if (!RobotState.haveAlgae()) RobotState.setNoAlgae(); });
+    }
+
     private void setFaceCommands(ReefFace face) {
         alignLeftCommands.put(face, ScoreCoral(face, true));
         alignRightCommands.put(face, ScoreCoral(face, false));
@@ -377,19 +386,25 @@ public class RobotContainer {
 
         goLeft.whileTrue(
             Commands.either(
-                Commands.select(alignLeftCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation())),
+                LoggedCommands.proxy(Commands.select(alignLeftCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation()))),
                 Commands.either(
-                    BargeShot(),
-                    Commands.select(deAlgaefyLeftCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation())),
+                    LoggedCommands.proxy(BargeShot()),
+                    Commands.either(
+                        LoggedCommands.proxy(Commands.select(deAlgaefyLeftCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation()))),
+                        DeLollipop(),
+                        optAutoReefAiming::get),
                     RobotState::haveAlgae),
                 RobotState::haveCoral));
 
         goRight.whileTrue(
             Commands.either(
-                Commands.select(alignRightCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation())),
+                LoggedCommands.proxy(Commands.select(alignRightCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation()))),
                 Commands.either(
-                    BargeShot(),
-                    Commands.select(deAlgaefyRightCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation())),
+                    LoggedCommands.proxy(BargeShot()),
+                    Commands.either(
+                        LoggedCommands.proxy(Commands.select(deAlgaefyRightCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation()))),
+                        DeLollipop(),
+                        optAutoReefAiming::get),
                     RobotState::haveAlgae),
                 RobotState::haveCoral));
 
