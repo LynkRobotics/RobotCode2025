@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
     private PoseSubsystem s_Pose = null;
+    private boolean slowMode = false;
 
     public SwerveModule[] mSwerveMods;
 
@@ -165,6 +166,14 @@ public class Swerve extends SubsystemBase {
 
     public Command Stop() {
         return LoggedCommands.runOnce("Stop Swerve", this::stopSwerve, this);
+    }
+
+    public void setSlowMode(boolean slowMode) {
+        this.slowMode = slowMode;
+    }
+
+    public boolean getSlowMode() {
+        return slowMode;
     }
 
     @Override

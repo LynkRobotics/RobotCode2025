@@ -343,6 +343,7 @@ public class RobotContainer {
 
         return LoggedCommands.sequence("Align to cage " + cage,
             LoggedCommands.runOnce("Disable reef aiming", optAutoReefAiming::disable),
+            LoggedCommands.runOnce("Enable Swerve slow mode", () -> s_Swerve.setSlowMode(true)),
             new PIDSwerve(s_Swerve, s_Pose, cageAlignPose.transformBy(Constants.Pose.cageApproachOffset), true, false, false),
             new PIDSwerve(s_Swerve, s_Pose, cageAlignPose, true, true, true));
     }

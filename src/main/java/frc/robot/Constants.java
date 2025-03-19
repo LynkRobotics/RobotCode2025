@@ -55,6 +55,7 @@ public final class Constants {
 
     public static final class Swerve {
         public static final String swerveCanBus = "lynk";
+        public static final double slowMode = 0.3;
 
         public static final COTSTalonFXSwerveConstants chosenModule =  
             COTSTalonFXSwerveConstants.SDS.MK4i.KrakenX60(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L2);
