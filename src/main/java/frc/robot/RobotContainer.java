@@ -342,12 +342,12 @@ public class RobotContainer {
                 s_Swerve.Stop(),
                 LoggedCommands.deadline("Toss Algae",
                     Commands.sequence(
-                        s_Elevator.WaitForStop(Stop.L4_SCORE),
-                        Commands.waitSeconds(0.5)), // TODO Remove delay?
+                        s_Elevator.WaitForStop(Stop.L4_SCORE)),
                     s_Elevator.Move(Stop.L4_SCORE),
                     LoggedCommands.sequence("Wait to release Algae",
                         LoggedCommands.waitUntil("Wait for Algae Release Point", () -> s_Elevator.aboveStop(Stop.ALGAE_RELEASE)),
-                        RobotState.ScoreGamePiece())));
+                        RobotState.ScoreGamePiece())),
+                s_Elevator.FastZero()); // TODO Defer so that drive control returns?
     }
 
     private Command AlignToCage(Cage cage) {
