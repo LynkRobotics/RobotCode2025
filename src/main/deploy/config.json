@@ -1,0 +1,18 @@
+{
+  "name": "Rocky",
+  "rotations": [
+    { "axis": "x", "degrees": 90 },
+    { "axis": "z", "degrees": 90 }
+  ],
+  "cameras": [
+    {
+      "name": "Forward Camera",
+      "rotations": [
+         { "axis": "y", "degrees": -20.0 }
+      ],
+      "position": [0.2042, 0, 0.1664],
+      "resolution": [1280, 720],
+      "fov": 75
+    }
+  ]
+}
