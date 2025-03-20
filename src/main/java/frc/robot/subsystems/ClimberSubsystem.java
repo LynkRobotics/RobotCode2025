@@ -19,6 +19,7 @@ import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
 import frc.lib.util.TunableOption;
 import frc.robot.Constants;
+import frc.robot.subsystems.RobotState.ClimbState;
 
 public class ClimberSubsystem extends SubsystemBase {
     /* Devices */
@@ -72,6 +73,7 @@ public class ClimberSubsystem extends SubsystemBase {
         return LoggedCommands.either("Deploy Climber",
             Commands.sequence(
                 Commands.runOnce(() -> deployed = true),
+                Commands.runOnce(() -> { if (RobotState.getClimbState() != ClimbState.NONE) RobotState.setClimbState(ClimbState.STARTED); }),
                 Commands.either(
                     LoggedCommands.log("Climber already partially deployed"),
                     Commands.sequence(
@@ -108,7 +110,7 @@ public class ClimberSubsystem extends SubsystemBase {
     public Command Retract() {
         return LoggedCommands.either("Retract Climber",
             Commands.sequence(
-                Commands.runOnce(LEDSubsystem::notifyClimbStarted),
+                Commands.runOnce(() -> RobotState.setClimbState(ClimbState.CLIMBING)),
                 Commands.either(
                     LoggedCommands.log("Climber already engaged"),
                     Commands.sequence(
@@ -128,7 +130,7 @@ public class ClimberSubsystem extends SubsystemBase {
                         LoggedCommands.waitUntil("Wait for full climber retraction", this::climberFullyRetracted)),
                     this::climberFullyRetracted),
                 LoggedCommands.runOnce("Set hold voltage", () -> motor.setControl(holdControl), this),
-                Commands.runOnce(LEDSubsystem::notifyClimbCompleted),
+                Commands.runOnce(() -> RobotState.setClimbState(ClimbState.CLIMBED)),
                 LoggedCommands.idle("Hold climb", this))
                 .handleInterrupt(motor::stopMotor),
             Commands.sequence(

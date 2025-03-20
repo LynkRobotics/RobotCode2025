@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.ctre.phoenix.led.Animation;
+import com.ctre.phoenix.led.ColorFlowAnimation;
 import com.ctre.phoenix.led.FireAnimation;
 import com.ctre.phoenix.led.LarsonAnimation;
 import com.ctre.phoenix.led.RainbowAnimation;
@@ -553,12 +555,15 @@ public final class Constants {
         public static final int totalLEDs = startIdx + numLEDs;
         public static final double brightness = Constants.atHQ ? 0.60 : 1.00;
         /* Animations */
-        public static final FireAnimation fireAnimation = new FireAnimation(1.0, 0.38, numLEDs, 0.8, 0.2, false, startIdx);
-        public static final RainbowAnimation rainbowAnimation = new RainbowAnimation(1.0, 0.7, numLEDs, false, startIdx);
-        public static final LarsonAnimation larsonAnimation = new LarsonAnimation(255, 64, 0, 0, 0.7, numLEDs, BounceMode.Front, 7, startIdx);
+        public static final Animation readyAnimation = new FireAnimation(1.0, 0.38, numLEDs, 0.8, 0.2, false, startIdx);
+        public static final Animation climbedAnimation = new RainbowAnimation(1.0, 0.7, numLEDs, false, startIdx);
+        public static final Animation climbingAnimation = new LarsonAnimation(255, 64, 0, 0, 0.85, numLEDs, BounceMode.Front, 7, startIdx);
+        public static final Animation endGameAnimation = new ColorFlowAnimation(255, 64, 0, 0, 0.85, numLEDs, ColorFlowAnimation.Direction.Forward, startIdx);
         /* Misc */
         public static final double blinkRate = 0.2; // Regular blink rate
         public static final double errorBlinkRate = 0.1; // Blink rate for errors and warnings
         public static final double tempStateTime = 0.70; // How long for warnings and errors
+        public static final double endGameNotifyStart = 20.0;
+        public static final double endGameNotifyDuration = 4.0;    
     }
 }

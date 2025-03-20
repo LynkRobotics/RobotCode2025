@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.Options.optAutoReefAiming;
+
 import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
 // import com.ctre.phoenix.led.LarsonAnimation;
@@ -14,19 +16,18 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.CANdleGroup;
 import frc.robot.Constants;
+import frc.robot.subsystems.RobotState.ClimbState;
 
 public class LEDSubsystem extends SubsystemBase {
     /** Creates a new LEDSubsystem. */
     private static CANdleGroup leds;
     private static final Timer tempStateTimer = new Timer();
     private static final Timer blinkTimer = new Timer();
+    private static final Timer endGameTimer = new Timer();
 
     private static LEDState state = LEDState.STARTUP;
     private static LEDState lastState = null;
     private static boolean blinkOff = false;
-
-    private static boolean climbStarted = false;
-    private static boolean climbCompleted = false;
 
     private enum Color {
         off(0, 0, 0),
@@ -38,6 +39,7 @@ public class LEDSubsystem extends SubsystemBase {
         cyan(0, 255, 255),
         magenta(255, 0, 255),
         yellow(255, 255, 0),
+        dimYellow(150, 150, 0),
         white(250, 250, 250),
         brightWhite(255, 255, 255),
         dim(10, 10, 10),
@@ -79,9 +81,11 @@ public class LEDSubsystem extends SubsystemBase {
     }
 
     public enum LEDState {
-        STARTUP(new LEDConfig(Constants.LEDs.fireAnimation)),
+        STARTUP(new LEDConfig(Constants.LEDs.readyAnimation)),
         DISABLED(new LEDConfig(Color.disabled)),
         NORMAL(new LEDConfig(Color.lynk)),
+        MANUAL(new LEDConfig(Color.hightideTeal)),
+        SLOWMODE(new LEDConfig(Color.dimYellow)),
         CORAL_L1(new LEDConfig(Color.magenta, 0.25)),
         CORAL_L2(new LEDConfig(Color.green, 0.50)),
         CORAL_L3(new LEDConfig(Color.magenta, 0.75)),
@@ -89,8 +93,9 @@ public class LEDSubsystem extends SubsystemBase {
         CORAL_UNKNOWN(new LEDConfig(Color.dim)),
         ALGAE_INTAKING(new LEDConfig(Color.cheesyBlue, true)),
         ALGAE(new LEDConfig(Color.cheesyBlue)),
-        CLIMBING(new LEDConfig(Constants.LEDs.larsonAnimation)),
-        CLIMBED(new LEDConfig(Constants.LEDs.rainbowAnimation)),
+        ENDGAME(new LEDConfig(Constants.LEDs.endGameAnimation)),
+        CLIMBING(new LEDConfig(Constants.LEDs.climbingAnimation)),
+        CLIMBED(new LEDConfig(Constants.LEDs.climbedAnimation)),
         ERROR(new LEDConfig(Color.red, true)),
         WARNING(new LEDConfig(Color.yellow, true));
 
@@ -145,16 +150,6 @@ public class LEDSubsystem extends SubsystemBase {
         tempStateTimer.restart();
     }
 
-    public static void notifyClimbStarted() {
-        climbStarted = true;
-        climbCompleted = false;
-    }
-
-    public static void notifyClimbCompleted() {
-        climbStarted = false;
-        climbCompleted = true;
-    }
-
     @Override
     public void periodic() {
         // Determine the proper LED state
@@ -169,36 +164,53 @@ public class LEDSubsystem extends SubsystemBase {
             }
             // Compute the proper state if's not temporarily overridden
             if (!tempStateTimer.isRunning()) {
-                if (climbStarted) {
-                    state = LEDState.CLIMBING;
-                } else if (climbCompleted) {
-                    state = LEDState.CLIMBED;
-                } else if (RobotState.haveAlgae()) {
-                    state = LEDState.ALGAE;
-                } else if (RobotState.intakingAlgae()) {
-                    state = LEDState.ALGAE_INTAKING;
-                } else if (RobotState.haveCoral()) {
-                    switch (RobotState.getNextStop()) {
-                        case L1:
-                            state = LEDState.CORAL_L1;
-                            break;
-                        case L2:
-                            state = LEDState.CORAL_L2;
-                            break;
-                        case L3:
-                            state = LEDState.CORAL_L3;
-                            break;
-                        case L4:
-                        case L4_SCORE:
-                            state = LEDState.CORAL_L4;
-                            break;
-                        default:
-                            state = LEDState.CORAL_UNKNOWN;
-                            break;
-                    }
+                ClimbState climbState = RobotState.getClimbState();
+                double timeLeft = DriverStation.getMatchTime();
+
+                if (DriverStation.isTeleopEnabled() && timeLeft < Constants.LEDs.endGameNotifyStart && endGameTimer.get() == 0) {
+                    DogLog.log("LED/Status", "Begin end game");
+                    endGameTimer.start();
+                    state = LEDState.ENDGAME;
+                } else if (endGameTimer.isRunning() && endGameTimer.hasElapsed(Constants.LEDs.endGameNotifyDuration)) {
+                    DogLog.log("LED/Status", "End end game");
+                    endGameTimer.stop();
                 } else {
-                    state = LEDState.NORMAL;
-                }        
+                    DogLog.log("LED/Status", "State: " + climbState + "; timeLeft = " + String.format("%1.1f", timeLeft) + "; timer = " + String.format("%1.1f", endGameTimer.get()));
+                }
+                if (!endGameTimer.isRunning()) {
+                    if (climbState == ClimbState.CLIMBING) {
+                        state = LEDState.CLIMBING;
+                    } else if (climbState == ClimbState.CLIMBED) {
+                        state = LEDState.CLIMBED;
+                    } else if (climbState == ClimbState.STARTED) {
+                        state = LEDState.SLOWMODE;
+                    } else if (RobotState.haveAlgae()) {
+                        state = LEDState.ALGAE;
+                    } else if (RobotState.intakingAlgae()) {
+                        state = LEDState.ALGAE_INTAKING;
+                    } else if (RobotState.haveCoral()) {
+                        switch (RobotState.getNextStop()) {
+                            case L1:
+                                state = LEDState.CORAL_L1;
+                                break;
+                            case L2:
+                                state = LEDState.CORAL_L2;
+                                break;
+                            case L3:
+                                state = LEDState.CORAL_L3;
+                                break;
+                            case L4:
+                            case L4_SCORE:
+                                state = LEDState.CORAL_L4;
+                                break;
+                            default:
+                                state = LEDState.CORAL_UNKNOWN;
+                                break;
+                        }
+                    } else {
+                        state = optAutoReefAiming.get() ? LEDState.NORMAL : LEDState.MANUAL;
+                    }        
+                }
             }
         }
 

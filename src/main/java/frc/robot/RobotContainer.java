@@ -43,6 +43,7 @@ import frc.robot.Constants.Pose.ReefFace;
 import frc.robot.Constants.Elevator.Stop;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.RobotState.ClimbState;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -355,7 +356,7 @@ public class RobotContainer {
 
         return LoggedCommands.sequence("Align to cage " + cage,
             LoggedCommands.runOnce("Disable reef aiming", optAutoReefAiming::disable),
-            LoggedCommands.runOnce("Enable Swerve slow mode", () -> s_Swerve.setSlowMode(true)),
+            LoggedCommands.runOnce("Enable end game mode", () -> RobotState.setClimbState(ClimbState.STARTED)),
             new PIDSwerve(s_Swerve, s_Pose, cageAlignPose.transformBy(Constants.Pose.cageApproachOffset), true, false, false),
             new PIDSwerve(s_Swerve, s_Pose, cageAlignPose, true, true, true));
     }

@@ -25,6 +25,7 @@ public class RobotState extends SubsystemBase {
     private static final CANrange finalSensor;
     private static boolean elevatorAtZero = false;
     private static GamePieceState gamePieceState = GamePieceState.NONE;
+    private static ClimbState climbState = ClimbState.NONE;
     private static final Timer L1Timer = new Timer();
     private static Stop activeStop = Stop.SAFE;
     private static Stop nextStop = Stop.SAFE;
@@ -48,6 +49,13 @@ public class RobotState extends SubsystemBase {
         ADVANCING_CORAL,
         HOLDING_CORAL,
         SCORING_CORAL
+    }
+
+    public enum ClimbState {
+        NONE,
+        STARTED,
+        CLIMBING,
+        CLIMBED
     }
 
     static {
@@ -241,6 +249,14 @@ public class RobotState extends SubsystemBase {
         return LoggedCommands.runOnce("Unjam Coral", () -> unjamCoral());
     }
 
+    public static void setClimbState(ClimbState state) {
+        climbState = state;
+    }
+
+    public static ClimbState getClimbState() {
+        return climbState;
+    }
+
     @Override
     public void periodic() {
         boolean intakeSensor = getIntakeSensor();
@@ -297,6 +313,7 @@ public class RobotState extends SubsystemBase {
         DogLog.log("State/Flipper sensor", flipperSensor);
         DogLog.log("State/Final sensor", finalSensor);
         DogLog.log("State/Game Piece State", gamePieceState);
+        DogLog.log("State/Climb State", climbState);
         DogLog.log("State/Have coral", haveCoral());
         DogLog.log("State/Have algae", haveAlgae());
 
