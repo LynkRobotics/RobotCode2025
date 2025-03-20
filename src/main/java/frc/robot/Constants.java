@@ -263,7 +263,7 @@ public final class Constants {
             // Intake occurs at zero
             SAFE     (Constants.Elevator.baseHeight + 5.0),
             L1       (28.5 - Constants.Elevator.endEffectorHeight),
-            L1_SCORE (31.0 - Constants.Elevator.endEffectorHeight),
+            L1_SCORE (30.0 - Constants.Elevator.endEffectorHeight),
             L2       (34.5 - Constants.Elevator.endEffectorHeight),
             L2_ALGAE (38.0 - Constants.Elevator.endEffectorHeight),
             L3       (49.5 - Constants.Elevator.endEffectorHeight),
@@ -279,7 +279,7 @@ public final class Constants {
             public final double height;
         }
 
-        public static final double L1RaiseDelay = 0.35;
+        public static final double L1RaiseDelay = 0.15;
         public static final double standoffBoost = 2.0; // In inches
     }
 
@@ -298,7 +298,7 @@ public final class Constants {
         public static final double unjamVoltage = 2.00;
         public static final double advanceVoltage = -1.20;
         public static final double scoreVoltage = -3.5;
-        public static final double scoreL1Voltage = -2.0; // -2.0 pre-NCASH
+        public static final double scoreL1Voltage = -1.3; // -2.0 pre-NCASH
         public static final double algaeVoltage = 3.00;
         public static final double algaeHoldVoltage = 1.00;
         public static final double algaeBargeVoltage = -12.00;
@@ -402,8 +402,8 @@ public final class Constants {
         private static final Translation2d bonusOffset = new Translation2d(bonusStandoff, 0.0);
         private static final Translation2d leftBonusOffset = leftOffset.plus(bonusOffset);
         private static final Translation2d rightBonusOffset = rightOffset.plus(bonusOffset);
-        private static final Transform2d leftL1Transform = new Transform2d(0, -branchSeparation / 2.0, Rotation2d.kZero);
-        private static final Transform2d rightL1Transform = new Transform2d(0, branchSeparation / 2.0, Rotation2d.kZero);
+        private static final Transform2d leftL1Transform = new Transform2d(-Units.inchesToMeters(2.5), -branchSeparation / 2.0 + Units.inchesToMeters(2.0), Rotation2d.kZero);
+        private static final Transform2d rightL1Transform = new Transform2d(-Units.inchesToMeters(2.5), branchSeparation / 2.0 - Units.inchesToMeters(2.0), Rotation2d.kZero);
 
         public static final double elevatorNoDownDistance = reefToFaceDistance + reefOffset + Units.inchesToMeters(12.0);
 

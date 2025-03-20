@@ -193,7 +193,19 @@ public class RobotContainer {
                                 s_Elevator.AutoElevatorUp(left ? face.leftL1.getTranslation() : face.rightL1.getTranslation()),
                                 s_Elevator.AutoElevatorUp(left ? face.alignLeft.getTranslation() : face.alignRight.getTranslation()),
                                 () -> RobotState.getNextStop() == Stop.L1)))),
-                RobotState.ScoreGamePiece()),
+                Commands.parallel(
+                    RobotState.ScoreGamePiece(),
+                    Commands.either(
+                        Commands.sequence(
+                            Commands.waitSeconds(0.25),
+                            Commands.defer(() -> new PIDSwerve(s_Swerve, s_Pose, s_Pose.getPose().plus(new Transform2d(0, 0, Rotation2d.fromDegrees(left ? 15 : -15))), left, left), Set.of(s_Swerve)),
+                            s_Swerve.Stop(),
+                            Commands.waitSeconds(0.35)
+                        ),
+                        Commands.none(),
+                        () -> RobotState.getNextStop() == Stop.L1
+                    )
+                )),
             LoggedCommands.log("Cannot score coral without coral"),
             RobotState::haveCoral);
     }
