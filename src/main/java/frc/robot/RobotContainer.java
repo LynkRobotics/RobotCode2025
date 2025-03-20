@@ -280,7 +280,7 @@ public class RobotContainer {
                                 s_Elevator.WaitForStop(algaeStop),
                                 s_Elevator.AutoElevatorUp(face.alignMiddle.getTranslation(), algaeStop)),
                             optInvertAlgae)))),
-            new PIDSwerve(s_Swerve, s_Pose, face.approachMiddle, true, false))
+            new PIDSwerve(s_Swerve, s_Pose, face.algaeBackup, true, false))
             .handleInterrupt(() -> { if (!RobotState.haveAlgae()) RobotState.setNoAlgae(); });
     }
 
