@@ -34,7 +34,7 @@ import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 
 public final class Constants {
-    public static final boolean atHQ = true; //TODO: consider a field calibration option to allow NT broadcasting
+    public static final boolean atHQ = false; //TODO: consider a field calibration option to allow NT broadcasting
     public static final double stickDeadband = 0.1;
     public static final double driveStickSensitivity = 1.00; 
     public static final double turnStickSensitivity = 1.00;
