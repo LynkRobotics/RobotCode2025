@@ -362,7 +362,7 @@ public final class Constants {
     public static final class Pose {
         public static final int pigeonID = 1;
 
-        public static final PIDController rotationPID = new PIDController(0.003, 0.0, 0.0); // kI was 0.050 for NCCMP 2024
+        public static final PIDController rotationPID = new PIDController(0.012, 0.0, 0.0); // kI was 0.050 for NCCMP 2024
         public static final double rotationKS = 0.02;
         public static final double rotationIZone = 2.0; // degrees
 
