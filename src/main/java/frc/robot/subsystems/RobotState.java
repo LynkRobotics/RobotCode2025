@@ -86,7 +86,8 @@ public class RobotState extends SubsystemBase {
         CANrangeConfig.FovParams.FOVCenterY = 11.8; // Maximum
         CANrangeConfig.FovParams.FOVRangeX = 6.75; // Minimum
         CANrangeConfig.FovParams.FOVRangeY = 6.75; // Minimum
-        CANrangeConfig.ProximityParams.ProximityThreshold = 0.30;
+        CANrangeConfig.ProximityParams.ProximityThreshold = 0.25;
+        CANrangeConfig.ProximityParams.ProximityHysteresis = 0.02;
         flipperSensor.getConfigurator().apply(CANrangeConfig); //should these be different configs?
 
         CANrangeConfig.FovParams.FOVCenterX = 0; // Reset to default
