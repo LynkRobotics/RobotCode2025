@@ -481,7 +481,6 @@ public class RobotContainer {
             RobotState.WaitForCoral(),
             Commands.sequence(
                 Commands.defer(() -> new PIDSwerve(s_Swerve, s_Pose, s_Pose.getPose().transformBy(transform), false, false), Set.of(s_Swerve)),
-                Commands.defer(() -> new PIDSwerve(s_Swerve, s_Pose, s_Pose.getPose().transformBy(transform), false, false), Set.of(s_Swerve)),
                 Commands.defer(() -> new PIDSwerve(s_Swerve, s_Pose, s_Pose.getPose().transformBy(transform), false, false), Set.of(s_Swerve))
             ));
     }
@@ -496,16 +495,24 @@ public class RobotContainer {
             SetStop(Stop.L4),
             LoggedCommands.proxy(PathCommand("Start towards EF")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
-            LoggedCommands.proxy(PathCommand("E to CS")),
+            Commands.race(
+                LoggedCommands.proxy(PathCommand("E to CS")),
+                RobotState.WaitForCoral()),
             LoggedCommands.proxy(BackUpAndWaitForCoral()),
             LoggedCommands.proxy(PathCommand("CS towards CD")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, true)),
-            LoggedCommands.proxy(PathCommand("C to CS")),
+            Commands.race(
+                LoggedCommands.proxy(PathCommand("C to CS")),
+                RobotState.WaitForCoral()
+            ),
             LoggedCommands.proxy(BackUpAndWaitForCoral()),
             LoggedCommands.proxy(PathCommand("CS towards CD")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false)),
             s_Swerve.CoastDriveMotors(),
-            LoggedCommands.proxy(PathCommand("D to CS")),
+            Commands.race(
+                LoggedCommands.proxy(PathCommand("D to CS")),
+                RobotState.WaitForCoral()
+            ),
             LoggedCommands.proxy(BackUpAndWaitForCoral()),
             LoggedCommands.proxy(PathCommand("CS to near B")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
