@@ -451,7 +451,8 @@ public final class Constants {
             HQ(8.16, 2.37);
 
             private final Translation2d location;
-            private static final Translation2d redFudge = new Translation2d(0.0, 0.05);
+            private static final Translation2d redFudge = new Translation2d(0.08, 0.02);
+            private static final Translation2d blueFudge = new Translation2d(0.0, 0.02);
 
             Cage(double yInches) {
                 // 8.774 m
@@ -463,10 +464,11 @@ public final class Constants {
             }
 
             public Translation2d location() {
+                // NOTE: This is prior to flipping to red
                 if (Robot.isRed()) {
                     return location.plus(redFudge);
                 } else {
-                    return location;
+                    return location.plus(blueFudge);
                 }        
             }
         }
@@ -493,8 +495,12 @@ public final class Constants {
         // Red MIDDLE = 9.07, 1.84
         // Red FAR = X
 
+        // Mecklenburg
+        // Blue CLOSE = 8.35, 5.10   (8.774 - 0.42)
+        // Red CLOSE = 9.11, 2.95    (8.774 + 0.34)
+
         // public static final Transform2d cageOffset = new Transform2d(robotFrameLength / 2.0 + bumperWidth - Units.inchesToMeters(2.0), 0, Rotation2d.kZero);
-        public static final Transform2d cageOffset = new Transform2d(0.30, 0, Rotation2d.kZero);
+        public static final Transform2d cageOffset = new Transform2d(0.42, 0, Rotation2d.kZero);
         public static final Transform2d cageApproachOffset = new Transform2d(Units.inchesToMeters(16.0), 0, Rotation2d.kZero);
     }
 
