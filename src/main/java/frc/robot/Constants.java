@@ -300,7 +300,7 @@ public final class Constants {
         public static final double unjamVoltage = 3.0;
         public static final double advanceVoltage = -1.9;
         public static final double scoreVoltage = -6.0;
-        public static final double scoreL1Voltage = -1.8;
+        public static final double scoreL1Voltage = -2.0;
         public static final double algaeVoltage = 3.3;
         public static final double algaeHoldVoltage = 1.2;
         public static final double algaeBargeVoltage = -12.0;
