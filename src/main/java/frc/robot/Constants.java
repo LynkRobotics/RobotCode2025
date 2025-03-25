@@ -54,6 +54,7 @@ public final class Constants {
     // Elastic Notifications
     public static final int warningTime = 4000;
     public static final int errorTime = 7000;
+    public static final int infoTime = 6000;
 
     public static final class Swerve {
         public static final String swerveCanBus = "lynk";

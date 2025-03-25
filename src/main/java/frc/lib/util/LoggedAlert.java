@@ -46,7 +46,7 @@ public class LoggedAlert {
      * @param msg the message of the logged info notification
      */
     public static void Info(String subsystem, String title, String msg) {
-        Elastic.sendNotification(new Notification(NotificationLevel.INFO, title, msg));
+        Elastic.sendNotification(new Notification(NotificationLevel.INFO, title, msg, Constants.infoTime));
         String formattedInfo = new String(subsystem + ": " + title + ": " + msg); //Constant formatting
         DogLog.logFault(formattedInfo, AlertType.kInfo); //Info(s) only
         DogLog.logFault(formattedInfo); //All Faults
