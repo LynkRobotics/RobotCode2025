@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.LoggedAlert;
 import frc.lib.util.TunableOption;
 import frc.robot.Constants;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -37,6 +38,7 @@ public class VisionSubsystem extends SubsystemBase {
     private PhotonPipelineResult lastResult = null;
     private boolean updateDashboard = true;
     private static final TunableOption optUpdateVisionDashboard = new TunableOption("Update vision dashboard", false);
+    private boolean cameraDisconectedCheck;
 
     public VisionSubsystem() {
         assert (instance == null);
@@ -51,6 +53,7 @@ public class VisionSubsystem extends SubsystemBase {
         photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
         SmartDashboard.putData("Vision/Field", field);
+        cameraDisconectedCheck = false;
     }
 
     public static VisionSubsystem getInstance() {
@@ -111,6 +114,15 @@ public class VisionSubsystem extends SubsystemBase {
             // SmartDashboard.putString("Vision/Result", lastResult.toString());
             SmartDashboard.putBoolean("Vision/Have target(s)", haveTarget);
             // SmartDashboard.putString("Vision/Last pose", PoseSubsystem.prettyPose(lastPose));
+        }
+
+        if (camera.isConnected() && cameraDisconectedCheck) {
+            LoggedAlert.Info("Vision", "Vision is Up", "Camera is connected");
+            cameraDisconectedCheck = false;
+        }
+        if (!camera.isConnected() && !cameraDisconectedCheck) { //If the camera is disconnected and the camera hasnt been disconnected before (so we dont flash the LEDs a bunch)
+            LoggedAlert.Error("Vision", "Vision Down", "Camera is not connected");
+            cameraDisconectedCheck = true;
         }
     }
 }
