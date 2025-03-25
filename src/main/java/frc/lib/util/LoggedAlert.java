@@ -17,6 +17,7 @@ public class LoggedAlert {
     public static void Error(String subsystem, String title, String msg) {
         Elastic.sendNotification(new Notification(NotificationLevel.ERROR, title, msg, Constants.errorTime));
         DogLog.log("Fault/Error", subsystem + ": " + title + " " + msg);
+        
         DogLog.log("Fault/All Faults", subsystem + ": " + "Error: " + title + " " + msg);
         LEDSubsystem.triggerError(); //TODO: i dont really like subsystem calls in util classes
     }
