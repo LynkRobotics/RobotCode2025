@@ -1,6 +1,7 @@
 package frc.lib.util;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.lib.util.Elastic.Notification;
 import frc.lib.util.Elastic.Notification.NotificationLevel;
 import frc.robot.Constants;
@@ -16,9 +17,9 @@ public class LoggedAlert {
      */
     public static void Error(String subsystem, String title, String msg) {
         Elastic.sendNotification(new Notification(NotificationLevel.ERROR, title, msg, Constants.errorTime));
-        DogLog.log("Fault/Error", subsystem + ": " + title + " " + msg);
-        
-        DogLog.log("Fault/All Faults", subsystem + ": " + "Error: " + title + " " + msg);
+        String formattedError = new String(subsystem + ": " + title + ": " + msg); //Constant Formatting
+        DogLog.logFault(formattedError, AlertType.kError); //Errors only
+        DogLog.logFault(formattedError); //All Faults
         LEDSubsystem.triggerError(); //TODO: i dont really like subsystem calls in util classes
     }
 
@@ -31,8 +32,9 @@ public class LoggedAlert {
      */
     public static void Warning(String subsystem, String title, String msg) {
         Elastic.sendNotification(new Notification(NotificationLevel.WARNING, title, msg, Constants.warningTime));
-        DogLog.log("Fault/Warning", subsystem + ": " + title + " " + msg);
-        DogLog.log("Fault/All Faults", subsystem + ": " + "Warning: " + title + " " + msg);
+        String formattedWarning = new String(subsystem + ": " + title + ": " + msg); //Constant formatting
+        DogLog.logFault(formattedWarning, AlertType.kWarning); //Warnings only
+        DogLog.logFault(formattedWarning); //All Faults
         LEDSubsystem.triggerWarning();
     }
 
@@ -45,7 +47,9 @@ public class LoggedAlert {
      */
     public static void Info(String subsystem, String title, String msg) {
         Elastic.sendNotification(new Notification(NotificationLevel.INFO, title, msg));
-        DogLog.log("Fault/Info", subsystem + ": " + title + " " + msg);
-        DogLog.log("Fault/All Faults",  subsystem + ": " + "Info: " + title + " " + msg);
+        String formattedInfo = new String(subsystem + ": " + title + ": " + msg); //Constant formatting
+        DogLog.logFault(formattedInfo, AlertType.kInfo); //Info(s) only
+        DogLog.logFault(formattedInfo); //All Faults
+        //TODO: consider LEDSubsystem.triggerInfo();
     }
 }
