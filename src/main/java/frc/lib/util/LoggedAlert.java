@@ -50,6 +50,6 @@ public class LoggedAlert {
         String formattedInfo = new String(subsystem + ": " + title + ": " + msg); //Constant formatting
         DogLog.logFault(formattedInfo, AlertType.kInfo); //Info(s) only
         DogLog.logFault(formattedInfo); //All Faults
-        //TODO: consider LEDSubsystem.triggerInfo();
+        LEDSubsystem.triggerInfo();
     }
 }
