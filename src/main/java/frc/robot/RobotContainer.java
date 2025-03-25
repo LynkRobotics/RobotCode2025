@@ -26,6 +26,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
@@ -105,6 +106,7 @@ public class RobotContainer {
             .withLogEntryQueueCapacity(1000)
             .withLogExtras(true)
             .withNtPublish(Constants.atHQ));
+        DogLog.setPdh(new PowerDistribution());
 
         DogLog.log("Misc/RIO Serial Number", RobotController.getSerialNumber());
         DogLog.log("Misc/Is Rocky?", Constants.isRocky);
