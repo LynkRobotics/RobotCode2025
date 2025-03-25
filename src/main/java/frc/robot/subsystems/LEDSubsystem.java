@@ -97,7 +97,8 @@ public class LEDSubsystem extends SubsystemBase {
         CLIMBING(new LEDConfig(Constants.LEDs.climbingAnimation)),
         CLIMBED(new LEDConfig(Constants.LEDs.climbedAnimation)),
         ERROR(new LEDConfig(Color.red, true)),
-        WARNING(new LEDConfig(Color.yellow, true));
+        WARNING(new LEDConfig(Color.yellow, true)),
+        INFO(new LEDConfig(Color.white, true));
 
         public final LEDConfig config;
 
@@ -147,6 +148,11 @@ public class LEDSubsystem extends SubsystemBase {
 
     public static void triggerWarning() {
         state = LEDState.WARNING;
+        tempStateTimer.restart();
+    }
+
+    public static void triggerInfo() {
+        state = LEDState.INFO;
         tempStateTimer.restart();
     }
 
