@@ -107,6 +107,14 @@ public class ClimberSubsystem extends SubsystemBase {
         return motor.getPosition().getValueAsDouble() <= Constants.Climber.fullyRetractedPosition;
     }
 
+    public Command SlowRetract() {
+        return Commands.sequence(
+            LoggedCommands.runOnce("Slow Climber Retract", () -> motor.setControl(slowRetractControl), this),
+            Commands.idle(this))
+            .handleInterrupt(motor::stopMotor);
+
+    }
+
     public Command Retract() {
         return LoggedCommands.either("Retract Climber",
             Commands.sequence(

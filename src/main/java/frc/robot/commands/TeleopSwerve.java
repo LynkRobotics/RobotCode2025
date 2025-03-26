@@ -44,6 +44,10 @@ public class TeleopSwerve extends LoggedCommandBase {
     @Override
     public void execute() {
         super.execute();
+
+        if (optServiceMode.get()) {
+            return;
+        }
         
         /* Get Values, Deadband */
         double translationVal = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.stickDeadband);

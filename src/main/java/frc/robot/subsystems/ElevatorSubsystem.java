@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import static frc.robot.Options.optBonusCoralStandoff;
+import static frc.robot.Options.optServiceMode;
 
 import java.util.function.Supplier;
 
@@ -360,23 +361,30 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command MoveToSafety() {
-        return LoggedCommands.sequence("Move Elevator to Safety",
-            Commands.runOnce(() -> {
-                movingToSafety = true;
-                safetyDeferred = false;
-            }),
-            Commands.either(
-                LoggedCommands.deadline("Move to L1 with Coral",
-                    LoggedCommands.waitUntil("Wait for no Coral", () -> !RobotState.haveCoral()),
-                    Move(Stop.L1)),
-                LoggedCommands.sequence("Zero and Idle",
-                    Commands.either(
-                        Zero(),
-                        FastZero(),
-                        RobotState::haveAlgae),
-                    LoggedCommands.idle("Elevator holding at zero", this)),
-                RobotState::coralReady))
-                .handleInterrupt(() -> movingToSafety = false);
+        return Commands.either(
+            Commands.sequence(
+                LoggedCommands.log("Not moving by default in service mode"),
+                Stop(),
+                Commands.idle(this)
+            ),
+            LoggedCommands.sequence("Move Elevator to Safety",
+                Commands.runOnce(() -> {
+                    movingToSafety = true;
+                    safetyDeferred = false;
+                }),
+                Commands.either(
+                    LoggedCommands.deadline("Move to L1 with Coral",
+                        LoggedCommands.waitUntil("Wait for no Coral", () -> !RobotState.haveCoral()),
+                        Move(Stop.L1)),
+                    LoggedCommands.sequence("Zero and Idle",
+                        Commands.either(
+                            Zero(),
+                            FastZero(),
+                            RobotState::haveAlgae),
+                        LoggedCommands.idle("Elevator holding at zero", this)),
+                    RobotState::coralReady))
+                    .handleInterrupt(() -> movingToSafety = false),
+            optServiceMode::get);
     }
     
     public void initDefaultCommand() {

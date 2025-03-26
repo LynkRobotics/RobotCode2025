@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static frc.robot.Options.optServiceMode;
 import static frc.robot.Options.optAutoReefAiming;
 import static frc.robot.Options.optBackupPush;
 import static frc.robot.Options.optBonusCoralStandoff;
@@ -448,7 +449,11 @@ public class RobotContainer {
         }
 
         driver.povDown().onTrue(s_Climber.Deploy());
-        driver.povUp().whileTrue(s_Climber.Retract());
+        driver.povUp().whileTrue(
+            Commands.either(
+                s_Climber.SlowRetract(),
+                s_Climber.Retract(),
+                optServiceMode::get));
         driver.povRight().whileTrue(LoggedCommands.parallel("Deploy and Align",
             s_Climber.Deploy(),
             AlignToNearestCage()));

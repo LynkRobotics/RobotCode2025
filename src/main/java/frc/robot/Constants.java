@@ -565,6 +565,7 @@ public final class Constants {
         public static final Animation climbedAnimation = new RainbowAnimation(1.0, 0.7, numLEDs, false, startIdx);
         public static final Animation climbingAnimation = new LarsonAnimation(255, 64, 0, 0, 0.85, numLEDs, BounceMode.Front, 7, startIdx);
         public static final Animation endGameAnimation = new ColorFlowAnimation(255, 64, 0, 0, 0.85, numLEDs, ColorFlowAnimation.Direction.Forward, startIdx);
+        public static final Animation serviceModeAnimation = new ColorFlowAnimation(0, 25, 25, 0, 0.3, numLEDs, ColorFlowAnimation.Direction.Backward, startIdx);
         /* Misc */
         public static final double blinkRate = 0.2; // Regular blink rate
         public static final double errorBlinkRate = 0.1; // Blink rate for errors and warnings

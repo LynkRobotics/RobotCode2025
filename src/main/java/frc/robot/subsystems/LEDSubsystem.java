@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import static frc.robot.Options.optAutoReefAiming;
+import static frc.robot.Options.optServiceMode;
 
 import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
@@ -44,6 +45,7 @@ public class LEDSubsystem extends SubsystemBase {
         brightWhite(255, 255, 255),
         dim(10, 10, 10),
         lynk(255, 64, 0),
+        service(0, 10, 10),
         disabled(200, 0, 0);
 
         public final int r, g, b;
@@ -96,6 +98,8 @@ public class LEDSubsystem extends SubsystemBase {
         ENDGAME(new LEDConfig(Constants.LEDs.endGameAnimation)),
         CLIMBING(new LEDConfig(Constants.LEDs.climbingAnimation)),
         CLIMBED(new LEDConfig(Constants.LEDs.climbedAnimation)),
+        SERVICE_MODE(new LEDConfig(Constants.LEDs.serviceModeAnimation)),
+        SERVICE_DISABLED(new LEDConfig(Color.service)),
         ERROR(new LEDConfig(Color.red, true)),
         WARNING(new LEDConfig(Color.yellow, true));
 
@@ -153,7 +157,9 @@ public class LEDSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // Determine the proper LED state
-        if (DriverStation.isDisabled()) {
+        if (optServiceMode.get()) {
+            state = DriverStation.isDisabled() ? LEDState.SERVICE_DISABLED : LEDState.SERVICE_MODE;
+        } else if (DriverStation.isDisabled()) {
             if (state != LEDState.STARTUP && state != LEDState.DISABLED) {
                 state = LEDState.DISABLED;
             }
@@ -216,7 +222,7 @@ public class LEDSubsystem extends SubsystemBase {
 
         // Change the LEDs if the state has changed
         if (state != lastState) {
-            if (lastState != null && lastState.config.animation != null) {
+            if (lastState == null || lastState.config.animation != null) {
                 leds.clearAnimation();
             }
             if (state.config.animation != null) {

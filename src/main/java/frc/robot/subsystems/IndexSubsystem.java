@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import static frc.robot.Options.optIndexEnabled;
+import static frc.robot.Options.optServiceMode;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -52,7 +53,11 @@ public class IndexSubsystem extends SubsystemBase {
         GamePieceState gamePieceState = RobotState.getGamePieceState();
         double velocity = motor.getVelocity().getValueAsDouble();
 
-        if (optIndexEnabled.get()) {
+        if (optServiceMode.get()) {
+            if (velocity != 0.0) {
+                motor.stopMotor();
+            }
+        } else if (optIndexEnabled.get()) {
             if (gamePieceState == GamePieceState.INTAKING_CORAL && Math.abs(velocity) < Constants.Index.minIntakeVelocity) {
                 stallCount++;
                 if (stallCount > Constants.Index.maxStallCount) {
