@@ -452,7 +452,9 @@ public class RobotContainer {
         driver.povRight().whileTrue(LoggedCommands.parallel("Deploy and Align",
             s_Climber.Deploy(),
             AlignToNearestCage()));
-        driver.povLeft().whileTrue(s_Swerve.setDriveVoltage());
+        if (Constants.atHQ) {
+            driver.povLeft().whileTrue(s_Swerve.setDriveVoltage());
+        }
     }
 
     /** 
