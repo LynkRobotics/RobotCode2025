@@ -214,7 +214,7 @@ public final class Constants {
             isRocky ?                
                 new Transform3d(
                     new Translation3d(Units.inchesToMeters(30.0/2.0 - 6.958), 0.0, Units.inchesToMeters(6.55)),
-                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(-20.0), 0.0))
+                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(-18.2), 0.0))
             :
                 new Transform3d(
                     new Translation3d(0.192, 0.0, 0.325),
