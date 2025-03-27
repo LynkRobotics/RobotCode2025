@@ -3,6 +3,7 @@ package frc.lib.util;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -74,6 +75,17 @@ public class SwerveModule {
             driveVelocity.FeedForward = driveFeedForward.calculate(desiredState.speedMetersPerSecond);
             mDriveMotor.setControl(driveVelocity);
         }
+    }
+
+    public void setDriveVoltage(double voltage) {
+        mDriveMotor.setControl(new VoltageOut(voltage).withEnableFOC(true));
+    }
+
+    public double getDriveStator() {
+        return mDriveMotor.getStatorCurrent().getValueAsDouble();
+    }
+    public double getDriveVelocity() {
+        return mDriveMotor.getVelocity().getValueAsDouble();
     }
 
     public double alignmentError() {
