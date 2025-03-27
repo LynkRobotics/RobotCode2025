@@ -6,6 +6,7 @@ public final class Options {
     /* Global Toggleable Options and their defaults */
     public static final TunableOption optBackupPush = new TunableOption("Back Up in Auto", false);
     public static final TunableOption optMirrorAuto = new TunableOption("Mirror Auto to Left", false);
+    public static final TunableOption optAutoCoralWait = new TunableOption("Wait for Coral in Auto", true);
     public static final TunableOption optAutoReefAiming = new TunableOption("Automatically Aim at Reef", true);
     public static final TunableOption optBonusCoralStandoff = new TunableOption("Bonus Coral Standoff", false);
     public static final TunableOption optAlgaeBargeOnly = new TunableOption("Algae into Barge Only", Constants.atHQ);
