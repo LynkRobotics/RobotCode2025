@@ -81,8 +81,8 @@ public class RobotContainer {
     /* Autonomous Control */
     private final SendableChooser<Command> autoChooser;
 
-    EnumMap<ReefFace, Command> alignLeftCommands = new EnumMap<>(ReefFace.class);
-    EnumMap<ReefFace, Command> alignRightCommands = new EnumMap<>(ReefFace.class);
+    EnumMap<ReefFace, Command> coralLeftCommands = new EnumMap<>(ReefFace.class);
+    EnumMap<ReefFace, Command> coralRightCommands = new EnumMap<>(ReefFace.class);
     EnumMap<ReefFace, Command> deAlgaefyLeftCommands = new EnumMap<>(ReefFace.class);
     EnumMap<ReefFace, Command> deAlgaefyRightCommands = new EnumMap<>(ReefFace.class);
 
@@ -295,8 +295,8 @@ public class RobotContainer {
     }
 
     private void setFaceCommands(ReefFace face) {
-        alignLeftCommands.put(face, ScoreCoral(face, true));
-        alignRightCommands.put(face, ScoreCoral(face, false));
+        coralLeftCommands.put(face, ScoreCoral(face, true));
+        coralRightCommands.put(face, ScoreCoral(face, false));
         deAlgaefyLeftCommands.put(face, DeAlgaefy(face));
         deAlgaefyRightCommands.put(face, DeAlgaefy(face));
     }
@@ -361,8 +361,30 @@ public class RobotContainer {
             new PIDSwerve(s_Swerve, s_Pose, cageAlignPose, true, true, true));
     }
 
+    private Command ProcessorAlign() {
+        return LoggedCommands.sequence("Align to processor",
+            new PIDSwerve(s_Swerve, s_Pose, Constants.Pose.processorApproach, true, false, false),
+            new PIDSwerve(s_Swerve, s_Pose, Constants.Pose.processorScore, true, true, false));
+    }
+
     private Command AlignToNearestCage() {
         return Commands.defer(() -> AlignToCage(s_Pose.nearestCage()), Set.of(s_Swerve));
+    }
+
+    private Command SmartScore(boolean left) {
+        return Commands.either(
+            LoggedCommands.proxy(Commands.select(left ? coralLeftCommands : coralRightCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation()))),
+            Commands.either(
+                Commands.either(
+                    LoggedCommands.proxy(ProcessorAlign()),
+                    LoggedCommands.proxy(BargeShot()),
+                    RobotState::algaeToProcessor),
+                Commands.either(
+                    LoggedCommands.proxy(Commands.select(left ? deAlgaefyLeftCommands : deAlgaefyRightCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation()))),
+                    DeLollipop(),
+                    optAutoReefAiming::get),
+                RobotState::haveAlgae),
+            RobotState::haveCoral);
     }
 
     /**
@@ -398,29 +420,8 @@ public class RobotContainer {
         L2.onTrue(SetStop(Stop.L2));
         L1.onTrue(SetStop(Stop.L1));
 
-        goLeft.whileTrue(
-            Commands.either(
-                LoggedCommands.proxy(Commands.select(alignLeftCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation()))),
-                Commands.either(
-                    LoggedCommands.proxy(BargeShot()),
-                    Commands.either(
-                        LoggedCommands.proxy(Commands.select(deAlgaefyLeftCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation()))),
-                        DeLollipop(),
-                        optAutoReefAiming::get),
-                    RobotState::haveAlgae),
-                RobotState::haveCoral));
-
-        goRight.whileTrue(
-            Commands.either(
-                LoggedCommands.proxy(Commands.select(alignRightCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation()))),
-                Commands.either(
-                    LoggedCommands.proxy(BargeShot()),
-                    Commands.either(
-                        LoggedCommands.proxy(Commands.select(deAlgaefyRightCommands, () -> PoseSubsystem.nearestFace(s_Pose.getPose().getTranslation()))),
-                        DeLollipop(),
-                        optAutoReefAiming::get),
-                    RobotState::haveAlgae),
-                RobotState::haveCoral));
+        goLeft.whileTrue(SmartScore(true));
+        goRight.whileTrue(SmartScore(false));
 
         alignmentToggle.onTrue(LoggedCommands.runOnce("Toggle Alignment", optAutoReefAiming::toggle));
 
