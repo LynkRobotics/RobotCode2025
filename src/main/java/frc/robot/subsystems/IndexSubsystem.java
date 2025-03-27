@@ -43,6 +43,9 @@ public class IndexSubsystem extends SubsystemBase {
         /* Config the peak outputs */
         indexMotorConfig.Voltage.PeakForwardVoltage = Constants.Index.peakForwardVoltage;
         indexMotorConfig.Voltage.PeakReverseVoltage = Constants.Index.peakReverseVoltage;
+        /* Index Current Configs */
+        indexMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        indexMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
         /* Apply Index Motor Configs */
         motor.getConfigurator().apply(indexMotorConfig);
     }

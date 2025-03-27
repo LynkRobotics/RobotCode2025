@@ -57,6 +57,9 @@ public class ClimberSubsystem extends SubsystemBase {
         /* Config the peak outputs */
         motorConfig.Voltage.PeakForwardVoltage = Constants.Climber.peakForwardVoltage;
         motorConfig.Voltage.PeakReverseVoltage = Constants.Climber.peakReverseVoltage;
+        /* Climber Current Config */
+        motorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        motorConfig.CurrentLimits.SupplyCurrentLimit = 40;
         /* Apply Index Motor Configs */
         motor.getConfigurator().apply(motorConfig);
     }

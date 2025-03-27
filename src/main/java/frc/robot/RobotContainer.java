@@ -104,7 +104,8 @@ public class RobotContainer {
             .withCaptureNt(true)
             .withLogEntryQueueCapacity(1000)
             .withLogExtras(true)
-            .withNtPublish(Constants.atHQ));
+            .withNtPublish(Constants.atHQ)
+            .withNtTunables(Constants.atHQ));
 
         DogLog.log("Misc/RIO Serial Number", RobotController.getSerialNumber());
         DogLog.log("Misc/Is Rocky?", Constants.isRocky);

@@ -47,6 +47,9 @@ public class EndEffectorSubsystem extends SubsystemBase {
         /* Config the peak outputs */
         m_endAffectorConfiguration.Voltage.PeakForwardVoltage = Constants.EndEffector.peakForwardVoltage;
         m_endAffectorConfiguration.Voltage.PeakReverseVoltage = Constants.EndEffector.peakReverseVoltage;
+        /* Current Configs */
+        m_endAffectorConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true;
+        m_endAffectorConfiguration.CurrentLimits.SupplyCurrentLimit = 40;
         /* Apply Index Motor Configs */
         motor.getConfigurator().apply(m_endAffectorConfiguration);
     }
