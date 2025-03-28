@@ -11,7 +11,6 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.DoubleSubscriber;
 // import edu.wpi.first.util.sendable.Sendable;
 // import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,8 +21,6 @@ public class Swerve extends SubsystemBase {
     private PoseSubsystem s_Pose = null;
 
     public SwerveModule[] mSwerveMods;
-
-    private final DoubleSubscriber voltage = DogLog.tunable("Swerve/Debug/VoltageSet", 1.0);
 
     public Swerve() {
         // To use Latch in 2025, we need to reverse what the front of the robot is
@@ -168,14 +165,6 @@ public class Swerve extends SubsystemBase {
 
     public Command Stop() {
         return LoggedCommands.runOnce("Stop Swerve", this::stopSwerve, this);
-    }
-
-    public Command setDriveVoltage() {
-        return LoggedCommands.runOnce("Set Swerve Drive Voltage", () -> {
-            for(SwerveModule mod : mSwerveMods){
-                mod.setDriveVoltage(voltage.get());
-            }
-        }, this);
     }
 
     @Override

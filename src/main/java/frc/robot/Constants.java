@@ -94,10 +94,14 @@ public final class Constants {
         public static final double angleCurrentThresholdTime = 0.1;
         public static final boolean angleEnableCurrentLimit = true;
 
-        public static final int driveCurrentLimit = 40; 
-        public static final int driveCurrentThreshold = 60;
-        public static final double driveCurrentThresholdTime = 0.1;
-        public static final boolean driveEnableCurrentLimit = true;
+        public static final int driveSupplyCurrentLimit = 70; 
+        public static final int driveSupplyCurrentThreshold = 80;
+        public static final double driveSupplyCurrentThresholdTime = 0.1;
+        public static final boolean driveEnableSupplyCurrentLimit = true;
+
+        public static final int driveStatorCurrentLimit = 80;
+        public static final boolean driveEnableStatorCurrentLimit = true;
+
 
         /* These values are used by the drive falcon to ramp in open loop and closed loop driving.
          * We found a small open loop ramp (0.25) helps with tread wear, tipping, etc */
@@ -541,7 +545,7 @@ public final class Constants {
                 1.916, // 3847 Spectrum Vex GripLock v2 CoF
                 DCMotor.getKrakenX60Foc(1),
                 Swerve.chosenModule.driveGearRatio,
-                Swerve.driveCurrentLimit,
+                Swerve.driveStatorCurrentLimit,
                 1),
             new Translation2d(Swerve.wheelBase / 2.0, Swerve.trackWidth / 2.0),
             new Translation2d(Swerve.wheelBase / 2.0, -Swerve.trackWidth / 2.0),
