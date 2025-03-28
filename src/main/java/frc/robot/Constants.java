@@ -212,7 +212,7 @@ public final class Constants {
     }
 
     public static final class Vision {
-        public static final String cameraName = "AprilTagCam";
+        public static final String cameraName = "AprilTag Center";
         public static final Transform3d robotToCam =
             isRocky ?                
                 new Transform3d(
