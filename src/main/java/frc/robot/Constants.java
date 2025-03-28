@@ -45,6 +45,7 @@ public final class Constants {
     public static final double algaeScoredTimeout = 1.0; // How long (in seconds) we should prevent auto-aiming after scoring algae
     public static final double maxVisionDiffCoral = Units.inchesToMeters(1.5);
     public static final double algaeSlowRot = 0.6; // Slower rotation when holding algae
+    public static final double autoStandoffTimeout = 1.5;
 
     public static final int indexSensorID = 7;
     public static final int candiID = 0;

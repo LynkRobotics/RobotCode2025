@@ -120,7 +120,7 @@ public class PIDSwerve extends LoggedCommandBase {
 
     @Override
     public boolean isFinished() {
-        return xPID.atSetpoint() && yPID.atSetpoint() && rotationPID.atSetpoint() && s_Pose.visionDifference() <= maxVisionDiff;
+        return xPID.atSetpoint() && yPID.atSetpoint() && rotationPID.atSetpoint(); // && s_Pose.visionDifference() <= maxVisionDiff;
     }
 
     @Override

@@ -160,6 +160,7 @@ public class RobotContainer {
     private Command ScoreCoral(ReefFace face, boolean left) {
         return Commands.either(
             LoggedCommands.sequence("Auto Align " + (left ? "Left " : "Right ") + face.toString() + " & Score",
+                LoggedCommands.runOnce("Reset standoff", RobotState::resetStandoff),
                 LoggedCommands.parallel("PID Align " + (left ? "Left " : "Right ") + face.toString(),
                     Commands.sequence(
                         Commands.race(

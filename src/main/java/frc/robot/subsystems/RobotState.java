@@ -16,6 +16,7 @@ import frc.lib.util.TunableOption;
 import frc.robot.Constants;
 import frc.robot.Constants.Elevator.Stop;
 import static frc.robot.Options.optAlgaeBargeOnly;
+import static frc.robot.Options.optBonusCoralStandoff;
 
 public class RobotState extends SubsystemBase {
     private static RobotState instance;
@@ -32,6 +33,7 @@ public class RobotState extends SubsystemBase {
     private static final Timer algaeScoreTimer = new Timer();
     private static final Timer unjamTimer = new Timer();
     private static final Timer algaeScoredTimer = new Timer();
+    private static boolean standoff = false;
 
     private static final TunableOption optOverrideElevatorPathBlocked = new TunableOption("Override Elevator Path Blocked", true);
     private static final TunableOption optOverrideReefElevatorZone = new TunableOption("Override Reef Safe Elevator Zone", true);
@@ -256,6 +258,18 @@ public class RobotState extends SubsystemBase {
 
     public static ClimbState getClimbState() {
         return climbState;
+    }
+
+    public static void resetStandoff() {
+        standoff = false;
+    }
+
+    public static void setStandoff() {
+        standoff = true;
+    }
+
+    public static boolean getStandoff() {
+        return standoff || optBonusCoralStandoff.get();
     }
 
     @Override
