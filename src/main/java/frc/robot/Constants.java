@@ -390,9 +390,9 @@ public final class Constants {
         public static final double bonusStandoff = Units.inchesToMeters(4.0);
 
         public static final double processorAreaY = fieldWidth / 2.0 - 1.0;
-        public static final Translation2d processor = fieldLayout.getTagPose(16).get().toPose2d().getTranslation();
+        public static final Translation2d processor = atHQ ? new Translation2d(7.38, 0.46) : fieldLayout.getTagPose(16).get().toPose2d().getTranslation();
         public static final Pose2d processorScore = new Pose2d(processor.plus(new Translation2d(0.0, centerToFrontBumper)), Rotation2d.kCW_90deg);
-        public static final double processorApproachOffset = Units.inchesToMeters(16.0);
+        public static final double processorApproachOffset = Units.inchesToMeters(24.0);
         public static final Pose2d processorApproach = processorScore.transformBy(new Transform2d(-processorApproachOffset, 0.0, Rotation2d.kZero));
 
         // Locations from the Blue Alliance perspective
