@@ -504,7 +504,7 @@ public class RobotContainer {
                 LoggedCommands.log("Will not wait for Coral"),
                 LoggedCommands.proxy(BackUpAndWaitForCoral()),
                 optAutoCoralWait::get),
-            LoggedCommands.proxy(PathCommand("CS towards CD")),
+            LoggedCommands.proxy(PathCommand("CS towards C")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, true)),
             Commands.race(
                 LoggedCommands.proxy(PathCommand("C to CS")),
@@ -514,7 +514,7 @@ public class RobotContainer {
                 LoggedCommands.log("Will not wait for Coral"),
                 LoggedCommands.proxy(BackUpAndWaitForCoral()),
                 optAutoCoralWait::get),
-            LoggedCommands.proxy(PathCommand("CS towards CD")),
+            LoggedCommands.proxy(PathCommand("CS towards D")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false)),
             s_Swerve.CoastDriveMotors(),
             Commands.race(
