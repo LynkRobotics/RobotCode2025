@@ -501,8 +501,8 @@ public class RobotContainer {
                 LoggedCommands.proxy(PathCommand("E to CS")),
                 RobotState.WaitForCoral()),
             Commands.either(
-                LoggedCommands.log("Will not wait for Coral"),
                 LoggedCommands.proxy(BackUpAndWaitForCoral()),
+                LoggedCommands.log("Will not wait for Coral"),
                 optAutoCoralWait::get),
             LoggedCommands.proxy(PathCommand("CS towards C")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, true)),
@@ -511,8 +511,8 @@ public class RobotContainer {
                 RobotState.WaitForCoral()
             ),
             Commands.either(
-                LoggedCommands.log("Will not wait for Coral"),
                 LoggedCommands.proxy(BackUpAndWaitForCoral()),
+                LoggedCommands.log("Will not wait for Coral"),
                 optAutoCoralWait::get),
             LoggedCommands.proxy(PathCommand("CS towards D")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false)),
@@ -522,8 +522,8 @@ public class RobotContainer {
                 RobotState.WaitForCoral()
             ),
             Commands.either(
-                LoggedCommands.log("Will not wait for Coral"),
                 LoggedCommands.proxy(BackUpAndWaitForCoral()),
+                LoggedCommands.log("Will not wait for Coral"),
                 optAutoCoralWait::get),
             LoggedCommands.proxy(PathCommand("CS to near B")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
@@ -532,6 +532,33 @@ public class RobotContainer {
         // startingPaths.put(autoECD, "Start to near E");
         startingPaths.put(autoECD, "Start towards EF");
         addAutoCommand(chooser, autoECD);
+
+        Command fastECDB = LoggedCommands.sequence("Fast ECDB",
+            SetStop(Stop.L4),
+            LoggedCommands.proxy(PathCommand("Fast - Start towards EF")),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
+            Commands.race(
+                LoggedCommands.proxy(PathCommand("Fast - E to CS")),
+                RobotState.WaitForCoral()),
+            LoggedCommands.proxy(PathCommand("Fast - CS towards C")),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, true)),
+            Commands.race(
+                LoggedCommands.proxy(PathCommand("C to CS")),
+                RobotState.WaitForCoral()
+            ),
+            LoggedCommands.proxy(PathCommand("CS towards D")),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false)),
+            Commands.race(
+                LoggedCommands.proxy(PathCommand("D to CS")),
+                RobotState.WaitForCoral()
+            ),
+            LoggedCommands.proxy(PathCommand("CS to near B")),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
+            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachRight, true, false)));
+
+        // startingPaths.put(autoECD, "Start to near E");
+        startingPaths.put(fastECDB, "Start towards EF");
+        addAutoCommand(chooser, fastECDB);
 
         Command autoBA = LoggedCommands.sequence("BA",
             LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
@@ -544,8 +571,8 @@ public class RobotContainer {
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
             LoggedCommands.proxy(PathCommand("B to CS2")),
             Commands.either(
-                LoggedCommands.log("Will not wait for Coral"),
                 LoggedCommands.proxy(BackUpAndWaitForCoral()),
+                LoggedCommands.log("Will not wait for Coral"),
                 optAutoCoralWait::get),
             LoggedCommands.proxy(PathCommand("CS2 to near A")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, true)),
