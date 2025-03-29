@@ -99,8 +99,10 @@ public class RobotState extends SubsystemBase {
         CANrangeConfig.ProximityParams.ProximityThreshold = 0.10;
         indexSensor.getConfigurator().apply(CANrangeConfig);
 
+        CANrangeConfig.FovParams.FOVCenterX = -11.8; // Maximum
         CANrangeConfig.FovParams.FOVCenterY = -11.8; // Maximum
-        CANrangeConfig.ProximityParams.ProximityThreshold = 0.28;
+        CANrangeConfig.FovParams.FOVRangeX = 27.0; // Maximum
+        CANrangeConfig.ProximityParams.ProximityThreshold = 0.37;
         CANrangeConfig.ProximityParams.ProximityHysteresis = 0.05;
         funnelSensor.getConfigurator().apply(CANrangeConfig);
     }
