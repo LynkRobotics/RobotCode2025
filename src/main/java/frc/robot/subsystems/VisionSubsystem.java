@@ -47,17 +47,17 @@ public class VisionSubsystem extends SubsystemBase {
     private static final EnumMap<Camera, PhotonCamera> cameras = new EnumMap<>(Camera.class);
     private static final EnumMap<Camera, PhotonPoseEstimator> photonEstimator = new EnumMap<>(Camera.class);
     private static final EnumMap<Camera, Field2d> field = new EnumMap<>(Camera.class);
-    private static final Camera[] cameraTypes = Camera.values();
 
     private static record PoseResult(double timestamp, Pose3d pose, List<Short> fiducialIDs, double ambiguity, double averageTagDistance) {
     }
 
     static {
-        for (Camera cameraType : Camera.values()) {
+        for (Camera cameraType : Constants.Vision.camerasAvailable) {
             cameras.put(cameraType, new PhotonCamera(cameraType.name));
             photonEstimator.put(cameraType, new PhotonPoseEstimator(Constants.fieldLayout, PoseStrategy.PNP_DISTANCE_TRIG_SOLVE, cameraType.robotToCamera));
             field.put(cameraType, new Field2d());
             SmartDashboard.putData("Vision/" + cameraType + " Field", field.get(cameraType));
+            SmartDashboard.putBoolean("Vision/" + cameraType + " Enabled", true);
         }
     }
 
@@ -181,7 +181,15 @@ public class VisionSubsystem extends SubsystemBase {
             heading = headingProvider.get();
             timestamp = Timer.getFPGATimestamp();
         }
-        for (var cameraType : cameraTypes) {
+
+        List<Camera> camerasEnabled = new LinkedList<Camera>();
+        for (var cameraType : Constants.Vision.camerasAvailable) {
+            if (SmartDashboard.getBoolean("Vision/" + cameraType + " Enabled", true)) {
+                camerasEnabled.add(cameraType);
+            }
+        }
+
+        for (var cameraType : camerasEnabled) {
             if (heading != null) {
                 photonEstimator.get(cameraType).addHeadingData(timestamp, heading);
             }
@@ -197,13 +205,14 @@ public class VisionSubsystem extends SubsystemBase {
                 if (poseIsReasonable(poseResult.pose)) {
                     if (poseEstimator != null) {
                         double stdDevFactor = poseResult.averageTagDistance * poseResult.averageTagDistance / poseResult.fiducialIDs.size();
-                        double linearStdDev = Constants.Vision.linearStdDevBaseline * stdDevFactor;
-                        double angularStdDev = Constants.Vision.angularStdDevBaseline * stdDevFactor;
-                        // NOTE Could possibly scale by camera, too
+                        double linearStdDev = Constants.Vision.linearStdDevBaseline * stdDevFactor * camerasEnabled.size();
+                        double angularStdDev = Constants.Vision.angularStdDevBaseline * stdDevFactor * camerasEnabled.size();
+                        // NOTE Could possibly scale by specific camera location, too
 
                         Pose2d pose = poseResult.pose.toPose2d();
                         poseEstimator.addVisionMeasurement(pose, poseResult.timestamp, VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
                         field.get(cameraType).setRobotPose(pose);
+                        lastPose = pose;
                     }
                 }
             }

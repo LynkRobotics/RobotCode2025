@@ -4,7 +4,7 @@ import frc.lib.util.TunableOption;
 
 public final class Options {
     /* Global Toggleable Options and their defaults */
-    public static final TunableOption optUseTrigVision = new TunableOption("Use Trig Vision", true);
+    public static final TunableOption optUseTrigVision = new TunableOption("Use Trig Vision", false);
     public static final TunableOption optBackupPush = new TunableOption("Back Up in Auto", false);
     public static final TunableOption optMirrorAuto = new TunableOption("Mirror Auto to Left", false);
     public static final TunableOption optAutoCoralWait = new TunableOption("Wait for Coral in Auto", true);

@@ -219,26 +219,31 @@ public final class Constants {
 
         // Standard deviation baselines, for 1 meter distance and 1 tag
         // (Adjusted automatically based on distance and # of tags)
-        public static double linearStdDevBaseline = 0.5; // Meters
-        public static double angularStdDevBaseline = 1.0; // Radians
+        public static double linearStdDevBaseline = 0.75; // Meters
+        public static double angularStdDevBaseline = 2.0; // Radians
 
         public enum Camera {
             LEFT  ("AprilTag Left", new Transform3d(
                 new Translation3d(Pose.robotFrameLength / 2.0 - Units.inchesToMeters(2.772),
                     Pose.robotFrameWidth / 2.0 - Units.inchesToMeters(4.843),
                     Units.inchesToMeters(8.46)),
-                new Rotation3d(0.0, Units.degreesToRadians(-22), Units.degreesToRadians(-30)))),
+                new Rotation3d(Units.degreesToRadians(1.3), Units.degreesToRadians(-15.5), Units.degreesToRadians(-30)))),
             CENTER("AprilTag Center", new Transform3d(
                 new Translation3d(Pose.robotFrameLength / 2.0 - Units.inchesToMeters(6.958),
                     0.0,
                     Units.inchesToMeters(6.55)),
-                new Rotation3d(0.0, Units.degreesToRadians(-18.2), Units.degreesToRadians(0)))),
+                new Rotation3d(Units.degreesToRadians(-0.6), Units.degreesToRadians(-19.2), Units.degreesToRadians(0)))),
             RIGHT ("AprilTag Right", new Transform3d(
                 new Translation3d(Pose.robotFrameLength / 2.0 - Units.inchesToMeters(2.772),
                     -Pose.robotFrameWidth / 2.0 + Units.inchesToMeters(4.843),
                     Units.inchesToMeters(8.46)),
-                new Rotation3d(0.0, Units.degreesToRadians(-19.3), Units.degreesToRadians(30))));
-    
+                new Rotation3d(Units.degreesToRadians(0.8), Units.degreesToRadians(-14.0), Units.degreesToRadians(30)))),
+            REAR ("AprilTag Rear", new Transform3d(
+                new Translation3d(Pose.robotFrameLength / 2.0 - Units.inchesToMeters(12.94),
+                    -Pose.robotFrameWidth / 2.0 + Units.inchesToMeters(2.75),
+                    Units.inchesToMeters(39.6)),
+                new Rotation3d(0.0, Units.degreesToRadians(-8.5), Units.degreesToRadians(180.0))));
+        
             Camera(String name, Transform3d robotToCamera) {
                 this.name = name;
                 this.robotToCamera = robotToCamera;
@@ -247,6 +252,9 @@ public final class Constants {
             public final String name;
             public final Transform3d robotToCamera;
         }
+
+        public static final Camera[] camerasAvailable = Camera.values();
+        // public static final Camera[] camerasAvailable = { Camera.CENTER };
     }
 
     public static final class Elevator {
