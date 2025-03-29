@@ -220,24 +220,24 @@ public final class Constants {
         // Standard deviation baselines, for 1 meter distance and 1 tag
         // (Adjusted automatically based on distance and # of tags)
         public static double linearStdDevBaseline = 0.5; // Meters
-        public static double angularStdDevBaseline = 100.0; // Radians
+        public static double angularStdDevBaseline = 1.0; // Radians
 
         public enum Camera {
             LEFT  ("AprilTag Left", new Transform3d(
-                new Translation3d(Pose.robotFrameLength / 2.0 - Units.inchesToMeters(2.75),
-                    Pose.robotFrameWidth / 2.0 - Units.inchesToMeters(4.85),
+                new Translation3d(Pose.robotFrameLength / 2.0 - Units.inchesToMeters(2.772),
+                    Pose.robotFrameWidth / 2.0 - Units.inchesToMeters(4.843),
                     Units.inchesToMeters(8.46)),
-                new Rotation3d(0.0, Units.degreesToRadians(-22), Units.degreesToRadians(-35)))),
+                new Rotation3d(0.0, Units.degreesToRadians(-22), Units.degreesToRadians(-30)))),
             CENTER("AprilTag Center", new Transform3d(
                 new Translation3d(Pose.robotFrameLength / 2.0 - Units.inchesToMeters(6.958),
                     0.0,
                     Units.inchesToMeters(6.55)),
                 new Rotation3d(0.0, Units.degreesToRadians(-18.2), Units.degreesToRadians(0)))),
             RIGHT ("AprilTag Right", new Transform3d(
-                new Translation3d(Pose.robotFrameLength / 2.0 - Units.inchesToMeters(2.75),
-                    -Pose.robotFrameWidth / 2.0 + Units.inchesToMeters(4.85),
+                new Translation3d(Pose.robotFrameLength / 2.0 - Units.inchesToMeters(2.772),
+                    -Pose.robotFrameWidth / 2.0 + Units.inchesToMeters(4.843),
                     Units.inchesToMeters(8.46)),
-                new Rotation3d(0.0, Units.degreesToRadians(-19.3), Units.degreesToRadians(35))));
+                new Rotation3d(0.0, Units.degreesToRadians(-19.3), Units.degreesToRadians(30))));
     
             Camera(String name, Transform3d robotToCamera) {
                 this.name = name;
