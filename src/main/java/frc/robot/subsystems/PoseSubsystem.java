@@ -21,11 +21,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 // import edu.wpi.first.util.sendable.Sendable;
 // import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.util.TunableOption;
+// import frc.lib.util.TunableOption;
 import frc.robot.Constants;
 import frc.robot.Constants.Pose;
 import frc.robot.Constants.Pose.Cage;
@@ -41,7 +40,7 @@ public class PoseSubsystem extends SubsystemBase {
     private final Field2d field;
     private final Pigeon2 gyro;
 
-    private static final TunableOption optUpdatePoseWithVisionAuto = new TunableOption("Pose/Update with vision in Auto", true);
+    // private static final TunableOption optUpdatePoseWithVisionAuto = new TunableOption("Pose/Update with vision in Auto", true);
 
     public enum Zone {
         SPEAKER,
@@ -65,6 +64,8 @@ public class PoseSubsystem extends SubsystemBase {
         Pose.rotationPID.reset();
 
         poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d());
+        VisionSubsystem.setPoseEstimator(poseEstimator);
+        VisionSubsystem.setHeadingProvider(this::getHeading);
 
         field = new Field2d();
         SmartDashboard.putData("Pose/Field", field);
@@ -344,12 +345,6 @@ public class PoseSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
-        if (!DriverStation.isAutonomousEnabled() || optUpdatePoseWithVisionAuto.get()) {
-            s_Vision.updatePoseEstimate(poseEstimator);
-        } else {
-            s_Vision.updatePoseEstimate(null);
-        }
-
         Pose2d pose = getPose();
         field.setRobotPose(pose);
 

@@ -212,16 +212,41 @@ public final class Constants {
     }
 
     public static final class Vision {
-        public static final String cameraName = "AprilTag Center";
-        public static final Transform3d robotToCam =
-            isRocky ?                
-                new Transform3d(
-                    new Translation3d(Units.inchesToMeters(30.0/2.0 - 6.958), 0.0, Units.inchesToMeters(6.55)),
-                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(-18.2), 0.0))
-            :
-                new Transform3d(
-                    new Translation3d(0.192, 0.0, 0.325),
-                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(0.0), 0.0));
+        public static final double fieldBorderMargin = 0.25; // Reject poses this far outside the field
+        public static final double maxZError = 0.5; // Reject poses this far above or below the floor
+        public static final double autoAcceptAmbiguity = 0.1; // Automatically accept results with ambiguity less than this
+        public static final double maxAmbiguity = 0.35; // Reject results with ambiguity greater than this
+
+        // Standard deviation baselines, for 1 meter distance and 1 tag
+        // (Adjusted automatically based on distance and # of tags)
+        public static double linearStdDevBaseline = 0.5; // Meters
+        public static double angularStdDevBaseline = 100.0; // Radians
+
+        public enum Camera {
+            LEFT  ("AprilTag Left", new Transform3d(
+                new Translation3d(Pose.robotFrameLength / 2.0 - Units.inchesToMeters(2.75),
+                    Pose.robotFrameWidth / 2.0 - Units.inchesToMeters(4.85),
+                    Units.inchesToMeters(8.46)),
+                new Rotation3d(0.0, Units.degreesToRadians(-22), Units.degreesToRadians(-35)))),
+            CENTER("AprilTag Center", new Transform3d(
+                new Translation3d(Pose.robotFrameLength / 2.0 - Units.inchesToMeters(6.958),
+                    0.0,
+                    Units.inchesToMeters(6.55)),
+                new Rotation3d(0.0, Units.degreesToRadians(-18.2), Units.degreesToRadians(0)))),
+            RIGHT ("AprilTag Right", new Transform3d(
+                new Translation3d(Pose.robotFrameLength / 2.0 - Units.inchesToMeters(2.75),
+                    -Pose.robotFrameWidth / 2.0 + Units.inchesToMeters(4.85),
+                    Units.inchesToMeters(8.46)),
+                new Rotation3d(0.0, Units.degreesToRadians(-19.3), Units.degreesToRadians(35))));
+    
+            Camera(String name, Transform3d robotToCamera) {
+                this.name = name;
+                this.robotToCamera = robotToCamera;
+            }
+    
+            public final String name;
+            public final Transform3d robotToCamera;
+        }
     }
 
     public static final class Elevator {
@@ -382,6 +407,7 @@ public final class Constants {
         public static final double wingLength = Units.inchesToMeters(280);
 
         public static final double robotFrameLength = Units.inchesToMeters(30);
+        public static final double robotFrameWidth = Units.inchesToMeters(27);
         public static final double bumperWidth = Units.inchesToMeters(3.2);
         public static final double reefStandoff = Units.inchesToMeters(1.5);
         public static final double centerToFrontBumper = robotFrameLength / 2.0 + bumperWidth;
