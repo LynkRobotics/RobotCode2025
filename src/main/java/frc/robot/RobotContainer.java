@@ -543,16 +543,16 @@ public class RobotContainer {
             LoggedCommands.proxy(PathCommand("Fast - CS towards C")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, true)),
             Commands.race(
-                LoggedCommands.proxy(PathCommand("C to CS")),
+                LoggedCommands.proxy(PathCommand("Fast - C to CS")),
                 RobotState.WaitForCoral()
             ),
-            LoggedCommands.proxy(PathCommand("CS towards D")),
+            LoggedCommands.proxy(PathCommand("Fast - CS towards D")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false)),
             Commands.race(
-                LoggedCommands.proxy(PathCommand("D to CS")),
+                LoggedCommands.proxy(PathCommand("Fast - D to CS")),
                 RobotState.WaitForCoral()
             ),
-            LoggedCommands.proxy(PathCommand("CS to near B")),
+            LoggedCommands.proxy(PathCommand("Fast - CS to near B")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
             LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachRight, true, false)));
 
