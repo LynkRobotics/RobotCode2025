@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 // import frc.lib.util.TunableOption;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.Constants.Vision.Camera;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.PoseEstimator;
@@ -16,7 +17,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+// import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static frc.robot.Options.optUseTrigVision;
@@ -46,7 +47,7 @@ public class VisionSubsystem extends SubsystemBase {
     // TODO Combine into record
     private static final EnumMap<Camera, PhotonCamera> cameras = new EnumMap<>(Camera.class);
     private static final EnumMap<Camera, PhotonPoseEstimator> photonEstimator = new EnumMap<>(Camera.class);
-    private static final EnumMap<Camera, Field2d> field = new EnumMap<>(Camera.class);
+    // private static final EnumMap<Camera, Field2d> field = new EnumMap<>(Camera.class);
 
     private static record PoseResult(double timestamp, Pose3d pose, List<Short> fiducialIDs, double ambiguity, double averageTagDistance) {
     }
@@ -55,8 +56,9 @@ public class VisionSubsystem extends SubsystemBase {
         for (Camera cameraType : Constants.Vision.camerasAvailable) {
             cameras.put(cameraType, new PhotonCamera(cameraType.name));
             photonEstimator.put(cameraType, new PhotonPoseEstimator(Constants.fieldLayout, PoseStrategy.PNP_DISTANCE_TRIG_SOLVE, cameraType.robotToCamera));
-            field.put(cameraType, new Field2d());
-            SmartDashboard.putData("Vision/" + cameraType + " Field", field.get(cameraType));
+            Robot.fieldSelector.addOption(cameraType.toString(), cameraType.toString());
+            // field.put(cameraType, new Field2d());
+            // SmartDashboard.putData("Vision/" + cameraType + " Field", field.get(cameraType));
             SmartDashboard.putBoolean("Vision/" + cameraType + " Enabled", true);
         }
     }
@@ -211,7 +213,12 @@ public class VisionSubsystem extends SubsystemBase {
 
                         Pose2d pose = poseResult.pose.toPose2d();
                         poseEstimator.addVisionMeasurement(pose, poseResult.timestamp, VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
-                        field.get(cameraType).setRobotPose(pose);
+
+                        if (Robot.fieldSelector.getSelected() == cameraType.toString()) {
+                            Robot.field.getObject("Vision").setPose(pose);
+                        }
+                        // field.get(cameraType).setRobotPose(pose);
+
                         lastPose = pose;
                     }
                 }

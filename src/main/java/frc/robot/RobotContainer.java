@@ -3,7 +3,6 @@ package frc.robot;
 import static frc.robot.Options.optAutoCoralWait;
 import static frc.robot.Options.optAutoReefAiming;
 import static frc.robot.Options.optBackupPush;
-import static frc.robot.Options.optBonusCoralStandoff;
 import static frc.robot.Options.optInvertAlgae;
 import static frc.robot.Options.optMirrorAuto;
 
@@ -42,6 +41,7 @@ import frc.lib.util.LoggedCommands;
 import frc.robot.Constants.Pose.Cage;
 import frc.robot.Constants.Pose.ReefFace;
 import frc.robot.Constants.Elevator.Stop;
+import frc.robot.Constants.PIDSwerve.PIDSpeed;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.RobotState.ClimbState;
@@ -164,21 +164,22 @@ public class RobotContainer {
                     Commands.sequence(
                         Commands.race(
                             Commands.sequence(
-                                new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, true, false, false, Constants.maxVisionDiffCoral),
                                 Commands.either(
-                                    LoggedCommands.log("Elevator reached stop in time"),
-                                    LoggedCommands.sequence("Pause to wait for elevator to catch up",
-                                        s_Swerve.Stop(),
-                                        s_Elevator.WaitForNearNext()),
-                                    s_Elevator::nearNextStop),
-                                Commands.either(
-                                    new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true, true),
-                                    Commands.either(
-                                        new PIDSwerve(s_Swerve, s_Pose, left ? face.leftL1 : face.rightL1, true, true),
-                                        new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true, true),
-                                        () -> RobotState.getNextStop() == Stop.L1
-                                    ),
-                                    optBonusCoralStandoff::get)),
+                                    new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true, true, PIDSpeed.TURBO),
+                                    Commands.sequence(
+                                        new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, true, false, PIDSpeed.FAST, Constants.maxVisionDiffCoral),
+                                        Commands.either(
+                                            LoggedCommands.log("Elevator reached stop in time"),
+                                            LoggedCommands.sequence("Pause to wait for elevator to catch up",
+                                                s_Swerve.Stop(),
+                                                s_Elevator.WaitForNearNext()),
+                                            s_Elevator::nearNextStop),
+                                        Commands.either(
+                                            new PIDSwerve(s_Swerve, s_Pose, left ? face.leftL1 : face.rightL1, true, true),
+                                            new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true, true),
+                                            () -> RobotState.getNextStop() == Stop.L1
+                                        )),
+                                    () -> RobotState.getNextStop() == Stop.L2 || RobotState.getNextStop() == Stop.L3)),
                             Commands.either(
                                 Commands.sequence(
                                     LoggedCommands.waitSeconds("Score coral watchdog", Constants.Auto.scoreCoralTimeout),
@@ -188,7 +189,10 @@ public class RobotContainer {
                                 () -> DriverStation.isAutonomousEnabled() && DriverStation.getMatchTime() >= (Constants.Auto.scoreCoralTimeout + Constants.Auto.scoreCoralTimeLeft))),
                         s_Swerve.Stop()),
                     Commands.sequence(
-                        RobotState.WaitForCoralReady(),
+                        Commands.either(
+                            LoggedCommands.log("Skip waiting for coral ready in turbo mode"),
+                            RobotState.WaitForCoralReady(),
+                            RobotState::getTurboMode),
                         LoggedCommands.deadline("Wait for auto up",
                             s_Elevator.WaitForNext(),
                             Commands.either(
@@ -209,7 +213,7 @@ public class RobotContainer {
                     )
                 )),
             LoggedCommands.log("Cannot score coral without coral"),
-            RobotState::haveCoral);
+            () -> RobotState.haveCoral() || RobotState.getTurboMode());
     }
 
     private static final Map<ReefFace, ReefFace> mirroredFaces = Collections.unmodifiableMap(Map.ofEntries(
@@ -358,14 +362,14 @@ public class RobotContainer {
         return LoggedCommands.sequence("Align to cage " + cage,
             LoggedCommands.runOnce("Disable reef aiming", optAutoReefAiming::disable),
             LoggedCommands.runOnce("Enable end game mode", () -> RobotState.setClimbState(ClimbState.STARTED)),
-            new PIDSwerve(s_Swerve, s_Pose, cageAlignPose.transformBy(Constants.Pose.cageApproachOffset), true, false, false),
-            new PIDSwerve(s_Swerve, s_Pose, cageAlignPose, true, true, true));
+            new PIDSwerve(s_Swerve, s_Pose, cageAlignPose.transformBy(Constants.Pose.cageApproachOffset), true, false, PIDSpeed.FAST),
+            new PIDSwerve(s_Swerve, s_Pose, cageAlignPose, true, true, PIDSpeed.SLOW));
     }
 
     private Command ProcessorAlign() {
         return LoggedCommands.sequence("Align to processor",
-            new PIDSwerve(s_Swerve, s_Pose, Constants.Pose.processorApproach, true, false, false),
-            new PIDSwerve(s_Swerve, s_Pose, Constants.Pose.processorScore, true, true, false));
+            new PIDSwerve(s_Swerve, s_Pose, Constants.Pose.processorApproach, true, false, PIDSpeed.FAST),
+            new PIDSwerve(s_Swerve, s_Pose, Constants.Pose.processorScore, true, true, PIDSpeed.FAST));
     }
 
     private Command AlignToNearestCage() {
@@ -487,6 +491,13 @@ public class RobotContainer {
             ));
     }
 
+    private Command PathWithRaise(String pathName, ReefFace face, boolean left) {
+        return LoggedCommands.deadline("Follow Path with Raise",
+            PathCommand(pathName),
+            s_Elevator.AutoElevatorUp(left ? face.alignLeft.getTranslation() : face.alignRight.getTranslation())
+        ); 
+    }
+
     private void buildAutos(SendableChooser<Command> chooser) {
         Command autoECD = LoggedCommands.sequence("ECDB",
             LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
@@ -534,27 +545,30 @@ public class RobotContainer {
         addAutoCommand(chooser, autoECD);
 
         Command fastECDB = LoggedCommands.sequence("Fast ECDB",
-            SetStop(Stop.L4),
-            LoggedCommands.proxy(PathCommand("Fast - Start towards EF")),
+            LoggedCommands.runOnce("Enable turbo mode", () -> RobotState.setTurboMode(true)),
+            SetStop(Stop.L2),
+            // LoggedCommands.proxy(PathWithRaise("Fast - Start towards EF", ReefFace.EF, true)),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
             Commands.race(
                 LoggedCommands.proxy(PathCommand("Fast - E to CS")),
                 RobotState.WaitForCoral()),
-            LoggedCommands.proxy(PathCommand("Fast - CS towards C")),
+            SetStop(Stop.L4),
+            LoggedCommands.proxy(PathWithRaise("Fast - CS towards C", ReefFace.CD, true)),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, true)),
             Commands.race(
                 LoggedCommands.proxy(PathCommand("Fast - C to CS")),
                 RobotState.WaitForCoral()
             ),
-            LoggedCommands.proxy(PathCommand("Fast - CS towards D")),
+            LoggedCommands.proxy(PathWithRaise("Fast - CS towards D", ReefFace.CD, false)),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false)),
             Commands.race(
                 LoggedCommands.proxy(PathCommand("Fast - D to CS")),
                 RobotState.WaitForCoral()
             ),
-            LoggedCommands.proxy(PathCommand("Fast - CS to near B")),
+            LoggedCommands.proxy(PathWithRaise("Fast - CS to near B", ReefFace.AB, false)),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
-            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachRight, true, false)));
+            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachRight, true, false)))
+            .handleInterrupt(() -> RobotState.setTurboMode(false));
 
         // startingPaths.put(autoECD, "Start to near E");
         startingPaths.put(fastECDB, "Start towards EF");

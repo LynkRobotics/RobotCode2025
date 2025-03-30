@@ -33,6 +33,7 @@ public class RobotState extends SubsystemBase {
     private static final Timer algaeScoreTimer = new Timer();
     private static final Timer unjamTimer = new Timer();
     private static final Timer algaeScoredTimer = new Timer();
+    private static boolean turboMode = false;
 
     private static final TunableOption optOverrideElevatorPathBlocked = new TunableOption("Override Elevator Path Blocked", true);
     private static final TunableOption optOverrideReefElevatorZone = new TunableOption("Override Reef Safe Elevator Zone", true);
@@ -126,6 +127,14 @@ public class RobotState extends SubsystemBase {
     
     public static boolean getFlipperSensor() {
         return !flipperSensor.getIsDetected().getValue();
+    }
+
+    public static void setTurboMode(boolean turbo) {
+        turboMode = turbo;
+    }
+
+    public static boolean getTurboMode() {
+        return turboMode;
     }
 
     public static boolean haveCoral() {

@@ -155,6 +155,7 @@ public class LEDSubsystem extends SubsystemBase {
         // Determine the proper LED state
         if (DriverStation.isDisabled()) {
             if (state != LEDState.STARTUP && state != LEDState.DISABLED) {
+                DogLog.log("LED/Status", "Transitioned to DISABLED from " + state);
                 state = LEDState.DISABLED;
             }
         } else {
