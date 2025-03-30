@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Options.optBonusCoralStandoff;
 import static frc.robot.Options.optServiceMode;
 
 import java.util.function.Supplier;
@@ -150,12 +149,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         leftMotor.setControl(voltageOut.withOutput(voltage));
     }
 
+    // TODO Return from enum
     private double stopHeight(Stop stop) {
         double height = stop.height;
-
-        if (optBonusCoralStandoff.get() && (stop == Stop.L1 || stop == Stop.L2 || stop == Stop.L3 || stop == Stop.L4)) {
-            height += Constants.Elevator.standoffBoost;
-        }
 
         return height;
     }

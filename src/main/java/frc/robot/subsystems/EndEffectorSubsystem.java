@@ -21,7 +21,8 @@ public class EndEffectorSubsystem extends SubsystemBase {
     private final VoltageOut feedControl = new VoltageOut(Constants.EndEffector.feedVoltage).withEnableFOC(true);
     private final VoltageOut unjamControl = new VoltageOut(Constants.EndEffector.unjamVoltage).withEnableFOC(true);
     private final VoltageOut advanceControl = new VoltageOut(Constants.EndEffector.advanceVoltage).withEnableFOC(true);
-    private final VoltageOut scoreControl = new VoltageOut(Constants.EndEffector.scoreVoltage).withEnableFOC(true);
+    private final VoltageOut scoreL2L3Control = new VoltageOut(Constants.EndEffector.scoreL2L3Voltage).withEnableFOC(true);
+    private final VoltageOut scoreL4Control = new VoltageOut(Constants.EndEffector.scoreL4Voltage).withEnableFOC(true);
     private final VoltageOut scoreL1Control = new VoltageOut(Constants.EndEffector.scoreL1Voltage).withEnableFOC(true);
     private final VoltageOut algaeControl = new VoltageOut(Constants.EndEffector.algaeVoltage).withEnableFOC(false);
     private final VoltageOut algaeOutControl = new VoltageOut(Constants.EndEffector.algaeOutVoltage).withEnableFOC(false);
@@ -99,12 +100,16 @@ public class EndEffectorSubsystem extends SubsystemBase {
                     motor.stopMotor();
                     break;
                 case SCORING_CORAL:
-                    if (RobotState.getNextStop() == Stop.L1) {
+                    Stop nextStop = RobotState.getNextStop();
+                    if (nextStop == Stop.L1) {
                         DogLog.log("EndEffector/Control", "Scoring L1 coral");
                         motor.setControl(scoreL1Control);
+                    } else if (nextStop == Stop.L2 || nextStop == Stop.L3) {
+                        DogLog.log("EndEffector/Control", "Scoring L2/L4 coral");
+                        motor.setControl(scoreL2L3Control);
                     } else {
-                        DogLog.log("EndEffector/Control", "Scoring coral");
-                        motor.setControl(scoreControl);
+                        DogLog.log("EndEffector/Control", "Scoring L4 coral");
+                        motor.setControl(scoreL4Control);
                     }
                     break;
                 default:

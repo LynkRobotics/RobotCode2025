@@ -20,6 +20,7 @@ import static frc.robot.Options.optAlgaeBargeOnly;
 public class RobotState extends SubsystemBase {
     private static RobotState instance;
     private static PoseSubsystem pose;
+    private static final CANrange funnelSensor;
     private static final CANrange indexSensor;
     private static final CANrange flipperSensor;
     private static final CANrange finalSensor;
@@ -32,6 +33,7 @@ public class RobotState extends SubsystemBase {
     private static final Timer algaeScoreTimer = new Timer();
     private static final Timer unjamTimer = new Timer();
     private static final Timer algaeScoredTimer = new Timer();
+    private static boolean turboMode = false;
 
     private static final TunableOption optOverrideElevatorPathBlocked = new TunableOption("Override Elevator Path Blocked", true);
     private static final TunableOption optOverrideReefElevatorZone = new TunableOption("Override Reef Safe Elevator Zone", true);
@@ -59,6 +61,7 @@ public class RobotState extends SubsystemBase {
     }
 
     static {
+        funnelSensor = new CANrange(4, "rio");
         indexSensor = new CANrange(1, "rio");
         flipperSensor = new CANrange(2, "rio");
         finalSensor = new CANrange(3, "rio");
@@ -96,6 +99,13 @@ public class RobotState extends SubsystemBase {
 
         CANrangeConfig.ProximityParams.ProximityThreshold = 0.10;
         indexSensor.getConfigurator().apply(CANrangeConfig);
+
+        CANrangeConfig.FovParams.FOVCenterX = -11.8; // Maximum
+        CANrangeConfig.FovParams.FOVCenterY = -11.8; // Maximum
+        CANrangeConfig.FovParams.FOVRangeX = 27.0; // Maximum
+        CANrangeConfig.ProximityParams.ProximityThreshold = 0.37;
+        CANrangeConfig.ProximityParams.ProximityHysteresis = 0.05;
+        funnelSensor.getConfigurator().apply(CANrangeConfig);
     }
 
     /*
@@ -103,7 +113,11 @@ public class RobotState extends SubsystemBase {
      * TODO Revisit
      */
 
-    public static boolean getIntakeSensor() {
+    public static boolean getFunnelSensor() {
+        return !funnelSensor.getIsDetected().getValue();
+    }
+
+    public static boolean getIndexSensor() {
         return !indexSensor.getIsDetected().getValue();
     }
 
@@ -115,12 +129,20 @@ public class RobotState extends SubsystemBase {
         return !flipperSensor.getIsDetected().getValue();
     }
 
+    public static void setTurboMode(boolean turbo) {
+        turboMode = turbo;
+    }
+
+    public static boolean getTurboMode() {
+        return turboMode;
+    }
+
     public static boolean haveCoral() {
-        return !haveAlgae() && (!getIntakeSensor() || !getFlipperSensor() || !getFinalSensor());
+        return !haveAlgae() && (!getFunnelSensor() ||!getIndexSensor() || !getFlipperSensor() || !getFinalSensor());
     }
 
     public static boolean elevatorPathBlocked() {
-        return (!getIntakeSensor() || !getFlipperSensor()) && !optOverrideElevatorPathBlocked.get();
+        return (!getIndexSensor() || !getFlipperSensor()) && !optOverrideElevatorPathBlocked.get();
     }
 
     // TODO Consider allowing a range, so that Elevator doesn't oscillate  
@@ -260,7 +282,8 @@ public class RobotState extends SubsystemBase {
 
     @Override
     public void periodic() {
-        boolean intakeSensor = getIntakeSensor();
+        boolean funnelSensor = getFunnelSensor();
+        boolean indexSensor = getIndexSensor();
         boolean flipperSensor = getFlipperSensor();
         boolean finalSensor = getFinalSensor();
 
@@ -280,7 +303,7 @@ public class RobotState extends SubsystemBase {
                     unjamTimer.stop();
                     gamePieceState = GamePieceState.NONE;
                 }
-            } else if (intakeSensor && flipperSensor && finalSensor) {
+            } else if (indexSensor && flipperSensor && finalSensor) {
                 // No Coral is present
                 if (gamePieceState == GamePieceState.SCORING_CORAL && activeStop == Stop.L1) {
                     if (!L1Timer.isRunning()) {
@@ -292,12 +315,12 @@ public class RobotState extends SubsystemBase {
                 } else {
                     gamePieceState = elevatorAtZero ? GamePieceState.INTAKING_CORAL : GamePieceState.NONE;
                 }
-            } else if (!intakeSensor && finalSensor) {
-                // Coral is in intake and not at final sensor
+            } else if (!indexSensor && finalSensor) {
+                // Coral is in indexer and not at final sensor
                 gamePieceState = elevatorAtZero ? GamePieceState.FEEDING_CORAL : GamePieceState.NONE;
             } else if (!flipperSensor) {
-                // Coral is blocking flipper sensor -- could be either at intake or at final sensor)
-                if (intakeSensor && gamePieceState == GamePieceState.SCORING_CORAL) {
+                // Coral is blocking flipper sensor -- could be either at index or at final sensor)
+                if (indexSensor && gamePieceState == GamePieceState.SCORING_CORAL) {
                     // Just continue scoring, even if coral "slid back"
                 } else {
                     gamePieceState = GamePieceState.ADVANCING_CORAL;
@@ -310,7 +333,8 @@ public class RobotState extends SubsystemBase {
             }
         }
 
-        DogLog.log("State/Index sensor", intakeSensor);
+        DogLog.log("State/Funnel sensor", funnelSensor);
+        DogLog.log("State/Index sensor", indexSensor);
         DogLog.log("State/Flipper sensor", flipperSensor);
         DogLog.log("State/Final sensor", finalSensor);
         DogLog.log("State/Game Piece State", gamePieceState);

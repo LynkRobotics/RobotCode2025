@@ -152,8 +152,8 @@ public final class Constants {
 
         /* Front Left Module - Module 0 */
         public static final class Mod0 { 
-            public static final int driveMotorID = 0;
-            public static final int angleMotorID = 1;
+            public static final int driveMotorID = 1;
+            public static final int angleMotorID = 2;
             public static final int canCoderID = 0;
             public static final String canBusID = swerveCanBus;
             public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? -97.6 : 33.9 + 180.0);
@@ -178,7 +178,7 @@ public final class Constants {
             public static final int angleMotorID = 9;
             public static final int canCoderID = 2;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? -159.6 : 162.6 + 180.0);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? 6.4 : 162.6 + 180.0);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
@@ -200,28 +200,71 @@ public final class Constants {
         public static final double roughTranslationKP = 0.09;
         public static final double positionTolerance = 1.0; // inches
         public static final double roughPositionTolerance = 2.5; // inches
-        public static final double maxSpeed = Constants.Swerve.maxSpeed / 3.0;
-        public static final double slowSpeed = Constants.Swerve.maxSpeed / 6.0;
         public static final double positionKS = 0.02;
         public static final double positionIZone = 4.0;
     
         public static final double rotationKP = 0.015; // Small overshoot at 0.015, more noticeable with 0.020, but still functional
-        public static final double rotationTolerance = 0.5; // degrees
+        public static final double rotationTolerance = 0.2; // degrees
         public static final double roughRotatationTolerance = 1.5; // degrees
-        public static final double maxAngularVelocity = Constants.Swerve.maxAngularVelocity / 2.0;    
+        public static final double maxAngularVelocity = Constants.Swerve.maxAngularVelocity / 2.0;
+        
+        public enum PIDSpeed {
+            SLOW(Constants.Swerve.maxSpeed / 6.0),
+            FAST(Constants.Swerve.maxSpeed / 3.0),
+            TURBO(Constants.Swerve.maxSpeed / 2.0); // TODO Reference
+
+            PIDSpeed(double speed) {
+                this.speed = speed;
+            }
+
+            public double speed;
+        }
     }
 
     public static final class Vision {
-        public static final String cameraName = "AprilTag Center";
-        public static final Transform3d robotToCam =
-            isRocky ?                
-                new Transform3d(
-                    new Translation3d(Units.inchesToMeters(30.0/2.0 - 6.958), 0.0, Units.inchesToMeters(6.55)),
-                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(-18.2), 0.0))
-            :
-                new Transform3d(
-                    new Translation3d(0.192, 0.0, 0.325),
-                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(0.0), 0.0));
+        public static final double fieldBorderMargin = 0.25; // Reject poses this far outside the field
+        public static final double maxZError = 0.5; // Reject poses this far above or below the floor
+        public static final double autoAcceptAmbiguity = 0.1; // Automatically accept results with ambiguity less than this
+        public static final double maxAmbiguity = 0.35; // Reject results with ambiguity greater than this
+
+        // Standard deviation baselines, for 1 meter distance and 1 tag
+        // (Adjusted automatically based on distance and # of tags)
+        public static double linearStdDevBaseline = 0.75; // Meters
+        public static double angularStdDevBaseline = 2.0; // Radians
+
+        public enum Camera {
+            LEFT  ("AprilTag Left", new Transform3d(
+                new Translation3d(Pose.robotFrameLength / 2.0 - Units.inchesToMeters(2.772),
+                    Pose.robotFrameWidth / 2.0 - Units.inchesToMeters(4.843),
+                    Units.inchesToMeters(8.46)),
+                new Rotation3d(Units.degreesToRadians(1.3), Units.degreesToRadians(-15.5), Units.degreesToRadians(-30)))),
+            CENTER("AprilTag Center", new Transform3d(
+                new Translation3d(Pose.robotFrameLength / 2.0 - Units.inchesToMeters(6.958),
+                    0.0,
+                    Units.inchesToMeters(6.55)),
+                new Rotation3d(Units.degreesToRadians(-0.6), Units.degreesToRadians(-19.2), Units.degreesToRadians(0)))),
+            RIGHT ("AprilTag Right", new Transform3d(
+                new Translation3d(Pose.robotFrameLength / 2.0 - Units.inchesToMeters(2.772),
+                    -Pose.robotFrameWidth / 2.0 + Units.inchesToMeters(4.843),
+                    Units.inchesToMeters(8.46)),
+                new Rotation3d(Units.degreesToRadians(0.8), Units.degreesToRadians(-14.0), Units.degreesToRadians(30)))),
+            REAR ("AprilTag Rear", new Transform3d(
+                new Translation3d(Pose.robotFrameLength / 2.0 - Units.inchesToMeters(12.94),
+                    -Pose.robotFrameWidth / 2.0 + Units.inchesToMeters(2.75),
+                    Units.inchesToMeters(39.6)),
+                new Rotation3d(0.0, Units.degreesToRadians(-8.5), Units.degreesToRadians(180.0))));
+        
+            Camera(String name, Transform3d robotToCamera) {
+                this.name = name;
+                this.robotToCamera = robotToCamera;
+            }
+    
+            public final String name;
+            public final Transform3d robotToCamera;
+        }
+
+        public static final Camera[] camerasAvailable = Camera.values();
+        // public static final Camera[] camerasAvailable = { Camera.CENTER };
     }
 
     public static final class Elevator {
@@ -269,9 +312,9 @@ public final class Constants {
             SAFE     (Constants.Elevator.baseHeight + 5.0),
             L1       (28.5 - Constants.Elevator.endEffectorHeight),
             L1_SCORE (30.0 - Constants.Elevator.endEffectorHeight),
-            L2       (34.5 - Constants.Elevator.endEffectorHeight),
-            L2_ALGAE (38.0 - Constants.Elevator.endEffectorHeight),
-            L3       (49.5 - Constants.Elevator.endEffectorHeight),
+            L2       (36.0 - Constants.Elevator.endEffectorHeight), //NOTE: changed for standoff, OG: 34.5
+            L2_ALGAE (38.0 - Constants.Elevator.endEffectorHeight), 
+            L3       (51.0 - Constants.Elevator.endEffectorHeight), //NOTE: changed for standoff, OG: 49.5
             L3_ALGAE (53.5 - Constants.Elevator.endEffectorHeight),
             ALGAE_RELEASE(63.5 - Constants.Elevator.endEffectorHeight),
             L4       (74.5 - Constants.Elevator.endEffectorHeight),
@@ -285,7 +328,7 @@ public final class Constants {
         }
 
         public static final double L1RaiseDelay = 0.15;
-        public static final double standoffBoost = 2.0; // In inches
+        // public static final double standoffBoost = 2.0; // In inches
     }
 
     public static final class EndEffector {
@@ -302,8 +345,9 @@ public final class Constants {
         public static final double feedVoltage = -6.5;
         public static final double unjamVoltage = 3.0;
         public static final double advanceVoltage = -1.9;
-        public static final double scoreVoltage = -6.0;
         public static final double scoreL1Voltage = -2.0;
+        public static final double scoreL2L3Voltage = -9.0;
+        public static final double scoreL4Voltage = -6.0;
         public static final double algaeVoltage = 3.3;
         public static final double algaeHoldVoltage = 1.2;
         public static final double algaeBargeVoltage = -12.0;
@@ -378,10 +422,11 @@ public final class Constants {
         public static final double fieldLength = FlippingUtil.fieldSizeX; // Units.inchesToMeters(57*12 + 6.875);
 
         public static final double reefElevatorZoneRadius = Units.inchesToMeters(80.0); // TODO Revisit
-        public static final double autoUpDistance = Units.inchesToMeters(44.0);
+        public static final double autoUpDistance = Units.inchesToMeters(44.0); // Increase for quicker auto scoring, but risky
         public static final double wingLength = Units.inchesToMeters(280);
 
         public static final double robotFrameLength = Units.inchesToMeters(30);
+        public static final double robotFrameWidth = Units.inchesToMeters(27);
         public static final double bumperWidth = Units.inchesToMeters(3.2);
         public static final double reefStandoff = Units.inchesToMeters(1.5);
         public static final double centerToFrontBumper = robotFrameLength / 2.0 + bumperWidth;

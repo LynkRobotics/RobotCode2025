@@ -3,6 +3,7 @@ package frc.robot.commands;
 import frc.lib.util.LoggedCommandBase;
 import frc.robot.Constants.Pose;
 import frc.robot.subsystems.PoseSubsystem;
+import frc.robot.subsystems.Swerve;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -20,10 +21,10 @@ public class PIDSwerve extends LoggedCommandBase {
     private final boolean precise;
     private final PIDController xPID, yPID;
     private final PIDController rotationPID = new PIDController(rotationKP, 0, 0);
-    private final boolean slow;
+    private final PIDSpeed speed;
     private final double maxVisionDiff;
 
-    public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise, boolean slow, double maxVisionDiff) {
+    public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise, PIDSpeed speed, double maxVisionDiff) {
         super();
 
         if (flipIfRed) {
@@ -34,7 +35,7 @@ public class PIDSwerve extends LoggedCommandBase {
         this.s_Pose = s_Pose;
         this.targetPose = targetPose;
         this.precise = precise;
-        this.slow = slow;
+        this.speed = speed;
         this.maxVisionDiff = maxVisionDiff;
         addRequirements(s_Swerve);
 
@@ -58,12 +59,12 @@ public class PIDSwerve extends LoggedCommandBase {
         rotationPID.setTolerance(precise ? rotationTolerance : roughRotatationTolerance); // TODO Set derivative, too
     }
 
-    public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise, boolean slow) {
-        this(s_Swerve, s_Pose, targetPose, flipIfRed, precise, false, Double.POSITIVE_INFINITY);
+    public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise, PIDSpeed speed) {
+        this(s_Swerve, s_Pose, targetPose, flipIfRed, precise, speed, Double.POSITIVE_INFINITY);
     }
 
     public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise) {
-        this(s_Swerve, s_Pose, targetPose, flipIfRed, precise, false);
+        this(s_Swerve, s_Pose, targetPose, flipIfRed, precise, PIDSpeed.FAST);
     }
 
     @Override
@@ -74,6 +75,7 @@ public class PIDSwerve extends LoggedCommandBase {
         yPID.reset();
         rotationPID.reset();
 
+        // Robot.field.getRobotObject().setTrajectory(targetPose);
         DogLog.log("PIDSwerve/Pose target", targetPose);
     }
 
@@ -111,7 +113,9 @@ public class PIDSwerve extends LoggedCommandBase {
 
         /* Drive */
         s_Swerve.drive(
-            new Translation2d(xVal, yVal).times(slow ? slowSpeed : maxSpeed),
+            // TODO Automatically go in turbo mode?
+            // new Translation2d(xVal, yVal).times((speed == PIDSpeed.FAST && RobotState.getTurboMode()) ? PIDSpeed.TURBO.speed : speed.speed),
+            new Translation2d(xVal, yVal).times(speed.speed),
             rotationVal * maxAngularVelocity,
             true
         );
