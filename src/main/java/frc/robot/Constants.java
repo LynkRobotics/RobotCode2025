@@ -13,6 +13,8 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.FlippingUtil;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -35,6 +37,7 @@ import frc.lib.util.SwerveModuleConstants;
 
 public final class Constants {
     public static final boolean atHQ = true; //TODO: consider a field calibration option to allow NT broadcasting
+    public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
     public static final double stickDeadband = 0.1;
     public static final double driveStickSensitivity = 1.00; 
     public static final double turnStickSensitivity = 1.00;
@@ -209,12 +212,12 @@ public final class Constants {
     }
 
     public static final class Vision {
-        public static final String cameraName = "AprilTagCam";
+        public static final String cameraName = "AprilTag Center";
         public static final Transform3d robotToCam =
             isRocky ?                
                 new Transform3d(
                     new Translation3d(Units.inchesToMeters(30.0/2.0 - 6.958), 0.0, Units.inchesToMeters(6.55)),
-                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(-20.0), 0.0))
+                    new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(-18.2), 0.0))
             :
                 new Transform3d(
                     new Translation3d(0.192, 0.0, 0.325),
@@ -377,21 +380,27 @@ public final class Constants {
         public static final double reefElevatorZoneRadius = Units.inchesToMeters(80.0); // TODO Revisit
         public static final double autoUpDistance = Units.inchesToMeters(44.0);
         public static final double wingLength = Units.inchesToMeters(280);
-        public static final double processorAreaY = fieldWidth / 2.0 - 0.5;
 
         public static final double robotFrameLength = Units.inchesToMeters(30);
         public static final double bumperWidth = Units.inchesToMeters(3.2);
         public static final double reefStandoff = Units.inchesToMeters(1.5);
-        public static final double reefOffset = robotFrameLength / 2.0 + bumperWidth + reefStandoff;
+        public static final double centerToFrontBumper = robotFrameLength / 2.0 + bumperWidth;
+        public static final double reefOffset = centerToFrontBumper + reefStandoff;
         public static final double reefExtraOffset = Units.inchesToMeters(9.0);
         public static final double bonusStandoff = Units.inchesToMeters(4.0);
+
+        public static final double processorAreaY = fieldWidth / 2.0 - 1.0;
+        public static final Translation2d processor = atHQ ? new Translation2d(7.38, 0.46) : fieldLayout.getTagPose(16).get().toPose2d().getTranslation();
+        public static final Pose2d processorScore = new Pose2d(processor.plus(new Translation2d(0.0, centerToFrontBumper)), Rotation2d.kCW_90deg);
+        public static final double processorApproachOffset = Units.inchesToMeters(24.0);
+        public static final Pose2d processorApproach = processorScore.transformBy(new Transform2d(-processorApproachOffset, 0.0, Rotation2d.kZero));
 
         // Locations from the Blue Alliance perspective
         public static final Translation2d reefCenter = new Translation2d(Units.inchesToMeters(176.75), fieldWidth / 2.0);
         public static final double reefToFaceDistance = reefCenter.getX() - Units.inchesToMeters(144.0);
         public static final double branchSeparation = Units.inchesToMeters(12.0 + 15.0 / 16.0);
         public static final double bargeShotDistanceFromCenter = Units.inchesToMeters(52.0);
-        public static final double bargeShotX = fieldLength / 2.0 - bargeShotDistanceFromCenter - robotFrameLength / 2.0 - bumperWidth;
+        public static final double bargeShotX = fieldLength / 2.0 - bargeShotDistanceFromCenter - centerToFrontBumper;
 
         // Offset to the reef face, not at the branches, but on the faces directly in front
         public static final Translation2d centerOffset = new Translation2d(reefToFaceDistance + reefOffset - reefStandoff, 0.0); // NOTE: Undo reef standoff for algae
@@ -499,7 +508,7 @@ public final class Constants {
         // Blue CLOSE = 8.35, 5.10   (8.774 - 0.42)
         // Red CLOSE = 9.11, 2.95    (8.774 + 0.34)
 
-        // public static final Transform2d cageOffset = new Transform2d(robotFrameLength / 2.0 + bumperWidth - Units.inchesToMeters(2.0), 0, Rotation2d.kZero);
+        // public static final Transform2d cageOffset = new Transform2d(centerToFrontBumper - Units.inchesToMeters(2.0), 0, Rotation2d.kZero);
         public static final Transform2d cageOffset = new Transform2d(0.42, 0, Rotation2d.kZero);
         public static final Transform2d cageApproachOffset = new Transform2d(Units.inchesToMeters(16.0), 0, Rotation2d.kZero);
     }

@@ -7,8 +7,6 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.TunableOption;
 import frc.robot.Constants;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -31,7 +29,6 @@ public class VisionSubsystem extends SubsystemBase {
     private static VisionSubsystem instance;
     private final PhotonCamera camera;
     private final PhotonPoseEstimator photonEstimator;
-    private AprilTagFieldLayout kTagLayout;
     private final Field2d field = new Field2d();
     private Pose2d lastPose = new Pose2d();
     private PhotonPipelineResult lastResult = null;
@@ -44,9 +41,7 @@ public class VisionSubsystem extends SubsystemBase {
 
         camera = new PhotonCamera(Constants.Vision.cameraName);
 
-        kTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
-
-        photonEstimator = new PhotonPoseEstimator(kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+        photonEstimator = new PhotonPoseEstimator(Constants.fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                 Constants.Vision.robotToCam);
         photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
