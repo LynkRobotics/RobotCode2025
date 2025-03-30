@@ -3,7 +3,6 @@ package frc.robot.commands;
 import frc.lib.util.LoggedCommandBase;
 import frc.robot.Constants.Pose;
 import frc.robot.subsystems.PoseSubsystem;
-import frc.robot.subsystems.Swerve;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
