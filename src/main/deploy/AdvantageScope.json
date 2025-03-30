@@ -3,25 +3,38 @@
     {
       "x": -8,
       "y": -8,
-      "width": 1708,
-      "height": 1020,
+      "width": 1722,
+      "height": 1034,
       "state": {
         "sidebar": {
-          "width": 300,
+          "width": 358,
           "expanded": [
-            "/Robot",
             "/Robot/Vision/Pose",
             "/Robot/Alerts/errors",
             "/Robot/Alerts/infos",
             "/Robot/Alerts/warnings",
             "/NT/Robot",
             "/NT/LiveWindow/.status",
-            "/NT",
-            "/NT/SmartDashboard"
+            "/Robot/Pose/PP Current Pose",
+            "/Robot/Pose/Auto Target Pose",
+            "/Robot/Vision/TargetPoses",
+            "/Robot/Vision/org.photonvision.PhotonCamera@519ad3",
+            "/Robot/Vision/LEFT",
+            "/Robot/Vision/CENTER",
+            "/photonvision/.timesync",
+            "/Robot/Vision/RIGHT/Tag Poses",
+            "/Robot/Vision/LEFT/Pose",
+            "/Robot/Vision/REAR/Tag Poses",
+            "/Robot/Robot",
+            "/Robot/Vision/LEFT/Pose/translation",
+            "/Robot/Vision/CENTER/Pose",
+            "/Robot/Vision/CENTER/Pose/translation",
+            "/Robot",
+            "/Robot/Fault"
           ]
         },
         "tabs": {
-          "selected": 2,
+          "selected": 3,
           "tabs": [
             {
               "type": 0,
@@ -30,6 +43,21 @@
               "controllerUUID": "pzlq2walq7p9ymnuprdjz706bbo4bx1x",
               "renderer": "#/",
               "controlsHeight": 0
+            },
+            {
+              "type": 8,
+              "title": "Joysticks",
+              "controller": [
+                "Xbox Controller (White)",
+                "None",
+                "None",
+                "None",
+                "None",
+                "None"
+              ],
+              "controllerUUID": "kq9ibimqfy8fdy8t1wtx6shdyd35o8rq",
+              "renderer": null,
+              "controlsHeight": 85
             },
             {
               "type": 1,
@@ -105,6 +133,25 @@
                     }
                   },
                   {
+                    "type": "ghost",
+                    "logKey": "/Robot/Pose/Auto Target Pose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff00ff"
+                    }
+                  },
+                  {
+                    "type": "trajectory",
+                    "logKey": "/Robot/Pose/Active Path",
+                    "logType": "Pose2d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff",
+                      "size": "normal"
+                    }
+                  },
+                  {
                     "type": "robot",
                     "logKey": "NT:/Robot/Pose/Pose",
                     "logType": "Pose2d",
@@ -113,15 +160,82 @@
                   },
                   {
                     "type": "ghost",
-                    "logKey": "NT:/Robot/Vision/Pose",
-                    "logType": "Pose2d",
+                    "logKey": "NT:/Robot/Vision/RIGHT/Pose",
+                    "logType": "Pose3d",
                     "visible": true,
+                    "options": {
+                      "color": "#ff0000"
+                    }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "NT:/Robot/Vision/RIGHT/Tag Poses",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Robot/Vision/LEFT/Pose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff"
+                    }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "NT:/Robot/Vision/LEFT/Pose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Robot/Vision/CENTER/Pose",
+                    "logType": "Pose3d",
+                    "visible": false,
                     "options": {
                       "color": "#ff8c00"
                     }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "NT:/Robot/Vision/CENTER/Tag Poses",
+                    "logType": "Pose3d[]",
+                    "visible": false,
+                    "options": {
+                      "color": "#ff8c00",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Robot/Vision/REAR/Pose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff00ff"
+                    }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "NT:/Robot/Vision/REAR/Tag Poses",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff00ff",
+                      "size": "normal"
+                    }
                   }
                 ],
-                "game": "2025 Field (Welded)",
+                "game": "2025 Field (AndyMark)",
                 "bumpers": "auto",
                 "origin": "blue",
                 "orientation": 0,
@@ -132,26 +246,204 @@
               "controlsHeight": 200
             },
             {
+              "type": 4,
+              "title": "Vision",
+              "controller": [
+                "NT:/Robot/Vision/CENTER/Status",
+                "NT:/Robot/Vision/LEFT/Status",
+                "NT:/Robot/Vision/RIGHT/Status",
+                "NT:/Robot/Vision/REAR/Status"
+              ],
+              "controllerUUID": "j1c1mt5htqidvxvlvbh8a9osgxgdy1d4",
+              "renderer": null,
+              "controlsHeight": 0
+            },
+            {
+              "type": 4,
+              "title": "Table",
+              "controller": [
+                "NT:/Robot/Vision/CENTER/Timestamp",
+                "NT:/Robot/Vision/CENTER/Distance",
+                "NT:/Robot/Vision/CENTER/Tag Poses/length"
+              ],
+              "controllerUUID": "b3kwd4w5qgaooo1ybp83rel1razokkf9",
+              "renderer": null,
+              "controlsHeight": 0
+            },
+            {
+              "type": 1,
+              "title": "Line Graph",
+              "controller": {
+                "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Robot/Vision/LEFT/Ambiguity",
+                    "logType": "Number",
+                    "visible": false,
+                    "options": {
+                      "color": "#2b66a2",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Robot/Vision/CENTER/Ambiguity",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Robot/Vision/RIGHT/Ambiguity",
+                    "logType": "Number",
+                    "visible": false,
+                    "options": {
+                      "color": "#af2437",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "rightSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Robot/Vision/LEFT/Distance",
+                    "logType": "Number",
+                    "visible": false,
+                    "options": {
+                      "color": "#80588e",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Robot/Vision/CENTER/Distance",
+                    "logType": "Number",
+                    "visible": false,
+                    "options": {
+                      "color": "#e48b32",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Robot/Vision/RIGHT/Distance",
+                    "logType": "Number",
+                    "visible": false,
+                    "options": {
+                      "color": "#c0b487",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "discreteSources": [],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "rightUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "uxfsl9iqzgfri4lq2092trlsmr3ndl9l",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 7,
+              "title": "Video",
+              "controller": null,
+              "controllerUUID": "vrgghleev6yskouhjytz33022uyx8d4g",
+              "renderer": null,
+              "controlsHeight": 85
+            },
+            {
               "type": 3,
               "title": "3D Field",
               "controller": {
-                "sources": [],
-                "game": "2025 Field (Welded)",
+                "sources": [
+                  {
+                    "type": "robot",
+                    "logKey": "NT:/Robot/Pose/Pose",
+                    "logType": "Pose2d",
+                    "visible": false,
+                    "options": {
+                      "model": "2025 KitBot"
+                    }
+                  },
+                  {
+                    "type": "robot",
+                    "logKey": "/Robot/Pose/Pose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "Rocky"
+                    }
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "/Robot/Swerve/Actual Module States",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "/Robot/Swerve/Desired Module States",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/Robot/Vision/Pose",
+                    "logType": "Pose2d",
+                    "visible": false,
+                    "options": {
+                      "model": "2025 KitBot",
+                      "color": "#00ff00"
+                    }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "/Robot/Vision/TargetPoses",
+                    "logType": "Pose3d[]",
+                    "visible": false,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "game": "2025 Field (AndyMark)",
                 "origin": "blue"
               },
               "controllerUUID": "tqq3v6kd1ryr67i2myagzbg8eplt4esy",
               "renderer": {
-                "cameraIndex": -1,
-                "orbitFov": 50,
+                "cameraIndex": 2,
+                "orbitFov": 90,
                 "cameraPosition": [
-                  1.4695761589768238e-15,
-                  5.999999999999999,
-                  -12
+                  -1.8502306683931349,
+                  0.20299999999999951,
+                  -0.8944808506044273
                 ],
                 "cameraTarget": [
-                  0,
-                  0.5,
-                  0
+                  -2.7953391466211652,
+                  0.5153349185122318,
+                  -0.9904853456005165
                 ]
               },
               "controlsHeight": 200
@@ -196,6 +488,16 @@
             },
             {
               "type": 4,
+              "title": "Table",
+              "controller": [
+                "NT:/Robot/Robot/Status"
+              ],
+              "controllerUUID": "ni3lcdfxnnr3wxjjdnnjm5fctntyh05r",
+              "renderer": null,
+              "controlsHeight": 0
+            },
+            {
+              "type": 4,
               "title": "Coral",
               "controller": [
                 "/Robot/Misc/FMS Match Time",
@@ -214,7 +516,9 @@
               "title": "Algae",
               "controller": [
                 "/Robot/State/Game Piece State",
-                "/Robot/State/Have algae"
+                "/Robot/State/Have algae",
+                "NT:/Robot/State/Game Piece State",
+                "NT:/Robot/State/Have algae"
               ],
               "controllerUUID": "biqoienhdqd3bs9e3wpftumhwznyye8b",
               "renderer": null,
@@ -344,6 +648,21 @@
               "controllerUUID": "jycob06x9fgyuvwlmkbdgv004u66thn1",
               "renderer": null,
               "controlsHeight": 200
+            },
+            {
+              "type": 4,
+              "title": "LED",
+              "controller": [
+                "NT:/Robot/State/Climb State",
+                "NT:/Robot/State/Game Piece State",
+                "/Robot/LED/State",
+                "/Robot/LED/Status",
+                "NT:/Robot/LED/State",
+                "NT:/Robot/LED/Status"
+              ],
+              "controllerUUID": "3oczojoexoo7h3r9xydnharpub9bzo3d",
+              "renderer": null,
+              "controlsHeight": 0
             }
           ]
         }
