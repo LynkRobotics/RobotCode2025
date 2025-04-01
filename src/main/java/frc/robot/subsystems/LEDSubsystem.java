@@ -86,6 +86,7 @@ public class LEDSubsystem extends SubsystemBase {
         STARTUP(new LEDConfig(Constants.LEDs.readyAnimation)),
         DISABLED(new LEDConfig(Color.disabled)),
         NORMAL(new LEDConfig(Color.lynk)),
+        NORMAL_BLINK(new LEDConfig(Color.lynk, true)),
         MANUAL(new LEDConfig(Color.hightideTeal)),
         SLOWMODE(new LEDConfig(Color.dimYellow)),
         CORAL_L1(new LEDConfig(Color.magenta, 0.25)),
@@ -151,6 +152,11 @@ public class LEDSubsystem extends SubsystemBase {
 
     public static void triggerWarning() {
         state = LEDState.WARNING;
+        tempStateTimer.restart();
+    }
+
+    public static void triggerScored() {
+        state = LEDState.NORMAL_BLINK;
         tempStateTimer.restart();
     }
 
@@ -245,7 +251,7 @@ public class LEDSubsystem extends SubsystemBase {
         }
 
         // Blink the LEDs if the blink interval has elapsed
-        if (blinkTimer.isRunning() && blinkTimer.advanceIfElapsed((state == LEDState.ERROR || state == LEDState.WARNING) ? Constants.LEDs.errorBlinkRate : Constants.LEDs.blinkRate)) {
+        if (blinkTimer.isRunning() && blinkTimer.advanceIfElapsed((state == LEDState.ERROR || state == LEDState.WARNING || state == LEDState.NORMAL_BLINK) ? Constants.LEDs.errorBlinkRate : Constants.LEDs.blinkRate)) {
             blinkOff = !blinkOff;
             setColor(blinkOff ? Color.off : state.config.color);
         }

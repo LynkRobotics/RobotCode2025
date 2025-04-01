@@ -332,6 +332,9 @@ public class RobotState extends SubsystemBase {
                 }
             }
         }
+        if (gamePieceState == GamePieceState.SCORING_CORAL && !haveCoral()) { //scored coral, so trigger LEDs
+            LEDSubsystem.triggerScored();
+        }
 
         DogLog.log("State/Funnel sensor", funnelSensor);
         DogLog.log("State/Index sensor", indexSensor);
