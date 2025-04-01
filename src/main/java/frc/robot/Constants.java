@@ -455,6 +455,7 @@ public final class Constants {
         private static final Translation2d centerApproachOffset = centerOffset.plus(extraOffset);
         private static final Translation2d leftApproachOffset = leftOffset.plus(extraOffset);
         private static final Translation2d rightApproachOffset = rightOffset.plus(extraOffset);
+        public static final double approachDistanceToReefCenter = centerApproachOffset.getDistance(reefCenter);
         private static final Translation2d bonusOffset = new Translation2d(bonusStandoff, 0.0);
         private static final Translation2d leftBonusOffset = leftOffset.plus(bonusOffset);
         private static final Translation2d rightBonusOffset = rightOffset.plus(bonusOffset);
