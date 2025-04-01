@@ -50,5 +50,6 @@ public class LoggedAlert {
         String formattedLog = new String(subsystem + ": " + "Info: " + title + ": " + msg);
         DogLog.logFault(formattedLog, AlertType.kWarning);
         DogLog.logFault(formattedLog);
+        LEDSubsystem.triggerInfo();
     }
 }
