@@ -166,7 +166,10 @@ public class RobotContainer {
                         Commands.race(
                             Commands.sequence(
                                 Commands.either(
-                                    new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true, true, PIDSpeed.TURBO),
+                                    Commands.sequence(
+                                        new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, true, false, PIDSpeed.TURBO),
+                                        new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true, true)
+                                    ),
                                     Commands.sequence(
                                         new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, true, false, PIDSpeed.FAST, Constants.maxVisionDiffCoral),
                                         Commands.either(
