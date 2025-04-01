@@ -295,11 +295,11 @@ public class PoseSubsystem extends SubsystemBase {
         Pose2d targetPose;
 
         if (currentPose.getX() > Constants.Pose.fieldLength / 2.0) {
-            // targetPose = new Pose2d(Constants.Pose.fieldLength - Constants.Pose.bargeShotX, currentPose.getY(), Rotation2d.k180deg);
-            targetPose = new Pose2d(currentPose.getX(), currentPose.getY(), Rotation2d.k180deg);
+            targetPose = new Pose2d(Constants.Pose.fieldLength - Constants.Pose.bargeShotX, currentPose.getY(), Rotation2d.k180deg);
+            // targetPose = new Pose2d(currentPose.getX(), currentPose.getY(), Rotation2d.k180deg);
         } else {
-            // targetPose = new Pose2d(Constants.Pose.bargeShotX, currentPose.getY(), Rotation2d.kZero);
-            targetPose = new Pose2d(currentPose.getX(), currentPose.getY(), Rotation2d.kZero);
+            targetPose = new Pose2d(Constants.Pose.bargeShotX, currentPose.getY(), Rotation2d.kZero);
+            // targetPose = new Pose2d(currentPose.getX(), currentPose.getY(), Rotation2d.kZero);
         }
 
         return flipIfRed(targetPose);
