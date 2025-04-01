@@ -29,6 +29,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.*;
 
+import java.util.EnumMap;
+
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.wpilibj.RobotController;
@@ -253,18 +255,37 @@ public final class Constants {
                     -Pose.robotFrameWidth / 2.0 + Units.inchesToMeters(2.75),
                     Units.inchesToMeters(39.6)),
                 new Rotation3d(0.0, Units.degreesToRadians(-8.5), Units.degreesToRadians(180.0))));
-        
+    
+            public final String name;
+            public final Transform3d robotToCamera;
+            
             Camera(String name, Transform3d robotToCamera) {
                 this.name = name;
                 this.robotToCamera = robotToCamera;
             }
-    
-            public final String name;
-            public final Transform3d robotToCamera;
         }
 
         public static final Camera[] camerasAvailable = Camera.values();
         // public static final Camera[] camerasAvailable = { Camera.CENTER };
+
+        public enum CameraMode {
+            DEFAULT(1.0, 0.9, 1.0, 1.5),
+            FRONT(1.2, 0.8, 1.2, Double.POSITIVE_INFINITY),
+            REAR(5.0, 5.0, 5.0, 0.5);
+
+            private final EnumMap<Camera, Double> stddev = new EnumMap<>(Camera.class);
+
+            CameraMode(double left, double center, double right, double rear) {
+                stddev.put(Camera.LEFT, left);
+                stddev.put(Camera.CENTER, center);
+                stddev.put(Camera.RIGHT, right);
+                stddev.put(Camera.REAR, rear);
+            }
+
+            public double getStdDev(Camera camera) {
+                return stddev.get(camera);
+            }
+        }
     }
 
     public static final class Elevator {

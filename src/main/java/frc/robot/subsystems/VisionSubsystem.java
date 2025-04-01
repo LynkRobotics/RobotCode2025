@@ -4,12 +4,15 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
+import frc.lib.util.LoggedCommands;
 // import frc.lib.util.TunableOption;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Constants.Vision.Camera;
+import frc.robot.Constants.Vision.CameraMode;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -48,6 +51,7 @@ public class VisionSubsystem extends SubsystemBase {
     private static final EnumMap<Camera, PhotonCamera> cameras = new EnumMap<>(Camera.class);
     private static final EnumMap<Camera, PhotonPoseEstimator> photonEstimator = new EnumMap<>(Camera.class);
     // private static final EnumMap<Camera, Field2d> field = new EnumMap<>(Camera.class);
+    private static CameraMode cameraMode = CameraMode.DEFAULT;
 
     private static record PoseResult(double timestamp, Pose3d pose, List<Short> fiducialIDs, double ambiguity, double averageTagDistance) {
     }
@@ -60,6 +64,7 @@ public class VisionSubsystem extends SubsystemBase {
             // field.put(cameraType, new Field2d());
             // SmartDashboard.putData("Vision/" + cameraType + " Field", field.get(cameraType));
             SmartDashboard.putBoolean("Vision/" + cameraType + " Enabled", true);
+            setCameraMode(CameraMode.DEFAULT);
         }
     }
 
@@ -70,6 +75,24 @@ public class VisionSubsystem extends SubsystemBase {
 
     public static VisionSubsystem getInstance() {
         return instance;
+    }
+
+    public static void setCameraMode(CameraMode cameraMode) {
+        VisionSubsystem.cameraMode = cameraMode;
+        DogLog.log("Vision/Camera Mode", cameraMode);
+        SmartDashboard.putString("Vision/Camera Mode", cameraMode.toString());
+    }
+
+    public static Command SwitchToDefaultVision() {
+        return LoggedCommands.runOnce("Switch to default vision", () -> setCameraMode(CameraMode.DEFAULT));
+    }
+
+    public static Command SwitchToFrontVision() {
+        return LoggedCommands.runOnce("Switch to front vision", () -> setCameraMode(CameraMode.FRONT));
+    }
+
+    public static Command SwitchToRearVision() {
+        return LoggedCommands.runOnce("Switch to rear vision", () -> setCameraMode(CameraMode.REAR));
     }
 
     public static void setPoseEstimator(PoseEstimator<SwerveModulePosition[]> poseEstimator) {
@@ -206,7 +229,7 @@ public class VisionSubsystem extends SubsystemBase {
                 // DogLog.log(logPrefix + "Pose Difference", PoseSubsystem.getInstance().getPose().getTranslation().getDistance(poseResult.pose.getTranslation()));
                 if (poseIsReasonable(poseResult.pose)) {
                     if (poseEstimator != null) {
-                        double stdDevFactor = poseResult.averageTagDistance * poseResult.averageTagDistance / poseResult.fiducialIDs.size();
+                        double stdDevFactor = cameraMode.getStdDev(cameraType) * poseResult.averageTagDistance * poseResult.averageTagDistance / poseResult.fiducialIDs.size();
                         double linearStdDev = Constants.Vision.linearStdDevBaseline * stdDevFactor * camerasEnabled.size();
                         double angularStdDev = Constants.Vision.angularStdDevBaseline * stdDevFactor * camerasEnabled.size();
                         // NOTE Could possibly scale by specific camera location, too

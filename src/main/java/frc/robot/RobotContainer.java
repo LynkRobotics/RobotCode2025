@@ -41,6 +41,7 @@ import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
 import frc.robot.Constants.Pose.Cage;
 import frc.robot.Constants.Pose.ReefFace;
+import frc.robot.Constants.Vision.CameraMode;
 import frc.robot.Constants.Elevator.Stop;
 import frc.robot.Constants.PIDSwerve.PIDSpeed;
 import frc.robot.commands.*;
@@ -163,6 +164,7 @@ public class RobotContainer {
             LoggedCommands.sequence("Auto Align " + (left ? "Left " : "Right ") + face.toString() + " & Score",
                 LoggedCommands.parallel("PID Align " + (left ? "Left " : "Right ") + face.toString(),
                     Commands.sequence(
+                        VisionSubsystem.SwitchToFrontVision(),
                         Commands.race(
                             Commands.sequence(
                                 Commands.either(
@@ -220,7 +222,8 @@ public class RobotContainer {
                     )
                 )),
             LoggedCommands.log("Cannot score coral without coral"),
-            () -> RobotState.haveCoral() || RobotState.getTurboMode());
+            () -> RobotState.haveCoral() || RobotState.getTurboMode())
+        .handleInterrupt(() -> VisionSubsystem.setCameraMode(CameraMode.DEFAULT));
     }
 
     private static final Map<ReefFace, ReefFace> mirroredFaces = Collections.unmodifiableMap(Map.ofEntries(
@@ -279,6 +282,7 @@ public class RobotContainer {
                     LoggedCommands.waitUntil("Wait for Algae", RobotState::haveAlgae),
                     TriggerRumble()),
                 LoggedCommands.sequence("Auto Align Middle " + face.toString(),
+                    VisionSubsystem.SwitchToFrontVision(),
                     RobotState.IntakeAlgae(),
                     LoggedCommands.parallel("PID Align Middle " + face.toString(),
                         Commands.sequence(
@@ -294,7 +298,10 @@ public class RobotContainer {
                                 s_Elevator.AutoElevatorUp(face.alignMiddle.getTranslation(), algaeStop)),
                             optInvertAlgae)))),
             new PIDSwerve(s_Swerve, s_Pose, face.algaeBackup, true, false))
-            .handleInterrupt(() -> { if (!RobotState.haveAlgae()) RobotState.setNoAlgae(); });
+            .handleInterrupt(() -> {
+                if (!RobotState.haveAlgae()) RobotState.setNoAlgae();
+                VisionSubsystem.setCameraMode(CameraMode.DEFAULT);
+            });
     }
 
     private Command DeLollipop() {
@@ -368,6 +375,7 @@ public class RobotContainer {
 
         return LoggedCommands.sequence("Align to cage " + cage,
             LoggedCommands.runOnce("Disable reef aiming", optAutoReefAiming::disable),
+            VisionSubsystem.SwitchToRearVision(),
             LoggedCommands.runOnce("Enable end game mode", () -> RobotState.setClimbState(ClimbState.STARTED)),
             new PIDSwerve(s_Swerve, s_Pose, cageAlignPose.transformBy(Constants.Pose.cageApproachOffset), true, false, PIDSpeed.FAST),
             new PIDSwerve(s_Swerve, s_Pose, cageAlignPose, true, true, PIDSpeed.SLOW));
@@ -511,6 +519,7 @@ public class RobotContainer {
 
     private void buildAutos(SendableChooser<Command> chooser) {
         Command autoECD = LoggedCommands.sequence("ECDB",
+            VisionSubsystem.SwitchToFrontVision(),
             LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
             Commands.either(
                 LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
@@ -519,6 +528,7 @@ public class RobotContainer {
             SetStop(Stop.L4),
             LoggedCommands.proxy(PathCommand("Start towards EF")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
+            VisionSubsystem.SwitchToRearVision(),
             Commands.race(
                 LoggedCommands.proxy(PathCommand("E to CS")),
                 RobotState.WaitForCoral()),
@@ -526,8 +536,10 @@ public class RobotContainer {
                 LoggedCommands.proxy(BackUpAndWaitForCoral()),
                 LoggedCommands.log("Will not wait for Coral"),
                 optAutoCoralWait::get),
+            VisionSubsystem.SwitchToFrontVision(),
             LoggedCommands.proxy(PathCommand("CS towards C")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, true)),
+            VisionSubsystem.SwitchToRearVision(),
             Commands.race(
                 LoggedCommands.proxy(PathCommand("C to CS")),
                 RobotState.WaitForCoral()
@@ -536,8 +548,10 @@ public class RobotContainer {
                 LoggedCommands.proxy(BackUpAndWaitForCoral()),
                 LoggedCommands.log("Will not wait for Coral"),
                 optAutoCoralWait::get),
+            VisionSubsystem.SwitchToFrontVision(),
             LoggedCommands.proxy(PathCommand("CS towards D")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false)),
+            VisionSubsystem.SwitchToRearVision(),
             s_Swerve.CoastDriveMotors(),
             Commands.race(
                 LoggedCommands.proxy(PathCommand("D to CS")),
@@ -547,9 +561,11 @@ public class RobotContainer {
                 LoggedCommands.proxy(BackUpAndWaitForCoral()),
                 LoggedCommands.log("Will not wait for Coral"),
                 optAutoCoralWait::get),
+            VisionSubsystem.SwitchToFrontVision(),
             LoggedCommands.proxy(PathCommand("CS to near B")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
-            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachRight, true, false)));
+            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachRight, true, false)))
+        .handleInterrupt(() -> VisionSubsystem.setCameraMode(CameraMode.DEFAULT));
 
         // startingPaths.put(autoECD, "Start to near E");
         startingPaths.put(autoECD, "Start towards EF");
