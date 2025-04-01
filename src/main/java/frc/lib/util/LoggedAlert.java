@@ -1,6 +1,7 @@
 package frc.lib.util;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.lib.util.Elastic.Notification;
 import frc.lib.util.Elastic.Notification.NotificationLevel;
 import frc.robot.Constants;
@@ -16,8 +17,9 @@ public class LoggedAlert {
      */
     public static void Error(String subsystem, String title, String msg) {
         Elastic.sendNotification(new Notification(NotificationLevel.ERROR, title, msg, Constants.errorTime));
-        DogLog.log("Fault/Error", subsystem + ": " + title + " " + msg);
-        DogLog.log("Fault/All Faults", subsystem + ": " + "Error: " + title + " " + msg);
+        String formattedLog = new String(subsystem + ": " + "Error: " + title + ": " + msg);
+        DogLog.logFault(formattedLog, AlertType.kError);
+        DogLog.logFault(formattedLog);
         LEDSubsystem.triggerError(); //TODO: i dont really like subsystem calls in util classes
     }
 
@@ -30,8 +32,9 @@ public class LoggedAlert {
      */
     public static void Warning(String subsystem, String title, String msg) {
         Elastic.sendNotification(new Notification(NotificationLevel.WARNING, title, msg, Constants.warningTime));
-        DogLog.log("Fault/Warning", subsystem + ": " + title + " " + msg);
-        DogLog.log("Fault/All Faults", subsystem + ": " + "Warning: " + title + " " + msg);
+        String formattedLog = new String(subsystem + ": " + "Warning: " + title + ": " + msg);
+        DogLog.logFault(formattedLog, AlertType.kWarning);
+        DogLog.logFault(formattedLog);
         LEDSubsystem.triggerWarning();
     }
 
@@ -44,7 +47,8 @@ public class LoggedAlert {
      */
     public static void Info(String subsystem, String title, String msg) {
         Elastic.sendNotification(new Notification(NotificationLevel.INFO, title, msg));
-        DogLog.log("Fault/Info", subsystem + ": " + title + " " + msg);
-        DogLog.log("Fault/All Faults",  subsystem + ": " + "Info: " + title + " " + msg);
+        String formattedLog = new String(subsystem + ": " + "Info: " + title + ": " + msg);
+        DogLog.logFault(formattedLog, AlertType.kWarning);
+        DogLog.logFault(formattedLog);
     }
 }
