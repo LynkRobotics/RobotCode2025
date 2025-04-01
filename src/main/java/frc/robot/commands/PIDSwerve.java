@@ -45,18 +45,30 @@ public class PIDSwerve extends LoggedCommandBase {
         xPID.setIZone(positionIZone); // Only use Integral term within this range
         xPID.setIntegratorRange(-positionKS * 2, positionKS * 2);
         xPID.setSetpoint(Units.metersToInches(targetPose.getX()));
-        xPID.setTolerance(precise ? positionTolerance : roughPositionTolerance);
+        if (precise) {
+            xPID.setTolerance(positionTolerance, 5.0); // Inches per second
+        } else {
+            xPID.setTolerance(roughPositionTolerance);
+        }
 
         yPID.setIZone(positionIZone); // Only use Integral term within this range
         yPID.setIntegratorRange(-positionKS * 2, positionKS * 2);
-        yPID.setSetpoint(Units.metersToInches(targetPose.getY())); // TODO Set derivative, too
-        yPID.setTolerance(precise ? positionTolerance : roughPositionTolerance);
+        yPID.setSetpoint(Units.metersToInches(targetPose.getY()));
+        if (precise) {
+            yPID.setTolerance(positionTolerance, 5.0); // Inches per second
+        } else {
+            yPID.setTolerance(roughPositionTolerance);
+        }
 
         rotationPID.enableContinuousInput(-180.0, 180.0);
         rotationPID.setIZone(Pose.rotationIZone); // Only use Integral term within this range
         rotationPID.setIntegratorRange(-Pose.rotationKS * 2, Pose.rotationKS * 2);
         rotationPID.setSetpoint(targetPose.getRotation().getDegrees());
-        rotationPID.setTolerance(precise ? rotationTolerance : roughRotatationTolerance); // TODO Set derivative, too
+        if (precise) {
+            rotationPID.setTolerance(rotationTolerance, 10.0);
+        } else {
+            rotationPID.setTolerance(roughRotatationTolerance);
+        }
     }
 
     public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise, PIDSpeed speed) {
@@ -94,6 +106,8 @@ public class PIDSwerve extends LoggedCommandBase {
         DogLog.log("PIDSwerve/X correction", xCorrection);
         DogLog.log("PIDSwerve/X feedforward", xFeedForward);
         DogLog.log("PIDSwerve/X value", xVal);
+        DogLog.log("PIDSwerve/X error", xPID.getError());
+        DogLog.log("PIDSwerve/X error derivative", xPID.getErrorDerivative());
 
         double yCorrection = yPID.calculate(Units.metersToInches(position.getY()));
         double yFeedForward = positionKS * Math.signum(yCorrection);
@@ -102,6 +116,8 @@ public class PIDSwerve extends LoggedCommandBase {
         DogLog.log("PIDSwerve/Y correction", yCorrection);
         DogLog.log("PIDSwerve/Y feedforward", yFeedForward);
         DogLog.log("PIDSwerve/Y value", yVal);
+        DogLog.log("PIDSwerve/Y error", yPID.getError());
+        DogLog.log("PIDSwerve/Y error derivative", yPID.getErrorDerivative());
 
         double correction = rotationPID.calculate(rotation.getDegrees());
         double feedForward = Pose.rotationKS * Math.signum(correction);
@@ -110,6 +126,8 @@ public class PIDSwerve extends LoggedCommandBase {
         DogLog.log("PIDSwerve/Rot correction", correction);
         DogLog.log("PIDSwerve/Rot feedforward", feedForward);
         DogLog.log("PIDSwerve/Rot value", rotationVal);
+        DogLog.log("PIDSwerve/Rot error", rotationPID.getError());
+        DogLog.log("PIDSwerve/Rot error derivative", rotationPID.getErrorDerivative());
 
         /* Drive */
         s_Swerve.drive(
