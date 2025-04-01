@@ -422,7 +422,7 @@ public final class Constants {
         public static final double fieldLength = FlippingUtil.fieldSizeX; // Units.inchesToMeters(57*12 + 6.875);
 
         public static final double reefElevatorZoneRadius = Units.inchesToMeters(80.0); // TODO Revisit
-        public static final double autoUpDistance = Units.inchesToMeters(44.0); // Increase for quicker auto scoring, but risky
+        public static final double autoUpDistance = Units.inchesToMeters(60.0); // Increase for quicker auto scoring, but risky
         public static final double wingLength = Units.inchesToMeters(280);
 
         public static final double robotFrameLength = Units.inchesToMeters(30);
