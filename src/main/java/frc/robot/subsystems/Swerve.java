@@ -76,6 +76,13 @@ public class Swerve extends SubsystemBase {
         return Constants.Swerve.swerveKinematics.toChassisSpeeds(getModuleStates());
     }
 
+    public void xSwerve() {
+        mSwerveMods[0].setDesiredState(new SwerveModuleState(0, new Rotation2d(315)), false); //FL
+        mSwerveMods[1].setDesiredState(new SwerveModuleState(0, new Rotation2d(45)), false); //FR
+        mSwerveMods[2].setDesiredState(new SwerveModuleState(0, new Rotation2d(225)), false); //RL
+        mSwerveMods[3].setDesiredState(new SwerveModuleState(0, new Rotation2d(135)), false); //RR
+    }
+
     public void driveRobotRelativeAuto(ChassisSpeeds desirChassisSpeeds) {
         driveRobotRelative(desirChassisSpeeds, false);
     }
