@@ -77,10 +77,10 @@ public class Swerve extends SubsystemBase {
     }
 
     public void xSwerve() {
-        mSwerveMods[0].setDesiredState(new SwerveModuleState(0, new Rotation2d(315)), false); //FL
-        mSwerveMods[1].setDesiredState(new SwerveModuleState(0, new Rotation2d(45)), false); //FR
-        mSwerveMods[2].setDesiredState(new SwerveModuleState(0, new Rotation2d(225)), false); //RL
-        mSwerveMods[3].setDesiredState(new SwerveModuleState(0, new Rotation2d(135)), false); //RR
+        Rotation2d[] rotations = {new Rotation2d(315), new Rotation2d(45), new Rotation2d(225), new Rotation2d(135)};
+        for (int i = 0; i < mSwerveMods.length; i++) {
+            mSwerveMods[i].setDesiredState(new SwerveModuleState(0, rotations[i]), false);
+        }
     }
 
     public void driveRobotRelativeAuto(ChassisSpeeds desirChassisSpeeds) {
