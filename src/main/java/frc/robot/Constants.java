@@ -244,7 +244,7 @@ public final class Constants {
                 new Translation3d(Pose.robotFrameLength / 2.0 - Units.inchesToMeters(6.958),
                     0.0,
                     Units.inchesToMeters(6.55)),
-                new Rotation3d(Units.degreesToRadians(-0.6), Units.degreesToRadians(-19.2), Units.degreesToRadians(0)))),
+                new Rotation3d(Units.degreesToRadians(0.9), Units.degreesToRadians(-20.3), Units.degreesToRadians(0)))),
             RIGHT ("AprilTag Right", new Transform3d(
                 new Translation3d(Pose.robotFrameLength / 2.0 - Units.inchesToMeters(2.772),
                     -Pose.robotFrameWidth / 2.0 + Units.inchesToMeters(4.843),
