@@ -443,7 +443,7 @@ public final class Constants {
         public static final double fieldLength = FlippingUtil.fieldSizeX; // Units.inchesToMeters(57*12 + 6.875);
 
         public static final double reefElevatorZoneRadius = Units.inchesToMeters(80.0); // TODO Revisit
-        public static final double autoUpDistance = Units.inchesToMeters(60.0); // Increase for quicker auto scoring, but risky
+        public static final double autoUpDistance = Units.inchesToMeters(38.0); // Increase for quicker auto scoring, but risky
         public static final double wingLength = Units.inchesToMeters(280);
 
         public static final double robotFrameLength = Units.inchesToMeters(30);
@@ -452,7 +452,7 @@ public final class Constants {
         public static final double reefStandoff = Units.inchesToMeters(1.5);
         public static final double centerToFrontBumper = robotFrameLength / 2.0 + bumperWidth;
         public static final double reefOffset = centerToFrontBumper + reefStandoff;
-        public static final double reefExtraOffset = Units.inchesToMeters(9.0);
+        public static final double reefExtraOffset = Units.inchesToMeters(16.0);
         public static final double bonusStandoff = Units.inchesToMeters(4.0);
 
         public static final double processorAreaY = fieldWidth / 2.0 - 1.0;

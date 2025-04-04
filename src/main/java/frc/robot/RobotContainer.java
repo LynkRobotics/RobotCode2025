@@ -176,7 +176,7 @@ public class RobotContainer {
                                         new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true, true)
                                     ),
                                     Commands.sequence(
-                                        new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, true, false, PIDSpeed.FAST, Constants.maxVisionDiffCoral),
+                                        new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, true, false, PIDSpeed.FAST), //, Constants.maxVisionDiffCoral),
                                         Commands.either(
                                             LoggedCommands.log("Elevator reached stop in time"),
                                             LoggedCommands.sequence("Pause to wait for elevator to catch up",
