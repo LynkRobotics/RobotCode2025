@@ -414,14 +414,14 @@ public final class Constants {
         public static final double fastDeployVoltage = 12.0;
         public static final double slowDeployVoltage = 3.0;
         public static final double engageRetractVoltage = -4.0;
-        public static final double fastRetractVoltage = -8.0;
+        public static final double fastRetractVoltage = -12.0;
         public static final double slowRetractVoltage = -3.0;
         public static final double holdVoltage = -0.5;
 
         public static final double fastDeployedPosition = 110.0;
         public static final double fullyDeployedPosition = 135.5;
-        public static final double engageRetractedPosition = 85.0;
-        public static final double fastRetractedPosition = -1.0;
+        public static final double engageRetractedPosition = 120.0;
+        public static final double fastRetractedPosition = -15.0;
         public static final double fullyRetractedPosition = -30.0;
 
         public static final int timeCutoff = 30;
@@ -575,8 +575,7 @@ public final class Constants {
         // Blue CLOSE = 8.35, 5.10   (8.774 - 0.42)
         // Red CLOSE = 9.11, 2.95    (8.774 + 0.34)
 
-        // public static final Transform2d cageOffset = new Transform2d(centerToFrontBumper - Units.inchesToMeters(2.0), 0, Rotation2d.kZero);
-        public static final Transform2d cageOffset = new Transform2d(0.42, 0, Rotation2d.kZero);
+        public static final Transform2d cageOffset = new Transform2d(Units.inchesToMeters(6.0), 0, Rotation2d.kZero);
         public static final Transform2d cageApproachOffset = new Transform2d(Units.inchesToMeters(16.0), 0, Rotation2d.kZero);
     }
 
