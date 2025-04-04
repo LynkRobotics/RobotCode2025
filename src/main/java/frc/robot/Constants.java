@@ -271,7 +271,7 @@ public final class Constants {
         public enum CameraMode {
             DEFAULT(1.0, 0.9, 1.0, 1.5),
             FRONT(1.2, 0.8, 1.2, Double.POSITIVE_INFINITY),
-            REAR(5.0, 5.0, 5.0, 0.5);
+            REAR(9.0, 9.0, 9.0, 0.001); // TODO Check other values between 0.1 and 0.001
 
             private final EnumMap<Camera, Double> stddev = new EnumMap<>(Camera.class);
 

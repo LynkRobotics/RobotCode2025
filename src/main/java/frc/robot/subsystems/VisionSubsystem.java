@@ -177,7 +177,7 @@ public class VisionSubsystem extends SubsystemBase {
                             DogLog.log(logPrefix + "Status", "Using best result from " + tsString);
                         }
                     } else {
-                        DogLog.log(logPrefix + "Status", "Rejecting result from " + tsString);
+                        DogLog.log(logPrefix + "Status", "Automatically accepting result from " + tsString);
                     }
                 }
 
@@ -229,10 +229,10 @@ public class VisionSubsystem extends SubsystemBase {
                         double stdDevFactor = cameraMode.getStdDev(cameraType) * poseResult.averageTagDistance * poseResult.averageTagDistance / poseResult.fiducialIDs.size();
                         double linearStdDev = Constants.Vision.linearStdDevBaseline * stdDevFactor * camerasEnabled.size();
                         double angularStdDev = Constants.Vision.angularStdDevBaseline * stdDevFactor * camerasEnabled.size();
-                        // NOTE Could possibly scale by specific camera location, too
 
                         Pose2d pose = poseResult.pose.toPose2d();
                         poseEstimator.addVisionMeasurement(pose, poseResult.timestamp, VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+                        DogLog.log("Vision/Status", "Adding vision measurement from " + cameraType + " at " + poseResult.timestamp + " with stddev " + String.format("%1.4f", linearStdDev));
 
                         if (Robot.fieldSelector.getSelected() == cameraType.toString()) {
                             Robot.field.getObject("Vision").setPose(pose);
@@ -242,6 +242,8 @@ public class VisionSubsystem extends SubsystemBase {
                         lastPose = pose;
                         havePose = true;
                     }
+                } else {
+                    DogLog.log("Vision/" + cameraType + "/Status", "Rejecting unreasonable pose");
                 }
             }
         }

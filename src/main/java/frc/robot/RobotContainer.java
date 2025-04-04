@@ -353,7 +353,10 @@ public class RobotContainer {
             return LoggedCommands.log("Missing PathPlanner path due to failure to load \"" + pathName + "\": " + exception.getMessage());
         }
 
-        return Commands.either(mirrorCommand, pathCommand, this::shouldMirror);
+        return LoggedCommands.either("Choosing auto path for " + pathName,
+            LoggedCommands.logWithName("Mirrored Path: " + pathName, mirrorCommand),
+            LoggedCommands.logWithName("Path: " + pathName, pathCommand),
+             this::shouldMirror);
     }
 
     private Command BargeShot() {
@@ -518,7 +521,7 @@ public class RobotContainer {
     }
 
     private void buildAutos(SendableChooser<Command> chooser) {
-        Command autoECD = LoggedCommands.sequence("ECDB",
+        Command autoECDB = LoggedCommands.sequence("ECDB",
             VisionSubsystem.SwitchToFrontVision(),
             LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
             Commands.either(
@@ -533,7 +536,8 @@ public class RobotContainer {
                 LoggedCommands.proxy(PathCommand("E to CS")),
                 RobotState.WaitForCoral()),
             Commands.either(
-                LoggedCommands.proxy(BackUpAndWaitForCoral()),
+                // LoggedCommands.proxy(BackUpAndWaitForCoral()),
+                LoggedCommands.proxy(RobotState.WaitForCoral()),
                 LoggedCommands.log("Will not wait for Coral"),
                 optAutoCoralWait::get),
             VisionSubsystem.SwitchToFrontVision(),
@@ -545,7 +549,8 @@ public class RobotContainer {
                 RobotState.WaitForCoral()
             ),
             Commands.either(
-                LoggedCommands.proxy(BackUpAndWaitForCoral()),
+                LoggedCommands.proxy(RobotState.WaitForCoral()),
+                // LoggedCommands.proxy(BackUpAndWaitForCoral()),
                 LoggedCommands.log("Will not wait for Coral"),
                 optAutoCoralWait::get),
             VisionSubsystem.SwitchToFrontVision(),
@@ -558,7 +563,8 @@ public class RobotContainer {
                 RobotState.WaitForCoral()
             ),
             Commands.either(
-                LoggedCommands.proxy(BackUpAndWaitForCoral()),
+                LoggedCommands.proxy(RobotState.WaitForCoral()),
+                // LoggedCommands.proxy(BackUpAndWaitForCoral()),
                 LoggedCommands.log("Will not wait for Coral"),
                 optAutoCoralWait::get),
             VisionSubsystem.SwitchToFrontVision(),
@@ -568,8 +574,8 @@ public class RobotContainer {
         .handleInterrupt(() -> VisionSubsystem.setCameraMode(CameraMode.DEFAULT));
 
         // startingPaths.put(autoECD, "Start to near E");
-        startingPaths.put(autoECD, "Start towards EF");
-        addAutoCommand(chooser, autoECD);
+        startingPaths.put(autoECDB, "Start towards EF");
+        addAutoCommand(chooser, autoECDB);
 
         Command fastECDB = LoggedCommands.sequence("Fast ECDB",
             LoggedCommands.runOnce("Enable turbo mode", () -> RobotState.setTurboMode(true)),
@@ -612,7 +618,8 @@ public class RobotContainer {
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
             LoggedCommands.proxy(PathCommand("B to CS2")),
             Commands.either(
-                LoggedCommands.proxy(BackUpAndWaitForCoral()),
+                LoggedCommands.proxy(RobotState.WaitForCoral()),
+                // LoggedCommands.proxy(BackUpAndWaitForCoral()),
                 LoggedCommands.log("Will not wait for Coral"),
                 optAutoCoralWait::get),
             LoggedCommands.proxy(PathCommand("CS2 to near A")),

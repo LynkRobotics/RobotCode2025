@@ -11,12 +11,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Score Left"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "E to CS"
@@ -35,12 +29,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Score Left"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "C to CS"
@@ -56,12 +44,6 @@
           "type": "path",
           "data": {
             "pathName": "CS to near D"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Score Right"
           }
         }
       ]
