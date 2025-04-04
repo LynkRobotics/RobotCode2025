@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
-// import frc.lib.util.TunableOption;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Constants.Vision.Camera;
@@ -20,7 +19,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.Timer;
-// import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static frc.robot.Options.optUseTrigVision;
@@ -44,7 +42,6 @@ import dev.doglog.DogLog;
 public class VisionSubsystem extends SubsystemBase {
     private static VisionSubsystem instance;
     private Pose2d lastPose = new Pose2d();
-    // private static final TunableOption optUpdateVisionDashboard = new TunableOption("Update vision dashboard", false);
     private static PoseEstimator<SwerveModulePosition[]> poseEstimator = null;
     private static Supplier<Rotation2d> headingProvider = null;
     // TODO Combine into record
@@ -61,8 +58,6 @@ public class VisionSubsystem extends SubsystemBase {
             cameras.put(cameraType, new PhotonCamera(cameraType.name));
             photonEstimator.put(cameraType, new PhotonPoseEstimator(Constants.fieldLayout, PoseStrategy.PNP_DISTANCE_TRIG_SOLVE, cameraType.robotToCamera));
             Robot.fieldSelector.addOption(cameraType.toString(), cameraType.toString());
-            // field.put(cameraType, new Field2d());
-            // SmartDashboard.putData("Vision/" + cameraType + " Field", field.get(cameraType));
             SmartDashboard.putBoolean("Vision/" + cameraType + " Enabled", true);
             setCameraMode(CameraMode.DEFAULT);
         }
@@ -201,6 +196,8 @@ public class VisionSubsystem extends SubsystemBase {
     public void periodic() {
         Rotation2d heading = null;
         double timestamp = 0;
+        boolean havePose = false;
+        boolean selectedResult = false;
 
         if (headingProvider != null) {
             heading = headingProvider.get();
@@ -239,13 +236,17 @@ public class VisionSubsystem extends SubsystemBase {
 
                         if (Robot.fieldSelector.getSelected() == cameraType.toString()) {
                             Robot.field.getObject("Vision").setPose(pose);
+                            selectedResult = true;
                         }
-                        // field.get(cameraType).setRobotPose(pose);
 
                         lastPose = pose;
+                        havePose = true;
                     }
                 }
             }
         }
+
+        SmartDashboard.putBoolean("Vision/Have Pose", havePose);
+        SmartDashboard.putBoolean("Vision/Selected Result", selectedResult);
     }
 }
