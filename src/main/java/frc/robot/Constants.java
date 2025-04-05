@@ -439,6 +439,7 @@ public final class Constants {
 
         // TODO What about AndyMark field?
         // NOTE That FlippingUtil might need to be impacted
+        // TODO Consider using fieldLayout.getFieldLength(), etc.
         public static final double fieldWidth = FlippingUtil.fieldSizeY; // Units.inchesToMeters(26*12 + 5);
         public static final double fieldLength = FlippingUtil.fieldSizeX; // Units.inchesToMeters(57*12 + 6.875);
 

@@ -112,7 +112,6 @@ public class ClimberSubsystem extends SubsystemBase {
             LoggedCommands.runOnce("Slow Climber Retract", () -> motor.setControl(slowRetractControl), this),
             Commands.idle(this))
             .handleInterrupt(motor::stopMotor);
-
     }
 
     public Command Retract() {
