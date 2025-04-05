@@ -415,15 +415,15 @@ public final class Constants {
         public static final double fastDeployVoltage = 12.0;
         public static final double slowDeployVoltage = 3.0;
         public static final double engageRetractVoltage = -4.0;
-        public static final double fastRetractVoltage = -12.0;
+        public static final double fastRetractVoltage = -8.0;
         public static final double slowRetractVoltage = -3.0;
         public static final double holdVoltage = -0.5;
 
         public static final double fastDeployedPosition = 110.0;
         public static final double fullyDeployedPosition = 135.5;
-        public static final double engageRetractedPosition = 120.0;
-        public static final double fastRetractedPosition = -15.0;
-        public static final double fullyRetractedPosition = -30.0;
+        public static final double engageRetractedPosition = 85.0;
+        public static final double fastRetractedPosition = -1.0;
+        public static final double fullyRetractedPosition = -30.5;
 
         public static final int timeCutoff = 30;
     }
