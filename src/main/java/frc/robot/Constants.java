@@ -198,7 +198,7 @@ public final class Constants {
     }
 
     public static final class PIDSwerve {
-        public static final double translationKP = 0.065;
+        public static final double translationKP = 0.070;
         public static final double roughTranslationKP = 0.09;
         public static final double positionTolerance = 1.0; // inches
         public static final double roughPositionTolerance = 2.5; // inches
