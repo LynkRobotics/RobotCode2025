@@ -503,6 +503,7 @@ public class RobotContainer {
                 new PIDSwerve(s_Swerve, s_Pose, s_Pose.getPose().transformBy(transform), false, true));
     }
 
+    @SuppressWarnings ("unused")
     private Command BackUpAndWaitForCoral() {
         Transform2d transform = new Transform2d(-Constants.Auto.backUpCSDistance, 0.0, Rotation2d.kZero); 
         return LoggedCommands.deadline("Backup and wait for Coral",
@@ -641,10 +642,13 @@ public class RobotContainer {
             LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.GH.approachMiddle, true, false)),
             LoggedCommands.proxy(DealgaefyMaybeMirror(ReefFace.GH)),
             LoggedCommands.proxy(PathCommand("GH to Barge Shot")),
-            BargeShot(),
+            LoggedCommands.proxy(BargeShot()),
             LoggedCommands.proxy(PathCommand("Barge Shot to near IJ")),
             LoggedCommands.proxy(DealgaefyMaybeMirror(ReefFace.IJ)), 
-            BargeShot());
+            LoggedCommands.proxy(BargeShot()),
+            LoggedCommands.deferredProxy("Backup after barge shot", 
+                () -> new PIDSwerve(s_Swerve, s_Pose, s_Pose.getPose().transformBy(new Transform2d(-Units.inchesToMeters(18.0), 0.0, Rotation2d.kZero)), false, false)),
+            LoggedCommands.proxy(s_Swerve.Stop()));
 
         startingPaths.put(autoG, "Start to near G");
         addAutoCommand(chooser, autoG);
