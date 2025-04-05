@@ -231,7 +231,7 @@ public final class Constants {
 
         // Standard deviation baselines, for 1 meter distance and 1 tag
         // (Adjusted automatically based on distance and # of tags)
-        public static double linearStdDevBaseline = 0.75; // Meters
+        public static double linearStdDevBaseline = 0.10; // Meters
         public static double angularStdDevBaseline = 2.0; // Radians
 
         public enum Camera {
@@ -269,9 +269,9 @@ public final class Constants {
         // public static final Camera[] camerasAvailable = { Camera.CENTER };
 
         public enum CameraMode {
-            DEFAULT(1.0, 0.9, 1.0, 1.5),
-            FRONT(1.2, 0.8, 1.2, Double.POSITIVE_INFINITY),
-            REAR(9.0, 9.0, 9.0, 0.001); // TODO Check other values between 0.1 and 0.001
+            DEFAULT(2.0, 0.75, 0.9, 2.0),
+            FRONT(1.0, 0.5, 1.0, Double.POSITIVE_INFINITY),
+            REAR(9.0, 9.0, 9.0, 0.01); // TODO Check other values between 0.1 and 0.001 -- changed linearStdDev since
 
             private final EnumMap<Camera, Double> stddev = new EnumMap<>(Camera.class);
 
