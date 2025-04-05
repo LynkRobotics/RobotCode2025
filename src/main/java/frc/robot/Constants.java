@@ -577,7 +577,7 @@ public final class Constants {
         // Blue CLOSE = 8.35, 5.10   (8.774 - 0.42)
         // Red CLOSE = 9.11, 2.95    (8.774 + 0.34)
 
-        public static final Transform2d cageOffset = new Transform2d(Units.inchesToMeters(6.0), 0, Rotation2d.kZero);
+        public static final Transform2d cageOffset = new Transform2d(Units.inchesToMeters(8.0), 0, Rotation2d.kZero);
         public static final Transform2d cageApproachOffset = new Transform2d(Units.inchesToMeters(16.0), 0, Rotation2d.kZero);
     }
 
