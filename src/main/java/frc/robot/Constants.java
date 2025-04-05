@@ -423,7 +423,7 @@ public final class Constants {
         public static final double fullyDeployedPosition = 135.5;
         public static final double engageRetractedPosition = 120.0;
         public static final double fastRetractedPosition = -15.0;
-        public static final double fullyRetractedPosition = -30.0;
+        public static final double fullyRetractedPosition = -30.5;
 
         public static final int timeCutoff = 30;
     }
