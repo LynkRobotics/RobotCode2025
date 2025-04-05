@@ -93,6 +93,8 @@ public class PIDSwerve extends LoggedCommandBase {
         xPID.reset();
         yPID.reset();
         rotationPID.reset();
+        alignedTimer.stop();
+        alignedTimer.reset();
 
         // Robot.field.getRobotObject().setTrajectory(targetPose);
         DogLog.log("PIDSwerve/Pose target", targetPose);
