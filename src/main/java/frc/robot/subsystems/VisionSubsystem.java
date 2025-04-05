@@ -192,6 +192,25 @@ public class VisionSubsystem extends SubsystemBase {
         return lastPose;
     }
 
+    private boolean hasAllianceTag(List<Short> fiducialIDs) {
+        final double fieldMiddle = Constants.Pose.fieldLength / 2.0;
+        boolean isRed = Robot.isRed();
+
+        for (Short fiducialID : fiducialIDs) {
+            double tagX = Constants.fieldLayout.getTagPose(fiducialID).get().getX();
+            if (tagX < fieldMiddle) {
+                if (!isRed) {
+                    return true;
+                }
+            } else {
+                if (isRed) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     @Override
     public void periodic() {
         Rotation2d heading = null;
@@ -224,8 +243,14 @@ public class VisionSubsystem extends SubsystemBase {
                 DogLog.log(logPrefix + "Distance", poseResult.averageTagDistance);
                 DogLog.log(logPrefix + "Tag Poses", (Pose3d[])poseResult.fiducialIDs.stream().map(tag -> Constants.fieldLayout.getTagPose(tag).get()).toArray(size -> new Pose3d[size]));
                 // DogLog.log(logPrefix + "Pose Difference", PoseSubsystem.getInstance().getPose().getTranslation().getDistance(poseResult.pose.getTranslation()));
-                if (poseIsReasonable(poseResult.pose)) {
-                    if (poseEstimator != null) {
+                if (!hasAllianceTag(poseResult.fiducialIDs)) {
+                    DogLog.log("Vision/" + cameraType + "/Status", "Rejecting result without a tag pose from our side of the field");
+                } else if (!poseIsReasonable(poseResult.pose)) {
+                    DogLog.log("Vision/" + cameraType + "/Status", "Rejecting unreasonable pose");
+                } else {
+                    if (poseEstimator == null) {
+                        DogLog.log("Vision/Status", "Unable to add vision measurement without a pose estimator");
+                    } else {
                         double stdDevFactor = cameraMode.getStdDev(cameraType) * poseResult.averageTagDistance * poseResult.averageTagDistance / poseResult.fiducialIDs.size();
                         double linearStdDev = Constants.Vision.linearStdDevBaseline * stdDevFactor * camerasEnabled.size();
                         double angularStdDev = Constants.Vision.angularStdDevBaseline * stdDevFactor * camerasEnabled.size();
@@ -242,8 +267,6 @@ public class VisionSubsystem extends SubsystemBase {
                         lastPose = pose;
                         havePose = true;
                     }
-                } else {
-                    DogLog.log("Vision/" + cameraType + "/Status", "Rejecting unreasonable pose");
                 }
             }
         }
