@@ -169,11 +169,13 @@ public class RobotContainer {
                             Commands.sequence(
                                 Commands.either(
                                     Commands.sequence(
-                                        Commands.either(
-                                            LoggedCommands.log("Skipping approach pose for L2/L3 due to proximity to reef"),
+                                        // Commands.either(
+                                            // LoggedCommands.log("Skipping approach pose for L2/L3 due to proximity to reef"),
                                             new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, true, false, PIDSpeed.TURBO),
-                                            () -> s_Pose.getPose().getTranslation().getDistance(Constants.Pose.reefCenter) <= Constants.Pose.approachDistanceToReefCenter),
-                                        new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true, true)
+                                            // new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, true, false, PIDSpeed.FAST),
+                                            // () -> s_Pose.getPose().getTranslation().getDistance(Constants.Pose.reefCenter) <= Constants.Pose.approachDistanceToReefCenter),
+                                        // new PIDSwerve(s_Swerve, s_Pose, left ? face.alignBonusLeft : face.alignBonusRight, true, true)
+                                        new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true, true)
                                     ),
                                     Commands.sequence(
                                         new PIDSwerve(s_Swerve, s_Pose, left ? face.approachLeft : face.approachRight, true, false, PIDSpeed.FAST), //, Constants.maxVisionDiffCoral),
@@ -188,7 +190,7 @@ public class RobotContainer {
                                             new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true, true),
                                             () -> RobotState.getNextStop() == Stop.L1
                                         )),
-                                    () -> RobotState.getNextStop() == Stop.L2 || RobotState.getNextStop() == Stop.L3)),
+                                    () -> false)), //RobotState.getNextStop() == Stop.L2 || RobotState.getNextStop() == Stop.L3)),
                             Commands.either(
                                 Commands.sequence(
                                     LoggedCommands.waitSeconds("Score coral watchdog", Constants.Auto.scoreCoralTimeout),

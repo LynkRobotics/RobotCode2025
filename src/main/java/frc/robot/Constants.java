@@ -334,9 +334,9 @@ public final class Constants {
             SAFE     (Constants.Elevator.baseHeight + 5.0),
             L1       (28.5 - Constants.Elevator.endEffectorHeight),
             L1_SCORE (30.0 - Constants.Elevator.endEffectorHeight),
-            L2       (36.0 - Constants.Elevator.endEffectorHeight), //NOTE: changed for standoff, OG: 34.5
+            L2       (34.5 - Constants.Elevator.endEffectorHeight),
             L2_ALGAE (38.0 - Constants.Elevator.endEffectorHeight), 
-            L3       (51.0 - Constants.Elevator.endEffectorHeight), //NOTE: changed for standoff, OG: 49.5
+            L3       (49.5 - Constants.Elevator.endEffectorHeight),
             L3_ALGAE (53.5 - Constants.Elevator.endEffectorHeight),
             ALGAE_RELEASE(63.5 - Constants.Elevator.endEffectorHeight),
             L4       (74.5 - Constants.Elevator.endEffectorHeight),
@@ -350,7 +350,7 @@ public final class Constants {
         }
 
         public static final double L1RaiseDelay = 0.15;
-        // public static final double standoffBoost = 2.0; // In inches
+        // public static final double standoffBoost = 1.5; // In inches
     }
 
     public static final class EndEffector {
@@ -368,7 +368,7 @@ public final class Constants {
         public static final double unjamVoltage = 3.0;
         public static final double advanceVoltage = -1.9;
         public static final double scoreL1Voltage = -2.3;
-        public static final double scoreL2L3Voltage = -9.0;
+        public static final double scoreL2L3Voltage = -6.0; // was -9.0 for standoff
         public static final double scoreL4Voltage = -6.0;
         public static final double algaeVoltage = 3.3;
         public static final double algaeHoldVoltage = 1.2;
