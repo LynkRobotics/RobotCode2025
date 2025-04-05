@@ -366,7 +366,7 @@ public final class Constants {
         public static final double feedVoltage = -6.5;
         public static final double unjamVoltage = 3.0;
         public static final double advanceVoltage = -1.9;
-        public static final double scoreL1Voltage = -2.0;
+        public static final double scoreL1Voltage = -2.3;
         public static final double scoreL2L3Voltage = -9.0;
         public static final double scoreL4Voltage = -6.0;
         public static final double algaeVoltage = 3.3;
@@ -528,8 +528,8 @@ public final class Constants {
             HQ(8.16, 2.37);
 
             private final Translation2d location;
-            private static final Translation2d redFudge = new Translation2d(0.08, 0.02);
-            private static final Translation2d blueFudge = new Translation2d(0.0, 0.02);
+            private static final Translation2d redFudge = new Translation2d(0.00, 0.0);
+            private static final Translation2d blueFudge = new Translation2d(0.0, 0.0);
 
             Cage(double yInches) {
                 // 8.774 m
