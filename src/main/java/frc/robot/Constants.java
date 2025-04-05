@@ -198,8 +198,8 @@ public final class Constants {
     }
 
     public static final class PIDSwerve {
-        public static final double translationKP = 0.065;
-        public static final double roughTranslationKP = 0.09;
+        public static final double translationKP = 0.070;
+        public static final double roughTranslationKP = 0.10;
         public static final double positionTolerance = 1.0; // inches
         public static final double roughPositionTolerance = 2.5; // inches
         public static final double positionKS = 0.02;
@@ -430,7 +430,7 @@ public final class Constants {
     public static final class Pose {
         public static final int pigeonID = 1;
 
-        public static final PIDController rotationPID = new PIDController(0.012, 0.0, 0.0); // kI was 0.050 for NCCMP 2024
+        public static final PIDController rotationPID = new PIDController(0.014, 0.0, 0.0); // kI was 0.050 for NCCMP 2024
         public static final double rotationKS = 0.02;
         public static final double rotationIZone = 2.0; // degrees
 
