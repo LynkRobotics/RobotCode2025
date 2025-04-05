@@ -83,7 +83,7 @@ public class PIDSwerve extends LoggedCommandBase {
     }
 
     private boolean isAligned() {
-        return xPID.getError() <= xPID.getErrorTolerance() && yPID.getError() <= yPID.getErrorTolerance() && rotationPID.getError() <= rotationPID.getErrorTolerance();
+        return Math.abs(xPID.getError()) <= xPID.getErrorTolerance() && Math.abs(yPID.getError()) <= yPID.getErrorTolerance() && Math.abs(rotationPID.getError()) <= rotationPID.getErrorTolerance();
     }
 
     @Override
