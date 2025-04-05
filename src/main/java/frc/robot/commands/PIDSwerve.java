@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import frc.lib.util.LoggedCommandBase;
+import frc.robot.Constants;
 import frc.robot.Constants.Pose;
 import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.subsystems.Swerve;
@@ -11,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 
 import static frc.robot.Constants.PIDSwerve.*;
 
@@ -23,6 +25,7 @@ public class PIDSwerve extends LoggedCommandBase {
     private final PIDController rotationPID = new PIDController(rotationKP, 0, 0);
     private final PIDSpeed speed;
     private final double maxVisionDiff;
+    private final Timer alignedTimer = new Timer();
 
     public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise, PIDSpeed speed, double maxVisionDiff) {
         super();
@@ -79,6 +82,10 @@ public class PIDSwerve extends LoggedCommandBase {
         this(s_Swerve, s_Pose, targetPose, flipIfRed, precise, PIDSpeed.FAST);
     }
 
+    private boolean isAligned() {
+        return xPID.getError() <= xPID.getErrorTolerance() && yPID.getError() <= yPID.getErrorTolerance() && rotationPID.getError() <= rotationPID.getErrorTolerance();
+    }
+
     @Override
     public void initialize() {
         super.initialize();
@@ -129,6 +136,16 @@ public class PIDSwerve extends LoggedCommandBase {
         DogLog.log("PIDSwerve/Rot error", rotationPID.getError());
         DogLog.log("PIDSwerve/Rot error derivative", rotationPID.getErrorDerivative());
 
+        if (isAligned()) {
+            if (!alignedTimer.isRunning()) {
+                alignedTimer.restart();
+            }
+        } else if (alignedTimer.isRunning()) {
+            alignedTimer.stop();
+            alignedTimer.reset();
+        }
+        DogLog.log("PIDSwerve/Aligned time", alignedTimer.get());
+
         /* Drive */
         s_Swerve.drive(
             // TODO Automatically go in turbo mode?
@@ -141,7 +158,7 @@ public class PIDSwerve extends LoggedCommandBase {
 
     @Override
     public boolean isFinished() {
-        return xPID.atSetpoint() && yPID.atSetpoint() && rotationPID.atSetpoint() && s_Pose.visionDifference() <= maxVisionDiff;
+        return ((xPID.atSetpoint() && yPID.atSetpoint() && rotationPID.atSetpoint()) || alignedTimer.get() >= Constants.PIDSwerve.alignedTimerMax) && s_Pose.visionDifference() <= maxVisionDiff;
     }
 
     @Override
