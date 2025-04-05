@@ -367,7 +367,7 @@ public final class Constants {
         public static final double feedVoltage = -6.5;
         public static final double unjamVoltage = 3.0;
         public static final double advanceVoltage = -1.9;
-        public static final double scoreL1Voltage = -2.3;
+        public static final double scoreL1Voltage = -2.5;
         public static final double scoreL2L3Voltage = -6.0; // was -9.0 for standoff
         public static final double scoreL4Voltage = -6.0;
         public static final double algaeVoltage = 3.3;
