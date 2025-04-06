@@ -23,24 +23,29 @@
             "/Robot/Vision/RIGHT/Tag Poses",
             "/Robot/Vision/LEFT/Pose",
             "/Robot/Vision/REAR/Tag Poses",
-            "/Robot/Robot",
             "/Robot/Vision/LEFT/Pose/translation",
             "/Robot/Vision/CENTER/Pose",
             "/Robot/Vision/CENTER/Pose/translation",
             "/Robot",
-            "/Robot/Fault",
             "/Robot/PIDSwerve/Pose target",
             "/Robot/PIDSwerve/Pose target/translation",
             "/Robot/RadioStatus",
-            "/Robot/Vision/REAR",
-            "/Robot/Pose",
             "/Robot/Pose/Pose/rotation",
             "/Robot/Pose/Pose/translation",
-            "/Robot/Vision"
+            "/Robot/Misc",
+            "/Robot/Vision/CENTER",
+            "/Robot/Vision/LEFT",
+            "/Robot/Vision/RIGHT",
+            "/Robot/Vision/REAR",
+            "/Robot/Pose/Pose",
+            "/Robot/State",
+            "/DS",
+            "/DS/joystick0/buttons",
+            "/Robot/EndEffector"
           ]
         },
         "tabs": {
-          "selected": 9,
+          "selected": 2,
           "tabs": [
             {
               "type": 0,
@@ -120,7 +125,7 @@
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
-                      "color": "#ff00ff"
+                      "color": "#00ff00"
                     }
                   },
                   {
@@ -182,7 +187,7 @@
                     "type": "ghost",
                     "logKey": "NT:/Robot/Vision/CENTER/Pose",
                     "logType": "Pose3d",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "color": "#ff8c00"
                     }
@@ -191,7 +196,7 @@
                     "type": "vision",
                     "logKey": "NT:/Robot/Vision/CENTER/Tag Poses",
                     "logType": "Pose3d[]",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "color": "#ff8c00",
                       "size": "normal"
@@ -215,17 +220,101 @@
                       "color": "#ff00ff",
                       "size": "normal"
                     }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/Robot/Vision/CENTER/Pose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff8c00"
+                    }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "/Robot/Vision/CENTER/Tag Poses",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff8c00",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/Robot/Vision/LEFT/Pose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff"
+                    }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "/Robot/Vision/LEFT/Tag Poses",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/Robot/Vision/RIGHT/Pose",
+                    "logType": "Pose3d",
+                    "visible": false,
+                    "options": {
+                      "color": "#ff0000"
+                    }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "/Robot/Vision/RIGHT/Pose",
+                    "logType": "Pose3d",
+                    "visible": false,
+                    "options": {
+                      "color": "#ff0000",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/Robot/Vision/REAR/Pose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff00ff"
+                    }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "/Robot/Vision/REAR/Pose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff00ff",
+                      "size": "normal"
+                    }
                   }
                 ],
                 "game": "2025 Field (AndyMark)",
                 "bumpers": "auto",
                 "origin": "blue",
-                "orientation": 0,
+                "orientation": 2,
                 "size": 30
               },
               "controllerUUID": "78pb9skb45b5cb0330ildjo3r46rbq99",
               "renderer": null,
               "controlsHeight": 200
+            },
+            {
+              "type": 7,
+              "title": "Video",
+              "controller": null,
+              "controllerUUID": "k6kujdfmu7b3bvbo9h5lnbgzwbwp46dg",
+              "renderer": null,
+              "controlsHeight": 85
             },
             {
               "type": 3,
@@ -315,13 +404,25 @@
               "type": 4,
               "title": "Vision",
               "controller": [
-                "NT:/Robot/Vision/Status",
+                "/Robot/Vision/Status",
+                "/Robot/Vision/Camera Mode",
                 "NT:/Robot/Vision/CENTER/Status",
                 "NT:/Robot/Vision/LEFT/Status",
                 "NT:/Robot/Vision/RIGHT/Status",
                 "NT:/Robot/Vision/REAR/Status"
               ],
               "controllerUUID": "j1c1mt5htqidvxvlvbh8a9osgxgdy1d4",
+              "renderer": null,
+              "controlsHeight": 0
+            },
+            {
+              "type": 4,
+              "title": "Camera mode",
+              "controller": [
+                "/Robot/Misc/Robot Status",
+                "/Robot/Vision/Camera Mode"
+              ],
+              "controllerUUID": "9cyuyt8utcrxdjn21iwm1m0l2t0o7hqu",
               "renderer": null,
               "controlsHeight": 0
             },
@@ -425,6 +526,7 @@
               "type": 4,
               "title": "Console",
               "controller": [
+                "/Robot/Misc/FMS Match Time",
                 "console"
               ],
               "controllerUUID": "o6kvg50n6ney7iblzn3kosybq27c0346",
@@ -458,6 +560,109 @@
               "controllerUUID": "d7zxvv9rs1qn3fhfvz1ioj1d7cgi6d3w",
               "renderer": null,
               "controlsHeight": 0
+            },
+            {
+              "type": 4,
+              "title": "PID Swerve",
+              "controller": [
+                "/Robot/PIDSwerve/Aligned time",
+                "/Robot/Pose/Pose/translation/x",
+                "/Robot/Pose/Pose/translation/y",
+                "/Robot/PIDSwerve/Pose target/translation/x",
+                "/Robot/PIDSwerve/Pose target/translation/y",
+                "/Robot/PIDSwerve/X error",
+                "/Robot/PIDSwerve/X error derivative",
+                "/Robot/PIDSwerve/Y error",
+                "/Robot/PIDSwerve/Y error derivative"
+              ],
+              "controllerUUID": "5o18idrv1n6xz0tt93vslydcghtvpxl4",
+              "renderer": null,
+              "controlsHeight": 0
+            },
+            {
+              "type": 1,
+              "title": "PID Swerve",
+              "controller": {
+                "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "/Robot/PIDSwerve/X error",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "/Robot/PIDSwerve/Y error",
+                    "logType": "Number",
+                    "visible": false,
+                    "options": {
+                      "color": "#e5b31b",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "rightSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "/Robot/PIDSwerve/X error derivative",
+                    "logType": "Number",
+                    "visible": false,
+                    "options": {
+                      "color": "#af2437",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "/Robot/PIDSwerve/Y error derivative",
+                    "logType": "Number",
+                    "visible": false,
+                    "options": {
+                      "color": "#80588e",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "discreteSources": [
+                  {
+                    "type": "stripes",
+                    "logKey": "/Robot/PIDSwerve/Pose target/translation/x",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e48b32"
+                    }
+                  },
+                  {
+                    "type": "stripes",
+                    "logKey": "/Robot/PIDSwerve/Pose target/translation/y",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#c0b487"
+                    }
+                  }
+                ],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "rightUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "tl76rl1jy7ze5kybbgcuxmqrpd4ddzid",
+              "renderer": null,
+              "controlsHeight": 200
             },
             {
               "type": 4,
