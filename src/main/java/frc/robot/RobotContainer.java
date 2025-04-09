@@ -123,15 +123,6 @@ public class RobotContainer {
         s_Index = new IndexSubsystem();
         s_Climber = new ClimberSubsystem();
 
-        s_Swerve.setDefaultCommand(
-            new TeleopSwerve(
-                s_Swerve,
-                () -> -translation.get() * Constants.driveStickSensitivity,
-                () -> -strafe.get() * Constants.driveStickSensitivity,
-                () -> -rotation.get() * Constants.turnStickSensitivity,
-                this::speedLimitFactor
-            ));
-
         // Default named commands for PathPlanner
         SmartDashboard.putNumber("auto/Startup delay", 0.0);
         autoNamedCommand("Startup delay", Commands.defer(() -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()));
@@ -658,9 +649,27 @@ public class RobotContainer {
         FollowPathCommand.warmupCommand().schedule();
     }
 
+    public void autonomousInit() {
+        // Ensure the Swerve subsystem doesn't run a default command, in case we previously were in teleop mode
+        Command oldDefault = s_Swerve.getDefaultCommand();
+
+        s_Swerve.removeDefaultCommand();
+        if (oldDefault != null && oldDefault.isScheduled()) {
+            oldDefault.cancel();
+        }
+    }
+
     public void teleopInit() {
         s_Swerve.stopSwerve();
         CommandScheduler.getInstance().schedule(s_Swerve.BrakeDriveMotors());
+        s_Swerve.setDefaultCommand(
+            new TeleopSwerve(
+                s_Swerve,
+                () -> -translation.get() * Constants.driveStickSensitivity,
+                () -> -strafe.get() * Constants.driveStickSensitivity,
+                () -> -rotation.get() * Constants.turnStickSensitivity,
+                this::speedLimitFactor
+            ));
     }
 
     public void teleopExit() {
