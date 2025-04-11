@@ -101,7 +101,8 @@ public class LEDSubsystem extends SubsystemBase {
         SERVICE_MODE(new LEDConfig(Constants.LEDs.serviceModeAnimation)),
         SERVICE_DISABLED(new LEDConfig(Color.service)),
         ERROR(new LEDConfig(Color.red, true)),
-        WARNING(new LEDConfig(Color.yellow, true));
+        WARNING(new LEDConfig(Color.yellow, true)),
+        INFO(new LEDConfig(Color.white, true));
 
         public final LEDConfig config;
 
@@ -151,6 +152,11 @@ public class LEDSubsystem extends SubsystemBase {
 
     public static void triggerWarning() {
         state = LEDState.WARNING;
+        tempStateTimer.restart();
+    }
+
+    public static void triggerInfo() {
+        state = LEDState.INFO;
         tempStateTimer.restart();
     }
 
@@ -245,7 +251,7 @@ public class LEDSubsystem extends SubsystemBase {
         }
 
         // Blink the LEDs if the blink interval has elapsed
-        if (blinkTimer.isRunning() && blinkTimer.advanceIfElapsed((state == LEDState.ERROR || state == LEDState.WARNING) ? Constants.LEDs.errorBlinkRate : Constants.LEDs.blinkRate)) {
+        if (blinkTimer.isRunning() && blinkTimer.advanceIfElapsed((state == LEDState.ERROR || state == LEDState.WARNING || state == LEDState.INFO) ? Constants.LEDs.errorBlinkRate : Constants.LEDs.blinkRate)) {
             blinkOff = !blinkOff;
             setColor(blinkOff ? Color.off : state.config.color);
         }
