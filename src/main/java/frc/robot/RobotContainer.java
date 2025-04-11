@@ -200,6 +200,7 @@ public class RobotContainer {
                             Commands.either(
                                 s_Elevator.AutoElevatorUp(left ? face.leftL1.getTranslation() : face.rightL1.getTranslation()),
                                 s_Elevator.AutoElevatorUp(left ? face.alignLeft.getTranslation() : face.alignRight.getTranslation()),
+                                // s_Elevator.SmoothElevatorUp(left ? face.approachLeft.getTranslation() : face.approachRight.getTranslation()), // TODO Not always Smooth!
                                 () -> RobotState.getNextStop() == Stop.L1)))),
                 Commands.parallel(
                     RobotState.ScoreGamePiece(),
