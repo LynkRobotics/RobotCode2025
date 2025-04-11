@@ -99,6 +99,7 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         DogLog.log("Misc/Robot Status", "Auto has begun");
 
+        m_robotContainer.autonomousInit();
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
         // schedule the autonomous command (example)
@@ -125,9 +126,9 @@ public class Robot extends TimedRobot {
         // this line or comment it out.
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
-            m_robotContainer.teleopInit();
         }
         DogLog.log("Misc/Robot Status", "TeleOp has begun");
+        m_robotContainer.teleopInit();
 
         if (!Constants.atHQ) {
             Elastic.selectTab("Primary");
