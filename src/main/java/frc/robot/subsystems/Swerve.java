@@ -169,6 +169,9 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic() {
+        Command currentCommand = getCurrentCommand();
+        DogLog.log("Swerve/Current Command", currentCommand == null ? "None" : currentCommand.getName());
+
         if (s_Pose == null) {
             s_Pose = PoseSubsystem.getInstance();
         }
