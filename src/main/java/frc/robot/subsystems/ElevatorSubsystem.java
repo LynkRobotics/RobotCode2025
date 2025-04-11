@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static frc.robot.Options.optServiceMode;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -13,6 +14,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 // import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 // import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -68,6 +70,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putData("Elevator/Zero", Zero());
         SmartDashboard.putData("Elevator/SetZero", SetZero());
         SmartDashboard.putData("Elevator/FastZero", FastZero());
+        SmartDashboard.putNumber("Elevator/Smooth L4 Time", 5.0);
+        SmartDashboard.putData("Elevator/Smooth L4", Commands.defer(() -> TimeBasedMove(Stop.L4, SmartDashboard.getNumber("Elevator/Smooth L4 Time", 5.0)), Set.of(this)));
 
         // double canvasWidth = Constants.Swerve.wheelBase * 1.5;
         // double canvasHeight = Units.inchesToMeters(Constants.Elevator.maxHeight) * 1.25;
@@ -182,6 +186,32 @@ public class ElevatorSubsystem extends SubsystemBase {
         nextStop = stop;
     }
 
+    private Timer smoothTimer = new Timer();
+    private double smoothStartHeight = 0.0;
+
+    public Command SmoothMove(Stop stop, Supplier<Double> pctSupplier) {
+        return LoggedCommands.startRun("Smooth Move Elevator",
+        () -> {
+            smoothStartHeight = getHeight();
+            DogLog.log("Elevator/Smooth Start", smoothStartHeight);
+        },
+        () -> {
+            double pct = MathUtil.clamp(pctSupplier.get(), 0.0, 1.0);
+            double newHeight = smoothStartHeight + pct * (stop.height - smoothStartHeight);
+
+            DogLog.log("Elevator/Smooth Percent", pct);
+            DogLog.log("Elevator/Smooth New Height", newHeight);
+
+            setHeight(newHeight);
+        }, this);
+    }
+
+    public Command TimeBasedMove(Stop stop, double time) {
+        return LoggedCommands.sequence("Smooth Move Elevator by Time (" + String.format("%1.2f", time) + ")",
+            Commands.runOnce(() -> smoothTimer.restart()),
+            SmoothMove(stop, () -> smoothTimer.get() / time));
+    }
+
     public Command AutoElevatorUp(Translation2d target) {
         return AutoElevatorUp(target, () -> nextStop).withName("Auto Elevator Up to Next");
     }
@@ -189,6 +219,24 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Command AutoElevatorUp(Translation2d target, Stop stop) {
         return AutoElevatorUp(target, () -> stop).withName("Auto Elevator Up to " + stop);
     };
+
+    // Smoothly raise the elevator as it approaches the target
+    public Command SmoothElevatorUp(Translation2d target) {
+        double closeEnough = Units.inchesToMeters(4.0); // TODO Base on PIDSwerve.roughPositionTolerance
+
+        return LoggedCommands.defer("Smooth Elevator Up to Target",
+            () -> {
+                Translation2d myTarget = PoseSubsystem.flipIfRed(target);
+                double startingDistance = PoseSubsystem.distanceTo(myTarget);
+
+                DogLog.log("Misc/Debug 0", startingDistance);
+                return SmoothMove(nextStop, () -> {
+                    DogLog.log("Misc/Debug 1", PoseSubsystem.distanceTo(myTarget));
+                    DogLog.log("Misc/Debug 2", Math.max(0.0, PoseSubsystem.distanceTo(myTarget) - closeEnough));
+                    return (1.0 - Math.max(0.0, PoseSubsystem.distanceTo(myTarget) - closeEnough) / startingDistance);
+                });
+            }, Set.of(this));
+    }
 
     public Command AutoElevatorUp(Translation2d target, Supplier<Stop> stopSupplier) {
         return IfNotBlocked(LoggedCommands.startRun("Auto Elevator Up",
