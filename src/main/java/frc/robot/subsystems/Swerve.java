@@ -15,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 // import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
@@ -165,6 +166,26 @@ public class Swerve extends SubsystemBase {
 
     public Command Stop() {
         return LoggedCommands.runOnce("Stop Swerve", this::stopSwerve, this);
+    }
+
+    public void xSwerve() {
+        Rotation2d[] rotations = {
+            Rotation2d.fromDegrees(45),
+            Rotation2d.fromDegrees(-45),
+            Rotation2d.fromDegrees(-45),
+            Rotation2d.fromDegrees(45),
+        };
+        
+        for (int i = 0; i < mSwerveMods.length; i++) {
+            mSwerveMods[i].setDesiredState(new SwerveModuleState(0, rotations[i]), false);
+        }
+    }
+
+    public Command HoldX() {
+        return LoggedCommands.sequence("Hold Swerve X",
+            Commands.runOnce(this::xSwerve),
+            Commands.idle(this)
+        );
     }
 
     @Override
