@@ -538,6 +538,16 @@ public class RobotContainer {
             () -> PoseSubsystem.reefDistance(s_Pose.getPose().getTranslation()) <= distance);
     }
 
+    private Command RaiseElevatorAtDistance(double distance) {
+        return LoggedCommands.sequence("Raise elevator within " + String.format("%1.2f", distance) + "m of reef center",
+            WaitForReefDistance(distance),
+            Commands.either(
+                RobotState.WaitForCoralReady(),
+                LoggedCommands.log("Missing coral"),
+                RobotState::haveCoral),
+            s_Elevator.GoToNext());
+    }
+
     private void buildAutos(SendableChooser<Command> chooser) {
         Command autoECDB = LoggedCommands.sequence("Regular Three Piece (ECD+B)",
             VisionSubsystem.SwitchToFrontVision(),
@@ -612,16 +622,14 @@ public class RobotContainer {
         startingPaths.put(dryFast, "Fast - Start to E");
         addAutoCommand(chooser, dryFast);
 
-        Command newFast = LoggedCommands.sequence("Fast Four Piece (ECDB)",
+        Command fastFour = LoggedCommands.sequence("Fast Four Piece (ECDB)",
             SetStop(Stop.L4),
             Commands.deadline(
                 Commands.sequence(
                     LoggedCommands.proxy(PathCommand("Fast - Start to E")),
                     LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.EF.alignLeft, true, true)),
                     s_Elevator.WaitForNext()),
-                Commands.sequence(
-                    WaitForReefDistance(2.52),
-                    LoggedCommands.proxy(s_Elevator.GoToNext()))),
+                LoggedCommands.proxy(RaiseElevatorAtDistance(2.52))),
             RobotState.ScoreGamePiece(),
             LoggedCommands.proxy(PathCommand("Fast - E to CS")),
             Commands.deadline(
@@ -629,9 +637,7 @@ public class RobotContainer {
                     LoggedCommands.proxy(PathCommand("Fast - CS to C")),
                     LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.CD.alignLeft, true, true)),
                     s_Elevator.WaitForNext()),
-                Commands.sequence(
-                    WaitForReefDistance(3.46),
-                    LoggedCommands.proxy(s_Elevator.GoToNext()))),
+                LoggedCommands.proxy(RaiseElevatorAtDistance(3.46))),
             RobotState.ScoreGamePiece(),
             LoggedCommands.proxy(PathCommand("Fast - C to CS")),
             Commands.deadline(
@@ -639,9 +645,7 @@ public class RobotContainer {
                     LoggedCommands.proxy(PathCommand("Fast - CS to D")),
                     LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.CD.alignRight, true, true)),
                     s_Elevator.WaitForNext()),
-                Commands.sequence(
-                    WaitForReefDistance(3.56),
-                    LoggedCommands.proxy(s_Elevator.GoToNext()))),
+                LoggedCommands.proxy(RaiseElevatorAtDistance(3.56))),
             RobotState.ScoreGamePiece(),
             LoggedCommands.proxy(PathCommand("Fast - D to CS")),
             Commands.deadline(
@@ -649,14 +653,12 @@ public class RobotContainer {
                     LoggedCommands.proxy(PathCommand("Fast - CS to B")),
                     LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.alignRight, true, true)),
                     s_Elevator.WaitForNext()),
-                Commands.sequence(
-                    WaitForReefDistance(2.91),
-                    LoggedCommands.proxy(s_Elevator.GoToNext()))),
+                LoggedCommands.proxy(RaiseElevatorAtDistance(2.91))),
             RobotState.ScoreGamePiece(),
             LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachMiddle, true, false)));
 
-        startingPaths.put(newFast, "Fast - Start to E");
-        addAutoCommand(chooser, newFast);
+        startingPaths.put(fastFour, "Fast - Start to E");
+        addAutoCommand(chooser, fastFour);
 
         Command autoBA = LoggedCommands.sequence("BA",
             LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
