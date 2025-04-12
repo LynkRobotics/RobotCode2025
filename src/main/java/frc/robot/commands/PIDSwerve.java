@@ -26,6 +26,7 @@ public class PIDSwerve extends LoggedCommandBase {
     private final PIDSpeed speed;
     private final double maxVisionDiff;
     private final Timer alignedTimer = new Timer();
+    private boolean ignoreY = false;
 
     public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise, PIDSpeed speed, double maxVisionDiff) {
         super();
@@ -82,8 +83,14 @@ public class PIDSwerve extends LoggedCommandBase {
         this(s_Swerve, s_Pose, targetPose, flipIfRed, precise, PIDSpeed.FAST);
     }
 
+    public PIDSwerve ignoreY() {
+        ignoreY = true;
+
+        return this;
+    }
+
     private boolean isAligned() {
-        return Math.abs(xPID.getError()) <= xPID.getErrorTolerance() && Math.abs(yPID.getError()) <= yPID.getErrorTolerance() && Math.abs(rotationPID.getError()) <= rotationPID.getErrorTolerance();
+        return Math.abs(xPID.getError()) <= xPID.getErrorTolerance() && (ignoreY || Math.abs(yPID.getError()) <= yPID.getErrorTolerance()) && Math.abs(rotationPID.getError()) <= rotationPID.getErrorTolerance();
     }
 
     @Override
@@ -160,7 +167,7 @@ public class PIDSwerve extends LoggedCommandBase {
 
     @Override
     public boolean isFinished() {
-        return ((xPID.atSetpoint() && yPID.atSetpoint() && rotationPID.atSetpoint()) || alignedTimer.get() >= Constants.PIDSwerve.alignedTimerMax) && s_Pose.visionDifference() <= maxVisionDiff;
+        return ((xPID.atSetpoint() && (ignoreY || yPID.atSetpoint()) && rotationPID.atSetpoint()) || alignedTimer.get() >= Constants.PIDSwerve.alignedTimerMax) && s_Pose.visionDifference() <= maxVisionDiff;
     }
 
     @Override
