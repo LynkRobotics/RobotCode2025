@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import static frc.robot.Options.optAutoReefAiming;
+import static frc.robot.Options.optL1Outside;
 import static frc.robot.Options.optServiceMode;
 
 import com.ctre.phoenix.led.Animation;
@@ -89,6 +90,7 @@ public class LEDSubsystem extends SubsystemBase {
         MANUAL(new LEDConfig(Color.hightideTeal)),
         SLOWMODE(new LEDConfig(Color.dimYellow)),
         CORAL_L1(new LEDConfig(Color.magenta, 0.25)),
+        CORAL_L1OUTSIDE(new LEDConfig(Color.cheesyBlue, 0.25)),
         CORAL_L2(new LEDConfig(Color.green, 0.50)),
         CORAL_L3(new LEDConfig(Color.magenta, 0.75)),
         CORAL_L4(new LEDConfig(Color.green, 1.00)),
@@ -202,23 +204,12 @@ public class LEDSubsystem extends SubsystemBase {
                     } else if (RobotState.intakingAlgae()) {
                         state = LEDState.ALGAE_INTAKING;
                     } else if (RobotState.haveCoral()) {
-                        switch (RobotState.getNextStop()) {
-                            case L1:
-                                state = LEDState.CORAL_L1;
-                                break;
-                            case L2:
-                                state = LEDState.CORAL_L2;
-                                break;
-                            case L3:
-                                state = LEDState.CORAL_L3;
-                                break;
-                            case L4:
-                            case L4_SCORE:
-                                state = LEDState.CORAL_L4;
-                                break;
-                            default:
-                                state = LEDState.CORAL_UNKNOWN;
-                                break;
+                        state = switch (RobotState.getNextStop()) {
+                            case L1 -> (optL1Outside.get() ? LEDState.CORAL_L1OUTSIDE : LEDState.CORAL_L1);
+                            case L2 -> LEDState.CORAL_L2;
+                            case L3 -> LEDState.CORAL_L3;
+                            case L4, L4_SCORE -> LEDState.CORAL_L4;
+                            default -> LEDState.CORAL_UNKNOWN;
                         }
                     } else {
                         state = optAutoReefAiming.get() ? LEDState.NORMAL : LEDState.MANUAL;
