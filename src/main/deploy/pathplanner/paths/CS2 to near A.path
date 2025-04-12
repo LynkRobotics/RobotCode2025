@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.7845198675496688,
-        "y": 1.2065397350993363
+        "x": 0.7046150662251657,
+        "y": 1.3155008278145681
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.544867549668873,
-        "y": 2.2307740066225152
+        "x": 3.548300698820183,
+        "y": 2.077464096596389
       },
       "isLocked": false,
       "linkedName": "Control Station 2"
@@ -17,11 +17,11 @@
     {
       "anchor": {
         "x": 2.8547806291390727,
-        "y": 4.1630173841059595
+        "y": 4.1
       },
       "prevControl": {
         "x": 1.4547806291390728,
-        "y": 4.1630173841059595
+        "y": 4.1
       },
       "nextControl": null,
       "isLocked": false,
@@ -41,7 +41,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.5,
+    "velocity": 0.2,
     "rotation": 0.0
   },
   "reversed": false,

@@ -677,12 +677,12 @@ public class RobotContainer {
             LoggedCommands.proxy(PathCommand("B to CS2")),
             Commands.either(
                 LoggedCommands.proxy(RobotState.WaitForCoral()),
-                // LoggedCommands.proxy(BackUpAndWaitForCoral()),
                 LoggedCommands.log("Will not wait for Coral"),
                 optAutoCoralWait::get),
             LoggedCommands.proxy(PathCommand("CS2 to near A")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, true)),
-            LoggedCommands.proxy(PathCommand("A backup")));
+            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachMiddle, true, false)),
+            LoggedCommands.proxy(s_Swerve.Stop()));
 
         startingPaths.put(autoBA, "Start to near B");
         addAutoCommand(chooser, autoBA);

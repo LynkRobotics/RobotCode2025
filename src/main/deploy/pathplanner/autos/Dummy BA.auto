@@ -39,12 +39,6 @@
           "data": {
             "name": "Score Left"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "A backup"
-          }
         }
       ]
     }
