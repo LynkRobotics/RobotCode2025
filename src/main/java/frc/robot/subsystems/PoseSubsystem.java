@@ -280,15 +280,15 @@ public class PoseSubsystem extends SubsystemBase {
         return position.getY() < Constants.Pose.processorAreaY;
     }
 
-    public Pose2d bargeShotPose() {
+    public Pose2d bargeShotPose(double adjustment) {
         Pose2d currentPose = flipIfRed(getPose());
         Pose2d targetPose;
 
         if (currentPose.getX() > Constants.Pose.fieldLength / 2.0) {
-            targetPose = new Pose2d(Constants.Pose.fieldLength - Constants.Pose.bargeShotX, currentPose.getY(), Rotation2d.k180deg);
+            targetPose = new Pose2d(Constants.Pose.fieldLength - Constants.Pose.bargeShotX - adjustment, currentPose.getY(), Rotation2d.k180deg);
             // targetPose = new Pose2d(currentPose.getX(), currentPose.getY(), Rotation2d.k180deg);
         } else {
-            targetPose = new Pose2d(Constants.Pose.bargeShotX, currentPose.getY(), Rotation2d.kZero);
+            targetPose = new Pose2d(Constants.Pose.bargeShotX + adjustment, currentPose.getY(), Rotation2d.kZero);
             // targetPose = new Pose2d(currentPose.getX(), currentPose.getY(), Rotation2d.kZero);
         }
 

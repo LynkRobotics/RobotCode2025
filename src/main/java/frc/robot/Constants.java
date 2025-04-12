@@ -488,7 +488,8 @@ public final class Constants {
         private static final Transform2d leftL1OutsideTransform = new Transform2d(-Units.inchesToMeters(4.0), Units.inchesToMeters(4.25), Rotation2d.kZero);
         private static final Transform2d rightL1OutsideTransform = new Transform2d(-Units.inchesToMeters(4.0), -Units.inchesToMeters(4.25), Rotation2d.kZero);
         public static final double L1MoveForward = Units.inchesToMeters(2.0);
-        private static final Transform2d extraAlgaeBackup = new Transform2d(Units.inchesToMeters(-18.0), 0.0, Rotation2d.kZero);
+        private static final Transform2d extraAlgaeBackupShort = new Transform2d(Units.inchesToMeters(-9.0), 0.0, Rotation2d.kZero);
+        private static final Transform2d extraAlgaeBackupExtended = new Transform2d(Units.inchesToMeters(-18.0), 0.0, Rotation2d.kZero);
 
         public static final double elevatorNoDownDistance = reefToFaceDistance + reefOffset + Units.inchesToMeters(12.0);
 
@@ -510,7 +511,8 @@ public final class Constants {
                 rightL1 = alignRight.transformBy(rightL1Transform);
                 rightL1Outside = alignRight.transformBy(rightL1OutsideTransform);
                 approachMiddle = new Pose2d(reefCenter.plus(centerApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
-                algaeBackup = approachMiddle.plus(extraAlgaeBackup);
+                algaeBackupShort = approachMiddle.plus(extraAlgaeBackupShort);
+                algaeBackupExtended = approachMiddle.plus(extraAlgaeBackupExtended);
                 approachLeft = new Pose2d(reefCenter.plus(leftApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
                 approachRight = new Pose2d(reefCenter.plus(rightApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
                 alignBonusLeft = new Pose2d(reefCenter.plus(leftBonusOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
@@ -523,7 +525,7 @@ public final class Constants {
             public final Pose2d leftL1, rightL1;
             public final Pose2d leftL1Outside, rightL1Outside;
             public final Pose2d approachLeft, approachMiddle, approachRight;
-            public final Pose2d algaeBackup;
+            public final Pose2d algaeBackupShort, algaeBackupExtended;
             public final Pose2d alignBonusLeft, alignBonusRight;
             public final boolean algaeHigh;
         }

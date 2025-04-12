@@ -245,12 +245,12 @@ public class RobotContainer {
             this::shouldMirror);
     }
 
-    private Command DealgaefyMaybeMirror(ReefFace face) {
+    private Command DealgaefyMaybeMirror(ReefFace face, boolean extendedBackup) {
         ReefFace mirroredFace = mirroredFaces.get(face);
 
         return Commands.either(
-            DeAlgaefy(mirroredFace),
-            DeAlgaefy(face),
+            DeAlgaefy(mirroredFace, extendedBackup),
+            DeAlgaefy(face, extendedBackup),
             this::shouldMirror);
     }
 
@@ -275,6 +275,10 @@ public class RobotContainer {
     }
 
     private Command DeAlgaefy(ReefFace face) {
+        return DeAlgaefy(face, true);
+    }
+
+    private Command DeAlgaefy(ReefFace face, boolean extendedBackup) {
         Stop algaeStop = face.algaeHigh ? Stop.L3_ALGAE: Stop.L2_ALGAE;
         Stop algaeInvertStop = face.algaeHigh ? Stop.L2_ALGAE : Stop.L3_ALGAE;
 
@@ -299,7 +303,7 @@ public class RobotContainer {
                                 s_Elevator.WaitForStop(algaeStop),
                                 s_Elevator.AutoElevatorUp(face.alignMiddle.getTranslation(), algaeStop)),
                             optInvertAlgae)))),
-            new PIDSwerve(s_Swerve, s_Pose, face.algaeBackup, true, false))
+            new PIDSwerve(s_Swerve, s_Pose, extendedBackup ? face.algaeBackupExtended : face.algaeBackupShort, true, false))
             .handleInterrupt(() -> {
                 if (!RobotState.haveAlgae()) RobotState.setNoAlgae();
                 VisionSubsystem.setCameraMode(CameraMode.DEFAULT);
@@ -362,8 +366,12 @@ public class RobotContainer {
     }
 
     private Command BargeShot() {
+        return BargeShot(0.0);
+    }
+
+    private Command BargeShot(double adjustment) {
         return LoggedCommands.sequence("Score Algae into Barge",
-                Commands.defer(() -> new PIDSwerve(s_Swerve, s_Pose, s_Pose.bargeShotPose(), false, false, PIDSpeed.TURBO).ignoreY(), Set.of(s_Swerve)),
+                Commands.defer(() -> new PIDSwerve(s_Swerve, s_Pose, s_Pose.bargeShotPose(adjustment), false, false, PIDSpeed.TURBO).ignoreY(), Set.of(s_Swerve)),
                 LoggedCommands.deadline("Toss Algae",
                     Commands.sequence(
                         s_Elevator.WaitForStop(Stop.L4_SCORE)),
@@ -530,7 +538,7 @@ public class RobotContainer {
     }
 
     private void buildAutos(SendableChooser<Command> chooser) {
-        Command autoECDB = LoggedCommands.sequence("ECDB",
+        Command autoECDB = LoggedCommands.sequence("Regular Three Piece (ECD+B)",
             VisionSubsystem.SwitchToFrontVision(),
             LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
             Commands.either(
@@ -603,7 +611,7 @@ public class RobotContainer {
         startingPaths.put(dryFast, "Fast - Start to E");
         addAutoCommand(chooser, dryFast);
 
-        Command newFast = LoggedCommands.sequence("New Four Piece",
+        Command newFast = LoggedCommands.sequence("Fast Four Piece (ECDB)",
             SetStop(Stop.L4),
             Commands.deadline(
                 Commands.sequence(
@@ -701,7 +709,8 @@ public class RobotContainer {
         startingPaths.put(autoBA, "Start to near B");
         addAutoCommand(chooser, autoBA);
 
-        Command autoG = LoggedCommands.sequence("G + Barge Shots",
+        // NOTE: Do not mirror this auto!
+        Command autoG = LoggedCommands.sequence("G + Barge Shots (don't mirror!)",
             LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
             Commands.either(
                 LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
@@ -711,12 +720,12 @@ public class RobotContainer {
             LoggedCommands.proxy(PathCommand("Start to near G")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.GH, true)),
             LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.GH.approachMiddle, true, false)),
-            LoggedCommands.proxy(DealgaefyMaybeMirror(ReefFace.GH)),
+            LoggedCommands.proxy(DealgaefyMaybeMirror(ReefFace.GH, false)),
             LoggedCommands.proxy(PathCommand("GH to Barge Shot")),
             LoggedCommands.proxy(BargeShot()),
             LoggedCommands.proxy(PathCommand("Barge Shot to near IJ")),
-            LoggedCommands.proxy(DealgaefyMaybeMirror(ReefFace.IJ)), 
-            LoggedCommands.proxy(BargeShot()),
+            LoggedCommands.proxy(DealgaefyMaybeMirror(ReefFace.IJ, false)), 
+            LoggedCommands.proxy(BargeShot(-Units.inchesToMeters(5))), // Ensure we are shy of the line at the end of auto
             LoggedCommands.deferredProxy("Backup after barge shot", 
                 () -> new PIDSwerve(s_Swerve, s_Pose, s_Pose.getPose().transformBy(new Transform2d(-Units.inchesToMeters(18.0), 0.0, Rotation2d.kZero)), false, false)),
             LoggedCommands.proxy(s_Swerve.Stop()));
