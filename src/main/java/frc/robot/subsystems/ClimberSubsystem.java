@@ -99,6 +99,10 @@ public class ClimberSubsystem extends SubsystemBase {
         return motor.getPosition().getValueAsDouble() <= Constants.Climber.engageRetractedPosition;
     }
 
+    private boolean climberPastPause() {
+        return motor.getPosition().getValueAsDouble() <= Constants.Climber.pausePosition;
+    }
+
     private boolean climberPartiallyRetracted() {
         return motor.getPosition().getValueAsDouble() <= Constants.Climber.fastRetractedPosition;
     }
@@ -132,9 +136,17 @@ public class ClimberSubsystem extends SubsystemBase {
                         LoggedCommands.waitUntil("Wait for climber engagement", this::climberEngaged)),
                     this::climberEngaged),
                 Commands.either(
+                    LoggedCommands.log("Climber already past pause position"),
+                    Commands.sequence(
+                        LoggedCommands.runOnce("Set fast retract voltage (pre-pause)", () -> motor.setControl(fastRetractControl), this),
+                        LoggedCommands.waitUntil("Wait for climber retraction to pause point", this::climberPastPause),
+                        LoggedCommands.runOnce("Set hold voltage (pause)", () -> motor.setControl(holdControl), this),
+                        LoggedCommands.waitSeconds("Wait for climb pause", Constants.Climber.pauseDuration)),
+                    this::climberPastPause),
+                Commands.either(
                     LoggedCommands.log("Climber already partially retracted"),
                     Commands.sequence(
-                        LoggedCommands.runOnce("Set fast retract voltage", () -> motor.setControl(fastRetractControl), this),
+                        LoggedCommands.runOnce("Set fast retract voltage (pose-pause)", () -> motor.setControl(fastRetractControl), this),
                         LoggedCommands.waitUntil("Wait for partial climber retraction", this::climberPartiallyRetracted)),
                     this::climberPartiallyRetracted),
                 Commands.either(
@@ -143,7 +155,7 @@ public class ClimberSubsystem extends SubsystemBase {
                         LoggedCommands.runOnce("Set slow retract voltage", () -> motor.setControl(slowRetractControl), this),
                         LoggedCommands.waitUntil("Wait for full climber retraction", this::climberFullyRetracted)),
                     this::climberFullyRetracted),
-                LoggedCommands.runOnce("Set hold voltage", () -> motor.setControl(holdControl), this),
+                LoggedCommands.runOnce("Set hold voltage (done)", () -> motor.setControl(holdControl), this),
                 Commands.runOnce(() -> RobotState.setClimbState(ClimbState.CLIMBED)),
                 LoggedCommands.idle("Hold climb", this))
                 .handleInterrupt(motor::stopMotor),

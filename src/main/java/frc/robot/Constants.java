@@ -212,7 +212,7 @@ public final class Constants {
         public static final double maxAngularVelocity = Constants.Swerve.maxAngularVelocity / 2.0;
         
         public enum PIDSpeed {
-            SLOW(Constants.Swerve.maxSpeed / 6.0),
+            SLOW(Constants.Swerve.maxSpeed / 8.0),
             FAST(Constants.Swerve.maxSpeed / 3.0),
             TURBO(Constants.Swerve.maxSpeed / 2.0); // TODO Reference
 
@@ -423,8 +423,10 @@ public final class Constants {
         public static final double fastDeployedPosition = 110.0;
         public static final double fullyDeployedPosition = 135.5;
         public static final double engageRetractedPosition = 120.0;
+        public static final double pausePosition = 17.5;
+        public static final double pauseDuration = 0.25;
         public static final double fastRetractedPosition = -15.0;
-        public static final double fullyRetractedPosition = -30.0;
+        public static final double fullyRetractedPosition = -30.5;
 
         public static final int timeCutoff = 30;
     }
