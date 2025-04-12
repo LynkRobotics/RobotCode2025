@@ -204,12 +204,22 @@ public class LEDSubsystem extends SubsystemBase {
                     } else if (RobotState.intakingAlgae()) {
                         state = LEDState.ALGAE_INTAKING;
                     } else if (RobotState.haveCoral()) {
-                        state = switch (RobotState.getNextStop()) {
-                            case L1 -> (optL1Outside.get() ? LEDState.CORAL_L1OUTSIDE : LEDState.CORAL_L1);
-                            case L2 -> LEDState.CORAL_L2;
-                            case L3 -> LEDState.CORAL_L3;
-                            case L4, L4_SCORE -> LEDState.CORAL_L4;
-                            default -> LEDState.CORAL_UNKNOWN;
+                        switch (RobotState.getNextStop()) {
+                            case L1:
+                                state = optL1Outside.get() ? LEDState.CORAL_L1OUTSIDE : LEDState.CORAL_L1;
+                                break;
+                            case L2:
+                                state = LEDState.CORAL_L2;
+                                break;
+                            case L3:
+                                state = LEDState.CORAL_L3;
+                                break;
+                            case L4:
+                            case L4_SCORE:
+                                state = LEDState.CORAL_L4;
+                                break;
+                            default:
+                                state = LEDState.CORAL_UNKNOWN;
                         }
                     } else {
                         state = optAutoReefAiming.get() ? LEDState.NORMAL : LEDState.MANUAL;

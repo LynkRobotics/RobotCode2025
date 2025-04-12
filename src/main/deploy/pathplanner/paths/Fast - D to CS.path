@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 1.21,
-        "y": 0.919
+        "x": 1.52,
+        "y": 0.72
       },
       "prevControl": {
-        "x": 1.5540179040211706,
-        "y": 1.281838368578739
+        "x": 1.8640179040211706,
+        "y": 1.0828383685787386
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Control Station"
+      "linkedName": "Control Station - Close"
     }
   ],
   "rotationTargets": [],
@@ -41,7 +41,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.2,
+    "velocity": 0.0,
     "rotation": 55.0
   },
   "reversed": false,

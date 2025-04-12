@@ -1,0 +1,55 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Fast - Start to E"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Fast - E to CS"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Fast - CS to C"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Fast - C to CS"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Fast - CS to D"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Fast - D to CS"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Fast - CS to B"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

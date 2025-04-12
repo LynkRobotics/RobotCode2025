@@ -442,6 +442,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        Command currentCommand = getCurrentCommand();
+        DogLog.log("Elevator/Current Command", currentCommand == null ? "None" : currentCommand.getName());
+
         double position = leftMotor.getPosition().getValueAsDouble();
         double height = getHeight(position);
         double followPosition = rightMotor.getPosition().getValueAsDouble();
@@ -455,16 +458,13 @@ public class ElevatorSubsystem extends SubsystemBase {
                 LoggedAlert.Error("Elevator", "Blocked", "Elevator stopped due to blockage");
                 stop();
             } else if (safetyDeferred && RobotState.elevatorDownAllowed()) {
-                // Moving elevator to safety was deferred, but is available now
-                Command currentCommand = getCurrentCommand();
-                
+                // Moving elevator to safety was deferred, but is available now                
                 if (currentCommand != null) {
                     currentCommand.cancel();
                 }
             } else if (!isSafe() && !movingToSafety && !RobotState.raisedElevatorAllowable()) {
                 // Elevator is unsafe, not allowed to raised, and not already moving to safety
                 LoggedAlert.Warning("Elevator", "Safety", "Cancelling current command to return to safe position");
-                Command currentCommand = getCurrentCommand();
                 
                 if (currentCommand != null) {
                     currentCommand.cancel();
@@ -500,7 +500,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         // If we have Coral ready, and the Elevator is still at zero, cancel the current default command so that it runs again with the L1 default
         if (RobotState.coralReady() && RobotState.getElevatorAtZero()) {
-            Command currentCommand = getCurrentCommand();
             if (currentCommand != null) {
                 currentCommand.cancel();
                 RobotState.setElevatorAtZero(false);

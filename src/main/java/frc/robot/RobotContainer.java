@@ -524,6 +524,11 @@ public class RobotContainer {
         ); 
     }
 
+    private Command WaitForReefDistance(double distance) {
+        return LoggedCommands.waitUntil("Wait until within " + String.format("%1.2f", distance) + "m of reef center",
+            () -> PoseSubsystem.reefDistance(s_Pose.getPose().getTranslation()) <= distance);
+    }
+
     private void buildAutos(SendableChooser<Command> chooser) {
         Command autoECDB = LoggedCommands.sequence("ECDB",
             VisionSubsystem.SwitchToFrontVision(),
@@ -580,6 +585,69 @@ public class RobotContainer {
         // startingPaths.put(autoECD, "Start to near E");
         startingPaths.put(autoECDB, "Start towards EF");
         addAutoCommand(chooser, autoECDB);
+
+        Command dryFast = LoggedCommands.sequence("Fast Dry Run",
+            LoggedCommands.proxy(PathCommand("Fast - Start to E")),
+            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.EF.alignLeft, true, true)),
+            LoggedCommands.proxy(PathCommand("Fast - E to CS")),
+            LoggedCommands.proxy(PathCommand("Fast - CS to C")),
+            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.CD.alignLeft, true, true)),
+            LoggedCommands.proxy(PathCommand("Fast - C to CS")),
+            LoggedCommands.proxy(PathCommand("Fast - CS to D")),
+            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.CD.alignRight, true, true)),
+            LoggedCommands.proxy(PathCommand("Fast - D to CS")),
+            LoggedCommands.proxy(PathCommand("Fast - CS to B")),
+            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.alignRight, true, true))
+        );
+
+        startingPaths.put(dryFast, "Fast - Start to E");
+        addAutoCommand(chooser, dryFast);
+
+        Command newFast = LoggedCommands.sequence("New Four Piece",
+            SetStop(Stop.L4),
+            Commands.deadline(
+                Commands.sequence(
+                    LoggedCommands.proxy(PathCommand("Fast - Start to E")),
+                    LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.EF.alignLeft, true, true)),
+                    s_Elevator.WaitForNext()),
+                Commands.sequence(
+                    WaitForReefDistance(2.52),
+                    LoggedCommands.proxy(s_Elevator.GoToNext()))),
+            RobotState.ScoreGamePiece(),
+            LoggedCommands.proxy(PathCommand("Fast - E to CS")),
+            Commands.deadline(
+                Commands.sequence(
+                    LoggedCommands.proxy(PathCommand("Fast - CS to C")),
+                    LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.CD.alignLeft, true, true)),
+                    s_Elevator.WaitForNext()),
+                Commands.sequence(
+                    WaitForReefDistance(3.46),
+                    LoggedCommands.proxy(s_Elevator.GoToNext()))),
+            RobotState.ScoreGamePiece(),
+            LoggedCommands.proxy(PathCommand("Fast - C to CS")),
+            Commands.deadline(
+                Commands.sequence(
+                    LoggedCommands.proxy(PathCommand("Fast - CS to D")),
+                    LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.CD.alignRight, true, true)),
+                    s_Elevator.WaitForNext()),
+                Commands.sequence(
+                    WaitForReefDistance(3.56),
+                    LoggedCommands.proxy(s_Elevator.GoToNext()))),
+            RobotState.ScoreGamePiece(),
+            LoggedCommands.proxy(PathCommand("Fast - D to CS")),
+            Commands.deadline(
+                Commands.sequence(
+                    LoggedCommands.proxy(PathCommand("Fast - CS to B")),
+                    LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.alignRight, true, true)),
+                    s_Elevator.WaitForNext()),
+                Commands.sequence(
+                    WaitForReefDistance(2.91),
+                    LoggedCommands.proxy(s_Elevator.GoToNext()))),
+            RobotState.ScoreGamePiece(),
+            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachMiddle, true, false)));
+
+        startingPaths.put(newFast, "Fast - Start to E");
+        addAutoCommand(chooser, newFast);
 
         Command fastECDB = LoggedCommands.sequence("Fast ECDB",
             LoggedCommands.runOnce("Enable turbo mode", () -> RobotState.setTurboMode(true)),
