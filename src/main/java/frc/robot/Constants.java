@@ -455,7 +455,7 @@ public final class Constants {
         public static final double reefStandoff = Units.inchesToMeters(1.5);
         public static final double centerToFrontBumper = robotFrameLength / 2.0 + bumperWidth;
         public static final double reefOffset = centerToFrontBumper + reefStandoff;
-        public static final double reefExtraOffset = Units.inchesToMeters(16.0);
+        public static final double reefExtraOffset = Units.inchesToMeters(9.0);
         public static final double bonusStandoff = Units.inchesToMeters(4.0);
 
         public static final double processorAreaY = fieldWidth / 2.0 - 1.0;
