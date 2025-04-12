@@ -525,6 +525,7 @@ public class RobotContainer {
             ));
     }
 
+    @SuppressWarnings ("unused")
     private Command PathWithRaise(String pathName, ReefFace face, boolean left) {
         return LoggedCommands.deadline("Follow Path with Raise",
             PathCommand(pathName),
@@ -656,36 +657,6 @@ public class RobotContainer {
 
         startingPaths.put(newFast, "Fast - Start to E");
         addAutoCommand(chooser, newFast);
-
-        Command fastECDB = LoggedCommands.sequence("Fast ECDB",
-            LoggedCommands.runOnce("Enable turbo mode", () -> RobotState.setTurboMode(true)),
-            SetStop(Stop.L2),
-            // LoggedCommands.proxy(PathWithRaise("Fast - Start towards EF", ReefFace.EF, true)),
-            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
-            Commands.race(
-                LoggedCommands.proxy(PathCommand("Fast - E to CS")),
-                RobotState.WaitForCoral()),
-            SetStop(Stop.L4),
-            LoggedCommands.proxy(PathWithRaise("Fast - CS towards C", ReefFace.CD, true)),
-            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, true)),
-            Commands.race(
-                LoggedCommands.proxy(PathCommand("Fast - C to CS")),
-                RobotState.WaitForCoral()
-            ),
-            LoggedCommands.proxy(PathWithRaise("Fast - CS towards D", ReefFace.CD, false)),
-            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false)),
-            Commands.race(
-                LoggedCommands.proxy(PathCommand("Fast - D to CS")),
-                RobotState.WaitForCoral()
-            ),
-            LoggedCommands.proxy(PathWithRaise("Fast - CS to near B", ReefFace.AB, false)),
-            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
-            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachRight, true, false)))
-            .handleInterrupt(() -> RobotState.setTurboMode(false));
-
-        // startingPaths.put(autoECD, "Start to near E");
-        startingPaths.put(fastECDB, "Start towards EF");
-        addAutoCommand(chooser, fastECDB);
 
         Command autoBA = LoggedCommands.sequence("BA",
             LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
