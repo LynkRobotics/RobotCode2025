@@ -148,6 +148,8 @@ public class ClimberSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        Command currentCommand = getCurrentCommand();
+        DogLog.log("Climber/Current Command", currentCommand == null ? "None" : currentCommand.getName());
         DogLog.log("Climber/TorqueCurrent", motor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("Climber/Velocity", motor.getVelocity().getValueAsDouble());
         DogLog.log("Climber/Position", motor.getPosition().getValueAsDouble());

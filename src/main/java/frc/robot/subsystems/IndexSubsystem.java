@@ -12,6 +12,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.RobotState.GamePieceState;
@@ -50,6 +51,9 @@ public class IndexSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        Command currentCommand = getCurrentCommand();
+        DogLog.log("Index/Current Command", currentCommand == null ? "None" : currentCommand.getName());
+
         GamePieceState gamePieceState = RobotState.getGamePieceState();
         double velocity = motor.getVelocity().getValueAsDouble();
 
