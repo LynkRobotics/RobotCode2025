@@ -363,11 +363,11 @@ public class RobotContainer {
 
     private Command BargeShot() {
         return LoggedCommands.sequence("Score Algae into Barge",
-                Commands.defer(() -> new PIDSwerve(s_Swerve, s_Pose, s_Pose.bargeShotPose(), false, false, PIDSpeed.TURBO), Set.of(s_Swerve)),
-                s_Swerve.Stop(),
+                Commands.defer(() -> new PIDSwerve(s_Swerve, s_Pose, s_Pose.bargeShotPose(), false, false, PIDSpeed.TURBO).ignoreY(), Set.of(s_Swerve)),
                 LoggedCommands.deadline("Toss Algae",
                     Commands.sequence(
                         s_Elevator.WaitForStop(Stop.L4_SCORE)),
+                    s_Swerve.HoldX(),
                     s_Elevator.Move(Stop.L4_SCORE),
                     LoggedCommands.sequence("Wait to release Algae",
                         LoggedCommands.waitUntil("Wait for Algae Release Point", () -> s_Elevator.aboveStop(Stop.ALGAE_RELEASE)),
