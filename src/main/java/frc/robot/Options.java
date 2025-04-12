@@ -13,4 +13,5 @@ public final class Options {
     public static final TunableOption optAlgaeBargeOnly = new TunableOption("Algae into Barge Only", false);
     public static final TunableOption optInvertAlgae = new TunableOption("Invert Algae Location", false);
     public static final TunableOption optIndexEnabled = new TunableOption("Index Enabled", true);
+    public static final TunableOption optL1Outside = new TunableOption("L1 Outside", false);
 }

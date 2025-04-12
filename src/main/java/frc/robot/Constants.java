@@ -332,8 +332,9 @@ public final class Constants {
         public enum Stop {
             // Intake occurs at zero
             SAFE     (Constants.Elevator.baseHeight + 5.0),
-            L1       (28.5 - Constants.Elevator.endEffectorHeight),
-            L1_SCORE (30.0 - Constants.Elevator.endEffectorHeight),
+            L1       (21.3 - Constants.Elevator.endEffectorHeight),
+            L1_SCORE (29.0 - Constants.Elevator.endEffectorHeight),
+            HOLD     (30.0 - Constants.Elevator.endEffectorHeight),
             L2       (34.5 - Constants.Elevator.endEffectorHeight),
             L2_ALGAE (38.0 - Constants.Elevator.endEffectorHeight), 
             L3       (49.5 - Constants.Elevator.endEffectorHeight),
@@ -349,7 +350,7 @@ public final class Constants {
             public final double height;
         }
 
-        public static final double L1RaiseDelay = 0.15;
+        public static final double L1RaiseDelay = 0.3;
         // public static final double standoffBoost = 1.5; // In inches
     }
 
@@ -367,7 +368,7 @@ public final class Constants {
         public static final double feedVoltage = -6.5;
         public static final double unjamVoltage = 3.0;
         public static final double advanceVoltage = -1.9;
-        public static final double scoreL1Voltage = -2.5;
+        public static final double scoreL1Voltage = -3.5;
         public static final double scoreL2L3Voltage = -6.0; // was -9.0 for standoff
         public static final double scoreL4Voltage = -6.0;
         public static final double algaeVoltage = 3.3;
@@ -482,8 +483,11 @@ public final class Constants {
         private static final Translation2d bonusOffset = new Translation2d(bonusStandoff, 0.0);
         private static final Translation2d leftBonusOffset = leftOffset.plus(bonusOffset);
         private static final Translation2d rightBonusOffset = rightOffset.plus(bonusOffset);
-        private static final Transform2d leftL1Transform = new Transform2d(-Units.inchesToMeters(4.0), -branchSeparation / 2.0 + Units.inchesToMeters(2.0), Rotation2d.kZero);
-        private static final Transform2d rightL1Transform = new Transform2d(-Units.inchesToMeters(4.0), branchSeparation / 2.0 - Units.inchesToMeters(2.0), Rotation2d.kZero);
+        private static final Transform2d leftL1Transform = new Transform2d(-Units.inchesToMeters(4.0), -branchSeparation / 2.0 + Units.inchesToMeters(2.5), Rotation2d.kZero);
+        private static final Transform2d rightL1Transform = new Transform2d(-Units.inchesToMeters(4.0), branchSeparation / 2.0 - Units.inchesToMeters(2.5), Rotation2d.kZero);
+        private static final Transform2d leftL1OutsideTransform = new Transform2d(-Units.inchesToMeters(4.0), Units.inchesToMeters(4.25), Rotation2d.kZero);
+        private static final Transform2d rightL1OutsideTransform = new Transform2d(-Units.inchesToMeters(4.0), -Units.inchesToMeters(4.25), Rotation2d.kZero);
+        public static final double L1MoveForward = Units.inchesToMeters(2.0);
         private static final Transform2d extraAlgaeBackup = new Transform2d(Units.inchesToMeters(-18.0), 0.0, Rotation2d.kZero);
 
         public static final double elevatorNoDownDistance = reefToFaceDistance + reefOffset + Units.inchesToMeters(12.0);
@@ -501,8 +505,10 @@ public final class Constants {
                 alignMiddle = new Pose2d(reefCenter.plus(centerOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
                 alignLeft = new Pose2d(reefCenter.plus(leftOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
                 leftL1 = alignLeft.transformBy(leftL1Transform);
+                leftL1Outside = alignLeft.transformBy(leftL1OutsideTransform);
                 alignRight = new Pose2d(reefCenter.plus(rightOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
                 rightL1 = alignRight.transformBy(rightL1Transform);
+                rightL1Outside = alignRight.transformBy(rightL1OutsideTransform);
                 approachMiddle = new Pose2d(reefCenter.plus(centerApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
                 algaeBackup = approachMiddle.plus(extraAlgaeBackup);
                 approachLeft = new Pose2d(reefCenter.plus(leftApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.k180deg));
@@ -515,6 +521,7 @@ public final class Constants {
             public final Rotation2d directionFromCenter;
             public final Pose2d alignLeft, alignMiddle, alignRight;
             public final Pose2d leftL1, rightL1;
+            public final Pose2d leftL1Outside, rightL1Outside;
             public final Pose2d approachLeft, approachMiddle, approachRight;
             public final Pose2d algaeBackup;
             public final Pose2d alignBonusLeft, alignBonusRight;

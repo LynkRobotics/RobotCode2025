@@ -303,7 +303,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     private Stop safetyStop() {
-        return !RobotState.getFinalSensor() ? Stop.L1 : Stop.SAFE;
+        return !RobotState.getFinalSensor() ? Stop.HOLD : Stop.SAFE;
     }
 
     private boolean isSafe(double height) {
@@ -355,7 +355,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public double raisedPercentage() {
-        return MathUtil.clamp((getHeight() - Stop.L1.height) / Stop.L4_SCORE.height, 0.0, 1.0);
+        return MathUtil.clamp((getHeight() - Stop.HOLD.height) / Stop.L4_SCORE.height, 0.0, 1.0);
     }
 
     public Command IfNotBlocked(Command command) {
@@ -417,9 +417,9 @@ public class ElevatorSubsystem extends SubsystemBase {
                     safetyDeferred = false;
                 }),
                 Commands.either(
-                    LoggedCommands.deadline("Move to L1 with Coral",
+                    LoggedCommands.deadline("Move to Hold position with Coral",
                         LoggedCommands.waitUntil("Wait for no Coral", () -> !RobotState.haveCoral()),
-                        Move(Stop.L1)),
+                        Move(Stop.HOLD)),
                     LoggedCommands.sequence("Zero and Idle",
                         Commands.either(
                             Zero(),
@@ -529,6 +529,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Elevator/In Range", inRange(position));
 
         SmartDashboard.putBoolean("Elevator/Safe", isSafe(height));
+        SmartDashboard.putBoolean("Elevator/HOLD", atStop(Stop.HOLD));
         SmartDashboard.putBoolean("Elevator/L1", atStop(Stop.L1));
         SmartDashboard.putBoolean("Elevator/L2", atStop(Stop.L2));
         SmartDashboard.putBoolean("Elevator/L3", atStop(Stop.L3));

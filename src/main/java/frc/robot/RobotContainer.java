@@ -6,6 +6,7 @@ import static frc.robot.Options.optAutoReefAiming;
 import static frc.robot.Options.optBackupPush;
 import static frc.robot.Options.optInvertAlgae;
 import static frc.robot.Options.optMirrorAuto;
+import static frc.robot.Options.optL1Outside;
 
 import java.util.Collections;
 import java.util.EnumMap;
@@ -177,7 +178,10 @@ public class RobotContainer {
                                                 s_Elevator.WaitForNearNext()),
                                             s_Elevator::nearNextStop),
                                         Commands.either(
-                                            new PIDSwerve(s_Swerve, s_Pose, left ? face.leftL1 : face.rightL1, true, true),
+                                            Commands.either(
+                                                new PIDSwerve(s_Swerve, s_Pose, left ? face.leftL1Outside : face.rightL1Outside, true, true),
+                                                new PIDSwerve(s_Swerve, s_Pose, left ? face.leftL1 : face.rightL1, true, true),
+                                                optL1Outside::get),
                                             new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true, true),
                                             () -> RobotState.getNextStop() == Stop.L1
                                         )),
@@ -198,7 +202,10 @@ public class RobotContainer {
                         LoggedCommands.deadline("Wait for auto up",
                             s_Elevator.WaitForNext(),
                             Commands.either(
-                                s_Elevator.AutoElevatorUp(left ? face.leftL1.getTranslation() : face.rightL1.getTranslation()),
+                                Commands.either(
+                                    s_Elevator.AutoElevatorUp(left ? face.leftL1Outside.getTranslation() : face.rightL1Outside.getTranslation()),
+                                    s_Elevator.AutoElevatorUp(left ? face.leftL1.getTranslation() : face.rightL1.getTranslation()),
+                                    optL1Outside::get),
                                 s_Elevator.AutoElevatorUp(left ? face.alignLeft.getTranslation() : face.alignRight.getTranslation()),
                                 // s_Elevator.SmoothElevatorUp(left ? face.approachLeft.getTranslation() : face.approachRight.getTranslation()), // TODO Not always Smooth!
                                 () -> RobotState.getNextStop() == Stop.L1)))),
@@ -206,10 +213,11 @@ public class RobotContainer {
                     RobotState.ScoreGamePiece(),
                     Commands.either(
                         Commands.sequence(
-                            Commands.waitSeconds(0.25),
-                            Commands.defer(() -> new PIDSwerve(s_Swerve, s_Pose, s_Pose.getPose().plus(new Transform2d(0, 0, Rotation2d.fromDegrees(left ? 15 : -15))), left, left), Set.of(s_Swerve)),
-                            s_Swerve.Stop(),
-                            Commands.waitSeconds(0.35)
+                            Commands.waitSeconds(Constants.Elevator.L1RaiseDelay),
+                            Commands.either(
+                                new PIDSwerve(s_Swerve, s_Pose, (left ? face.leftL1Outside : face.rightL1Outside).transformBy(new Transform2d(Constants.Pose.L1MoveForward, left ? Units.inchesToMeters(-2.7) : Units.inchesToMeters(2.7), Rotation2d.kZero)), true, true),
+                                new PIDSwerve(s_Swerve, s_Pose, (left ? face.leftL1 : face.rightL1).transformBy(new Transform2d(Constants.Pose.L1MoveForward, 0, Rotation2d.kZero)), true, true),
+                                optL1Outside)
                         ),
                         Commands.none(),
                         () -> RobotState.getNextStop() == Stop.L1
@@ -474,6 +482,7 @@ public class RobotContainer {
         driver.povRight().whileTrue(LoggedCommands.parallel("Deploy and Align",
             s_Climber.Deploy(),
             AlignToNearestCage()));
+        driver.povLeft().onTrue(LoggedCommands.runOnce("Toggle L1 Inside/Outside", optL1Outside::toggle));
     }
 
     /** 

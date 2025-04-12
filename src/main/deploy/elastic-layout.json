@@ -261,6 +261,19 @@
               "true_icon": "Checkmark",
               "false_icon": "X"
             }
+          },
+          {
+            "title": "L1 Outside",
+            "x": 864.0,
+            "y": 512.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Toggle Button",
+            "properties": {
+              "topic": "/SmartDashboard/TunableOptions/L1 Outside",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
           }
         ]
       }
