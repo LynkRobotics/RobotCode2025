@@ -481,15 +481,20 @@ public class RobotContainer {
             //         LoggedCommands.runOnce("Test End", () -> LEDSubsystem.triggerError())));
         }
 
-        driver.povDown().onTrue(s_Climber.Deploy());
+        driver.povDown().onTrue(
+            Commands.either(
+                s_Climber.SlowDeploy().until(driver.povDown().negate()),
+                s_Climber.Deploy(),
+                optServiceMode::get));
         driver.povUp().whileTrue(
             Commands.either(
                 s_Climber.SlowRetract(),
                 s_Climber.Retract(),
                 optServiceMode::get));
-        driver.povRight().whileTrue(LoggedCommands.parallel("Deploy and Align",
-            s_Climber.Deploy(),
-            AlignToNearestCage()));
+        driver.povRight().whileTrue(
+            LoggedCommands.parallel("Deploy and Align",
+                s_Climber.Deploy(),
+                AlignToNearestCage()));
         driver.povLeft().onTrue(LoggedCommands.runOnce("Toggle L1 Inside/Outside", optL1Outside::toggle));
     }
 
