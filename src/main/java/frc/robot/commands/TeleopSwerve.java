@@ -93,8 +93,8 @@ public class TeleopSwerve extends LoggedCommandBase {
 
         /* Drive */
         s_Swerve.drive(
-            new Translation2d(translationVal, strafeVal).times(speedLimitSupplier.getAsDouble()).times(Constants.Swerve.maxSpeed).times(RobotState.getClimbState() != ClimbState.NONE ? Constants.Swerve.slowMode : 1.0),
-            rotationVal * Constants.Swerve.maxAngularVelocity * speedLimitSupplier.getAsDouble() * (RobotState.haveAlgae() ? Constants.algaeSlowRot : 1.0) * (RobotState.getClimbState() != ClimbState.NONE ? Constants.Swerve.slowMode : 1.0),
+            new Translation2d(translationVal, strafeVal).times(speedLimitSupplier.getAsDouble()).times(Constants.Swerve.maxSpeed).times((RobotState.intakingAlgae() || (RobotState.getClimbState() != ClimbState.NONE)) ? Constants.Swerve.slowMode : 1.0),
+            rotationVal * Constants.Swerve.maxAngularVelocity * speedLimitSupplier.getAsDouble() * (RobotState.haveAlgae() ? Constants.algaeSlowRot : 1.0) * ((RobotState.intakingAlgae() || (RobotState.getClimbState() != ClimbState.NONE)) ? Constants.Swerve.slowMode : 1.0),
             true
         );
     }
