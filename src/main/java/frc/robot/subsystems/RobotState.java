@@ -305,7 +305,7 @@ public class RobotState extends SubsystemBase {
                 }
             } else if (indexSensor && flipperSensor && finalSensor) {
                 // No Coral is present
-                if (gamePieceState == GamePieceState.SCORING_CORAL && activeStop == Stop.L1) {
+                if (gamePieceState == GamePieceState.SCORING_CORAL && (activeStop == Stop.L1 || activeStop == Stop.L1_SCORE)) {
                     if (!L1Timer.isRunning()) {
                         L1Timer.restart();
                     } else if (L1Timer.hasElapsed(Constants.EndEffector.L1RunTime)) {
