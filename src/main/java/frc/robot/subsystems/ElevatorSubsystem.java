@@ -265,6 +265,11 @@ public class ElevatorSubsystem extends SubsystemBase {
         return LoggedCommands.waitUntil("Wait for Elevator to near next stop", () -> nearNextStop());
     }
 
+    // Very particular use cases
+    public Command WaitForTowardsNext() {
+        return LoggedCommands.waitUntil("Wait for Elevator towards next stop", () -> towardsNextStop());
+    }
+
     private boolean isStalled() {
         return stallCount >= stallMax;
     }
@@ -338,12 +343,21 @@ public class ElevatorSubsystem extends SubsystemBase {
         return stopError <= allowableError;
     }
 
+    // Are potentially towards a stop? (limited use cases)
+    public boolean towardsStop(Stop stop) {
+        return (getHeight() + Constants.Elevator.towardsMargin) >= stopHeight(stop);
+    }
+
     public boolean atNextStop() {
         return atStop(nextStop);
     }
 
     public boolean nearNextStop() {
         return nearStop(nextStop);
+    }
+
+    public boolean towardsNextStop() {
+        return towardsStop(nextStop);
     }
 
     private double getHeight(double position) {

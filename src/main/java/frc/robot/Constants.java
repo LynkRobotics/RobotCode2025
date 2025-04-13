@@ -315,6 +315,7 @@ public final class Constants {
         public static final double positionCloseError = rotPerInch * 6.0; // Allowable rotation error to be considered in position
         public static final double stopError = 0.25;      // Allowable inches of error to be considered at a stop
         public static final double slowVoltage = 2.0;    // Volts to move slowly to zero
+        public static final double towardsMargin = 32.0; // inches
 
         public static final double RPSperVolt = 7.9; // RPS increase with every volt
         public static final double kP = 2.2; // output per unit of error in position (output/rotation)

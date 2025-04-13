@@ -550,7 +550,46 @@ public class RobotContainer {
                 RobotState.WaitForCoralReady(),
                 LoggedCommands.log("Missing coral"),
                 RobotState::haveCoral),
-            s_Elevator.GoToNext());
+            LoggedCommands.proxy(s_Elevator.GoToNext()));
+    }
+
+    private Command WaitForTowardsNext() {
+        return LoggedCommands.either("Ensure towards next stop",
+            Commands.none(),
+            Commands.sequence(
+                LoggedCommands.proxy(s_Swerve.Stop()),
+                s_Elevator.WaitForTowardsNext()),
+            s_Elevator::towardsNextStop);
+    }
+
+    private Command FastScoreCoral(String path, Pose2d alignment, double raiseDistance) {
+        return LoggedCommands.sequence("Fast coral score following " + path,
+            Commands.deadline(
+                Commands.sequence(
+                    LoggedCommands.proxy(PathCommand(path)),
+                    WaitForTowardsNext(),
+                    LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, alignment, true, true)),
+                    LoggedCommands.proxy(s_Swerve.Stop()),
+                    s_Elevator.WaitForNext()),
+                LoggedCommands.proxy(RaiseElevatorAtDistance(raiseDistance))),
+            RobotState.ScoreGamePiece());
+    }
+
+    private Command MaybeWaitForCoral() {
+        return Commands.either(
+            LoggedCommands.proxy(RobotState.WaitForCoral()),
+            LoggedCommands.log("Will not wait for Coral"),
+            optAutoCoralWait::get);
+    }
+
+    private Command GoGetCoral(String path) {
+        return LoggedCommands.sequence("Go Get Coral following " + path,
+            VisionSubsystem.SwitchToRearVision(),
+            Commands.race(
+                LoggedCommands.proxy(PathCommand(path)),
+                RobotState.WaitForCoral()),
+            MaybeWaitForCoral(),
+            VisionSubsystem.SwitchToFrontVision());
     }
 
     private void buildAutos(SendableChooser<Command> chooser) {
@@ -564,128 +603,101 @@ public class RobotContainer {
             SetStop(Stop.L4),
             LoggedCommands.proxy(PathCommand("Start towards EF")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
-            VisionSubsystem.SwitchToRearVision(),
-            Commands.race(
-                LoggedCommands.proxy(PathCommand("E to CS")),
-                RobotState.WaitForCoral()),
-            Commands.either(
-                // LoggedCommands.proxy(BackUpAndWaitForCoral()),
-                LoggedCommands.proxy(RobotState.WaitForCoral()),
-                LoggedCommands.log("Will not wait for Coral"),
-                optAutoCoralWait::get),
-            VisionSubsystem.SwitchToFrontVision(),
+            GoGetCoral("E to CS"),
             LoggedCommands.proxy(PathCommand("CS towards C")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, true)),
-            VisionSubsystem.SwitchToRearVision(),
-            Commands.race(
-                LoggedCommands.proxy(PathCommand("C to CS")),
-                RobotState.WaitForCoral()
-            ),
-            Commands.either(
-                LoggedCommands.proxy(RobotState.WaitForCoral()),
-                // LoggedCommands.proxy(BackUpAndWaitForCoral()),
-                LoggedCommands.log("Will not wait for Coral"),
-                optAutoCoralWait::get),
-            VisionSubsystem.SwitchToFrontVision(),
+            GoGetCoral("C to CS"),
             LoggedCommands.proxy(PathCommand("CS towards D")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false)),
-            VisionSubsystem.SwitchToRearVision(),
             s_Swerve.CoastDriveMotors(),
-            Commands.race(
-                LoggedCommands.proxy(PathCommand("D to CS")),
-                RobotState.WaitForCoral()
-            ),
-            Commands.either(
-                LoggedCommands.proxy(RobotState.WaitForCoral()),
-                // LoggedCommands.proxy(BackUpAndWaitForCoral()),
-                LoggedCommands.log("Will not wait for Coral"),
-                optAutoCoralWait::get),
-            VisionSubsystem.SwitchToFrontVision(),
+            GoGetCoral("D to CS"),
             LoggedCommands.proxy(PathCommand("CS to near B")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
             LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachRight, true, false)))
         .handleInterrupt(() -> VisionSubsystem.setCameraMode(CameraMode.DEFAULT));
 
-        // startingPaths.put(autoECD, "Start to near E");
         startingPaths.put(autoECDB, "Start towards EF");
         addAutoCommand(chooser, autoECDB);
 
-        Command dryFast = LoggedCommands.sequence("Fast Dry Run",
-            LoggedCommands.proxy(PathCommand("Fast - Start to E")),
-            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.EF.alignLeft, true, true)),
-            LoggedCommands.proxy(PathCommand("Fast - E to CS")),
-            LoggedCommands.proxy(PathCommand("Fast - CS to C")),
-            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.CD.alignLeft, true, true)),
-            LoggedCommands.proxy(PathCommand("Fast - C to CS")),
-            LoggedCommands.proxy(PathCommand("Fast - CS to D")),
-            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.CD.alignRight, true, true)),
-            LoggedCommands.proxy(PathCommand("Fast - D to CS")),
-            LoggedCommands.proxy(PathCommand("Fast - CS to B")),
-            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.alignRight, true, true))
-        );
-
-        startingPaths.put(dryFast, "Fast - Start to E");
-        addAutoCommand(chooser, dryFast);
-
         Command fastFour = LoggedCommands.sequence("Fast Four Piece (ECDB)",
+            LoggedCommands.runOnce("Disable waiting for coral for fast four piece auto", optAutoCoralWait::disable),
             SetStop(Stop.L4),
-            Commands.deadline(
-                Commands.sequence(
-                    LoggedCommands.proxy(PathCommand("Fast - Start to E")),
-                    LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.EF.alignLeft, true, true)),
-                    s_Elevator.WaitForNext()),
-                LoggedCommands.proxy(RaiseElevatorAtDistance(2.52))),
-            RobotState.ScoreGamePiece(),
-            LoggedCommands.proxy(PathCommand("Fast - E to CS")),
-            Commands.deadline(
-                Commands.sequence(
-                    LoggedCommands.proxy(PathCommand("Fast - CS to C")),
-                    LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.CD.alignLeft, true, true)),
-                    s_Elevator.WaitForNext()),
-                LoggedCommands.proxy(RaiseElevatorAtDistance(3.46))),
-            RobotState.ScoreGamePiece(),
-            LoggedCommands.proxy(PathCommand("Fast - C to CS")),
-            Commands.deadline(
-                Commands.sequence(
-                    LoggedCommands.proxy(PathCommand("Fast - CS to D")),
-                    LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.CD.alignRight, true, true)),
-                    s_Elevator.WaitForNext()),
-                LoggedCommands.proxy(RaiseElevatorAtDistance(3.56))),
-            RobotState.ScoreGamePiece(),
-            LoggedCommands.proxy(PathCommand("Fast - D to CS")),
-            Commands.deadline(
-                Commands.sequence(
-                    LoggedCommands.proxy(PathCommand("Fast - CS to B")),
-                    LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.alignRight, true, true)),
-                    s_Elevator.WaitForNext()),
-                LoggedCommands.proxy(RaiseElevatorAtDistance(2.91))),
-            RobotState.ScoreGamePiece(),
-            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachMiddle, true, false)));
+            VisionSubsystem.SwitchToFrontVision(),
+            LoggedCommands.proxy(FastScoreCoral("Fast - Start to E", ReefFace.EF.alignLeft, 2.52)),
+            GoGetCoral("Fast - E to CS"),
+            LoggedCommands.proxy(FastScoreCoral("Fast - CS to C", ReefFace.CD.alignLeft, 3.46)),
+            GoGetCoral("Fast - C to CS"),
+            LoggedCommands.proxy(FastScoreCoral("Fast - CS to D", ReefFace.CD.alignRight, 3.56)),
+            GoGetCoral("Fast - D to CS"),
+            LoggedCommands.proxy(FastScoreCoral("Fast - CS to B", ReefFace.AB.alignRight, 2.91)),
+            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachMiddle, true, false)))
+        .handleInterrupt(() -> VisionSubsystem.setCameraMode(CameraMode.DEFAULT));
 
         startingPaths.put(fastFour, "Fast - Start to E");
         addAutoCommand(chooser, fastFour);
 
-        Command autoBA = LoggedCommands.sequence("BA",
+        Command autoBA = LoggedCommands.sequence("BA (Outside)",
             LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
             Commands.either(
                 LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
                 LoggedCommands.log("Skip back up option"),
                 optBackupPush::get),
             SetStop(Stop.L4),
+            VisionSubsystem.SwitchToFrontVision(),
             LoggedCommands.proxy(PathCommand("Start to near B")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
-            LoggedCommands.proxy(PathCommand("B to CS2")),
+            GoGetCoral("B to CS2"),
             Commands.either(
-                LoggedCommands.proxy(RobotState.WaitForCoral()),
-                LoggedCommands.log("Will not wait for Coral"),
-                optAutoCoralWait::get),
-            LoggedCommands.proxy(PathCommand("CS2 to near A")),
-            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, true)),
+                // At HQ, we need to score on L2 B instead of L4 A, due to space constraints
+                Commands.sequence(
+                    SetStop(Stop.L2),
+                    LoggedCommands.proxy(PathCommand("CS2 to near B")),
+                    LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false))
+                ),
+                Commands.sequence(
+                    LoggedCommands.proxy(PathCommand("CS2 to near A")),
+                    LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, true))
+                ),
+                () -> Constants.atHQ),
             LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachMiddle, true, false)),
-            LoggedCommands.proxy(s_Swerve.Stop()));
+            LoggedCommands.proxy(s_Swerve.Stop()))
+        .handleInterrupt(() -> VisionSubsystem.setCameraMode(CameraMode.DEFAULT));
 
         startingPaths.put(autoBA, "Start to near B");
         addAutoCommand(chooser, autoBA);
+
+        Command autoGBA = LoggedCommands.sequence("GBA (Inside)",
+            LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
+            Commands.either(
+                LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
+                LoggedCommands.log("Skip back up option"),
+                optBackupPush::get),
+            SetStop(Stop.L4),
+            VisionSubsystem.SwitchToFrontVision(),
+            LoggedCommands.proxy(PathCommand("Start to near G")),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.GH, true)),
+            GoGetCoral("G to CS2"),
+            LoggedCommands.proxy(PathCommand("CS2 to near B")),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
+            GoGetCoral("B to CS2"),
+            Commands.either(
+                // At HQ, we need to score on L2 B instead of L4 A, due to space constraints
+                Commands.sequence(
+                    SetStop(Stop.L2),
+                    LoggedCommands.proxy(PathCommand("CS2 to near B")),
+                    LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false))
+                ),
+                Commands.sequence(
+                    LoggedCommands.proxy(PathCommand("CS2 to near A")),
+                    LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, true))
+                ),
+                () -> Constants.atHQ),
+            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachMiddle, true, false)),
+            LoggedCommands.proxy(s_Swerve.Stop()))
+        .handleInterrupt(() -> VisionSubsystem.setCameraMode(CameraMode.DEFAULT));
+
+        startingPaths.put(autoGBA, "Start to near G");
+        addAutoCommand(chooser, autoGBA);
 
         // NOTE: Do not mirror this auto!
         Command autoG = LoggedCommands.sequence("G + Barge Shots (don't mirror!)",

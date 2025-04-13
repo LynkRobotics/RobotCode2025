@@ -7,7 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Start to near B"
+            "pathName": "Start to near G"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "G to CS2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CS2 to near B"
           }
         },
         {
