@@ -562,13 +562,17 @@ public class RobotContainer {
             s_Elevator::towardsNextStop);
     }
 
-    private Command FastScoreCoral(String path, Pose2d alignment, double raiseDistance) {
+    private Command FastScoreCoral(String path, ReefFace face, boolean left, double raiseDistance) {
         return LoggedCommands.sequence("Fast coral score following " + path,
             Commands.deadline(
                 Commands.sequence(
                     LoggedCommands.proxy(PathCommand(path)),
                     WaitForTowardsNext(),
-                    LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, alignment, true, true)),
+                    Commands.either(
+                        LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, left ? mirroredFaces.get(face).alignRight : mirroredFaces.get(face).alignLeft, true, true)),
+                        LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true, true)),
+                        this::shouldMirror
+                    ),
                     LoggedCommands.proxy(s_Swerve.Stop()),
                     s_Elevator.WaitForNext()),
                 LoggedCommands.proxy(RaiseElevatorAtDistance(raiseDistance))),
@@ -623,13 +627,13 @@ public class RobotContainer {
             LoggedCommands.runOnce("Disable waiting for coral for fast four piece auto", optAutoCoralWait::disable),
             SetStop(Stop.L4),
             VisionSubsystem.SwitchToFrontVision(),
-            LoggedCommands.proxy(FastScoreCoral("Fast - Start to E", ReefFace.EF.alignLeft, 2.52)),
+            LoggedCommands.proxy(FastScoreCoral("Fast - Start to E", ReefFace.EF, true, 2.52)),
             GoGetCoral("Fast - E to CS"),
-            LoggedCommands.proxy(FastScoreCoral("Fast - CS to C", ReefFace.CD.alignLeft, 3.46)),
+            LoggedCommands.proxy(FastScoreCoral("Fast - CS to C", ReefFace.CD, true, 3.46)),
             GoGetCoral("Fast - C to CS"),
-            LoggedCommands.proxy(FastScoreCoral("Fast - CS to D", ReefFace.CD.alignRight, 3.56)),
+            LoggedCommands.proxy(FastScoreCoral("Fast - CS to D", ReefFace.CD, false, 3.56)),
             GoGetCoral("Fast - D to CS"),
-            LoggedCommands.proxy(FastScoreCoral("Fast - CS to B", ReefFace.AB.alignRight, 2.91)),
+            LoggedCommands.proxy(FastScoreCoral("Fast - CS to B", ReefFace.AB, false, 2.91)),
             LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachMiddle, true, false)))
         .handleInterrupt(() -> VisionSubsystem.setCameraMode(CameraMode.DEFAULT));
 
