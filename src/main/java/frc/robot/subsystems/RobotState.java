@@ -313,6 +313,9 @@ public class RobotState extends SubsystemBase {
                         gamePieceState = GamePieceState.NONE;
                     }
                 } else {
+                    if (L1Timer.isRunning()) {
+                        L1Timer.stop();
+                    }
                     gamePieceState = elevatorAtZero ? GamePieceState.INTAKING_CORAL : GamePieceState.NONE;
                 }
             } else if (!indexSensor && finalSensor) {
@@ -339,6 +342,7 @@ public class RobotState extends SubsystemBase {
         DogLog.log("State/Final sensor", finalSensor);
         DogLog.log("State/Game Piece State", gamePieceState);
         DogLog.log("State/Climb State", climbState);
+        DogLog.log("State/Active Stop", activeStop);
         DogLog.log("State/Have coral", haveCoral());
         DogLog.log("State/Have algae", haveAlgae());
 
