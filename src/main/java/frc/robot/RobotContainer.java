@@ -574,7 +574,10 @@ public class RobotContainer {
                         this::shouldMirror
                     ),
                     LoggedCommands.proxy(s_Swerve.Stop()),
-                    s_Elevator.WaitForNext()),
+                    Commands.either(
+                        Commands.none(),
+                        s_Elevator.WaitForNext(),
+                        s_Elevator::atNextStop)),
                 LoggedCommands.proxy(RaiseElevatorAtDistance(raiseDistance))),
             RobotState.ScoreGamePiece());
     }
