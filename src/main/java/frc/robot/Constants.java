@@ -369,7 +369,7 @@ public final class Constants {
         public static final double feedVoltage = -6.5;
         public static final double unjamVoltage = 3.0;
         public static final double advanceVoltage = -1.9;
-        public static final double scoreL1Voltage = -2.5;
+        public static final double scoreL1Voltage = -3.5;
         public static final double scoreL2L3Voltage = -6.0; // was -9.0 for standoff
         public static final double scoreL4Voltage = -6.0;
         public static final double algaeVoltage = 3.3;
@@ -490,7 +490,7 @@ public final class Constants {
         private static final Transform2d rightL1Transform = new Transform2d(-Units.inchesToMeters(4.0), branchSeparation / 2.0 - Units.inchesToMeters(2.5), Rotation2d.kZero);
         private static final Transform2d leftL1OutsideTransform = new Transform2d(-Units.inchesToMeters(4.0), Units.inchesToMeters(4.25), Rotation2d.kZero);
         private static final Transform2d rightL1OutsideTransform = new Transform2d(-Units.inchesToMeters(4.0), -Units.inchesToMeters(4.25), Rotation2d.kZero);
-        public static final double L1MoveForward = Units.inchesToMeters(3.0);
+        public static final double L1MoveForward = Units.inchesToMeters(4.5);
         private static final Transform2d extraAlgaeBackupShort = new Transform2d(Units.inchesToMeters(-9.0), 0.0, Rotation2d.kZero);
         private static final Transform2d extraAlgaeBackupExtended = new Transform2d(Units.inchesToMeters(-18.0), 0.0, Rotation2d.kZero);
 
