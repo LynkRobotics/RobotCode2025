@@ -219,7 +219,7 @@ public class RobotContainer {
                                 Commands.sequence(
                                     Commands.waitSeconds(0.30),
                                     Commands.either(
-                                        new PIDSwerve(s_Swerve, s_Pose, (left ? face.leftL1Outside : face.rightL1Outside).transformBy(new Transform2d(Constants.Pose.L1MoveForward, left ? Units.inchesToMeters(-2.7) : Units.inchesToMeters(2.7), Rotation2d.kZero)), true, true, PIDSpeed.FAST),
+                                        new PIDSwerve(s_Swerve, s_Pose, (left ? face.leftL1Outside : face.rightL1Outside).transformBy(new Transform2d(Constants.Pose.L1MoveForward, left ? Units.inchesToMeters(0) : Units.inchesToMeters(0), Rotation2d.kZero)), true, true, PIDSpeed.FAST),
                                         new PIDSwerve(s_Swerve, s_Pose, (left ? face.leftL1 : face.rightL1).transformBy(new Transform2d(Constants.Pose.L1MoveForward, 0, Rotation2d.kZero)), true, true, PIDSpeed.FAST),
                                         optL1Outside)))
                         ),
