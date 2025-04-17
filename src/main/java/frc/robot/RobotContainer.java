@@ -573,8 +573,8 @@ public class RobotContainer {
                     LoggedCommands.proxy(PathCommand(path)),
                     WaitForTowardsNext(),
                     Commands.either(
-                        LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, left ? mirroredFaces.get(face).alignRight : mirroredFaces.get(face).alignLeft, true, true)),
-                        LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true, true)),
+                        LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, left ? mirroredFaces.get(face).alignRight : mirroredFaces.get(face).alignLeft, true, true).fastAlign()),
+                        LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true, true).fastAlign()),
                         this::shouldMirror
                     ),
                     LoggedCommands.proxy(s_Swerve.Stop()),

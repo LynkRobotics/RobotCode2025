@@ -27,6 +27,7 @@ public class PIDSwerve extends LoggedCommandBase {
     private final double maxVisionDiff;
     private final Timer alignedTimer = new Timer();
     private boolean ignoreY = false;
+    private boolean fastAlign = false;
 
     public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise, PIDSpeed speed, double maxVisionDiff) {
         super();
@@ -85,6 +86,12 @@ public class PIDSwerve extends LoggedCommandBase {
 
     public PIDSwerve ignoreY() {
         ignoreY = true;
+
+        return this;
+    }
+
+    public PIDSwerve fastAlign() {
+        fastAlign = true;
 
         return this;
     }
@@ -167,7 +174,7 @@ public class PIDSwerve extends LoggedCommandBase {
 
     @Override
     public boolean isFinished() {
-        return ((xPID.atSetpoint() && (ignoreY || yPID.atSetpoint()) && rotationPID.atSetpoint()) || alignedTimer.get() >= Constants.PIDSwerve.alignedTimerMax) && s_Pose.visionDifference() <= maxVisionDiff;
+        return ((xPID.atSetpoint() && (ignoreY || yPID.atSetpoint()) && rotationPID.atSetpoint()) || alignedTimer.get() >= (fastAlign ? Constants.PIDSwerve.fastAlignedTimerMax : Constants.PIDSwerve.alignedTimerMax)) && s_Pose.visionDifference() <= maxVisionDiff;
     }
 
     @Override
