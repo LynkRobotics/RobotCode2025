@@ -214,10 +214,14 @@ public class RobotContainer {
                     Commands.either(
                         Commands.sequence(
                             Commands.waitSeconds(Constants.Elevator.L1RaiseDelay),
-                            Commands.either(
-                                new PIDSwerve(s_Swerve, s_Pose, (left ? face.leftL1Outside : face.rightL1Outside).transformBy(new Transform2d(Constants.Pose.L1MoveForward, left ? Units.inchesToMeters(-2.7) : Units.inchesToMeters(2.7), Rotation2d.kZero)), true, true),
-                                new PIDSwerve(s_Swerve, s_Pose, (left ? face.leftL1 : face.rightL1).transformBy(new Transform2d(Constants.Pose.L1MoveForward, 0, Rotation2d.kZero)), true, true),
-                                optL1Outside)
+                            Commands.parallel(
+                                s_Elevator.TimeBasedMove(Stop.L1_SCORE, 0.25),
+                                Commands.sequence(
+                                    Commands.waitSeconds(0.30),
+                                    Commands.either(
+                                        new PIDSwerve(s_Swerve, s_Pose, (left ? face.leftL1Outside : face.rightL1Outside).transformBy(new Transform2d(Constants.Pose.L1MoveForward, left ? Units.inchesToMeters(-2.7) : Units.inchesToMeters(2.7), Rotation2d.kZero)), true, true, PIDSpeed.FAST),
+                                        new PIDSwerve(s_Swerve, s_Pose, (left ? face.leftL1 : face.rightL1).transformBy(new Transform2d(Constants.Pose.L1MoveForward, 0, Rotation2d.kZero)), true, true, PIDSpeed.FAST),
+                                        optL1Outside)))
                         ),
                         Commands.none(),
                         () -> RobotState.getNextStop() == Stop.L1
@@ -498,7 +502,7 @@ public class RobotContainer {
         driver.povLeft().onTrue(LoggedCommands.runOnce("Toggle L1 Inside/Outside", optL1Outside::toggle));
     }
 
-    /** 
+    /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
      *
      * @return the command to run in autonomous
