@@ -334,7 +334,7 @@ public final class Constants {
             // Intake occurs at zero
             SAFE     (Constants.Elevator.baseHeight + 5.0),
             L1       (21.3 - Constants.Elevator.endEffectorHeight),
-            L1_SCORE (29.0 - Constants.Elevator.endEffectorHeight),
+            L1_SCORE (33.0 - Constants.Elevator.endEffectorHeight),
             HOLD     (30.0 - Constants.Elevator.endEffectorHeight),
             L2       (34.5 - Constants.Elevator.endEffectorHeight),
             L2_ALGAE (38.0 - Constants.Elevator.endEffectorHeight), 
