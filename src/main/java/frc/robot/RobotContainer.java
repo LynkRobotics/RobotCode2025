@@ -592,8 +592,8 @@ public class RobotContainer {
                         Commands.either(
                             Commands.none(),
                             s_Elevator.WaitForNext(),
-                            s_Elevator::atNextStop)),
-                        RobotState.ScoreGamePiece())),
+                            s_Elevator::atNextStop),
+                        RobotState.ScoreGamePiece()))),
             LoggedCommands.proxy(RaiseElevatorAtDistance(raiseDistance)));
     }
 
