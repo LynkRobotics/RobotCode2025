@@ -568,25 +568,32 @@ public class RobotContainer {
     }
 
     private Command FastScoreCoral(String path, ReefFace face, boolean left, double raiseDistance, double timeCutoff) {
-        return LoggedCommands.sequence("Fast coral score following " + path,
-            Commands.deadline(
-                Commands.sequence(
-                    LoggedCommands.proxy(PathCommand(path)),
-                    WaitForTowardsNext(),
-                    Commands.race(
-                        Commands.waitUntil(() -> Timer.getMatchTime() <= timeCutoff),
+        return LoggedCommands.race("Fast coral score following " + path,
+            Commands.sequence(
+                Commands.waitUntil(() -> Timer.getMatchTime() <= timeCutoff),
+                Commands.either(
+                    Commands.none(),
+                    s_Elevator.WaitForNext(),
+                    s_Elevator::atNextStop),
+                RobotState.ScoreGamePiece()
+            ),
+            Commands.sequence(
+                Commands.deadline(
+                    Commands.sequence(
+                        LoggedCommands.proxy(PathCommand(path)),
+                        WaitForTowardsNext(),
                         Commands.either(
                             LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, left ? mirroredFaces.get(face).alignRight : mirroredFaces.get(face).alignLeft, true, true).fastAlign()),
                             LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true, true).fastAlign()),
                             this::shouldMirror
-                        )),
-                    LoggedCommands.proxy(s_Swerve.Stop()),
-                    Commands.either(
-                        Commands.none(),
-                        s_Elevator.WaitForNext(),
-                        s_Elevator::atNextStop)),
-                LoggedCommands.proxy(RaiseElevatorAtDistance(raiseDistance))),
-            RobotState.ScoreGamePiece());
+                        ),
+                        LoggedCommands.proxy(s_Swerve.Stop()),
+                        Commands.either(
+                            Commands.none(),
+                            s_Elevator.WaitForNext(),
+                            s_Elevator::atNextStop)),
+                    LoggedCommands.proxy(RaiseElevatorAtDistance(raiseDistance))),
+                RobotState.ScoreGamePiece()));
     }
 
     private Command MaybeWaitForCoral() {
