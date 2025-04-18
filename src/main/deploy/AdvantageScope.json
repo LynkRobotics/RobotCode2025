@@ -3,8 +3,8 @@
     {
       "x": -8,
       "y": -8,
-      "width": 1722,
-      "height": 1034,
+      "width": 1708,
+      "height": 1020,
       "state": {
         "sidebar": {
           "width": 358,
@@ -16,7 +16,6 @@
             "/NT/Robot",
             "/NT/LiveWindow/.status",
             "/Robot/Pose/PP Current Pose",
-            "/Robot/Pose/Auto Target Pose",
             "/Robot/Vision/TargetPoses",
             "/Robot/Vision/org.photonvision.PhotonCamera@519ad3",
             "/photonvision/.timesync",
@@ -26,26 +25,35 @@
             "/Robot/Vision/LEFT/Pose/translation",
             "/Robot/Vision/CENTER/Pose",
             "/Robot/Vision/CENTER/Pose/translation",
-            "/Robot",
             "/Robot/PIDSwerve/Pose target",
             "/Robot/PIDSwerve/Pose target/translation",
-            "/Robot/RadioStatus",
-            "/Robot/Pose/Pose/rotation",
             "/Robot/Pose/Pose/translation",
-            "/Robot/Misc",
-            "/Robot/Vision/CENTER",
-            "/Robot/Vision/LEFT",
-            "/Robot/Vision/RIGHT",
-            "/Robot/Vision/REAR",
             "/Robot/Pose/Pose",
-            "/Robot/State",
             "/DS",
             "/DS/joystick0/buttons",
-            "/Robot/EndEffector"
+            "/Robot/Swerve/Actual Module States",
+            "/Robot/Swerve/Actual Module States/0",
+            "/Robot/Swerve/Actual Module States/1",
+            "/Robot/Swerve/Actual Module States/0/angle",
+            "/Robot/Swerve/Desired Module States",
+            "/Robot",
+            "/Robot/PIDSwerve/Pose target/rotation",
+            "/Robot/Swerve/Desired Module States/0",
+            "/NTConnection",
+            "/NT",
+            "/NT/SmartDashboard",
+            "/Robot/Vision/REAR/Pose",
+            "/Robot/Vision/REAR/Pose/translation",
+            "/Robot/Vision/RIGHT/Pose",
+            "/Robot/Vision/RIGHT/Pose/translation",
+            "/NT/SmartDashboard/Pose",
+            "/Robot/Vision",
+            "/Robot/Vision/CENTER",
+            "/Robot/Pose"
           ]
         },
         "tabs": {
-          "selected": 2,
+          "selected": 5,
           "tabs": [
             {
               "type": 0,
@@ -86,35 +94,16 @@
                     "type": "ghost",
                     "logKey": "/Robot/Pose/PP Current Pose",
                     "logType": "Pose2d",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "color": "#00ffff"
                     }
                   },
                   {
                     "type": "ghost",
-                    "logKey": "/Robot/Vision/Pose",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {
-                      "color": "#ff8c00"
-                    }
-                  },
-                  {
-                    "type": "vision",
-                    "logKey": "/Robot/Vision/TargetPoses",
-                    "logType": "Pose3d[]",
-                    "visible": true,
-                    "options": {
-                      "color": "#00ff00",
-                      "size": "normal"
-                    }
-                  },
-                  {
-                    "type": "ghost",
                     "logKey": "/Robot/PIDSwerve/Pose target",
                     "logType": "Pose2d",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "color": "#ffff00"
                     }
@@ -123,7 +112,7 @@
                     "type": "ghost",
                     "logKey": "/Robot/Pose/Auto Target Pose",
                     "logType": "Pose2d",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "color": "#00ff00"
                     }
@@ -139,93 +128,10 @@
                     }
                   },
                   {
-                    "type": "robot",
-                    "logKey": "NT:/Robot/Pose/Pose",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {}
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "NT:/Robot/Vision/RIGHT/Pose",
-                    "logType": "Pose3d",
-                    "visible": false,
-                    "options": {
-                      "color": "#ff0000"
-                    }
-                  },
-                  {
-                    "type": "vision",
-                    "logKey": "NT:/Robot/Vision/RIGHT/Tag Poses",
-                    "logType": "Pose3d[]",
-                    "visible": false,
-                    "options": {
-                      "color": "#ff0000",
-                      "size": "normal"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "NT:/Robot/Vision/LEFT/Pose",
-                    "logType": "Pose3d",
-                    "visible": true,
-                    "options": {
-                      "color": "#0000ff"
-                    }
-                  },
-                  {
-                    "type": "vision",
-                    "logKey": "NT:/Robot/Vision/LEFT/Pose",
-                    "logType": "Pose3d",
-                    "visible": true,
-                    "options": {
-                      "color": "#0000ff",
-                      "size": "normal"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "NT:/Robot/Vision/CENTER/Pose",
-                    "logType": "Pose3d",
-                    "visible": false,
-                    "options": {
-                      "color": "#ff8c00"
-                    }
-                  },
-                  {
-                    "type": "vision",
-                    "logKey": "NT:/Robot/Vision/CENTER/Tag Poses",
-                    "logType": "Pose3d[]",
-                    "visible": false,
-                    "options": {
-                      "color": "#ff8c00",
-                      "size": "normal"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "NT:/Robot/Vision/REAR/Pose",
-                    "logType": "Pose3d",
-                    "visible": false,
-                    "options": {
-                      "color": "#ff00ff"
-                    }
-                  },
-                  {
-                    "type": "vision",
-                    "logKey": "NT:/Robot/Vision/REAR/Tag Poses",
-                    "logType": "Pose3d[]",
-                    "visible": false,
-                    "options": {
-                      "color": "#ff00ff",
-                      "size": "normal"
-                    }
-                  },
-                  {
                     "type": "ghost",
                     "logKey": "/Robot/Vision/CENTER/Pose",
                     "logType": "Pose3d",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "color": "#ff8c00"
                     }
@@ -234,7 +140,7 @@
                     "type": "vision",
                     "logKey": "/Robot/Vision/CENTER/Tag Poses",
                     "logType": "Pose3d[]",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "color": "#ff8c00",
                       "size": "normal"
@@ -244,7 +150,7 @@
                     "type": "ghost",
                     "logKey": "/Robot/Vision/LEFT/Pose",
                     "logType": "Pose3d",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "color": "#0000ff"
                     }
@@ -253,7 +159,7 @@
                     "type": "vision",
                     "logKey": "/Robot/Vision/LEFT/Tag Poses",
                     "logType": "Pose3d[]",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "color": "#0000ff",
                       "size": "normal"
@@ -270,8 +176,8 @@
                   },
                   {
                     "type": "vision",
-                    "logKey": "/Robot/Vision/RIGHT/Pose",
-                    "logType": "Pose3d",
+                    "logKey": "/Robot/Vision/RIGHT/Tag Poses",
+                    "logType": "Pose3d[]",
                     "visible": false,
                     "options": {
                       "color": "#ff0000",
@@ -282,16 +188,16 @@
                     "type": "ghost",
                     "logKey": "/Robot/Vision/REAR/Pose",
                     "logType": "Pose3d",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "color": "#ff00ff"
                     }
                   },
                   {
                     "type": "vision",
-                    "logKey": "/Robot/Vision/REAR/Pose",
-                    "logType": "Pose3d",
-                    "visible": true,
+                    "logKey": "/Robot/Vision/REAR/Tag Poses",
+                    "logType": "Pose3d[]",
+                    "visible": false,
                     "options": {
                       "color": "#ff00ff",
                       "size": "normal"
@@ -301,10 +207,151 @@
                 "game": "2025 Field (AndyMark)",
                 "bumpers": "auto",
                 "origin": "blue",
-                "orientation": 2,
+                "orientation": 0,
                 "size": 30
               },
               "controllerUUID": "78pb9skb45b5cb0330ildjo3r46rbq99",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 1,
+              "title": "Swerve",
+              "controller": {
+                "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "/Robot/Swerve/Actual Module States/0/speed",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "/Robot/Swerve/Desired Module States/0/speed",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#c0b487",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "/Robot/Swerve/Actual Module States/1/speed",
+                    "logType": "Number",
+                    "visible": false,
+                    "options": {
+                      "color": "#e5b31b",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "/Robot/Swerve/Actual Module States/2/speed",
+                    "logType": "Number",
+                    "visible": false,
+                    "options": {
+                      "color": "#af2437",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "/Robot/Swerve/Actual Module States/3/speed",
+                    "logType": "Number",
+                    "visible": false,
+                    "options": {
+                      "color": "#80588e",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Robot/Swerve/Actual Module States/0/speed",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#858584",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Robot/Swerve/Desired Module States/0/speed",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#3b875a",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "rightSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "/Robot/Swerve/Actual Module States/0/angle/value",
+                    "logType": "Number",
+                    "visible": false,
+                    "options": {
+                      "color": "#e48b32",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "discreteSources": [],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "rightUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "c7zx82gger8o3ow37h1835vbdbnbf26t",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 9,
+              "title": "Swerve",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "states",
+                    "logKey": "/Robot/Swerve/Actual Module States",
+                    "logType": "SwerveModuleState[]",
+                    "visible": false,
+                    "options": {
+                      "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "states",
+                    "logKey": "/Robot/Swerve/Desired Module States",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff",
+                      "arrangement": "0,1,2,3"
+                    }
+                  }
+                ],
+                "maxSpeed": 5,
+                "sizeX": 0.65,
+                "sizeY": 0.65,
+                "orientation": 1
+              },
+              "controllerUUID": "alc3eq7zkvn23s9li97mz8g8yqa88mgf",
               "renderer": null,
               "controlsHeight": 200
             },
@@ -405,11 +452,7 @@
               "title": "Vision",
               "controller": [
                 "/Robot/Vision/Status",
-                "/Robot/Vision/Camera Mode",
-                "NT:/Robot/Vision/CENTER/Status",
-                "NT:/Robot/Vision/LEFT/Status",
-                "NT:/Robot/Vision/RIGHT/Status",
-                "NT:/Robot/Vision/REAR/Status"
+                "/Robot/Vision/Camera Mode"
               ],
               "controllerUUID": "j1c1mt5htqidvxvlvbh8a9osgxgdy1d4",
               "renderer": null,
@@ -546,6 +589,16 @@
             },
             {
               "type": 4,
+              "title": "Misc Status",
+              "controller": [
+                "/Robot/Misc/Robot Status"
+              ],
+              "controllerUUID": "cx1mob8po7ynlz7xxfnrjey4h08r8dsd",
+              "renderer": null,
+              "controlsHeight": 0
+            },
+            {
+              "type": 4,
               "title": "Robot Status",
               "controller": [
                 "/Robot/Swerve/Status",
@@ -558,6 +611,19 @@
                 "/Robot/Index/Control"
               ],
               "controllerUUID": "d7zxvv9rs1qn3fhfvz1ioj1d7cgi6d3w",
+              "renderer": null,
+              "controlsHeight": 0
+            },
+            {
+              "type": 4,
+              "title": "Algae",
+              "controller": [
+                "/Robot/State/Game Piece State",
+                "/Robot/State/Have algae",
+                "NT:/Robot/State/Game Piece State",
+                "NT:/Robot/State/Have algae"
+              ],
+              "controllerUUID": "biqoienhdqd3bs9e3wpftumhwznyye8b",
               "renderer": null,
               "controlsHeight": 0
             },
@@ -670,25 +736,14 @@
               "controller": [
                 "/Robot/Misc/FMS Match Time",
                 "/Robot/State/Game Piece State",
+                "/Robot/State/L1Timer running",
+                "/Robot/State/Active Stop",
                 "/Robot/State/Have coral",
                 "/Robot/State/Index sensor",
                 "/Robot/State/Flipper sensor",
                 "/Robot/State/Final sensor"
               ],
               "controllerUUID": "jrj1u0btwr89pctwm9f3pf2999kl56ix",
-              "renderer": null,
-              "controlsHeight": 0
-            },
-            {
-              "type": 4,
-              "title": "Algae",
-              "controller": [
-                "/Robot/State/Game Piece State",
-                "/Robot/State/Have algae",
-                "NT:/Robot/State/Game Piece State",
-                "NT:/Robot/State/Have algae"
-              ],
-              "controllerUUID": "biqoienhdqd3bs9e3wpftumhwznyye8b",
               "renderer": null,
               "controlsHeight": 0
             },
@@ -752,6 +807,7 @@
               "type": 4,
               "title": "Elevator",
               "controller": [
+                "/Robot/Elevator/Current Command",
                 "/Robot/Elevator/Status",
                 "/Robot/Elevator/height",
                 "/Robot/Elevator/leftPosition",
@@ -838,5 +894,5 @@
     }
   ],
   "satellites": [],
-  "version": "4.1.5"
+  "version": "4.1.6"
 }
