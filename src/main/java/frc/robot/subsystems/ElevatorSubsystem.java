@@ -434,12 +434,18 @@ public class ElevatorSubsystem extends SubsystemBase {
                     LoggedCommands.deadline("Move to Hold position with Coral",
                         LoggedCommands.waitUntil("Wait for no Coral", () -> !RobotState.haveCoral()),
                         Move(Stop.HOLD)),
-                    LoggedCommands.sequence("Zero and Idle",
-                        Commands.either(
-                            Zero(),
-                            FastZero(),
-                            RobotState::haveAlgae),
-                        LoggedCommands.idle("Elevator holding at zero", this)),
+                    Commands.either(
+                        // TODO Handle Algae into processor
+                        LoggedCommands.deadline("Move to Hold position with Algae",
+                            LoggedCommands.waitUntil("Wait for no algae", () -> !RobotState.haveAlgae()),
+                            Move(Stop.HOLD)), // TODO Different height for algae?
+                        LoggedCommands.sequence("Zero and Idle",
+                            Commands.either(
+                                Zero(),
+                                FastZero(),
+                                RobotState::haveAlgae),
+                            LoggedCommands.idle("Elevator holding at zero", this)),
+                        RobotState::haveAlgae),
                     RobotState::coralReady))
                     .handleInterrupt(() -> movingToSafety = false),
             optServiceMode::get);
