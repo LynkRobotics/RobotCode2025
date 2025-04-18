@@ -202,6 +202,7 @@ public final class Constants {
         public static final double roughTranslationKP = 0.10;
         public static final double positionTolerance = 1.0; // inches
         public static final double roughPositionTolerance = 2.5; // inches
+        public static final double errorDerivativeTolerance = 5.0;
         public static final double positionKS = 0.02;
         public static final double positionIZone = 4.0;
         public static final double alignedTimerMax = 0.2;
@@ -599,6 +600,7 @@ public final class Constants {
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
         public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
         public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+        public static final double fastPositionTolerance = 1.5;
     
         public static final double kPXController = 1;
         public static final double kPYController = 1;

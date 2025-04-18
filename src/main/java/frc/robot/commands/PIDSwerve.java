@@ -51,7 +51,7 @@ public class PIDSwerve extends LoggedCommandBase {
         xPID.setIntegratorRange(-positionKS * 2, positionKS * 2);
         xPID.setSetpoint(Units.metersToInches(targetPose.getX()));
         if (precise) {
-            xPID.setTolerance(positionTolerance, 5.0); // Inches per second
+            xPID.setTolerance(positionTolerance, errorDerivativeTolerance); // Inches per second
         } else {
             xPID.setTolerance(roughPositionTolerance);
         }
@@ -60,7 +60,7 @@ public class PIDSwerve extends LoggedCommandBase {
         yPID.setIntegratorRange(-positionKS * 2, positionKS * 2);
         yPID.setSetpoint(Units.metersToInches(targetPose.getY()));
         if (precise) {
-            yPID.setTolerance(positionTolerance, 5.0); // Inches per second
+            yPID.setTolerance(positionTolerance, errorDerivativeTolerance); // Inches per second
         } else {
             yPID.setTolerance(roughPositionTolerance);
         }
@@ -92,6 +92,18 @@ public class PIDSwerve extends LoggedCommandBase {
 
     public PIDSwerve fastAlign() {
         fastAlign = true;
+
+        return this;
+    }
+
+    public PIDSwerve setTolerance(double tolerance) {
+        if (precise) {
+            xPID.setTolerance(tolerance, errorDerivativeTolerance); // Inches per second
+            yPID.setTolerance(tolerance, errorDerivativeTolerance); // Inches per second
+        } else {
+            xPID.setTolerance(tolerance); // Inches per second
+            yPID.setTolerance(tolerance); // Inches per second
+        }
 
         return this;
     }
