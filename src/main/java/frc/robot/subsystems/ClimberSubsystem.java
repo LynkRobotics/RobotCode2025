@@ -35,6 +35,7 @@ public class ClimberSubsystem extends SubsystemBase {
     private final VoltageOut holdControl = new VoltageOut(Constants.Climber.holdVoltage).withEnableFOC(true);
 
     private boolean deployed = false;
+    public static boolean wasFullyDeployed = false;
 
     private static final TunableOption optOverrideClimberTiming = new TunableOption("Override Climber Timing", false);
 
@@ -69,6 +70,10 @@ public class ClimberSubsystem extends SubsystemBase {
         return motor.getPosition().getValueAsDouble() >= Constants.Climber.fullyDeployedPosition;
     }
 
+    public static boolean wasFullyDeployed() {
+        return wasFullyDeployed;
+    }
+
     public Command Deploy() {
         return LoggedCommands.either("Deploy Climber",
             Commands.sequence(
@@ -86,6 +91,7 @@ public class ClimberSubsystem extends SubsystemBase {
                         LoggedCommands.runOnce("Set slow deploy voltage", () -> motor.setControl(slowDeployControl), this),
                         LoggedCommands.waitUntil("Wait for climber full deployment", this::climberFullyDeployed)),
                     this::climberFullyDeployed),
+                Commands.runOnce(() -> wasFullyDeployed = true),
                 LoggedCommands.runOnce("Stop climber (deploy)", motor::stopMotor, this))
                 .handleInterrupt(motor::stopMotor),
             Commands.sequence(

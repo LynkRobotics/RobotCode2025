@@ -395,6 +395,12 @@ public class RobotContainer {
             VisionSubsystem.SwitchToRearVision(),
             LoggedCommands.runOnce("Enable end game mode", () -> RobotState.setClimbState(ClimbState.STARTED)),
             new PIDSwerve(s_Swerve, s_Pose, cageAlignPose.transformBy(Constants.Pose.cageApproachOffset), true, false, PIDSpeed.FAST),
+            Commands.either(
+                LoggedCommands.log("Climber was fully deployed in time"),
+                Commands.sequence(
+                    s_Swerve.Stop(),
+                    LoggedCommands.waitUntil("Wait for full climber deployement", ClimberSubsystem::wasFullyDeployed)),
+                ClimberSubsystem::wasFullyDeployed),
             new PIDSwerve(s_Swerve, s_Pose, cageAlignPose, true, true, PIDSpeed.SLOW));
     }
 
