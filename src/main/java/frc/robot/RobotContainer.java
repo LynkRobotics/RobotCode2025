@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -566,17 +567,19 @@ public class RobotContainer {
             s_Elevator::towardsNextStop);
     }
 
-    private Command FastScoreCoral(String path, ReefFace face, boolean left, double raiseDistance) {
+    private Command FastScoreCoral(String path, ReefFace face, boolean left, double raiseDistance, double timeCutoff) {
         return LoggedCommands.sequence("Fast coral score following " + path,
             Commands.deadline(
                 Commands.sequence(
                     LoggedCommands.proxy(PathCommand(path)),
                     WaitForTowardsNext(),
-                    Commands.either(
-                        LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, left ? mirroredFaces.get(face).alignRight : mirroredFaces.get(face).alignLeft, true, true).fastAlign()),
-                        LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true, true).fastAlign()),
-                        this::shouldMirror
-                    ),
+                    Commands.race(
+                        Commands.waitUntil(() -> Timer.getMatchTime() <= timeCutoff),
+                        Commands.either(
+                            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, left ? mirroredFaces.get(face).alignRight : mirroredFaces.get(face).alignLeft, true, true).fastAlign()),
+                            LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, left ? face.alignLeft : face.alignRight, true, true).fastAlign()),
+                            this::shouldMirror
+                        )),
                     LoggedCommands.proxy(s_Swerve.Stop()),
                     Commands.either(
                         Commands.none(),
@@ -634,13 +637,13 @@ public class RobotContainer {
             LoggedCommands.runOnce("Disable waiting for coral for fast four piece auto", optAutoCoralWait::disable),
             SetStop(Stop.L4),
             VisionSubsystem.SwitchToFrontVision(),
-            LoggedCommands.proxy(FastScoreCoral("Fast - Start to E", ReefFace.EF, true, 2.52)),
+            LoggedCommands.proxy(FastScoreCoral("Fast - Start to E", ReefFace.EF, true, 2.52, 0.0)),
             GoGetCoral("Fast - E to CS"),
-            LoggedCommands.proxy(FastScoreCoral("Fast - CS to C", ReefFace.CD, true, 3.46)),
+            LoggedCommands.proxy(FastScoreCoral("Fast - CS to C", ReefFace.CD, true, 3.46, 0.0)),
             GoGetCoral("Fast - C to CS"),
-            LoggedCommands.proxy(FastScoreCoral("Fast - CS to D", ReefFace.CD, false, 3.56)),
+            LoggedCommands.proxy(FastScoreCoral("Fast - CS to D", ReefFace.CD, false, 3.56, 0.0)),
             GoGetCoral("Fast - D to CS"),
-            LoggedCommands.proxy(FastScoreCoral("Fast - CS to B", ReefFace.AB, false, 2.91)),
+            LoggedCommands.proxy(FastScoreCoral("Fast - CS to B", ReefFace.AB, false, 2.91, 0.25)),
             LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachMiddle, true, false)))
         .handleInterrupt(() -> VisionSubsystem.setCameraMode(CameraMode.DEFAULT));
 
