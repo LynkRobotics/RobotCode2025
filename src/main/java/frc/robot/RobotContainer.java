@@ -651,6 +651,7 @@ public class RobotContainer {
             GoGetCoral("Fast - C to CS"),
             LoggedCommands.proxy(FastScoreCoral("Fast - CS to D", ReefFace.CD, false, 3.56, 0.0)),
             GoGetCoral("Fast - D to CS"),
+            SetStop(Stop.L2),
             LoggedCommands.proxy(FastScoreCoral("Fast - CS to B", ReefFace.AB, false, 2.91, 0.25)),
             LoggedCommands.proxy(new PIDSwerve(s_Swerve, s_Pose, ReefFace.AB.approachMiddle, true, false)))
         .handleInterrupt(() -> VisionSubsystem.setCameraMode(CameraMode.DEFAULT));
