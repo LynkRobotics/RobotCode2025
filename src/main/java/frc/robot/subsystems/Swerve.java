@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import frc.lib.util.ControllerHelpers;
 import frc.lib.util.LoggedCommands;
 import frc.lib.util.SwerveModule;
 import frc.robot.Constants;
@@ -63,6 +64,10 @@ public class Swerve extends SubsystemBase {
     }
 
     public void drive(Translation2d translation, double rotation, boolean isOpenLoop) {
+        DogLog.log("Swerve/Joystick/Input", translation);
+        translation = ControllerHelpers.fromCircularDiscCoordinates(translation.getX(), translation.getY());
+        DogLog.log("Swerve/Joystick/Output", translation);
+        
         ChassisSpeeds desiredChassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                                     translation.getX(), 
                                     translation.getY(), 
