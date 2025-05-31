@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.pose;
 
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -21,11 +21,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.Pose;
-import frc.robot.Constants.Pose.Cage;
-import frc.robot.Constants.Pose.ReefFace;
+import frc.robot.subsystems.pose.PoseConstants.Cage;
+import frc.robot.subsystems.pose.PoseConstants.ReefFace;
+import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.Robot;
+import frc.robot.auto.Constants;
 
 public class PoseSubsystem extends SubsystemBase {
     private static PoseSubsystem instance;
@@ -48,15 +49,15 @@ public class PoseSubsystem extends SubsystemBase {
         this.s_Swerve = s_Swerve;
         this.s_Vision = s_Vision;
 
-        gyro = new Pigeon2(Pose.pigeonID, Constants.Swerve.swerveCanBus);
+        gyro = new Pigeon2(PoseConstants.pigeonID, frc.robot.auto.Swerve.swerveCanBus);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);        
 
-        Pose.rotationPID.enableContinuousInput(-180.0, 180.0);
-        Pose.rotationPID.setIZone(Pose.rotationIZone); // Only use Integral term within this range
-        Pose.rotationPID.reset();
+        PoseConstants.rotationPID.enableContinuousInput(-180.0, 180.0);
+        PoseConstants.rotationPID.setIZone(PoseConstants.rotationIZone); // Only use Integral term within this range
+        PoseConstants.rotationPID.reset();
 
-        poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d());
+        poseEstimator = new SwerveDrivePoseEstimator(frc.robot.auto.Swerve.swerveKinematics, getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d());
         VisionSubsystem.setPoseEstimator(poseEstimator);
         VisionSubsystem.setHeadingProvider(this::getHeading);
 
@@ -70,7 +71,7 @@ public class PoseSubsystem extends SubsystemBase {
                 new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
                 new PIDConstants(5, 0.0, 0.0)  // Rotation PID constants
             ),
-            Constants.PathPlanner.robotConfig,
+            frc.robot.auto.PathPlanner.robotConfig,
             Robot::isRed,
             s_Swerve // Reference to Swerve subsystem to set requirements
         );
@@ -128,20 +129,20 @@ public class PoseSubsystem extends SubsystemBase {
     }
 
     public static void angleErrorReset() {
-        angleErrorReset(Pose.rotationPID);
+        angleErrorReset(PoseConstants.rotationPID);
     }
 
     public static void angleErrorReset(PIDController pid) {
         pid.reset();
     }
     public static double angleErrorToSpeed(Rotation2d angleError) {
-        return angleErrorToSpeed(angleError, Pose.rotationPID);
+        return angleErrorToSpeed(angleError, PoseConstants.rotationPID);
     }
 
     public static double angleErrorToSpeed(Rotation2d angleError, PIDController pid) {
         double angleErrorDeg = angleError.getDegrees();
         double correction = pid.calculate(angleErrorDeg);
-        double feedForward = Pose.rotationKS * Math.signum(correction);
+        double feedForward = PoseConstants.rotationKS * Math.signum(correction);
         double output = MathUtil.clamp(correction + feedForward, -1.0, 1.0);
 
         DogLog.log("Pose/Angle Error", angleErrorDeg);
@@ -196,7 +197,7 @@ public class PoseSubsystem extends SubsystemBase {
     }
 
     public static Rotation2d reefBearing(Translation2d position) {
-        Translation2d reefCenter = flipIfRed(Constants.Pose.reefCenter);
+        Translation2d reefCenter = flipIfRed(PoseConstants.reefCenter);
         Translation2d relativePosition = reefCenter.minus(position);
 
         return relativePosition.getAngle();
@@ -240,7 +241,7 @@ public class PoseSubsystem extends SubsystemBase {
     }
 
     public static double reefDistance(Translation2d position) {
-        Translation2d reefCenter = flipIfRed(Constants.Pose.reefCenter);
+        Translation2d reefCenter = flipIfRed(PoseConstants.reefCenter);
         return position.getDistance(reefCenter);
     }
 
@@ -249,7 +250,7 @@ public class PoseSubsystem extends SubsystemBase {
     }
 
     public static boolean inReefElevatorZone(Translation2d position) {
-        return reefDistance(position) <= Constants.Pose.reefElevatorZoneRadius;
+        return reefDistance(position) <= PoseConstants.reefElevatorZoneRadius;
     }
 
     public boolean inReefElevatorZone() {
@@ -257,7 +258,7 @@ public class PoseSubsystem extends SubsystemBase {
     }
 
     public static boolean elevatorDownAllowed(Translation2d position) {
-        return reefDistance(position) >= Constants.Pose.elevatorNoDownDistance;
+        return reefDistance(position) >= PoseConstants.elevatorNoDownDistance;
     }
 
     public boolean elevatorDownAllowed() {
@@ -265,30 +266,30 @@ public class PoseSubsystem extends SubsystemBase {
     }
 
     public static boolean inWing(Translation2d position) {
-        return flipIfRed(position).getX() <= Constants.Pose.wingLength;
+        return flipIfRed(position).getX() <= PoseConstants.wingLength;
     }
 
     public boolean isUpright() {
         double roll = getGyroRoll().getDegrees();
         double pitch = getGyroPitch().getDegrees();
-        return (Math.abs(roll) < Pose.tiltError && Math.abs(pitch) < Pose.tiltError);
+        return (Math.abs(roll) < PoseConstants.tiltError && Math.abs(pitch) < PoseConstants.tiltError);
     }
 
     public boolean nearProcessor() {
         Translation2d position = flipIfRed(getPose().getTranslation());
 
-        return position.getY() < Constants.Pose.processorAreaY;
+        return position.getY() < PoseConstants.processorAreaY;
     }
 
     public Pose2d bargeShotPose(double adjustment) {
         Pose2d currentPose = flipIfRed(getPose());
         Pose2d targetPose;
 
-        if (currentPose.getX() > Constants.Pose.fieldLength / 2.0) {
-            targetPose = new Pose2d(Constants.Pose.fieldLength - Constants.Pose.bargeShotX - adjustment, currentPose.getY(), Rotation2d.k180deg);
+        if (currentPose.getX() > PoseConstants.fieldLength / 2.0) {
+            targetPose = new Pose2d(PoseConstants.fieldLength - PoseConstants.bargeShotX - adjustment, currentPose.getY(), Rotation2d.k180deg);
             // targetPose = new Pose2d(currentPose.getX(), currentPose.getY(), Rotation2d.k180deg);
         } else {
-            targetPose = new Pose2d(Constants.Pose.bargeShotX + adjustment, currentPose.getY(), Rotation2d.kZero);
+            targetPose = new Pose2d(PoseConstants.bargeShotX + adjustment, currentPose.getY(), Rotation2d.kZero);
             // targetPose = new Pose2d(currentPose.getX(), currentPose.getY(), Rotation2d.kZero);
         }
 
@@ -345,9 +346,9 @@ public class PoseSubsystem extends SubsystemBase {
         double pitch = getGyroPitch().getDegrees();
         SmartDashboard.putNumber("Pose/Gyro Roll", -roll);
         SmartDashboard.putNumber("Pose/Gyro Pitch", -pitch);
-        if (Math.abs(roll) > Pose.tiltError || Math.abs(pitch) > Pose.tiltError) {
+        if (Math.abs(roll) > PoseConstants.tiltError || Math.abs(pitch) > PoseConstants.tiltError) {
             SmartDashboard.putString("Pose/Tilt State", "#D61E1E");
-        } else if (Math.abs(roll) > Pose.tiltWarning || Math.abs(pitch) > Pose.tiltWarning) {
+        } else if (Math.abs(roll) > PoseConstants.tiltWarning || Math.abs(pitch) > PoseConstants.tiltWarning) {
             SmartDashboard.putString("Pose/Tilt State", "#D6BE1E");
         } else {
             SmartDashboard.putString("Pose/Tilt State", "#266336");

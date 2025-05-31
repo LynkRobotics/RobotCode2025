@@ -1,8 +1,9 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.swerve;
 
 import frc.lib.util.LoggedCommands;
 import frc.lib.util.SwerveModule;
-import frc.robot.Constants;
+import frc.robot.auto.Constants;
+import frc.robot.subsystems.pose.PoseSubsystem;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -27,17 +28,17 @@ public class Swerve extends SubsystemBase {
         // To use Latch in 2025, we need to reverse what the front of the robot is
         if (Constants.isRocky) {
             mSwerveMods = new SwerveModule[] {
-                new SwerveModule(0, Constants.Swerve.Mod0.constants),
-                new SwerveModule(1, Constants.Swerve.Mod1.constants),
-                new SwerveModule(2, Constants.Swerve.Mod2.constants),
-                new SwerveModule(3, Constants.Swerve.Mod3.constants)
+                new SwerveModule(0, SwerveConstants.Mod0.constants),
+                new SwerveModule(1, SwerveConstants.Mod1.constants),
+                new SwerveModule(2, SwerveConstants.Mod2.constants),
+                new SwerveModule(3, SwerveConstants.Mod3.constants)
             };
         } else {
             mSwerveMods = new SwerveModule[] {
-                new SwerveModule(0, Constants.Swerve.Mod3.constants),
-                new SwerveModule(1, Constants.Swerve.Mod2.constants),
-                new SwerveModule(2, Constants.Swerve.Mod1.constants),
-                new SwerveModule(3, Constants.Swerve.Mod0.constants)
+                new SwerveModule(0, SwerveConstants.Mod3.constants),
+                new SwerveModule(1, SwerveConstants.Mod2.constants),
+                new SwerveModule(2, SwerveConstants.Mod1.constants),
+                new SwerveModule(3, SwerveConstants.Mod0.constants)
             };
         }
 
@@ -74,7 +75,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public ChassisSpeeds getSpeeds() {
-        return Constants.Swerve.swerveKinematics.toChassisSpeeds(getModuleStates());
+        return SwerveConstants.swerveKinematics.toChassisSpeeds(getModuleStates());
     }
 
     public void driveRobotRelativeAuto(ChassisSpeeds desirChassisSpeeds) {
@@ -84,8 +85,8 @@ public class Swerve extends SubsystemBase {
     public void driveRobotRelative(ChassisSpeeds desiredChassisSpeeds, boolean isOpenLoop) {
         ChassisSpeeds.discretize(desiredChassisSpeeds, 0.02); 
         
-        SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(desiredChassisSpeeds); 
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
+        SwerveModuleState[] swerveModuleStates = SwerveConstants.swerveKinematics.toSwerveModuleStates(desiredChassisSpeeds); 
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.maxSpeed);
 
         DogLog.log("Swerve/Desired Module States", swerveModuleStates);
         for(SwerveModule mod : mSwerveMods) {

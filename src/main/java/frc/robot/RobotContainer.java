@@ -40,14 +40,25 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
-import frc.robot.Constants.Pose.Cage;
-import frc.robot.Constants.Pose.ReefFace;
-import frc.robot.Constants.Vision.CameraMode;
-import frc.robot.Constants.Elevator.Stop;
-import frc.robot.Constants.PIDSwerve.PIDSpeed;
+import frc.robot.subsystems.pose.PoseConstants.Cage;
+import frc.robot.subsystems.pose.PoseConstants.ReefFace;
+import frc.robot.subsystems.vision.VisionConstants.CameraMode;
+import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
+import frc.robot.commands.pidswerve.PIDSwerveConstants.PIDSpeed;
 import frc.robot.commands.*;
-import frc.robot.subsystems.*;
-import frc.robot.subsystems.RobotState.ClimbState;
+import frc.robot.commands.pidswerve.PIDSwerve;
+import frc.robot.subsystems.robotstate.RobotState;
+import frc.robot.subsystems.robotstate.RobotState.ClimbState;
+import frc.robot.subsystems.climber.ClimberSubsystem;
+import frc.robot.subsystems.elevator.ElevatorConstants;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.endeffector.EndEffectorSubsystem;
+import frc.robot.subsystems.index.IndexSubsystem;
+import frc.robot.subsystems.led.LEDSubsystem;
+import frc.robot.subsystems.pose.PoseConstants;
+import frc.robot.subsystems.pose.PoseSubsystem;
+import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.vision.VisionSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -213,14 +224,14 @@ public class RobotContainer {
                     RobotState.ScoreGamePiece(),
                     Commands.either(
                         Commands.sequence(
-                            Commands.waitSeconds(Constants.Elevator.L1RaiseDelay),
+                            Commands.waitSeconds(ElevatorConstants.L1RaiseDelay),
                             Commands.parallel(
                                 s_Elevator.TimeBasedMove(Stop.L1_SCORE, 0.25),
                                 Commands.sequence(
                                     Commands.waitSeconds(0.30),
                                     Commands.either(
-                                        new PIDSwerve(s_Swerve, s_Pose, (left ? face.leftL1Outside : face.rightL1Outside).transformBy(new Transform2d(Constants.Pose.L1MoveForward, left ? Units.inchesToMeters(0) : Units.inchesToMeters(0), Rotation2d.kZero)), true, true, PIDSpeed.FAST),
-                                        new PIDSwerve(s_Swerve, s_Pose, (left ? face.leftL1 : face.rightL1).transformBy(new Transform2d(Constants.Pose.L1MoveForward, 0, Rotation2d.kZero)), true, true, PIDSpeed.FAST),
+                                        new PIDSwerve(s_Swerve, s_Pose, (left ? face.leftL1Outside : face.rightL1Outside).transformBy(new Transform2d(PoseConstants.L1MoveForward, left ? Units.inchesToMeters(0) : Units.inchesToMeters(0), Rotation2d.kZero)), true, true, PIDSpeed.FAST),
+                                        new PIDSwerve(s_Swerve, s_Pose, (left ? face.leftL1 : face.rightL1).transformBy(new Transform2d(PoseConstants.L1MoveForward, 0, Rotation2d.kZero)), true, true, PIDSpeed.FAST),
                                         optL1Outside)))
                         ),
                         Commands.none(),
@@ -331,7 +342,7 @@ public class RobotContainer {
     }
 
     private double speedLimitFactor() {
-        return 1.0 - s_Elevator.raisedPercentage() * (1.0 - Constants.Elevator.speedLimitAtMax);
+        return 1.0 - s_Elevator.raisedPercentage() * (1.0 - ElevatorConstants.speedLimitAtMax);
     }
 
     private Command SetStop(Stop stop) {
@@ -388,20 +399,20 @@ public class RobotContainer {
     }
 
     private Command AlignToCage(Cage cage) {
-        Pose2d cageAlignPose = new Pose2d(cage.location(), Rotation2d.k180deg).transformBy(Constants.Pose.cageOffset);
+        Pose2d cageAlignPose = new Pose2d(cage.location(), Rotation2d.k180deg).transformBy(PoseConstants.cageOffset);
 
         return LoggedCommands.sequence("Align to cage " + cage,
             LoggedCommands.runOnce("Disable reef aiming", optAutoReefAiming::disable),
             VisionSubsystem.SwitchToRearVision(),
             LoggedCommands.runOnce("Enable end game mode", () -> RobotState.setClimbState(ClimbState.STARTED)),
-            new PIDSwerve(s_Swerve, s_Pose, cageAlignPose.transformBy(Constants.Pose.cageApproachOffset), true, false, PIDSpeed.FAST),
+            new PIDSwerve(s_Swerve, s_Pose, cageAlignPose.transformBy(PoseConstants.cageApproachOffset), true, false, PIDSpeed.FAST),
             new PIDSwerve(s_Swerve, s_Pose, cageAlignPose, true, true, PIDSpeed.SLOW));
     }
 
     private Command ProcessorAlign() {
         return LoggedCommands.sequence("Align to processor",
-            new PIDSwerve(s_Swerve, s_Pose, Constants.Pose.processorApproach, true, false, PIDSpeed.FAST),
-            new PIDSwerve(s_Swerve, s_Pose, Constants.Pose.processorScore, true, true, PIDSpeed.FAST));
+            new PIDSwerve(s_Swerve, s_Pose, PoseConstants.processorApproach, true, false, PIDSpeed.FAST),
+            new PIDSwerve(s_Swerve, s_Pose, PoseConstants.processorScore, true, true, PIDSpeed.FAST));
     }
 
     private Command AlignToNearestCage() {

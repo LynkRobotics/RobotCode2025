@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.robotstate;
 
 import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.hardware.CANrange;
@@ -13,8 +13,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
 import frc.lib.util.TunableOption;
-import frc.robot.Constants;
-import frc.robot.Constants.Elevator.Stop;
+import frc.robot.auto.Constants;
+import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
+import frc.robot.subsystems.endeffector.EndEffectorConstants;
+import frc.robot.subsystems.index.IndexConstants;
+import frc.robot.subsystems.pose.PoseSubsystem;
+
 import static frc.robot.Options.optAlgaeBargeOnly;
 
 public class RobotState extends SubsystemBase {
@@ -291,7 +295,7 @@ public class RobotState extends SubsystemBase {
             if (!algaeScoreTimer.isRunning()) {
                 algaeScoreTimer.restart();
                 algaeScoredTimer.restart();
-            } else if (algaeScoreTimer.get() > Constants.EndEffector.algaeRunTime) {
+            } else if (algaeScoreTimer.get() > EndEffectorConstants.algaeRunTime) {
                 gamePieceState = GamePieceState.NONE;
                 algaeScoreTimer.stop();
             }
@@ -299,7 +303,7 @@ public class RobotState extends SubsystemBase {
             if (gamePieceState == GamePieceState.UNJAMMING_CORAL) {
                 if (!unjamTimer.isRunning()) {
                     unjamTimer.restart();
-                } else if (unjamTimer.hasElapsed(Constants.Index.unjamTime)) {
+                } else if (unjamTimer.hasElapsed(IndexConstants.unjamTime)) {
                     unjamTimer.stop();
                     gamePieceState = GamePieceState.NONE;
                 }
@@ -308,7 +312,7 @@ public class RobotState extends SubsystemBase {
                 if (gamePieceState == GamePieceState.SCORING_CORAL && (activeStop == Stop.L1 || activeStop == Stop.L1_SCORE)) {
                     if (!L1Timer.isRunning()) {
                         L1Timer.restart();
-                    } else if (L1Timer.hasElapsed(Constants.EndEffector.L1RunTime)) {
+                    } else if (L1Timer.hasElapsed(EndEffectorConstants.L1RunTime)) {
                         L1Timer.stop();
                         gamePieceState = GamePieceState.NONE;
                     }

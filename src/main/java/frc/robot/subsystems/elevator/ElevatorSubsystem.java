@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.elevator;
 
 import static frc.robot.Options.optServiceMode;
 
@@ -28,8 +28,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
-import frc.robot.Constants;
-import frc.robot.Constants.Elevator.Stop;
+import frc.robot.auto.Constants;
+import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
+import frc.robot.subsystems.pose.PoseSubsystem;
+import frc.robot.subsystems.robotstate.RobotState;
 
 public class ElevatorSubsystem extends SubsystemBase {
     private final TalonFX leftMotor;
@@ -54,14 +56,14 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final double positionDiffMax = 0.5;
 
     public ElevatorSubsystem() {
-        leftMotor = new TalonFX(Constants.Elevator.leftID, Constants.Elevator.canBus);
-        rightMotor = new TalonFX(Constants.Elevator.rightID, Constants.Elevator.canBus);
+        leftMotor = new TalonFX(ElevatorConstants.leftID, ElevatorConstants.canBus);
+        rightMotor = new TalonFX(ElevatorConstants.rightID, ElevatorConstants.canBus);
         applyConfigs();
 
         SmartDashboard.putData("Elevator/Raise", Raise());
         SmartDashboard.putData("Elevator/Lower", Lower());
         SmartDashboard.putData("Elevator/Stop", Stop());
-        SmartDashboard.putNumber("Elevator/Direct Voltage", Constants.Elevator.slowVoltage);
+        SmartDashboard.putNumber("Elevator/Direct Voltage", ElevatorConstants.slowVoltage);
         SmartDashboard.putData("Elevator/Set Voltage", LoggedCommands.runOnce("Set Voltage", () -> { setVoltage(SmartDashboard.getNumber("Elevator/Direct Voltage", 0.0));}));
         SmartDashboard.putNumber("Elevator/Direct Position", 0.0);
         SmartDashboard.putData("Elevator/Set Position", LoggedCommands.runOnce("Set Position", () -> { setPosition(SmartDashboard.getNumber("Elevator/Direct Position", 0.0));}));
@@ -74,11 +76,11 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putData("Elevator/Smooth L4", Commands.defer(() -> TimeBasedMove(Stop.L4, SmartDashboard.getNumber("Elevator/Smooth L4 Time", 5.0)), Set.of(this)));
 
         // double canvasWidth = Constants.Swerve.wheelBase * 1.5;
-        // double canvasHeight = Units.inchesToMeters(Constants.Elevator.maxHeight) * 1.25;
+        // double canvasHeight = Units.inchesToMeters(ElevatorConstants.maxHeight) * 1.25;
         // Mechanism2d canvas = new Mechanism2d(canvasWidth, canvasHeight, new Color8Bit(Color.kLightGray));
         // MechanismRoot2d origin = canvas.getRoot("elevator-root", canvasWidth / 2.0, 0);
-        // MechanismLigament2d offset = origin.append(new MechanismLigament2d("elevator-offset", canvasWidth / 2.0  - Units.inchesToMeters(Constants.Elevator.setback), 0.0, 1.0, new Color8Bit()));
-        // mechanism = offset.append(new MechanismLigament2d("elevator", Units.inchesToMeters(Constants.Elevator.baseHeight), 90.0, Units.inchesToMeters(Constants.Elevator.thickness), new Color8Bit(0xBF, 0x57, 0x00)));
+        // MechanismLigament2d offset = origin.append(new MechanismLigament2d("elevator-offset", canvasWidth / 2.0  - Units.inchesToMeters(ElevatorConstants.setback), 0.0, 1.0, new Color8Bit()));
+        // mechanism = offset.append(new MechanismLigament2d("elevator", Units.inchesToMeters(ElevatorConstants.baseHeight), 90.0, Units.inchesToMeters(ElevatorConstants.thickness), new Color8Bit(0xBF, 0x57, 0x00)));
 
         // TODO Get mechanism working
         // SmartDashboard.putData("Elevator/mechanism", canvas);
@@ -119,7 +121,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Command Raise() {
         return LoggedCommands.runOnce("Raise Elevator", 
             () -> {
-                setVoltage(Constants.Elevator.slowVoltage);
+                setVoltage(ElevatorConstants.slowVoltage);
             },
             this);
     }
@@ -127,7 +129,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Command Lower() {
         return LoggedCommands.runOnce("Lower Elevator",
         () -> {
-            setVoltage(-Constants.Elevator.slowVoltage);
+            setVoltage(-ElevatorConstants.slowVoltage);
         },
         this);
     }
@@ -243,7 +245,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             () -> autoUp = false,
             () -> {
                 // TODO Always flip?
-                if (!autoUp && PoseSubsystem.distanceTo(PoseSubsystem.flipIfRed(target)) <= Constants.Pose.autoUpDistance) {
+                if (!autoUp && PoseSubsystem.distanceTo(PoseSubsystem.flipIfRed(target)) <= frc.robot.auto.Pose.autoUpDistance) {
                     Stop stop = stopSupplier.get();
                     RobotState.updateActiveStop(stop);
                     setHeight(stopHeight(stop));
@@ -276,17 +278,17 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     // Set Elevator height to given position, provided in inches
     private void setHeight(double height) {
-        if (height > Constants.Elevator.maxHeight) {
+        if (height > ElevatorConstants.maxHeight) {
             LoggedAlert.Warning("Elevator", "Elevator Range", "Requested elevator height too high");
-            height = Constants.Elevator.maxHeight;
+            height = ElevatorConstants.maxHeight;
         }
-        if (height < Constants.Elevator.baseHeight) {
+        if (height < ElevatorConstants.baseHeight) {
             LoggedAlert.Warning("Elevator", "Elevator Range", "Requested elevator height too low");
-            height = Constants.Elevator.baseHeight;
+            height = ElevatorConstants.baseHeight;
         }
         DogLog.log("Elevator/Status", "Move to height " + String.format("%1.1f", height));
 
-        double position = (height - Constants.Elevator.baseHeight) * Constants.Elevator.rotPerInch;
+        double position = (height - ElevatorConstants.baseHeight) * ElevatorConstants.rotPerInch;
         setPosition(position);
     }
 
@@ -304,7 +306,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
     
     private boolean inRange(double position) {
-        return desiredPosition >= 0.0 && Math.abs(desiredPosition - position) <= Constants.Elevator.positionError;
+        return desiredPosition >= 0.0 && Math.abs(desiredPosition - position) <= ElevatorConstants.positionError;
     }
 
     private Stop safetyStop() {
@@ -312,7 +314,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     private boolean isSafe(double height) {
-        return height < (safetyStop().height + Constants.Elevator.safetyMargin);
+        return height < (safetyStop().height + ElevatorConstants.safetyMargin);
     }
 
     private boolean isSafe() {
@@ -326,7 +328,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public boolean atStop(Stop stop) {
         double stopError = stopError(stop);
         // The safe stop is just a guideline, and has a wider margin for error
-        double allowableError = stop == Stop.SAFE ? 3 * Constants.Elevator.positionError : Constants.Elevator.positionError;
+        double allowableError = stop == Stop.SAFE ? 3 * ElevatorConstants.positionError : ElevatorConstants.positionError;
 
         return stopError <= allowableError;
     }
@@ -338,14 +340,14 @@ public class ElevatorSubsystem extends SubsystemBase {
     public boolean nearStop(Stop stop) {
         double stopError = stopError(stop);
         // The safe stop is just a guideline, and has a wider margin for error
-        double allowableError = stop == Stop.SAFE ? 3 * Constants.Elevator.positionError : Constants.Elevator.positionCloseError;
+        double allowableError = stop == Stop.SAFE ? 3 * ElevatorConstants.positionError : ElevatorConstants.positionCloseError;
 
         return stopError <= allowableError;
     }
 
     // Are potentially towards a stop? (limited use cases)
     public boolean towardsStop(Stop stop) {
-        return (getHeight() + Constants.Elevator.towardsMargin) >= stopHeight(stop);
+        return (getHeight() + ElevatorConstants.towardsMargin) >= stopHeight(stop);
     }
 
     public boolean atNextStop() {
@@ -361,7 +363,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     private double getHeight(double position) {
-        return position / Constants.Elevator.rotPerInch + Constants.Elevator.baseHeight;
+        return position / ElevatorConstants.rotPerInch + ElevatorConstants.baseHeight;
     }
 
     private double getHeight() {
@@ -383,10 +385,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     private void applyConfigs() {
         // Configure the primary motor
         var motorConfig = new TalonFXConfiguration();
-        motorConfig.MotorOutput.NeutralMode = Constants.Elevator.motorNeutralValue;
-        motorConfig.MotorOutput.Inverted = Constants.Elevator.motorOutputInverted;
-        motorConfig.Voltage.PeakForwardVoltage = Constants.Elevator.peakForwardVoltage;
-        motorConfig.Voltage.PeakReverseVoltage = Constants.Elevator.peakReverseVoltage;
+        motorConfig.MotorOutput.NeutralMode = ElevatorConstants.motorNeutralValue;
+        motorConfig.MotorOutput.Inverted = ElevatorConstants.motorOutputInverted;
+        motorConfig.Voltage.PeakForwardVoltage = ElevatorConstants.peakForwardVoltage;
+        motorConfig.Voltage.PeakReverseVoltage = ElevatorConstants.peakReverseVoltage;
         motorConfig.CurrentLimits.StatorCurrentLimit = 80; //TODO: Test 
         motorConfig.CurrentLimits.SupplyCurrentLimit = 120; //TODO: Make these constants
         motorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -394,19 +396,19 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     
         // PID & FF configuration
-        motorConfig.Slot0.kP = Constants.Elevator.kP;
-        motorConfig.Slot0.kI = Constants.Elevator.kI;
-        motorConfig.Slot0.kD = Constants.Elevator.kD;
-        motorConfig.Slot0.kS = Constants.Elevator.kS;
-        motorConfig.Slot0.kV = Constants.Elevator.kV;
-        motorConfig.Slot0.kA = Constants.Elevator.kA;
-        motorConfig.Slot0.kG = Constants.Elevator.kG;
+        motorConfig.Slot0.kP = ElevatorConstants.kP;
+        motorConfig.Slot0.kI = ElevatorConstants.kI;
+        motorConfig.Slot0.kD = ElevatorConstants.kD;
+        motorConfig.Slot0.kS = ElevatorConstants.kS;
+        motorConfig.Slot0.kV = ElevatorConstants.kV;
+        motorConfig.Slot0.kA = ElevatorConstants.kA;
+        motorConfig.Slot0.kG = ElevatorConstants.kG;
     
         // Set Motion Magic settings
         // var motionMagicConfigs = motorConfig.MotionMagic;
-        // motionMagicConfigs.MotionMagicCruiseVelocity = Constants.Elevator.cruiseVelocity;
-        // motionMagicConfigs.MotionMagicAcceleration = Constants.Elevator.acceleration;
-        // motionMagicConfigs.MotionMagicJerk = Constants.Elevator.jerk;
+        // motionMagicConfigs.MotionMagicCruiseVelocity = ElevatorConstants.cruiseVelocity;
+        // motionMagicConfigs.MotionMagicAcceleration = ElevatorConstants.acceleration;
+        // motionMagicConfigs.MotionMagicJerk = ElevatorConstants.jerk;
     
         // Apply motor config
         leftMotor.getConfigurator().apply(motorConfig);
@@ -415,7 +417,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         leftMotor.stopMotor();
 
         // Set right motor to follow left, but opposite direction
-        rightMotor.setControl(new Follower(Constants.Elevator.leftID, true));
+        rightMotor.setControl(new Follower(ElevatorConstants.leftID, true));
     }
 
     public Command MoveToSafety() {
@@ -507,7 +509,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         if (RobotState.coralScoring() && atStop(Stop.L1)) {
             if (!scoreTimer.isRunning()) {
                 scoreTimer.restart();
-            } else if (scoreTimer.hasElapsed(Constants.Elevator.L1RaiseDelay)) {
+            } else if (scoreTimer.hasElapsed(ElevatorConstants.L1RaiseDelay)) {
                 setHeight(Stop.L1_SCORE.height);
             }
         }

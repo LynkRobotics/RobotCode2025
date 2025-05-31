@@ -1,10 +1,10 @@
-package frc.robot.commands;
+package frc.robot.commands.pidswerve;
 
 import frc.lib.util.LoggedCommandBase;
-import frc.robot.Constants;
-import frc.robot.Constants.Pose;
-import frc.robot.subsystems.PoseSubsystem;
-import frc.robot.subsystems.Swerve;
+import frc.robot.commands.pidswerve.PIDSwerveConstants.PIDSpeed;
+import frc.robot.subsystems.pose.PoseConstants;
+import frc.robot.subsystems.pose.PoseSubsystem;
+import frc.robot.subsystems.swerve.Swerve;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -14,7 +14,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 
-import static frc.robot.Constants.PIDSwerve.*;
 
 public class PIDSwerve extends LoggedCommandBase {
     private final Swerve s_Swerve;
@@ -22,7 +21,7 @@ public class PIDSwerve extends LoggedCommandBase {
     private final Pose2d targetPose;
     private final boolean precise;
     private final PIDController xPID, yPID;
-    private final PIDController rotationPID = new PIDController(rotationKP, 0, 0);
+    private final PIDController rotationPID = new PIDController(PIDSwerveConstants.rotationKP, 0, 0);
     private final PIDSpeed speed;
     private final double maxVisionDiff;
     private final Timer alignedTimer = new Timer();
@@ -44,35 +43,35 @@ public class PIDSwerve extends LoggedCommandBase {
         this.maxVisionDiff = maxVisionDiff;
         addRequirements(s_Swerve);
 
-        xPID = new PIDController(precise ? translationKP : roughTranslationKP, 0, 0);
-        yPID = new PIDController(precise ? translationKP : roughTranslationKP, 0, 0);
+        xPID = new PIDController(precise ? PIDSwerveConstants.translationKP : PIDSwerveConstants.roughTranslationKP, 0, 0);
+        yPID = new PIDController(precise ? PIDSwerveConstants.translationKP : PIDSwerveConstants.roughTranslationKP, 0, 0);
 
-        xPID.setIZone(positionIZone); // Only use Integral term within this range
-        xPID.setIntegratorRange(-positionKS * 2, positionKS * 2);
+        xPID.setIZone(PIDSwerveConstants.positionIZone); // Only use Integral term within this range
+        xPID.setIntegratorRange(-PIDSwerveConstants.positionKS * 2, PIDSwerveConstants.positionKS * 2);
         xPID.setSetpoint(Units.metersToInches(targetPose.getX()));
         if (precise) {
-            xPID.setTolerance(positionTolerance, 5.0); // Inches per second
+            xPID.setTolerance(PIDSwerveConstants.positionTolerance, 5.0); // Inches per second
         } else {
-            xPID.setTolerance(roughPositionTolerance);
+            xPID.setTolerance(PIDSwerveConstants.roughPositionTolerance);
         }
 
-        yPID.setIZone(positionIZone); // Only use Integral term within this range
-        yPID.setIntegratorRange(-positionKS * 2, positionKS * 2);
+        yPID.setIZone(PIDSwerveConstants.positionIZone); // Only use Integral term within this range
+        yPID.setIntegratorRange(-PIDSwerveConstants.positionKS * 2, PIDSwerveConstants.positionKS * 2);
         yPID.setSetpoint(Units.metersToInches(targetPose.getY()));
         if (precise) {
-            yPID.setTolerance(positionTolerance, 5.0); // Inches per second
+            yPID.setTolerance(PIDSwerveConstants.positionTolerance, 5.0); // Inches per second
         } else {
-            yPID.setTolerance(roughPositionTolerance);
+            yPID.setTolerance(PIDSwerveConstants.roughPositionTolerance);
         }
 
         rotationPID.enableContinuousInput(-180.0, 180.0);
-        rotationPID.setIZone(Pose.rotationIZone); // Only use Integral term within this range
-        rotationPID.setIntegratorRange(-Pose.rotationKS * 2, Pose.rotationKS * 2);
+        rotationPID.setIZone(PoseConstants.rotationIZone); // Only use Integral term within this range
+        rotationPID.setIntegratorRange(-PoseConstants.rotationKS * 2, PoseConstants.rotationKS * 2);
         rotationPID.setSetpoint(targetPose.getRotation().getDegrees());
         if (precise) {
-            rotationPID.setTolerance(rotationTolerance, 10.0);
+            rotationPID.setTolerance(PIDSwerveConstants.rotationTolerance, 10.0);
         } else {
-            rotationPID.setTolerance(roughRotatationTolerance);
+            rotationPID.setTolerance(PIDSwerveConstants.roughRotatationTolerance);
         }
     }
 
@@ -123,7 +122,7 @@ public class PIDSwerve extends LoggedCommandBase {
         /* TODO Consider a potential need to rotate most of the way first, then translate */
 
         double xCorrection = xPID.calculate(Units.metersToInches(position.getX()));
-        double xFeedForward = positionKS * Math.signum(xCorrection);
+        double xFeedForward = PIDSwerveConstants.positionKS * Math.signum(xCorrection);
         double xVal = MathUtil.clamp(xCorrection + xFeedForward, -1.0, 1.0);
         DogLog.log("PIDSwerve/X position", position.getX());
         DogLog.log("PIDSwerve/X correction", xCorrection);
@@ -133,7 +132,7 @@ public class PIDSwerve extends LoggedCommandBase {
         DogLog.log("PIDSwerve/X error derivative", xPID.getErrorDerivative());
 
         double yCorrection = yPID.calculate(Units.metersToInches(position.getY()));
-        double yFeedForward = positionKS * Math.signum(yCorrection);
+        double yFeedForward = PIDSwerveConstants.positionKS * Math.signum(yCorrection);
         double yVal = MathUtil.clamp(yCorrection + yFeedForward, -1.0, 1.0);
         DogLog.log("PIDSwerve/Y position", position.getY());
         DogLog.log("PIDSwerve/Y correction", yCorrection);
@@ -143,7 +142,7 @@ public class PIDSwerve extends LoggedCommandBase {
         DogLog.log("PIDSwerve/Y error derivative", yPID.getErrorDerivative());
 
         double correction = rotationPID.calculate(rotation.getDegrees());
-        double feedForward = Pose.rotationKS * Math.signum(correction);
+        double feedForward = PoseConstants.rotationKS * Math.signum(correction);
         double rotationVal = MathUtil.clamp(correction + feedForward, -1.0, 1.0);
         DogLog.log("PIDSwerve/Rot position", rotation.getDegrees());
         DogLog.log("PIDSwerve/Rot correction", correction);
@@ -167,14 +166,14 @@ public class PIDSwerve extends LoggedCommandBase {
             // TODO Automatically go in turbo mode?
             // new Translation2d(xVal, yVal).times((speed == PIDSpeed.FAST && RobotState.getTurboMode()) ? PIDSpeed.TURBO.speed : speed.speed),
             new Translation2d(xVal, yVal).times(speed.speed),
-            rotationVal * maxAngularVelocity,
+            rotationVal * PIDSwerveConstants.maxAngularVelocity,
             true
         );
     }
 
     @Override
     public boolean isFinished() {
-        return ((xPID.atSetpoint() && (ignoreY || yPID.atSetpoint()) && rotationPID.atSetpoint()) || alignedTimer.get() >= (fastAlign ? Constants.PIDSwerve.fastAlignedTimerMax : Constants.PIDSwerve.alignedTimerMax)) && s_Pose.visionDifference() <= maxVisionDiff;
+        return ((xPID.atSetpoint() && (ignoreY || yPID.atSetpoint()) && rotationPID.atSetpoint()) || alignedTimer.get() >= (fastAlign ? PIDSwerveConstants.fastAlignedTimerMax : PIDSwerveConstants.alignedTimerMax)) && s_Pose.visionDifference() <= maxVisionDiff;
     }
 
     @Override

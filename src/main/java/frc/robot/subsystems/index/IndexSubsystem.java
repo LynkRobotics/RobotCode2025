@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.index;
 
 import static frc.robot.Options.optIndexEnabled;
 import static frc.robot.Options.optServiceMode;
@@ -14,23 +14,23 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.subsystems.RobotState.GamePieceState;
+import frc.robot.subsystems.robotstate.RobotState;
+import frc.robot.subsystems.robotstate.RobotState.GamePieceState;
 
 public class IndexSubsystem extends SubsystemBase {
     /* Devices */
     private final TalonFX motor;
     /* Control Requests */
-    private final VoltageOut intakeControl = new VoltageOut(Constants.Index.intakeVoltage).withEnableFOC(true);
-    private final VoltageOut rejectControl = new VoltageOut(Constants.Index.rejectVoltage).withEnableFOC(true);
-    private final VoltageOut unjamControl = new VoltageOut(Constants.Index.unjamVoltage).withEnableFOC(true);
+    private final VoltageOut intakeControl = new VoltageOut(IndexConstants.intakeVoltage).withEnableFOC(true);
+    private final VoltageOut rejectControl = new VoltageOut(IndexConstants.rejectVoltage).withEnableFOC(true);
+    private final VoltageOut unjamControl = new VoltageOut(IndexConstants.unjamVoltage).withEnableFOC(true);
     private boolean intaking = false;
 
     private int stallCount = 0;
 
     public IndexSubsystem() {
         /* Devices */
-        motor = new TalonFX(Constants.Index.motorID, Constants.Index.canBus);
+        motor = new TalonFX(IndexConstants.motorID, IndexConstants.canBus);
 
         applyConfigs();
     }
@@ -39,12 +39,12 @@ public class IndexSubsystem extends SubsystemBase {
         /* Configure the motor */
         var indexMotorConfig = new TalonFXConfiguration();
         /* Set motor to brake control */
-        indexMotorConfig.MotorOutput.NeutralMode = Constants.Index.motorNeutralValue;
+        indexMotorConfig.MotorOutput.NeutralMode = IndexConstants.motorNeutralValue;
         /* Set the motor direction */
-        indexMotorConfig.MotorOutput.Inverted = Constants.Index.motorOutputInverted;
+        indexMotorConfig.MotorOutput.Inverted = IndexConstants.motorOutputInverted;
         /* Config the peak outputs */
-        indexMotorConfig.Voltage.PeakForwardVoltage = Constants.Index.peakForwardVoltage;
-        indexMotorConfig.Voltage.PeakReverseVoltage = Constants.Index.peakReverseVoltage;
+        indexMotorConfig.Voltage.PeakForwardVoltage = IndexConstants.peakForwardVoltage;
+        indexMotorConfig.Voltage.PeakReverseVoltage = IndexConstants.peakReverseVoltage;
         /* Apply Index Motor Configs */
         motor.getConfigurator().apply(indexMotorConfig);
     }
@@ -62,9 +62,9 @@ public class IndexSubsystem extends SubsystemBase {
                 motor.stopMotor();
             }
         } else if (optIndexEnabled.get()) {
-            if (gamePieceState == GamePieceState.INTAKING_CORAL && Math.abs(velocity) < Constants.Index.minIntakeVelocity) {
+            if (gamePieceState == GamePieceState.INTAKING_CORAL && Math.abs(velocity) < IndexConstants.minIntakeVelocity) {
                 stallCount++;
-                if (stallCount > Constants.Index.maxStallCount) {
+                if (stallCount > IndexConstants.maxStallCount) {
                     RobotState.UnjamCoral().schedule();
                 }
             } else {

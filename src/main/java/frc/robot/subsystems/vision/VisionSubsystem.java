@@ -2,16 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.vision;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
-import frc.robot.Constants;
 import frc.robot.Robot;
-import frc.robot.Constants.Vision.Camera;
-import frc.robot.Constants.Vision.CameraMode;
+import frc.robot.auto.Constants;
+import frc.robot.subsystems.pose.PoseConstants;
+import frc.robot.subsystems.vision.VisionConstants.Camera;
+import frc.robot.subsystems.vision.VisionConstants.CameraMode;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -54,7 +55,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     static {
-        for (Camera cameraType : Constants.Vision.camerasAvailable) {
+        for (Camera cameraType : VisionConstants.camerasAvailable) {
             cameras.put(cameraType, new PhotonCamera(cameraType.name));
             photonEstimator.put(cameraType, new PhotonPoseEstimator(Constants.fieldLayout, PoseStrategy.PNP_DISTANCE_TRIG_SOLVE, cameraType.robotToCamera));
             Robot.fieldSelector.addOption(cameraType.toString(), cameraType.toString());
@@ -99,12 +100,12 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public static boolean poseIsReasonable(Pose3d pose) {
-        if (pose.getX() < -Constants.Vision.fieldBorderMargin
-            || pose.getX() > Constants.Pose.fieldLength + Constants.Vision.fieldBorderMargin
-            || pose.getY() < -Constants.Vision.fieldBorderMargin
-            || pose.getY() > Constants.Pose.fieldWidth + Constants.Vision.fieldBorderMargin
-            || pose.getZ() < -Constants.Vision.maxZError
-            || pose.getZ() > Constants.Vision.maxZError) {
+        if (pose.getX() < -VisionConstants.fieldBorderMargin
+            || pose.getX() > PoseConstants.fieldLength + VisionConstants.fieldBorderMargin
+            || pose.getY() < -VisionConstants.fieldBorderMargin
+            || pose.getY() > PoseConstants.fieldWidth + VisionConstants.fieldBorderMargin
+            || pose.getZ() < -VisionConstants.maxZError
+            || pose.getZ() > VisionConstants.maxZError) {
             return false;
         }
 
@@ -139,7 +140,7 @@ public class VisionSubsystem extends SubsystemBase {
                 DogLog.log(logPrefix + "Status", "Using multitag result from " + tsString);
             } else if (!result.targets.isEmpty()) {
                 PhotonTrackedTarget target = result.targets.get(0);
-                if (target.poseAmbiguity > Constants.Vision.maxAmbiguity) {
+                if (target.poseAmbiguity > VisionConstants.maxAmbiguity) {
                     DogLog.log(logPrefix + "Status", "Rejected ambiguous (" + String.format("%1.2f", target.poseAmbiguity) + ") single tag pose from " + tsString);
                     continue;
                 }
@@ -164,7 +165,7 @@ public class VisionSubsystem extends SubsystemBase {
                     robotPose = tagPose.get().plus(target.bestCameraToTarget.inverse()).plus(cameraType.robotToCamera.inverse());
 
                     // Choose the alternate pose if it's better aligned with the current robot pose
-                    if (target.poseAmbiguity > Constants.Vision.autoAcceptAmbiguity && headingProvider != null) {
+                    if (target.poseAmbiguity > VisionConstants.autoAcceptAmbiguity && headingProvider != null) {
                         Pose3d altPose = tagPose.get().plus(target.altCameraToTarget.inverse()).plus(cameraType.robotToCamera.inverse());
                         Rotation2d heading = headingProvider.get();
 
@@ -193,7 +194,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     private boolean hasAllianceTag(List<Short> fiducialIDs) {
-        final double fieldMiddle = Constants.Pose.fieldLength / 2.0;
+        final double fieldMiddle = PoseConstants.fieldLength / 2.0;
         boolean isRed = Robot.isRed();
 
         for (Short fiducialID : fiducialIDs) {
@@ -224,7 +225,7 @@ public class VisionSubsystem extends SubsystemBase {
         }
 
         List<Camera> camerasEnabled = new LinkedList<Camera>();
-        for (var cameraType : Constants.Vision.camerasAvailable) {
+        for (var cameraType : VisionConstants.camerasAvailable) {
             if (SmartDashboard.getBoolean("Vision/" + cameraType + " Enabled", true)) {
                 camerasEnabled.add(cameraType);
             }
@@ -252,8 +253,8 @@ public class VisionSubsystem extends SubsystemBase {
                         DogLog.log("Vision/Status", "Unable to add vision measurement without a pose estimator");
                     } else {
                         double stdDevFactor = cameraMode.getStdDev(cameraType) * poseResult.averageTagDistance * poseResult.averageTagDistance / poseResult.fiducialIDs.size();
-                        double linearStdDev = Constants.Vision.linearStdDevBaseline * stdDevFactor * camerasEnabled.size();
-                        double angularStdDev = Constants.Vision.angularStdDevBaseline * stdDevFactor * camerasEnabled.size();
+                        double linearStdDev = VisionConstants.linearStdDevBaseline * stdDevFactor * camerasEnabled.size();
+                        double angularStdDev = VisionConstants.angularStdDevBaseline * stdDevFactor * camerasEnabled.size();
 
                         Pose2d pose = poseResult.pose.toPose2d();
                         poseEstimator.addVisionMeasurement(pose, poseResult.timestamp, VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));

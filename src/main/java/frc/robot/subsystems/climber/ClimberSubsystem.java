@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.climber;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -18,8 +18,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
 import frc.lib.util.TunableOption;
-import frc.robot.Constants;
-import frc.robot.subsystems.RobotState.ClimbState;
+import frc.robot.subsystems.robotstate.RobotState;
+import frc.robot.subsystems.robotstate.RobotState.ClimbState;
 
 public class ClimberSubsystem extends SubsystemBase {
     /* Devices */
@@ -27,12 +27,12 @@ public class ClimberSubsystem extends SubsystemBase {
 
     /* Control Requests */
     // TODO Use PositionVoltage
-    private final VoltageOut fastDeployControl = new VoltageOut(Constants.Climber.fastDeployVoltage).withEnableFOC(true);
-    private final VoltageOut slowDeployControl = new VoltageOut(Constants.Climber.slowDeployVoltage).withEnableFOC(true);
-    private final VoltageOut engageRetractControl = new VoltageOut(Constants.Climber.engageRetractVoltage).withEnableFOC(true);
-    private final VoltageOut fastRetractControl = new VoltageOut(Constants.Climber.fastRetractVoltage).withEnableFOC(true);
-    private final VoltageOut slowRetractControl = new VoltageOut(Constants.Climber.slowRetractVoltage).withEnableFOC(true);
-    private final VoltageOut holdControl = new VoltageOut(Constants.Climber.holdVoltage).withEnableFOC(true);
+    private final VoltageOut fastDeployControl = new VoltageOut(ClimberConstants.fastDeployVoltage).withEnableFOC(true);
+    private final VoltageOut slowDeployControl = new VoltageOut(ClimberConstants.slowDeployVoltage).withEnableFOC(true);
+    private final VoltageOut engageRetractControl = new VoltageOut(ClimberConstants.engageRetractVoltage).withEnableFOC(true);
+    private final VoltageOut fastRetractControl = new VoltageOut(ClimberConstants.fastRetractVoltage).withEnableFOC(true);
+    private final VoltageOut slowRetractControl = new VoltageOut(ClimberConstants.slowRetractVoltage).withEnableFOC(true);
+    private final VoltageOut holdControl = new VoltageOut(ClimberConstants.holdVoltage).withEnableFOC(true);
 
     private boolean deployed = false;
 
@@ -40,7 +40,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     public ClimberSubsystem() {
         /* Devices */
-        motor = new TalonFX(Constants.Climber.motorID, Constants.Climber.canBus);
+        motor = new TalonFX(ClimberConstants.motorID, ClimberConstants.canBus);
 
         SmartDashboard.putData(LoggedCommands.runOnce("Coast Climber", () -> motor.setNeutralMode(NeutralModeValue.Coast)).ignoringDisable(true));
         SmartDashboard.putData(LoggedCommands.runOnce("Brake Climber", () -> motor.setNeutralMode(NeutralModeValue.Brake)).ignoringDisable(true));
@@ -51,22 +51,22 @@ public class ClimberSubsystem extends SubsystemBase {
         /* Configure the motor */
         var motorConfig = new TalonFXConfiguration();
         /* Set motor to brake control */
-        motorConfig.MotorOutput.NeutralMode = Constants.Climber.motorNeutralValue;
+        motorConfig.MotorOutput.NeutralMode = ClimberConstants.motorNeutralValue;
         /* Set the motor direction */
-        motorConfig.MotorOutput.Inverted = Constants.Climber.motorOutputInverted;
+        motorConfig.MotorOutput.Inverted = ClimberConstants.motorOutputInverted;
         /* Config the peak outputs */
-        motorConfig.Voltage.PeakForwardVoltage = Constants.Climber.peakForwardVoltage;
-        motorConfig.Voltage.PeakReverseVoltage = Constants.Climber.peakReverseVoltage;
+        motorConfig.Voltage.PeakForwardVoltage = ClimberConstants.peakForwardVoltage;
+        motorConfig.Voltage.PeakReverseVoltage = ClimberConstants.peakReverseVoltage;
         /* Apply Index Motor Configs */
         motor.getConfigurator().apply(motorConfig);
     }
 
     private boolean climberPartiallyDeployed() {
-        return motor.getPosition().getValueAsDouble() >= Constants.Climber.fastDeployedPosition;
+        return motor.getPosition().getValueAsDouble() >= ClimberConstants.fastDeployedPosition;
     }
 
     private boolean climberFullyDeployed() {
-        return motor.getPosition().getValueAsDouble() >= Constants.Climber.fullyDeployedPosition;
+        return motor.getPosition().getValueAsDouble() >= ClimberConstants.fullyDeployedPosition;
     }
 
     public Command Deploy() {
@@ -89,26 +89,26 @@ public class ClimberSubsystem extends SubsystemBase {
                 LoggedCommands.runOnce("Stop climber (deploy)", motor::stopMotor, this))
                 .handleInterrupt(motor::stopMotor),
             Commands.sequence(
-                LoggedCommands.log("Cannot deploy before cutoff time (" + Constants.Climber.timeCutoff + ")"),
+                LoggedCommands.log("Cannot deploy before cutoff time (" + ClimberConstants.timeCutoff + ")"),
                 Commands.runOnce(() -> LoggedAlert.Error("Climber", "Too Early", "Cannot deploy before cutoff time"))
             ),
-            () -> optOverrideClimberTiming.get() || DriverStation.getMatchTime() <= Constants.Climber.timeCutoff);
+            () -> optOverrideClimberTiming.get() || DriverStation.getMatchTime() <= ClimberConstants.timeCutoff);
     }
 
     private boolean climberEngaged() {
-        return motor.getPosition().getValueAsDouble() <= Constants.Climber.engageRetractedPosition;
+        return motor.getPosition().getValueAsDouble() <= ClimberConstants.engageRetractedPosition;
     }
 
     private boolean climberPastPause() {
-        return motor.getPosition().getValueAsDouble() <= Constants.Climber.pausePosition;
+        return motor.getPosition().getValueAsDouble() <= ClimberConstants.pausePosition;
     }
 
     private boolean climberPartiallyRetracted() {
-        return motor.getPosition().getValueAsDouble() <= Constants.Climber.fastRetractedPosition;
+        return motor.getPosition().getValueAsDouble() <= ClimberConstants.fastRetractedPosition;
     }
 
     private boolean climberFullyRetracted() {
-        return motor.getPosition().getValueAsDouble() <= Constants.Climber.fullyRetractedPosition;
+        return motor.getPosition().getValueAsDouble() <= ClimberConstants.fullyRetractedPosition;
     }
 
     public Command SlowRetract() {
@@ -141,7 +141,7 @@ public class ClimberSubsystem extends SubsystemBase {
                         LoggedCommands.runOnce("Set fast retract voltage (pre-pause)", () -> motor.setControl(fastRetractControl), this),
                         LoggedCommands.waitUntil("Wait for climber retraction to pause point", this::climberPastPause),
                         LoggedCommands.runOnce("Set hold voltage (pause)", () -> motor.setControl(holdControl), this),
-                        LoggedCommands.waitSeconds("Wait for climb pause", Constants.Climber.pauseDuration)),
+                        LoggedCommands.waitSeconds("Wait for climb pause", ClimberConstants.pauseDuration)),
                     this::climberPastPause),
                 Commands.either(
                     LoggedCommands.log("Climber already partially retracted"),

@@ -14,8 +14,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
 import frc.lib.math.Conversions;
-import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.auto.Constants;
 
 public class SwerveModule {
     public int moduleNumber;
@@ -25,7 +25,7 @@ public class SwerveModule {
     private TalonFX mDriveMotor;
     private CANcoder angleEncoder;
 
-    private final SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(Constants.Swerve.driveKS, Constants.Swerve.driveKV, Constants.Swerve.driveKA);
+    private final SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(frc.robot.auto.Swerve.driveKS, frc.robot.auto.Swerve.driveKV, frc.robot.auto.Swerve.driveKA);
 
     /* drive motor control requests */
     private final DutyCycleOut driveDutyCycle = new DutyCycleOut(0).withEnableFOC(true);
@@ -66,11 +66,11 @@ public class SwerveModule {
 
     private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop){
         if(isOpenLoop){
-            driveDutyCycle.Output = desiredState.speedMetersPerSecond / Constants.Swerve.maxSpeed;
+            driveDutyCycle.Output = desiredState.speedMetersPerSecond / frc.robot.auto.Swerve.maxSpeed;
             mDriveMotor.setControl(driveDutyCycle);
         }
         else {
-            driveVelocity.Velocity = Conversions.MPSToRPS(desiredState.speedMetersPerSecond, Constants.Swerve.wheelCircumference);
+            driveVelocity.Velocity = Conversions.MPSToRPS(desiredState.speedMetersPerSecond, frc.robot.auto.Swerve.wheelCircumference);
             driveVelocity.FeedForward = driveFeedForward.calculate(desiredState.speedMetersPerSecond);
             mDriveMotor.setControl(driveVelocity);
         }
@@ -81,7 +81,7 @@ public class SwerveModule {
     }
 
     public boolean isAligned() {
-        return Math.abs(alignmentError()) <= Constants.Swerve.maxAngleError;
+        return Math.abs(alignmentError()) <= frc.robot.auto.Swerve.maxAngleError;
     }
 
     public Rotation2d getCANcoder(){
@@ -120,14 +120,14 @@ public class SwerveModule {
 
     public SwerveModuleState getState(){
         return new SwerveModuleState(
-            Conversions.RPSToMPS(mDriveMotor.getVelocity().getValueAsDouble(), Constants.Swerve.wheelCircumference), 
+            Conversions.RPSToMPS(mDriveMotor.getVelocity().getValueAsDouble(), frc.robot.auto.Swerve.wheelCircumference), 
             Rotation2d.fromRotations(mAngleMotor.getPosition().getValueAsDouble())
         );
     }
 
     public SwerveModulePosition getPosition(){
         return new SwerveModulePosition(
-            Conversions.rotationsToMeters(mDriveMotor.getPosition().getValueAsDouble(), Constants.Swerve.wheelCircumference), 
+            Conversions.rotationsToMeters(mDriveMotor.getPosition().getValueAsDouble(), frc.robot.auto.Swerve.wheelCircumference), 
             Rotation2d.fromRotations(mAngleMotor.getPosition().getValueAsDouble())
         );
     }

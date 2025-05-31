@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.led;
 
 import static frc.robot.Options.optAutoReefAiming;
 import static frc.robot.Options.optL1Outside;
@@ -17,8 +17,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.CANdleGroup;
-import frc.robot.Constants;
-import frc.robot.subsystems.RobotState.ClimbState;
+import frc.robot.subsystems.robotstate.RobotState;
+import frc.robot.subsystems.robotstate.RobotState.ClimbState;
 
 public class LEDSubsystem extends SubsystemBase {
     /** Creates a new LEDSubsystem. */
@@ -84,7 +84,7 @@ public class LEDSubsystem extends SubsystemBase {
     }
 
     public enum LEDState {
-        STARTUP(new LEDConfig(Constants.LEDs.readyAnimation)),
+        STARTUP(new LEDConfig(LEDConstants.readyAnimation)),
         DISABLED(new LEDConfig(Color.disabled)),
         NORMAL(new LEDConfig(Color.lynk)),
         MANUAL(new LEDConfig(Color.hightideTeal)),
@@ -97,10 +97,10 @@ public class LEDSubsystem extends SubsystemBase {
         CORAL_UNKNOWN(new LEDConfig(Color.dim)),
         ALGAE_INTAKING(new LEDConfig(Color.cheesyBlue, true)),
         ALGAE(new LEDConfig(Color.cheesyBlue)),
-        ENDGAME(new LEDConfig(Constants.LEDs.endGameAnimation)),
-        CLIMBING(new LEDConfig(Constants.LEDs.climbingAnimation)),
-        CLIMBED(new LEDConfig(Constants.LEDs.climbedAnimation)),
-        SERVICE_MODE(new LEDConfig(Constants.LEDs.serviceModeAnimation)),
+        ENDGAME(new LEDConfig(LEDConstants.endGameAnimation)),
+        CLIMBING(new LEDConfig(LEDConstants.climbingAnimation)),
+        CLIMBED(new LEDConfig(LEDConstants.climbedAnimation)),
+        SERVICE_MODE(new LEDConfig(LEDConstants.serviceModeAnimation)),
         SERVICE_DISABLED(new LEDConfig(Color.service)),
         ERROR(new LEDConfig(Color.red, true)),
         WARNING(new LEDConfig(Color.yellow, true)),
@@ -116,11 +116,11 @@ public class LEDSubsystem extends SubsystemBase {
     public LEDSubsystem() {
         // Control both CANdles in the same way
         leds = new CANdleGroup(
-                new CANdle(Constants.LEDs.leftCandle, Constants.LEDs.canBus),
-                new CANdle(Constants.LEDs.rightCandle, Constants.LEDs.canBus));
+                new CANdle(LEDConstants.leftCandle, LEDConstants.canBus),
+                new CANdle(LEDConstants.rightCandle, LEDConstants.canBus));
 
         // Set color on the CANdles themselves
-        setColor(Color.lynk, 0, Constants.LEDs.startIdx);
+        setColor(Color.lynk, 0, LEDConstants.startIdx);
     }
 
     private static void setColor(Color color, int startIdx, int count) {
@@ -128,23 +128,23 @@ public class LEDSubsystem extends SubsystemBase {
     }
 
     private static void setColor(Color color, int count) {
-        setColor(color, Constants.LEDs.startIdx, count);
+        setColor(color, LEDConstants.startIdx, count);
     }
 
     private static void setColor(Color color) {
-        setColor(color, Constants.LEDs.numLEDs);
+        setColor(color, LEDConstants.numLEDs);
     }
 
     private static void setColor(Color color, double pct) {
-        int ledCount = (int)Math.round(Constants.LEDs.numLEDs * pct);
+        int ledCount = (int)Math.round(LEDConstants.numLEDs * pct);
 
-        setColor(Color.off, Constants.LEDs.startIdx + ledCount, Constants.LEDs.numLEDs - ledCount);
+        setColor(Color.off, LEDConstants.startIdx + ledCount, LEDConstants.numLEDs - ledCount);
         setColor(color, ledCount);
     }
 
     // private static void setLarson(Color color, int count) {
     //     leds.animate(new LarsonAnimation(color.r, color.g, color.b, 255, 0.5, count, LarsonAnimation.BounceMode.Front,
-    //             7, Constants.LEDs.startIdx));
+    //             7, LEDConstants.startIdx));
     // }
 
     public static void triggerError() {
@@ -174,7 +174,7 @@ public class LEDSubsystem extends SubsystemBase {
             }
         } else {
             // Check if the temporary state should be cleared
-            if (tempStateTimer.isRunning() && tempStateTimer.hasElapsed(Constants.LEDs.tempStateTime)) {
+            if (tempStateTimer.isRunning() && tempStateTimer.hasElapsed(LEDConstants.tempStateTime)) {
                 tempStateTimer.stop();
             }
             // Compute the proper state if's not temporarily overridden
@@ -182,11 +182,11 @@ public class LEDSubsystem extends SubsystemBase {
                 ClimbState climbState = RobotState.getClimbState();
                 double timeLeft = DriverStation.getMatchTime();
 
-                if (DriverStation.isTeleopEnabled() && timeLeft < Constants.LEDs.endGameNotifyStart && endGameTimer.get() == 0) {
+                if (DriverStation.isTeleopEnabled() && timeLeft < LEDConstants.endGameNotifyStart && endGameTimer.get() == 0) {
                     DogLog.log("LED/Status", "Begin end game");
                     endGameTimer.start();
                     state = LEDState.ENDGAME;
-                } else if (endGameTimer.isRunning() && endGameTimer.hasElapsed(Constants.LEDs.endGameNotifyDuration)) {
+                } else if (endGameTimer.isRunning() && endGameTimer.hasElapsed(LEDConstants.endGameNotifyDuration)) {
                     DogLog.log("LED/Status", "End end game");
                     endGameTimer.stop();
                 } else {
@@ -252,7 +252,7 @@ public class LEDSubsystem extends SubsystemBase {
         }
 
         // Blink the LEDs if the blink interval has elapsed
-        if (blinkTimer.isRunning() && blinkTimer.advanceIfElapsed((state == LEDState.ERROR || state == LEDState.WARNING || state == LEDState.INFO) ? Constants.LEDs.errorBlinkRate : Constants.LEDs.blinkRate)) {
+        if (blinkTimer.isRunning() && blinkTimer.advanceIfElapsed((state == LEDState.ERROR || state == LEDState.WARNING || state == LEDState.INFO) ? LEDConstants.errorBlinkRate : LEDConstants.blinkRate)) {
             blinkOff = !blinkOff;
             setColor(blinkOff ? Color.off : state.config.color);
         }
