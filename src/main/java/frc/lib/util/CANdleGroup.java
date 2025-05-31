@@ -6,7 +6,7 @@ import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdleConfiguration;
 
 import dev.doglog.DogLog;
-import frc.robot.auto.Constants;
+import frc.robot.subsystems.led.LEDConstants;
 
 public class CANdleGroup {
     private CANdle[] candles;
@@ -18,7 +18,7 @@ public class CANdleGroup {
 
     private void applyConfigs() {
         CANdleConfiguration config = new CANdleConfiguration();
-        config.brightnessScalar = frc.robot.auto.LEDs.brightness;
+        config.brightnessScalar = LEDConstants.brightness;
         config.stripType = LEDStripType.GRB;
         config.v5Enabled = true;
         config.disableWhenLOS = false; //TODO: verify // TODO: true -- why is this triggering?

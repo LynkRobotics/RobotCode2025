@@ -28,8 +28,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
-import frc.robot.auto.Constants;
 import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
+import frc.robot.subsystems.pose.PoseConstants;
 import frc.robot.subsystems.pose.PoseSubsystem;
 import frc.robot.subsystems.robotstate.RobotState;
 
@@ -245,7 +245,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             () -> autoUp = false,
             () -> {
                 // TODO Always flip?
-                if (!autoUp && PoseSubsystem.distanceTo(PoseSubsystem.flipIfRed(target)) <= frc.robot.auto.Pose.autoUpDistance) {
+                if (!autoUp && PoseSubsystem.distanceTo(PoseSubsystem.flipIfRed(target)) <= PoseConstants.autoUpDistance) {
                     Stop stop = stopSupplier.get();
                     RobotState.updateActiveStop(stop);
                     setHeight(stopHeight(stop));

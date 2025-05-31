@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
 import frc.robot.Robot;
-import frc.robot.auto.Constants;
+import frc.robot.Constants;
 import frc.robot.subsystems.pose.PoseConstants;
 import frc.robot.subsystems.vision.VisionConstants.Camera;
 import frc.robot.subsystems.vision.VisionConstants.CameraMode;

@@ -6,7 +6,7 @@ import com.ctre.phoenix.led.FireAnimation;
 import com.ctre.phoenix.led.LarsonAnimation;
 import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 
-import frc.robot.auto.Constants;
+import frc.robot.Constants;
 
 import com.ctre.phoenix.led.RainbowAnimation;
 

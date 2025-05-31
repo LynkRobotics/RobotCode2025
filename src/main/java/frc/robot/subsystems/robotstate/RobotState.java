@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
 import frc.lib.util.TunableOption;
-import frc.robot.auto.Constants;
+import frc.robot.Constants;
 import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
 import frc.robot.subsystems.endeffector.EndEffectorConstants;
 import frc.robot.subsystems.index.IndexConstants;

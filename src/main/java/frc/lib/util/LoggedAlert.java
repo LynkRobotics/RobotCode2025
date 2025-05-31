@@ -4,7 +4,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.lib.util.Elastic.Notification;
 import frc.lib.util.Elastic.Notification.NotificationLevel;
-import frc.robot.auto.Constants;
+import frc.robot.Constants;
 import frc.robot.subsystems.led.LEDSubsystem;
 
 public class LoggedAlert {

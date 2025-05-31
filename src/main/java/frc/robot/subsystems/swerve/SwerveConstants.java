@@ -10,7 +10,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
-import frc.robot.auto.Constants;
+import frc.robot.Constants;
 
 public class SwerveConstants {
     public static final String swerveCanBus = "lynk";

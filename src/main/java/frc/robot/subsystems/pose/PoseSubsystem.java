@@ -24,9 +24,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.pose.PoseConstants.Cage;
 import frc.robot.subsystems.pose.PoseConstants.ReefFace;
 import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.Robot;
-import frc.robot.auto.Constants;
+import frc.robot.Constants;
 
 public class PoseSubsystem extends SubsystemBase {
     private static PoseSubsystem instance;
@@ -49,7 +50,7 @@ public class PoseSubsystem extends SubsystemBase {
         this.s_Swerve = s_Swerve;
         this.s_Vision = s_Vision;
 
-        gyro = new Pigeon2(PoseConstants.pigeonID, frc.robot.auto.Swerve.swerveCanBus);
+        gyro = new Pigeon2(PoseConstants.pigeonID, SwerveConstants.swerveCanBus);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);        
 
@@ -57,7 +58,7 @@ public class PoseSubsystem extends SubsystemBase {
         PoseConstants.rotationPID.setIZone(PoseConstants.rotationIZone); // Only use Integral term within this range
         PoseConstants.rotationPID.reset();
 
-        poseEstimator = new SwerveDrivePoseEstimator(frc.robot.auto.Swerve.swerveKinematics, getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d());
+        poseEstimator = new SwerveDrivePoseEstimator(SwerveConstants.swerveKinematics, getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d());
         VisionSubsystem.setPoseEstimator(poseEstimator);
         VisionSubsystem.setHeadingProvider(this::getHeading);
 
@@ -71,7 +72,7 @@ public class PoseSubsystem extends SubsystemBase {
                 new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
                 new PIDConstants(5, 0.0, 0.0)  // Rotation PID constants
             ),
-            frc.robot.auto.PathPlanner.robotConfig,
+            Constants.PathPlanner.robotConfig,
             Robot::isRed,
             s_Swerve // Reference to Swerve subsystem to set requirements
         );

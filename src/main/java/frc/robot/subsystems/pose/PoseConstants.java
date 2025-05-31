@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Robot;
-import frc.robot.auto.Constants;
+import frc.robot.Constants;
 
 public class PoseConstants {
     public static final int pigeonID = 1;
