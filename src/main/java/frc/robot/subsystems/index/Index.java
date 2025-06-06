@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.robotstate.RobotState;
 import frc.robot.subsystems.robotstate.RobotState.GamePieceState;
 
-public class IndexSubsystem extends SubsystemBase {
+public class Index extends SubsystemBase {
     /* Devices */
     private final TalonFX motor;
     /* Control Requests */
@@ -28,7 +28,7 @@ public class IndexSubsystem extends SubsystemBase {
 
     private int stallCount = 0;
 
-    public IndexSubsystem() {
+    public Index() {
         /* Devices */
         motor = new TalonFX(IndexConstants.motorID, IndexConstants.canBus);
 

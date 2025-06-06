@@ -3,7 +3,7 @@ package frc.robot.commands.pidswerve;
 import frc.lib.util.LoggedCommandBase;
 import frc.robot.commands.pidswerve.PIDSwerveConstants.PIDSpeed;
 import frc.robot.subsystems.pose.PoseConstants;
-import frc.robot.subsystems.pose.PoseSubsystem;
+import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.swerve.Swerve;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.Timer;
 
 public class PIDSwerve extends LoggedCommandBase {
     private final Swerve s_Swerve;
-    private final PoseSubsystem s_Pose;
+    private final Pose s_Pose;
     private final Pose2d targetPose;
     private final boolean precise;
     private final PIDController xPID, yPID;
@@ -28,11 +28,11 @@ public class PIDSwerve extends LoggedCommandBase {
     private boolean ignoreY = false;
     private boolean fastAlign = false;
 
-    public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise, PIDSpeed speed, double maxVisionDiff) {
+    public PIDSwerve(Swerve s_Swerve, Pose s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise, PIDSpeed speed, double maxVisionDiff) {
         super();
 
         if (flipIfRed) {
-            targetPose = PoseSubsystem.flipIfRed(targetPose);
+            targetPose = Pose.flipIfRed(targetPose);
         }
 
         this.s_Swerve = s_Swerve;
@@ -75,11 +75,11 @@ public class PIDSwerve extends LoggedCommandBase {
         }
     }
 
-    public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise, PIDSpeed speed) {
+    public PIDSwerve(Swerve s_Swerve, Pose s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise, PIDSpeed speed) {
         this(s_Swerve, s_Pose, targetPose, flipIfRed, precise, speed, Double.POSITIVE_INFINITY);
     }
 
-    public PIDSwerve(Swerve s_Swerve, PoseSubsystem s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise) {
+    public PIDSwerve(Swerve s_Swerve, Pose s_Pose, Pose2d targetPose, boolean flipIfRed, boolean precise) {
         this(s_Swerve, s_Pose, targetPose, flipIfRed, precise, PIDSpeed.FAST);
     }
 
@@ -178,6 +178,6 @@ public class PIDSwerve extends LoggedCommandBase {
 
     @Override
     public String getName() {
-        return "PID Swerve to " + PoseSubsystem.prettyPose(targetPose) + (precise ? " (precise)" : " (rough)");
+        return "PID Swerve to " + Pose.prettyPose(targetPose) + (precise ? " (precise)" : " (rough)");
     }
 }

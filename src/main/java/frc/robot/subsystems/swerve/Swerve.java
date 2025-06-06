@@ -3,7 +3,7 @@ package frc.robot.subsystems.swerve;
 import frc.lib.util.LoggedCommands;
 import frc.lib.util.SwerveModule;
 import frc.robot.Constants;
-import frc.robot.subsystems.pose.PoseSubsystem;
+import frc.robot.subsystems.pose.Pose;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
-    private PoseSubsystem s_Pose = null;
+    private Pose s_Pose = null;
 
     public SwerveModule[] mSwerveMods;
 
@@ -68,7 +68,7 @@ public class Swerve extends SubsystemBase {
                                     translation.getX(), 
                                     translation.getY(), 
                                     rotation, 
-                                    PoseSubsystem.getInstance().getHeading()
+                                    Pose.getInstance().getHeading()
                                 );
 
         driveRobotRelative(desiredChassisSpeeds, isOpenLoop);
@@ -195,7 +195,7 @@ public class Swerve extends SubsystemBase {
         DogLog.log("Swerve/Current Command", currentCommand == null ? "None" : currentCommand.getName());
 
         if (s_Pose == null) {
-            s_Pose = PoseSubsystem.getInstance();
+            s_Pose = Pose.getInstance();
         }
 
         boolean aligned = true;

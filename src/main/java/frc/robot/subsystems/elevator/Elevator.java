@@ -30,10 +30,10 @@ import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
 import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
 import frc.robot.subsystems.pose.PoseConstants;
-import frc.robot.subsystems.pose.PoseSubsystem;
+import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.robotstate.RobotState;
 
-public class ElevatorSubsystem extends SubsystemBase {
+public class Elevator extends SubsystemBase {
     private final TalonFX leftMotor;
     private final TalonFX rightMotor;
     private final VoltageOut voltageOut = new VoltageOut(0).withEnableFOC(true);
@@ -55,7 +55,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     
     private final double positionDiffMax = 0.5;
 
-    public ElevatorSubsystem() {
+    public Elevator() {
         leftMotor = new TalonFX(ElevatorConstants.leftID, ElevatorConstants.canBus);
         rightMotor = new TalonFX(ElevatorConstants.rightID, ElevatorConstants.canBus);
         applyConfigs();
@@ -228,14 +228,14 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         return LoggedCommands.defer("Smooth Elevator Up to Target",
             () -> {
-                Translation2d myTarget = PoseSubsystem.flipIfRed(target);
-                double startingDistance = PoseSubsystem.distanceTo(myTarget);
+                Translation2d myTarget = Pose.flipIfRed(target);
+                double startingDistance = Pose.distanceTo(myTarget);
 
                 DogLog.log("Misc/Debug 0", startingDistance);
                 return SmoothMove(nextStop, () -> {
-                    DogLog.log("Misc/Debug 1", PoseSubsystem.distanceTo(myTarget));
-                    DogLog.log("Misc/Debug 2", Math.max(0.0, PoseSubsystem.distanceTo(myTarget) - closeEnough));
-                    return (1.0 - Math.max(0.0, PoseSubsystem.distanceTo(myTarget) - closeEnough) / startingDistance);
+                    DogLog.log("Misc/Debug 1", Pose.distanceTo(myTarget));
+                    DogLog.log("Misc/Debug 2", Math.max(0.0, Pose.distanceTo(myTarget) - closeEnough));
+                    return (1.0 - Math.max(0.0, Pose.distanceTo(myTarget) - closeEnough) / startingDistance);
                 });
             }, Set.of(this));
     }
@@ -245,7 +245,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             () -> autoUp = false,
             () -> {
                 // TODO Always flip?
-                if (!autoUp && PoseSubsystem.distanceTo(PoseSubsystem.flipIfRed(target)) <= PoseConstants.autoUpDistance) {
+                if (!autoUp && Pose.distanceTo(Pose.flipIfRed(target)) <= PoseConstants.autoUpDistance) {
                     Stop stop = stopSupplier.get();
                     RobotState.updateActiveStop(stop);
                     setHeight(stopHeight(stop));

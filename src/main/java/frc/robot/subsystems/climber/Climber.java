@@ -21,7 +21,7 @@ import frc.lib.util.TunableOption;
 import frc.robot.subsystems.robotstate.RobotState;
 import frc.robot.subsystems.robotstate.RobotState.ClimbState;
 
-public class ClimberSubsystem extends SubsystemBase {
+public class Climber extends SubsystemBase {
     /* Devices */
     private final TalonFX motor;
 
@@ -38,7 +38,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     private static final TunableOption optOverrideClimberTiming = new TunableOption("Override Climber Timing", false);
 
-    public ClimberSubsystem() {
+    public Climber() {
         /* Devices */
         motor = new TalonFX(ClimberConstants.motorID, ClimberConstants.canBus);
 

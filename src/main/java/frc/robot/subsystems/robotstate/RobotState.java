@@ -17,13 +17,13 @@ import frc.robot.Constants;
 import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
 import frc.robot.subsystems.endeffector.EndEffectorConstants;
 import frc.robot.subsystems.index.IndexConstants;
-import frc.robot.subsystems.pose.PoseSubsystem;
+import frc.robot.subsystems.pose.Pose;
 
 import static frc.robot.Options.optAlgaeBargeOnly;
 
 public class RobotState extends SubsystemBase {
     private static RobotState instance;
-    private static PoseSubsystem pose;
+    private static Pose pose;
     private static final CANrange funnelSensor;
     private static final CANrange indexSensor;
     private static final CANrange flipperSensor;
@@ -151,12 +151,12 @@ public class RobotState extends SubsystemBase {
 
     // TODO Consider allowing a range, so that Elevator doesn't oscillate  
     public static boolean raisedElevatorAllowable() {
-        if (pose == null) pose = PoseSubsystem.getInstance();
+        if (pose == null) pose = Pose.getInstance();
         if (pose == null) return false;
         return (pose.inReefElevatorZone() || optOverrideReefElevatorZone.get()) && pose.isUpright();
     }
     public static boolean elevatorDownAllowed() {
-        if (pose == null) pose = PoseSubsystem.getInstance();
+        if (pose == null) pose = Pose.getInstance();
         if (pose == null) return true;
         return pose.elevatorDownAllowed() || optOverrideElevatorDownAllowed.get();
     }
@@ -183,7 +183,7 @@ public class RobotState extends SubsystemBase {
     }
 
     public static boolean algaeToProcessor() {
-        if (pose == null) pose = PoseSubsystem.getInstance();
+        if (pose == null) pose = Pose.getInstance();
         if (pose == null) return false;
 
         return !optAlgaeBargeOnly.get() && pose.nearProcessor();

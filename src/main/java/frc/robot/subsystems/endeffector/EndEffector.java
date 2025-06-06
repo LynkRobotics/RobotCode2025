@@ -15,7 +15,7 @@ import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
 import frc.robot.subsystems.robotstate.RobotState;
 import frc.robot.subsystems.robotstate.RobotState.GamePieceState;
 
-public class EndEffectorSubsystem extends SubsystemBase {
+public class EndEffector extends SubsystemBase {
     /* Devices */
     private final TalonFX motor;
     /* Control Requests */
@@ -32,7 +32,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
 
     private GamePieceState lastState = GamePieceState.NONE;
 
-    public EndEffectorSubsystem() {
+    public EndEffector() {
         /* Devices */
         motor = new TalonFX(EndEffectorConstants.motorID, EndEffectorConstants.canBus);
 

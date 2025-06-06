@@ -21,19 +21,19 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.auto.AutoConstants;
 import frc.robot.subsystems.pose.PoseConstants.Cage;
 import frc.robot.subsystems.pose.PoseConstants.ReefFace;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConstants;
-import frc.robot.subsystems.vision.VisionSubsystem;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.Robot;
+import frc.robot.autos.AutoConstants;
 import frc.robot.Constants;
 
-public class PoseSubsystem extends SubsystemBase {
-    private static PoseSubsystem instance;
+public class Pose extends SubsystemBase {
+    private static Pose instance;
     private final Swerve s_Swerve;
-    private final VisionSubsystem s_Vision;
+    private final Vision s_Vision;
 
     private final SwerveDrivePoseEstimator poseEstimator;
     private final Pigeon2 gyro;
@@ -44,7 +44,7 @@ public class PoseSubsystem extends SubsystemBase {
         FAR
     }
 
-    public PoseSubsystem(Swerve s_Swerve, VisionSubsystem s_Vision) {
+    public Pose(Swerve s_Swerve, Vision s_Vision) {
         assert(instance == null);
         instance = this;
         
@@ -60,8 +60,8 @@ public class PoseSubsystem extends SubsystemBase {
         PoseConstants.rotationPID.reset();
 
         poseEstimator = new SwerveDrivePoseEstimator(SwerveConstants.swerveKinematics, getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d());
-        VisionSubsystem.setPoseEstimator(poseEstimator);
-        VisionSubsystem.setHeadingProvider(this::getHeading);
+        Vision.setPoseEstimator(poseEstimator);
+        Vision.setHeadingProvider(this::getHeading);
 
         AutoBuilder.configure(
             this::getPose,
@@ -105,7 +105,7 @@ public class PoseSubsystem extends SubsystemBase {
         // });
     }
 
-    public static PoseSubsystem getInstance() {
+    public static Pose getInstance() {
         return instance;
     }
     
@@ -248,7 +248,7 @@ public class PoseSubsystem extends SubsystemBase {
     }
 
     public static double distanceTo(Translation2d target) {
-        return PoseSubsystem.getInstance().getPose().getTranslation().getDistance(target);
+        return Pose.getInstance().getPose().getTranslation().getDistance(target);
     }
 
     public static boolean inReefElevatorZone(Translation2d position) {

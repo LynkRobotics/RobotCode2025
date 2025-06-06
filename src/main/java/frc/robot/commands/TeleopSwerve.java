@@ -5,7 +5,7 @@ import frc.robot.subsystems.robotstate.RobotState;
 import frc.robot.Robot;
 import frc.robot.Constants;
 import frc.robot.subsystems.robotstate.RobotState.ClimbState;
-import frc.robot.subsystems.pose.PoseSubsystem;
+import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConstants;
 
@@ -25,7 +25,7 @@ public class TeleopSwerve extends LoggedCommandBase {
     private final DoubleSupplier strafeSup;
     private final DoubleSupplier rotationSup;
     private DoubleSupplier speedLimitSupplier;
-    private PoseSubsystem s_Pose = null;
+    private Pose s_Pose = null;
     private boolean autoAiming = false;
     private Rotation2d lastAngle = null;
 
@@ -59,7 +59,7 @@ public class TeleopSwerve extends LoggedCommandBase {
         translationVal *= teleOpMult;
 
         if (s_Pose == null) {
-            s_Pose = PoseSubsystem.getInstance();
+            s_Pose = Pose.getInstance();
         }
 
         // Driver position is inverted for Red alliance, so adjust field-oriented controls
@@ -73,15 +73,15 @@ public class TeleopSwerve extends LoggedCommandBase {
             Pose2d pose = s_Pose.getPose();
             Translation2d position = pose.getTranslation();
             Rotation2d rotation = pose.getRotation();
-            if (PoseSubsystem.inWing(position)) {
-                Rotation2d bearing = PoseSubsystem.reefBearing(position);
+            if (Pose.inWing(position)) {
+                Rotation2d bearing = Pose.reefBearing(position);
                 
                 if (!autoAiming) {
-                    PoseSubsystem.angleErrorReset();
+                    Pose.angleErrorReset();
                     autoAiming = true;
                 } else {
                     Rotation2d angleError = bearing.minus(lastAngle);
-                    rotationVal = PoseSubsystem.angleErrorToSpeed(angleError);
+                    rotationVal = Pose.angleErrorToSpeed(angleError);
                 }
                 lastAngle = rotation;
             } else {

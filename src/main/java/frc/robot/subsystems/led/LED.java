@@ -20,7 +20,7 @@ import frc.lib.util.CANdleGroup;
 import frc.robot.subsystems.robotstate.RobotState;
 import frc.robot.subsystems.robotstate.RobotState.ClimbState;
 
-public class LEDSubsystem extends SubsystemBase {
+public class LED extends SubsystemBase {
     /** Creates a new LEDSubsystem. */
     private static CANdleGroup leds;
     private static final Timer tempStateTimer = new Timer();
@@ -113,7 +113,7 @@ public class LEDSubsystem extends SubsystemBase {
         } 
     }
 
-    public LEDSubsystem() {
+    public LED() {
         // Control both CANdles in the same way
         leds = new CANdleGroup(
                 new CANdle(LEDConstants.leftCandle, LEDConstants.canBus),

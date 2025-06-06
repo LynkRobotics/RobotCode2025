@@ -40,8 +40,8 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import dev.doglog.DogLog;
 
-public class VisionSubsystem extends SubsystemBase {
-    private static VisionSubsystem instance;
+public class Vision extends SubsystemBase {
+    private static Vision instance;
     private Pose2d lastPose = new Pose2d();
     private static PoseEstimator<SwerveModulePosition[]> poseEstimator = null;
     private static Supplier<Rotation2d> headingProvider = null;
@@ -64,17 +64,17 @@ public class VisionSubsystem extends SubsystemBase {
         }
     }
 
-    public VisionSubsystem() {
+    public Vision() {
         assert (instance == null);
         instance = this;
     }
 
-    public static VisionSubsystem getInstance() {
+    public static Vision getInstance() {
         return instance;
     }
 
     public static void setCameraMode(CameraMode cameraMode) {
-        VisionSubsystem.cameraMode = cameraMode;
+        Vision.cameraMode = cameraMode;
         DogLog.log("Vision/Camera Mode", cameraMode);
         SmartDashboard.putString("Vision/Camera Mode", cameraMode.toString());
     }
@@ -92,11 +92,11 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public static void setPoseEstimator(PoseEstimator<SwerveModulePosition[]> poseEstimator) {
-        VisionSubsystem.poseEstimator = poseEstimator;
+        Vision.poseEstimator = poseEstimator;
     }
 
     public static void setHeadingProvider(Supplier<Rotation2d> headingProvider) {
-        VisionSubsystem.headingProvider = headingProvider;
+        Vision.headingProvider = headingProvider;
     }
 
     public static boolean poseIsReasonable(Pose3d pose) {
