@@ -21,6 +21,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.auto.AutoConstants;
 import frc.robot.subsystems.pose.PoseConstants.Cage;
 import frc.robot.subsystems.pose.PoseConstants.ReefFace;
 import frc.robot.subsystems.swerve.Swerve;
@@ -72,7 +73,7 @@ public class PoseSubsystem extends SubsystemBase {
                 new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
                 new PIDConstants(5, 0.0, 0.0)  // Rotation PID constants
             ),
-            Constants.PathPlanner.robotConfig,
+            AutoConstants.robotConfig,
             Robot::isRed,
             s_Swerve // Reference to Swerve subsystem to set requirements
         );

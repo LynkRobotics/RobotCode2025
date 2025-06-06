@@ -49,6 +49,7 @@ import frc.robot.commands.*;
 import frc.robot.commands.pidswerve.PIDSwerve;
 import frc.robot.subsystems.robotstate.RobotState;
 import frc.robot.subsystems.robotstate.RobotState.ClimbState;
+import frc.robot.subsystems.auto.AutoConstants;
 import frc.robot.subsystems.climber.ClimberSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
@@ -199,11 +200,11 @@ public class RobotContainer {
                                     () -> false)), //RobotState.getNextStop() == Stop.L2 || RobotState.getNextStop() == Stop.L3)),
                             Commands.either(
                                 Commands.sequence(
-                                    LoggedCommands.waitSeconds("Score coral watchdog", Constants.Auto.scoreCoralTimeout),
+                                    LoggedCommands.waitSeconds("Score coral watchdog", AutoConstants.scoreCoralTimeout),
                                     Commands.runOnce(() -> LoggedAlert.Error("Auto", "Timed out", "Timed out moving to score coral"))
                                 ),
                                 Commands.idle(),
-                                () -> DriverStation.isAutonomousEnabled() && DriverStation.getMatchTime() >= (Constants.Auto.scoreCoralTimeout + Constants.Auto.scoreCoralTimeLeft))),
+                                () -> DriverStation.isAutonomousEnabled() && DriverStation.getMatchTime() >= (AutoConstants.scoreCoralTimeout + AutoConstants.scoreCoralTimeLeft))),
                         s_Swerve.Stop()),
                     Commands.sequence(
                         Commands.either(
@@ -527,7 +528,7 @@ public class RobotContainer {
     }
 
     private Command BackUpCommand() {
-        Transform2d transform = new Transform2d(-Constants.Auto.backUpPushDistance, 0.0, Rotation2d.kZero); 
+        Transform2d transform = new Transform2d(-AutoConstants.backUpPushDistance, 0.0, Rotation2d.kZero); 
         return
             LoggedCommands.race("Backup with timeout",
                 LoggedCommands.waitSeconds("Backup timeout", 3), // TODO Make constant
@@ -536,7 +537,7 @@ public class RobotContainer {
 
     @SuppressWarnings ("unused")
     private Command BackUpAndWaitForCoral() {
-        Transform2d transform = new Transform2d(-Constants.Auto.backUpCSDistance, 0.0, Rotation2d.kZero); 
+        Transform2d transform = new Transform2d(-AutoConstants.backUpCSDistance, 0.0, Rotation2d.kZero); 
         return LoggedCommands.deadline("Backup and wait for Coral",
             RobotState.WaitForCoral(),
             Commands.sequence(
@@ -793,9 +794,9 @@ public class RobotContainer {
                         Units.metersToInches(currentPose.getY() - startingPose.getY()),
                         startingPose.getRotation().minus(currentPose.getRotation()).getDegrees());
 
-                    if (Math.abs(currentPose.getX() - startingPose.getX()) < Constants.Auto.maxSetupXError &&
-                        Math.abs(currentPose.getY() - startingPose.getY()) < Constants.Auto.maxSetupYError &&
-                        Math.abs(startingPose.getRotation().minus(currentPose.getRotation()).getDegrees()) < Constants.Auto.maxSetupDegError) {
+                    if (Math.abs(currentPose.getX() - startingPose.getX()) < AutoConstants.maxSetupXError &&
+                        Math.abs(currentPose.getY() - startingPose.getY()) < AutoConstants.maxSetupYError &&
+                        Math.abs(startingPose.getRotation().minus(currentPose.getRotation()).getDegrees()) < AutoConstants.maxSetupDegError) {
                         differenceOK = true;
                     }
                 }
