@@ -41,7 +41,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import dev.doglog.DogLog;
 
 public class Vision extends SubsystemBase {
-    private static Vision instance;
+    public static Vision instance;
     private Pose2d lastPose = new Pose2d();
     private static PoseEstimator<SwerveModulePosition[]> poseEstimator = null;
     private static Supplier<Rotation2d> headingProvider = null;

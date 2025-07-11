@@ -32,8 +32,6 @@ import frc.robot.Constants;
 
 public class Pose extends SubsystemBase {
     public static Pose instance;
-    private final Swerve s_Swerve;
-    private final Vision s_Vision;
 
     private final SwerveDrivePoseEstimator poseEstimator;
     private final Pigeon2 gyro;
@@ -44,13 +42,10 @@ public class Pose extends SubsystemBase {
         FAR
     }
 
-    public Pose(Swerve s_Swerve, Vision s_Vision) {
+    public Pose() {
         assert(instance == null);
         instance = this;
         
-        this.s_Swerve = s_Swerve;
-        this.s_Vision = s_Vision;
-
         gyro = new Pigeon2(PoseConstants.pigeonID, SwerveConstants.swerveCanBus);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);        
@@ -59,15 +54,15 @@ public class Pose extends SubsystemBase {
         PoseConstants.rotationPID.setIZone(PoseConstants.rotationIZone); // Only use Integral term within this range
         PoseConstants.rotationPID.reset();
 
-        poseEstimator = new SwerveDrivePoseEstimator(SwerveConstants.swerveKinematics, getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d());
+        poseEstimator = new SwerveDrivePoseEstimator(SwerveConstants.swerveKinematics, getGyroYaw(), Swerve.instance.getModulePositions(), new Pose2d());
         Vision.setPoseEstimator(poseEstimator);
         Vision.setHeadingProvider(this::getHeading);
 
         AutoBuilder.configure(
             this::getPose,
             this::setPose,
-            s_Swerve::getSpeeds, 
-            (speeds, feedforwards) -> s_Swerve.driveRobotRelativeAuto(speeds),
+            Swerve.instance::getSpeeds,
+            (speeds, feedforwards) -> Swerve.instance.driveRobotRelativeAuto(speeds),
             // TODO Configure PIDs
             new PPHolonomicDriveController(
                 new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
@@ -75,7 +70,7 @@ public class Pose extends SubsystemBase {
             ),
             AutoConstants.robotConfig,
             Robot::isRed,
-            s_Swerve // Reference to Swerve subsystem to set requirements
+            Swerve.instance // Reference to Swerve subsystem to set requirements
         );
 
         PathPlannerLogging.setLogTargetPoseCallback((targetPose) -> {
@@ -161,7 +156,7 @@ public class Pose extends SubsystemBase {
     }
 
     public void setPose(Pose2d pose) {
-        poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), pose);
+        poseEstimator.resetPosition(getGyroYaw(), Swerve.instance.getModulePositions(), pose);
         DogLog.log("Pose/Status/Setting Pose", pose);
     }
 
@@ -170,7 +165,7 @@ public class Pose extends SubsystemBase {
     }
 
     public void setHeading(Rotation2d heading) {
-        poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d(getPose().getTranslation(), heading));
+        poseEstimator.resetPosition(getGyroYaw(), Swerve.instance.getModulePositions(), new Pose2d(getPose().getTranslation(), heading));
     }
 
     public void zeroHeading() {
@@ -326,7 +321,7 @@ public class Pose extends SubsystemBase {
     }
 
     public double visionDifference() {
-        Pose2d visionPose = s_Vision.lastPose();
+        Pose2d visionPose = Vision.instance.lastPose();
 
         if (visionPose == null) {
             return Double.POSITIVE_INFINITY;
@@ -337,7 +332,7 @@ public class Pose extends SubsystemBase {
 
     @Override
     public void periodic() {
-        poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
+        poseEstimator.update(getGyroYaw(), Swerve.instance.getModulePositions());
         Pose2d pose = getPose();
         Robot.field.setRobotPose(pose);
 

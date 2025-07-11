@@ -4,12 +4,8 @@ import java.util.Set;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.lib.util.LoggedCommands;
 import frc.robot.autos.Autos;
@@ -40,6 +36,7 @@ public class RobotContainer {
     private final Swerve s_Swerve;
     @SuppressWarnings ("unused")
     private final LED s_LED;
+    @SuppressWarnings ("unused")
     private final Vision s_Vision;
     private final Pose s_Pose;
     @SuppressWarnings ("unused")
@@ -70,7 +67,7 @@ public class RobotContainer {
         // Initial Subsystems
         s_Swerve = new Swerve();
         s_Vision = new Vision();
-        s_Pose = new Pose(s_Swerve, s_Vision);
+        s_Pose = new Pose();
         s_RobotState = new RobotState();
         s_Elevator = new Elevator();
         s_EndEffector = new EndEffector();
@@ -93,29 +90,5 @@ public class RobotContainer {
         SmartDashboard.putData(LoggedCommands.run("autoSetup/Set Swerve Aligned", s_Swerve::alignStraight, s_Swerve).ignoringDisable(true));
 
         Controls.instance.configureButtonBindings();
-    }
-
-    /**
-     * Use this method to define your button->command mappings. Buttons can be
-     * created by
-     * instantiating a {@link GenericHID} or one of its subclasses ({@link
-     * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
-     * it to a {@link
-     * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-     */
-    public void autonomousInit() {
-        // Ensure the Swerve subsystem doesn't run a default command, in case we previously were in teleop mode
-        Command oldDefault = s_Swerve.getDefaultCommand();
-
-        s_Swerve.removeDefaultCommand();
-        if (oldDefault != null && oldDefault.isScheduled()) {
-            oldDefault.cancel();
-        }
-    }
-
-    public void teleopInit() {
-        s_Swerve.stopSwerve();
-        CommandScheduler.getInstance().schedule(s_Swerve.BrakeDriveMotors());
-        s_Swerve.setDefaultCommand(Controls.instance.TeleOpSwerve());
     }
 }
