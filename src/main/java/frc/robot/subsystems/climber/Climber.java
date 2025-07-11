@@ -22,6 +22,8 @@ import frc.robot.subsystems.robotstate.RobotState;
 import frc.robot.subsystems.robotstate.RobotState.ClimbState;
 
 public class Climber extends SubsystemBase {
+    public static final Climber instance = new Climber();
+
     /* Devices */
     private final TalonFX motor;
 

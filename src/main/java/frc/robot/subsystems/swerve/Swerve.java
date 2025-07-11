@@ -20,11 +20,15 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
+    public static Swerve instance;
     private Pose s_Pose = null;
 
     public SwerveModule[] mSwerveMods;
 
     public Swerve() {
+        assert (instance == null);
+        instance = this;
+
         // To use Latch in 2025, we need to reverse what the front of the robot is
         if (Constants.isRocky) {
             mSwerveMods = new SwerveModule[] {

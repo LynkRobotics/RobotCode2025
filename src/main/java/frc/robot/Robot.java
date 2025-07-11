@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.lib.util.Elastic;
+import frc.robot.autos.Autos;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -86,11 +87,6 @@ public class Robot extends TimedRobot {
         DogLog.log("Misc/Robot Status", "Robot has been disabled");
     }
 
-    @Override
-    public void disabledPeriodic() {
-        m_robotContainer.disabledPeriodic();
-    }
-
     /**
      * This autonomous runs the autonomous command selected by your
      * {@link RobotContainer} class.
@@ -100,7 +96,7 @@ public class Robot extends TimedRobot {
         DogLog.log("Misc/Robot Status", "Auto has begun");
 
         m_robotContainer.autonomousInit();
-        m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+        m_autonomousCommand = Autos.instance.getAutonomousCommand();
 
         // schedule the autonomous command (example)
         if (m_autonomousCommand != null) {
@@ -138,11 +134,6 @@ public class Robot extends TimedRobot {
     /** This function is called periodically during operator control. */
     @Override
     public void teleopPeriodic() {
-    }
-
-    @Override
-    public void teleopExit() {
-        m_robotContainer.teleopExit();
     }
 
     @Override

@@ -31,7 +31,7 @@ import frc.robot.autos.AutoConstants;
 import frc.robot.Constants;
 
 public class Pose extends SubsystemBase {
-    private static Pose instance;
+    public static Pose instance;
     private final Swerve s_Swerve;
     private final Vision s_Vision;
 
