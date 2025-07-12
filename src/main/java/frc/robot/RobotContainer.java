@@ -1,13 +1,5 @@
 package frc.robot;
 
-import java.util.Set;
-
-import dev.doglog.DogLog;
-import dev.doglog.DogLogOptions;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Commands;
-import frc.lib.util.LoggedCommands;
 import frc.robot.autos.Autos;
 import frc.robot.subsystems.robotstate.RobotState;
 import frc.robot.subsystems.climber.Climber;
@@ -33,11 +25,13 @@ public class RobotContainer {
     /* Subsystems */
     @SuppressWarnings ("unused")
     private final RobotState s_RobotState;
+    @SuppressWarnings ("unused")
     private final Swerve s_Swerve;
     @SuppressWarnings ("unused")
     private final LED s_LED;
     @SuppressWarnings ("unused")
     private final Vision s_Vision;
+    @SuppressWarnings ("unused")
     private final Pose s_Pose;
     @SuppressWarnings ("unused")
     private final Elevator s_Elevator;
@@ -47,23 +41,15 @@ public class RobotContainer {
     private final Index s_Index;
     @SuppressWarnings ("unused")
     private final Climber s_Climber;
+    @SuppressWarnings ("unused")
+    private final Controls s_Controls;
+    @SuppressWarnings ("unused")
+    private final Autos s_Autos;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
-        DogLog.setOptions(
-            new DogLogOptions()
-            .withCaptureConsole(true)
-            .withCaptureDs(true)
-            .withCaptureNt(true)
-            .withLogEntryQueueCapacity(1000)
-            .withLogExtras(true)
-            .withNtPublish(Constants.atHQ));
-
-        DogLog.log("Misc/RIO Serial Number", RobotController.getSerialNumber());
-        DogLog.log("Misc/Is Rocky?", Constants.isRocky);
-
         // Initial Subsystems
         s_Swerve = new Swerve();
         s_Vision = new Vision();
@@ -74,21 +60,7 @@ public class RobotContainer {
         s_LED = new LED();
         s_Index = new Index();
         s_Climber = new Climber();
-
-        // Default named commands for PathPlanner
-        SmartDashboard.putNumber("auto/Startup delay", 0.0);
-        Autos.autoNamedCommand("Startup delay", Commands.defer(() -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()));
-        Autos.autoNamedCommand("Stop", Commands.runOnce(s_Swerve::stopSwerve));
-
-        SmartDashboard.putNumber("TeleOp Speed Governor", 1.0);
-
-        SmartDashboard.putData(LoggedCommands.runOnce("Zero Gyro", s_Pose::zeroGyro, s_Swerve));
-        SmartDashboard.putData(LoggedCommands.runOnce("Reset heading", s_Pose::resetHeading, s_Swerve));
-
-        SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Coast", s_Swerve::setMotorsToCoast, s_Swerve).ignoringDisable(true));
-        SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Brake", s_Swerve::setMotorsToBrake, s_Swerve).ignoringDisable(true));
-        SmartDashboard.putData(LoggedCommands.run("autoSetup/Set Swerve Aligned", s_Swerve::alignStraight, s_Swerve).ignoringDisable(true));
-
-        Controls.instance.configureButtonBindings();
+        s_Controls = new Controls();
+        s_Autos = new Autos();
     }
 }

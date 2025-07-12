@@ -7,6 +7,7 @@ import static frc.robot.Options.optServiceMode;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,13 +19,14 @@ import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
+import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.robotstate.RobotState;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.superstructure.Superstructure;
 import frc.robot.commands.TeleopSwerve;
 
 public class Controls extends SubsystemBase{
-    public static final Controls instance = new Controls();
+    public static Controls instance;
 
     /* Controllers */
     private final CommandXboxController driver = new CommandXboxController(0);
@@ -33,6 +35,24 @@ public class Controls extends SubsystemBase{
     private final Supplier<Double> translation = driver::getLeftY;
     private final Supplier<Double> strafe = driver::getLeftX;
     private final Supplier<Double> rotation = driver::getRightX;
+
+    public Controls() {
+        assert(instance == null);
+        instance = this;
+
+        SmartDashboard.putNumber("TeleOp Speed Governor", 1.0);
+
+        Pose pose = Pose.instance;
+        SmartDashboard.putData(LoggedCommands.runOnce("Zero Gyro", pose::zeroGyro));
+        SmartDashboard.putData(LoggedCommands.runOnce("Reset heading", pose::resetHeading));
+
+        Swerve swerve = Swerve.instance;
+        SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Coast", swerve::setMotorsToCoast, swerve).ignoringDisable(true));
+        SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Brake", swerve::setMotorsToBrake, swerve).ignoringDisable(true));
+        SmartDashboard.putData(LoggedCommands.run("autoSetup/Set Swerve Aligned", swerve::alignStraight, swerve).ignoringDisable(true));
+
+        configureButtonBindings();
+    }
 
     private Command Rumble() {
         return Commands.deadline(

@@ -5,9 +5,11 @@
 package frc.robot;
 
 import dev.doglog.DogLog;
+import dev.doglog.DogLogOptions;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -48,9 +50,22 @@ public class Robot extends TimedRobot {
         // Serve up deployed files for Elastic dashboard
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
+        DogLog.setOptions(
+            new DogLogOptions()
+            .withCaptureConsole(true)
+            .withCaptureDs(true)
+            .withCaptureNt(true)
+            .withLogEntryQueueCapacity(1000)
+            .withLogExtras(true)
+            .withNtPublish(Constants.atHQ));
+
+        DogLog.log("Misc/RIO Serial Number", RobotController.getSerialNumber());
+        DogLog.log("Misc/Is Rocky?", Constants.isRocky);
+
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our autonomous chooser on the dashboard.
         m_robotContainer = new RobotContainer();
+        
         if (Constants.atHQ) {
             DriverStation.silenceJoystickConnectionWarning(true);
         }

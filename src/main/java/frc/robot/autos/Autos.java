@@ -62,7 +62,12 @@ public class Autos extends SubsystemBase {
         autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
             (stream) -> stream.filter(auto -> !auto.getName().startsWith("Dummy")));
         SmartDashboard.putData("auto/Auto Chooser", autoChooser);
-        buildAutos(autoChooser);        
+        buildAutos(autoChooser);
+        
+        // Default named commands for PathPlanner
+        SmartDashboard.putNumber("auto/Startup delay", 0.0);
+        Autos.autoNamedCommand("Startup delay", Commands.defer(() -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()));
+        Autos.autoNamedCommand("Stop", Commands.runOnce(Swerve.instance::stopSwerve));        
     }
     
     public static void autoNamedCommand(String name, Command command) {
