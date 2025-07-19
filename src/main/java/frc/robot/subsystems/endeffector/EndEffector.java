@@ -16,6 +16,8 @@ import frc.robot.subsystems.robotstate.RobotState;
 import frc.robot.subsystems.robotstate.RobotState.GamePieceState;
 
 public class EndEffector extends SubsystemBase {
+    public static final EndEffector instance = new EndEffector();
+    
     /* Devices */
     private final TalonFX motor;
     /* Control Requests */

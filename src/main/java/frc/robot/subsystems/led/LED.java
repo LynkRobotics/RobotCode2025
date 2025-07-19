@@ -21,6 +21,8 @@ import frc.robot.subsystems.robotstate.RobotState;
 import frc.robot.subsystems.robotstate.RobotState.ClimbState;
 
 public class LED extends SubsystemBase {
+    public static final LED instance = new LED();
+    
     /** Creates a new LEDSubsystem. */
     private static CANdleGroup leds;
     private static final Timer tempStateTimer = new Timer();

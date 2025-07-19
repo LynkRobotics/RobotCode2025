@@ -26,7 +26,7 @@ import frc.robot.superstructure.Superstructure;
 import frc.robot.commands.TeleopSwerve;
 
 public class Controls extends SubsystemBase{
-    public static Controls instance;
+    public static final Controls instance = new Controls();
 
     /* Controllers */
     private final CommandXboxController driver = new CommandXboxController(0);
@@ -37,9 +37,6 @@ public class Controls extends SubsystemBase{
     private final Supplier<Double> rotation = driver::getRightX;
 
     public Controls() {
-        assert(instance == null);
-        instance = this;
-
         SmartDashboard.putNumber("TeleOp Speed Governor", 1.0);
 
         Pose pose = Pose.instance;
@@ -50,8 +47,6 @@ public class Controls extends SubsystemBase{
         SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Coast", swerve::setMotorsToCoast, swerve).ignoringDisable(true));
         SmartDashboard.putData(LoggedCommands.runOnce("autoSetup/Set Swerve Brake", swerve::setMotorsToBrake, swerve).ignoringDisable(true));
         SmartDashboard.putData(LoggedCommands.run("autoSetup/Set Swerve Aligned", swerve::alignStraight, swerve).ignoringDisable(true));
-
-        configureButtonBindings();
     }
 
     private Command Rumble() {

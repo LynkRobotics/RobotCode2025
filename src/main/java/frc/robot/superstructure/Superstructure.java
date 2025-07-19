@@ -50,13 +50,13 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void setFaceCommands(ReefFace face) {
-        coralLeftCommands.put(face, Superstructure.instance.ScoreCoral(face, true));
-        coralRightCommands.put(face, Superstructure.instance.ScoreCoral(face, false));
-        deAlgaefyLeftCommands.put(face, Superstructure.instance.DeAlgaefy(face));
-        deAlgaefyRightCommands.put(face, Superstructure.instance.DeAlgaefy(face));
+        coralLeftCommands.put(face, ScoreCoral(face, true));
+        coralRightCommands.put(face, ScoreCoral(face, false));
+        deAlgaefyLeftCommands.put(face, DeAlgaefy(face));
+        deAlgaefyRightCommands.put(face, DeAlgaefy(face));
     }
     
-    public Command ScoreCoral(ReefFace face, boolean left) {
+    public static Command ScoreCoral(ReefFace face, boolean left) {
         return Commands.either(
             LoggedCommands.sequence("Auto Align " + (left ? "Left " : "Right ") + face.toString() + " & Score",
                 LoggedCommands.parallel("PID Align " + (left ? "Left " : "Right ") + face.toString(),
@@ -137,11 +137,11 @@ public class Superstructure extends SubsystemBase {
         .handleInterrupt(() -> Vision.setCameraMode(CameraMode.DEFAULT));
     }
 
-    public Command DeAlgaefy(ReefFace face) {
+    public static Command DeAlgaefy(ReefFace face) {
         return DeAlgaefy(face, true);
     }
 
-    public Command DeAlgaefy(ReefFace face, boolean extendedBackup) {
+    public static Command DeAlgaefy(ReefFace face, boolean extendedBackup) {
         Stop algaeStop = face.algaeHigh ? Stop.L3_ALGAE: Stop.L2_ALGAE;
         Stop algaeInvertStop = face.algaeHigh ? Stop.L2_ALGAE : Stop.L3_ALGAE;
 

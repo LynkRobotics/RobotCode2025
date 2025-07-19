@@ -20,15 +20,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
-    public static Swerve instance;
-    private Pose s_Pose = null;
-
+    public static final Swerve instance = new Swerve();
+    
     public SwerveModule[] mSwerveMods;
 
     public Swerve() {
-        assert (instance == null);
-        instance = this;
-
         // To use Latch in 2025, we need to reverse what the front of the robot is
         if (Constants.isRocky) {
             mSwerveMods = new SwerveModule[] {
@@ -72,7 +68,7 @@ public class Swerve extends SubsystemBase {
                                     translation.getX(), 
                                     translation.getY(), 
                                     rotation, 
-                                    Pose.getInstance().getHeading()
+                                    Pose.instance.getHeading()
                                 );
 
         driveRobotRelative(desiredChassisSpeeds, isOpenLoop);
@@ -197,10 +193,6 @@ public class Swerve extends SubsystemBase {
     public void periodic() {
         Command currentCommand = getCurrentCommand();
         DogLog.log("Swerve/Current Command", currentCommand == null ? "None" : currentCommand.getName());
-
-        if (s_Pose == null) {
-            s_Pose = Pose.getInstance();
-        }
 
         boolean aligned = true;
         for(SwerveModule mod : mSwerveMods) {

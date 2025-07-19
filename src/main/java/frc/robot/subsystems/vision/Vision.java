@@ -41,7 +41,8 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import dev.doglog.DogLog;
 
 public class Vision extends SubsystemBase {
-    public static Vision instance;
+    public static final Vision instance = new Vision();
+    
     private Pose2d lastPose = new Pose2d();
     private static PoseEstimator<SwerveModulePosition[]> poseEstimator = null;
     private static Supplier<Rotation2d> headingProvider = null;
@@ -62,15 +63,6 @@ public class Vision extends SubsystemBase {
             SmartDashboard.putBoolean("Vision/" + cameraType + " Enabled", true);
             setCameraMode(CameraMode.DEFAULT);
         }
-    }
-
-    public Vision() {
-        assert (instance == null);
-        instance = this;
-    }
-
-    public static Vision getInstance() {
-        return instance;
     }
 
     public static void setCameraMode(CameraMode cameraMode) {

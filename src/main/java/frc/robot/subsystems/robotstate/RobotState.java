@@ -22,8 +22,8 @@ import frc.robot.subsystems.pose.Pose;
 import static frc.robot.Options.optAlgaeBargeOnly;
 
 public class RobotState extends SubsystemBase {
-    private static RobotState instance;
-    private static Pose pose;
+    public static final RobotState instance = new RobotState();
+
     private static final CANrange funnelSensor;
     private static final CANrange indexSensor;
     private static final CANrange flipperSensor;
@@ -73,15 +73,6 @@ public class RobotState extends SubsystemBase {
         applyConfigs();
     }
     
-    public RobotState() {
-        if (instance == null) {
-            instance = this;
-        } else {
-            System.out.println("Multiple RobotState instances detected!");
-            System.exit(1);
-        }
-    }
-
     public static RobotState getInstance() {
         return instance;
     }
@@ -151,14 +142,10 @@ public class RobotState extends SubsystemBase {
 
     // TODO Consider allowing a range, so that Elevator doesn't oscillate  
     public static boolean raisedElevatorAllowable() {
-        if (pose == null) pose = Pose.getInstance();
-        if (pose == null) return false;
-        return (pose.inReefElevatorZone() || optOverrideReefElevatorZone.get()) && pose.isUpright();
+        return (Pose.instance.inReefElevatorZone() || optOverrideReefElevatorZone.get()) && Pose.instance.isUpright();
     }
     public static boolean elevatorDownAllowed() {
-        if (pose == null) pose = Pose.getInstance();
-        if (pose == null) return true;
-        return pose.elevatorDownAllowed() || optOverrideElevatorDownAllowed.get();
+        return Pose.instance.elevatorDownAllowed() || optOverrideElevatorDownAllowed.get();
     }
     
     public static void setElevatorAtZero(boolean atZero) {
@@ -183,10 +170,7 @@ public class RobotState extends SubsystemBase {
     }
 
     public static boolean algaeToProcessor() {
-        if (pose == null) pose = Pose.getInstance();
-        if (pose == null) return false;
-
-        return !optAlgaeBargeOnly.get() && pose.nearProcessor();
+        return !optAlgaeBargeOnly.get() && Pose.instance.nearProcessor();
     }
 
     public static Command ScoreGamePiece() {

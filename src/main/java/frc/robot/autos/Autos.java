@@ -1,8 +1,6 @@
 package frc.robot.autos;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -41,23 +39,13 @@ import frc.robot.subsystems.vision.VisionConstants.CameraMode;
 import frc.robot.superstructure.Superstructure;
 
 public class Autos extends SubsystemBase {
-    public static Autos instance;
+    public static final Autos instance = new Autos();
+
     private final SendableChooser<Command> autoChooser;
     private final HashMap<Command, String> startingPaths = new HashMap<>();
     private final HashMap<String, Pose2d> startingPoses = new HashMap<>();
 
-    private static final Map<ReefFace, ReefFace> mirroredFaces = Collections.unmodifiableMap(Map.ofEntries(
-        Map.entry(ReefFace.AB, ReefFace.AB),
-        Map.entry(ReefFace.CD, ReefFace.KL),
-        Map.entry(ReefFace.EF, ReefFace.IJ),
-        Map.entry(ReefFace.GH, ReefFace.GH),
-        Map.entry(ReefFace.IJ, ReefFace.EF),
-        Map.entry(ReefFace.KL, ReefFace.CD)));
-
     public Autos() {
-        assert(instance == null);
-        instance = this;
-        
         // Build an autoChooser (defaults to none)
         autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
             (stream) -> stream.filter(auto -> !auto.getName().startsWith("Dummy")));
@@ -140,7 +128,7 @@ public class Autos extends SubsystemBase {
                     LoggedCommands.proxy(PathCommand(path)),
                     WaitForTowardsNext(),
                     Commands.either(
-                        LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, left ? mirroredFaces.get(face).alignRight : mirroredFaces.get(face).alignLeft, true, true).fastAlign()),
+                        LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, left ? AutoConstants.mirroredFaces.get(face).alignRight : AutoConstants.mirroredFaces.get(face).alignLeft, true, true).fastAlign()),
                         LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, left ? face.alignLeft : face.alignRight, true, true).fastAlign()),
                         Superstructure.instance::shouldMirror
                     ),
@@ -171,20 +159,20 @@ public class Autos extends SubsystemBase {
     }
 
     public Command ScoreCoralMaybeMirror(ReefFace face, boolean left) {
-        ReefFace mirroredFace = mirroredFaces.get(face);
+        ReefFace mirroredFace = AutoConstants.mirroredFaces.get(face);
 
         return Commands.either(
-            Superstructure.instance.ScoreCoral(mirroredFace, !left),
-            Superstructure.instance.ScoreCoral(face, left),
+            Superstructure.ScoreCoral(mirroredFace, !left),
+            Superstructure.ScoreCoral(face, left),
             Superstructure.instance::shouldMirror);
     }
 
     public Command DealgaefyMaybeMirror(ReefFace face, boolean extendedBackup) {
-        ReefFace mirroredFace = mirroredFaces.get(face);
+        ReefFace mirroredFace = AutoConstants.mirroredFaces.get(face);
 
         return Commands.either(
-            Superstructure.instance.DeAlgaefy(mirroredFace, extendedBackup),
-            Superstructure.instance.DeAlgaefy(face, extendedBackup),
+            Superstructure.DeAlgaefy(mirroredFace, extendedBackup),
+            Superstructure.DeAlgaefy(face, extendedBackup),
             Superstructure.instance::shouldMirror);
     }
 

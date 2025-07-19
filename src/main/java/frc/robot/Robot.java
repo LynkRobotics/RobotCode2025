@@ -16,10 +16,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.lib.util.Elastic;
 import frc.robot.autos.Autos;
+import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.controls.Controls;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.endeffector.EndEffector;
+import frc.robot.subsystems.index.Index;
+import frc.robot.subsystems.led.LED;
+import frc.robot.subsystems.pose.Pose;
+import frc.robot.subsystems.robotstate.RobotState;
 import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.superstructure.Superstructure;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -31,19 +41,15 @@ import frc.robot.subsystems.swerve.Swerve;
  * project.
  */
 public class Robot extends TimedRobot {
-    private Command autoCommand;
-
-    @SuppressWarnings ("unused")
-    private RobotContainer m_robotContainer;
-
     public static final CTREConfigs ctreConfigs = new CTREConfigs();
     public static final Field2d field = new Field2d();
     public static final SendableChooser<String> fieldSelector = new SendableChooser<>();
 
+    private Command autoCommand;
+ 
     /**
      * This function is run when the robot is first started up and should be used
-     * for any
-     * initialization code.
+     * for any initialization code.
      */
     @Override
     public void robotInit() {
@@ -52,23 +58,38 @@ public class Robot extends TimedRobot {
 
         DogLog.setOptions(
             new DogLogOptions()
-            .withCaptureConsole(true)
-            .withCaptureDs(true)
-            .withCaptureNt(true)
-            .withLogEntryQueueCapacity(1000)
-            .withLogExtras(true)
-            .withNtPublish(Constants.atHQ));
+                .withCaptureConsole(true)
+                .withCaptureDs(true)
+                .withCaptureNt(true)
+                .withLogEntryQueueCapacity(1000)
+                .withLogExtras(true)
+                .withNtPublish(Constants.atHQ));
 
         DogLog.log("Misc/RIO Serial Number", RobotController.getSerialNumber());
         DogLog.log("Misc/Is Rocky?", Constants.isRocky);
 
-        // Instantiate our RobotContainer. This will perform all our button bindings,
-        // and put our autonomous chooser on the dashboard.
-        m_robotContainer = new RobotContainer();
+        // Ensure all subsystems get instantiated, and in order as necessary
+        @SuppressWarnings("unused")
+        Subsystem[] subsystems = new Subsystem[] {
+            Climber.instance,
+            EndEffector.instance,
+            Elevator.instance,
+            Index.instance,
+            LED.instance,
+            RobotState.instance,
+            Swerve.instance,
+            Vision.instance,
+            Pose.instance,
+            Controls.instance,
+            Superstructure.instance,
+            Autos.instance
+        };
         
         if (Constants.atHQ) {
             DriverStation.silenceJoystickConnectionWarning(true);
         }
+        Controls.instance.configureButtonBindings();
+
         DogLog.log("Misc/Robot Status", "Robot has Started");
         SmartDashboard.putData("Field Selector", fieldSelector);
         SmartDashboard.putData("Field", field);

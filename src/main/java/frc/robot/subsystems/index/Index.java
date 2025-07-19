@@ -18,6 +18,8 @@ import frc.robot.subsystems.robotstate.RobotState;
 import frc.robot.subsystems.robotstate.RobotState.GamePieceState;
 
 public class Index extends SubsystemBase {
+    public static final Index instance = new Index();
+
     /* Devices */
     private final TalonFX motor;
     /* Control Requests */

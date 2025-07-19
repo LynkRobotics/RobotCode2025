@@ -10,7 +10,11 @@ import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.*;
 
+import java.util.Collections;
+import java.util.Map;
+
 import frc.robot.Constants;
+import frc.robot.subsystems.pose.PoseConstants.ReefFace;
 import frc.robot.subsystems.swerve.SwerveConstants;
 
 public final class AutoConstants {
@@ -23,6 +27,14 @@ public final class AutoConstants {
 
     public static final double scoreCoralTimeout = 3.5;
     public static final double scoreCoralTimeLeft = 4.0;
+
+    public static final Map<ReefFace, ReefFace> mirroredFaces = Collections.unmodifiableMap(Map.ofEntries(
+        Map.entry(ReefFace.AB, ReefFace.AB),
+        Map.entry(ReefFace.CD, ReefFace.KL),
+        Map.entry(ReefFace.EF, ReefFace.IJ),
+        Map.entry(ReefFace.GH, ReefFace.GH),
+        Map.entry(ReefFace.IJ, ReefFace.EF),
+        Map.entry(ReefFace.KL, ReefFace.CD)));
 
     // TODO Find out why this doesn't work
     public static final RobotConfig robotConfig = new RobotConfig(

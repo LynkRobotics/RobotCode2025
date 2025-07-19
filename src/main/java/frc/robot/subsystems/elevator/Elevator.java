@@ -34,7 +34,8 @@ import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.robotstate.RobotState;
 
 public class Elevator extends SubsystemBase {
-    public static Elevator instance;
+    public static final Elevator instance = new Elevator();
+    
     private final TalonFX leftMotor;
     private final TalonFX rightMotor;
     private final VoltageOut voltageOut = new VoltageOut(0).withEnableFOC(true);
@@ -57,9 +58,6 @@ public class Elevator extends SubsystemBase {
     private final double positionDiffMax = 0.5;
 
     public Elevator() {
-        assert(instance == null);
-        instance = this;
-
         leftMotor = new TalonFX(ElevatorConstants.leftID, ElevatorConstants.canBus);
         rightMotor = new TalonFX(ElevatorConstants.rightID, ElevatorConstants.canBus);
         applyConfigs();

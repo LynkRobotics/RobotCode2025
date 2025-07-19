@@ -31,7 +31,7 @@ import frc.robot.autos.AutoConstants;
 import frc.robot.Constants;
 
 public class Pose extends SubsystemBase {
-    public static Pose instance;
+    public static final Pose instance = new Pose();
 
     private final SwerveDrivePoseEstimator poseEstimator;
     private final Pigeon2 gyro;
@@ -43,9 +43,6 @@ public class Pose extends SubsystemBase {
     }
 
     public Pose() {
-        assert(instance == null);
-        instance = this;
-        
         gyro = new Pigeon2(PoseConstants.pigeonID, SwerveConstants.swerveCanBus);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);        
@@ -100,10 +97,6 @@ public class Pose extends SubsystemBase {
         // });
     }
 
-    public static Pose getInstance() {
-        return instance;
-    }
-    
     public static String prettyPose(Pose2d pose) {
         return String.format("(%01.2f, %01.2f @ %01.1f)", pose.getX(), pose.getY(), pose.getRotation().getDegrees());
     }
@@ -243,7 +236,7 @@ public class Pose extends SubsystemBase {
     }
 
     public static double distanceTo(Translation2d target) {
-        return Pose.getInstance().getPose().getTranslation().getDistance(target);
+        return Pose.instance.getPose().getTranslation().getDistance(target);
     }
 
     public static boolean inReefElevatorZone(Translation2d position) {

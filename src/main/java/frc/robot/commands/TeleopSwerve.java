@@ -25,7 +25,6 @@ public class TeleopSwerve extends LoggedCommandBase {
     private final DoubleSupplier strafeSup;
     private final DoubleSupplier rotationSup;
     private DoubleSupplier speedLimitSupplier;
-    private Pose s_Pose = null;
     private boolean autoAiming = false;
     private Rotation2d lastAngle = null;
 
@@ -58,10 +57,6 @@ public class TeleopSwerve extends LoggedCommandBase {
         double teleOpMult = SmartDashboard.getNumber("TeleOp Speed Governor", 1.0);
         translationVal *= teleOpMult;
 
-        if (s_Pose == null) {
-            s_Pose = Pose.getInstance();
-        }
-
         // Driver position is inverted for Red alliance, so adjust field-oriented controls
         if (Robot.isRed()) {
             translationVal *= -1.0;
@@ -70,7 +65,7 @@ public class TeleopSwerve extends LoggedCommandBase {
 
         // Automatically aim at reef when applicable
         if (optAutoReefAiming.get() && Math.abs(rotationVal) < Constants.aimingOverride && !RobotState.haveAlgae() && !RobotState.scoredAlgaeRecently()) {
-            Pose2d pose = s_Pose.getPose();
+            Pose2d pose = Pose.instance.getPose();
             Translation2d position = pose.getTranslation();
             Rotation2d rotation = pose.getRotation();
             if (Pose.inWing(position)) {
