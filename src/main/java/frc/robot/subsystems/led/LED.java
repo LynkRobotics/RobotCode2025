@@ -4,21 +4,16 @@
 
 package frc.robot.subsystems.led;
 
-import static frc.robot.Options.optAutoReefAiming;
-import static frc.robot.Options.optL1Outside;
 import static frc.robot.Options.optServiceMode;
 
 import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
-// import com.ctre.phoenix.led.LarsonAnimation;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.CANdleGroup;
-import frc.robot.subsystems.robotstate.RobotState;
-import frc.robot.subsystems.robotstate.RobotState.ClimbState;
 
 public class LED extends SubsystemBase {
     public static final LED instance = new LED();
@@ -181,7 +176,6 @@ public class LED extends SubsystemBase {
             }
             // Compute the proper state if's not temporarily overridden
             if (!tempStateTimer.isRunning()) {
-                ClimbState climbState = RobotState.getClimbState();
                 double timeLeft = DriverStation.getMatchTime();
 
                 if (DriverStation.isTeleopEnabled() && timeLeft < LEDConstants.endGameNotifyStart && endGameTimer.get() == 0) {
@@ -192,40 +186,40 @@ public class LED extends SubsystemBase {
                     DogLog.log("LED/Status", "End end game");
                     endGameTimer.stop();
                 } else {
-                    DogLog.log("LED/Status", "State: " + climbState + "; timeLeft = " + String.format("%1.1f", timeLeft) + "; timer = " + String.format("%1.1f", endGameTimer.get()));
+                    // DogLog.log("LED/Status", "State: " + climbState + "; timeLeft = " + String.format("%1.1f", timeLeft) + "; timer = " + String.format("%1.1f", endGameTimer.get()));
                 }
                 if (!endGameTimer.isRunning()) {
-                    if (climbState == ClimbState.CLIMBING) {
-                        state = LEDState.CLIMBING;
-                    } else if (climbState == ClimbState.CLIMBED) {
-                        state = LEDState.CLIMBED;
-                    } else if (climbState == ClimbState.STARTED) {
-                        state = LEDState.SLOWMODE;
-                    } else if (RobotState.haveAlgae()) {
-                        state = LEDState.ALGAE;
-                    } else if (RobotState.intakingAlgae()) {
-                        state = LEDState.ALGAE_INTAKING;
-                    } else if (RobotState.haveCoral()) {
-                        switch (RobotState.getNextStop()) {
-                            case L1:
-                                state = optL1Outside.get() ? LEDState.CORAL_L1OUTSIDE : LEDState.CORAL_L1;
-                                break;
-                            case L2:
-                                state = LEDState.CORAL_L2;
-                                break;
-                            case L3:
-                                state = LEDState.CORAL_L3;
-                                break;
-                            case L4:
-                            case L4_SCORE:
-                                state = LEDState.CORAL_L4;
-                                break;
-                            default:
-                                state = LEDState.CORAL_UNKNOWN;
-                        }
-                    } else {
-                        state = optAutoReefAiming.get() ? LEDState.NORMAL : LEDState.MANUAL;
-                    }        
+                    // if (climbState == ClimbState.CLIMBING) {
+                    //     state = LEDState.CLIMBING;
+                    // } else if (climbState == ClimbState.CLIMBED) {
+                    //     state = LEDState.CLIMBED;
+                    // } else if (climbState == ClimbState.STARTED) {
+                    //     state = LEDState.SLOWMODE;
+                    // } else if (RobotState.haveAlgae()) {
+                    //     state = LEDState.ALGAE;
+                    // } else if (RobotState.intakingAlgae()) {
+                    //     state = LEDState.ALGAE_INTAKING;
+                    // } else if (RobotState.haveCoral()) {
+                    //     switch (RobotState.getNextStop()) {
+                    //         case L1:
+                    //             state = optL1Outside.get() ? LEDState.CORAL_L1OUTSIDE : LEDState.CORAL_L1;
+                    //             break;
+                    //         case L2:
+                    //             state = LEDState.CORAL_L2;
+                    //             break;
+                    //         case L3:
+                    //             state = LEDState.CORAL_L3;
+                    //             break;
+                    //         case L4:
+                    //         case L4_SCORE:
+                    //             state = LEDState.CORAL_L4;
+                    //             break;
+                    //         default:
+                    //             state = LEDState.CORAL_UNKNOWN;
+                    //     }
+                    // } else {
+                    //     state = optAutoReefAiming.get() ? LEDState.NORMAL : LEDState.MANUAL;
+                    // }        
                 }
             }
         }

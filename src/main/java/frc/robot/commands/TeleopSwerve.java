@@ -1,19 +1,14 @@
 package frc.robot.commands;
 
 import frc.lib.util.LoggedCommandBase;
-import frc.robot.subsystems.robotstate.RobotState;
 import frc.robot.Robot;
 import frc.robot.Constants;
-import frc.robot.subsystems.robotstate.RobotState.ClimbState;
-import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConstants;
 
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -25,8 +20,8 @@ public class TeleopSwerve extends LoggedCommandBase {
     private final DoubleSupplier strafeSup;
     private final DoubleSupplier rotationSup;
     private DoubleSupplier speedLimitSupplier;
-    private boolean autoAiming = false;
-    private Rotation2d lastAngle = null;
+    // private boolean autoAiming = false;
+    // private Rotation2d lastAngle = null;
 
     public TeleopSwerve(Swerve s_Swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, DoubleSupplier speedLimitSupplier) {
         super();
@@ -64,32 +59,34 @@ public class TeleopSwerve extends LoggedCommandBase {
         }
 
         // Automatically aim at reef when applicable
-        if (optAutoReefAiming.get() && Math.abs(rotationVal) < Constants.aimingOverride && !RobotState.haveAlgae() && !RobotState.scoredAlgaeRecently()) {
-            Pose2d pose = Pose.instance.getPose();
-            Translation2d position = pose.getTranslation();
-            Rotation2d rotation = pose.getRotation();
-            if (Pose.inWing(position)) {
-                Rotation2d bearing = Pose.reefBearing(position);
+        // if (optAutoReefAiming.get() && Math.abs(rotationVal) < Constants.aimingOverride && !RobotState.haveAlgae() && !RobotState.scoredAlgaeRecently()) {
+        //     Pose2d pose = Pose.instance.getPose();
+        //     Translation2d position = pose.getTranslation();
+        //     Rotation2d rotation = pose.getRotation();
+        //     if (Pose.inWing(position)) {
+        //         Rotation2d bearing = Pose.reefBearing(position);
                 
-                if (!autoAiming) {
-                    Pose.angleErrorReset();
-                    autoAiming = true;
-                } else {
-                    Rotation2d angleError = bearing.minus(lastAngle);
-                    rotationVal = Pose.angleErrorToSpeed(angleError);
-                }
-                lastAngle = rotation;
-            } else {
-                autoAiming = false;
-            }
-        } else {
-            autoAiming = false;
-        }
+        //         if (!autoAiming) {
+        //             Pose.angleErrorReset();
+        //             autoAiming = true;
+        //         } else {
+        //             Rotation2d angleError = bearing.minus(lastAngle);
+        //             rotationVal = Pose.angleErrorToSpeed(angleError);
+        //         }
+        //         lastAngle = rotation;
+        //     } else {
+        //         autoAiming = false;
+        //     }
+        // } else {
+            // autoAiming = false;
+        // }
 
         /* Drive */
         s_Swerve.drive(
-            new Translation2d(translationVal, strafeVal).times(speedLimitSupplier.getAsDouble()).times(SwerveConstants.maxSpeed).times((RobotState.intakingAlgae() || (RobotState.getClimbState() != ClimbState.NONE)) ? SwerveConstants.slowMode : 1.0),
-            rotationVal * SwerveConstants.maxAngularVelocity * speedLimitSupplier.getAsDouble() * (RobotState.haveAlgae() ? Constants.algaeSlowRot : 1.0) * ((RobotState.intakingAlgae() || (RobotState.getClimbState() != ClimbState.NONE)) ? SwerveConstants.slowMode : 1.0),
+            // new Translation2d(translationVal, strafeVal).times(speedLimitSupplier.getAsDouble()).times(SwerveConstants.maxSpeed).times((RobotState.intakingAlgae() || (RobotState.getClimbState() != ClimbState.NONE)) ? SwerveConstants.slowMode : 1.0),
+            // rotationVal * SwerveConstants.maxAngularVelocity * speedLimitSupplier.getAsDouble() * (RobotState.haveAlgae() ? Constants.algaeSlowRot : 1.0) * ((RobotState.intakingAlgae() || (RobotState.getClimbState() != ClimbState.NONE)) ? SwerveConstants.slowMode : 1.0),
+            new Translation2d(translationVal, strafeVal).times(speedLimitSupplier.getAsDouble()).times(SwerveConstants.maxSpeed),
+            rotationVal * SwerveConstants.maxAngularVelocity * speedLimitSupplier.getAsDouble(),
             true
         );
     }

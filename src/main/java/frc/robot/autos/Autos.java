@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static frc.robot.Options.optAutoCoralWait;
 import static frc.robot.Options.optBackupPush;
 
 import frc.lib.util.LoggedAlert;
@@ -82,7 +81,7 @@ public class Autos extends SubsystemBase {
     private Command BackUpAndWaitForCoral() {
         Transform2d transform = new Transform2d(-AutoConstants.backUpCSDistance, 0.0, Rotation2d.kZero); 
         return LoggedCommands.deadline("Backup and wait for Coral",
-            RobotState.WaitForCoral(),
+            Superstructure.WaitForCoral(),
             Commands.sequence(
                 Commands.defer(() -> new PIDSwerve(Swerve.instance, Pose.instance, Pose.instance.getPose().transformBy(transform), false, false), Set.of(Swerve.instance)),
                 Commands.defer(() -> new PIDSwerve(Swerve.instance, Pose.instance, Pose.instance.getPose().transformBy(transform), false, false), Set.of(Swerve.instance))
@@ -106,7 +105,7 @@ public class Autos extends SubsystemBase {
         return LoggedCommands.sequence("Raise elevator within " + String.format("%1.2f", distance) + "m of reef center",
             WaitForReefDistance(distance),
             Commands.either(
-                RobotState.WaitForCoralReady(),
+                Superstructure.WaitForCoralReady(),
                 LoggedCommands.log("Missing coral"),
                 RobotState::haveCoral),
             LoggedCommands.proxy(Elevator.instance.GoToNext()));
@@ -138,14 +137,11 @@ public class Autos extends SubsystemBase {
                         Elevator.instance.WaitForNext(),
                         Elevator.instance::atNextStop)),
                 LoggedCommands.proxy(RaiseElevatorAtDistance(raiseDistance))),
-            RobotState.ScoreGamePiece());
+            Superstructure.ScoreGamePiece());
     }
 
     private Command MaybeWaitForCoral() {
-        return Commands.either(
-            LoggedCommands.proxy(RobotState.WaitForCoral()),
-            LoggedCommands.log("Will not wait for Coral"),
-            optAutoCoralWait::get);
+        return Superstructure.WaitForCoral();
     }
 
     private Command GoGetCoral(String path) {
@@ -153,7 +149,7 @@ public class Autos extends SubsystemBase {
             Vision.SwitchToRearVision(),
             Commands.race(
                 LoggedCommands.proxy(PathCommand(path)),
-                RobotState.WaitForCoral()),
+                Superstructure.WaitForCoral()),
             MaybeWaitForCoral(),
             Vision.SwitchToFrontVision());
     }
@@ -204,7 +200,7 @@ public class Autos extends SubsystemBase {
         addAutoCommand(chooser, autoECDB);
 
         Command fastFour = LoggedCommands.sequence("Fast Four Piece (ECDB)",
-            LoggedCommands.runOnce("Disable waiting for coral for fast four piece auto", optAutoCoralWait::disable),
+            // LoggedCommands.runOnce("Disable waiting for coral for fast four piece auto", optAutoCoralWait::disable),
             Superstructure.instance.SetStop(Stop.L4),
             Vision.SwitchToFrontVision(),
             LoggedCommands.proxy(FastScoreCoral("Fast - Start to E", ReefFace.EF, true, 2.52)),

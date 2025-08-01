@@ -1,8 +1,6 @@
 package frc.robot.subsystems.controls;
 
 import static frc.robot.Options.optAutoReefAiming;
-import static frc.robot.Options.optL1Outside;
-import static frc.robot.Options.optServiceMode;
 
 import java.util.function.Supplier;
 
@@ -19,8 +17,8 @@ import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.pose.Pose;
-import frc.robot.subsystems.robotstate.RobotState;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.superstructure.Superstructure;
 import frc.robot.commands.TeleopSwerve;
@@ -86,8 +84,8 @@ public class Controls extends SubsystemBase{
         // Only used in case of automation failure
         moveElevator.whileTrue(Elevator.instance.GoToNext());
         zero.onTrue(Elevator.instance.Zero());
-        unjam.onTrue(RobotState.UnjamCoral());
-        score.whileTrue(RobotState.ScoreGamePiece()); // Also useful to dump Algae or put it into Processor
+        unjam.onTrue(Intake.instance.Reverse());
+        score.whileTrue(Superstructure.ScoreGamePiece()); // Also useful to dump Algae or put it into Processor
 
         L4.onTrue(Superstructure.instance.SetStop(Stop.L4));
         L3.onTrue(Superstructure.instance.SetStop(Stop.L3));
@@ -122,21 +120,8 @@ public class Controls extends SubsystemBase{
             //         LoggedCommands.runOnce("Test End", () -> LEDSubsystem.triggerError())));
         }
 
-        driver.povDown().onTrue(
-            Commands.either(
-                Climber.instance.SlowDeploy().until(driver.povDown().negate()),
-                Climber.instance.Deploy(),
-                optServiceMode::get));
-        driver.povUp().whileTrue(
-            Commands.either(
-                Climber.instance.SlowRetract(),
-                Climber.instance.Retract(),
-                optServiceMode::get));
-        driver.povRight().whileTrue(
-            LoggedCommands.parallel("Deploy and Align",
-                Climber.instance.Deploy(),
-                Superstructure.instance.AlignToNearestCage()));
-        driver.povLeft().onTrue(LoggedCommands.runOnce("Toggle L1 Inside/Outside", optL1Outside::toggle));
+        driver.povDown().onTrue(Climber.Deploy());
+        driver.povUp().onTrue(Climber.Retract());
     }
 
     private double speedLimitFactor() {

@@ -23,7 +23,7 @@ import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.controls.Controls;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.endeffector.EndEffector;
-import frc.robot.subsystems.index.Index;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.led.LED;
 import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.robotstate.RobotState;
@@ -74,7 +74,7 @@ public class Robot extends TimedRobot {
             Climber.instance,
             EndEffector.instance,
             Elevator.instance,
-            Index.instance,
+            Intake.instance,
             LED.instance,
             RobotState.instance,
             Swerve.instance,

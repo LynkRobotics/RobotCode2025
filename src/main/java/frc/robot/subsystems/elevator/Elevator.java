@@ -91,7 +91,7 @@ public class Elevator extends SubsystemBase {
 
     public void setAsZero() {
         DogLog.log("Elevator/Status", "Set as Zero");
-        RobotState.setElevatorAtZero(true);
+        // RobotState.setElevatorAtZero(true);
         leftMotor.setPosition(0);
         rightMotor.setPosition(0);
     }
@@ -148,12 +148,9 @@ public class Elevator extends SubsystemBase {
     private void setVoltage(double voltage) {
         stallCount = 0;
         desiredPosition = -1.0;
-        if (RobotState.elevatorPathBlocked()) {
-            LoggedAlert.Error("Elevator", "Blocked", "Cannot set voltage on elevator while blocked");
-            return;
-        }
+        // TODO Handle blocking
         DogLog.log("Elevator/Status", "Set voltage " + String.format("%1.2f", voltage));
-        RobotState.setElevatorAtZero(false);
+        // RobotState.setElevatorAtZero(false);
         leftMotor.setControl(voltageOut.withOutput(voltage));
     }
 
@@ -167,7 +164,7 @@ public class Elevator extends SubsystemBase {
     public Command Move(Stop stop) {
         return IfNotBlocked(LoggedCommands.sequence("Move Elevator to " + stop,
             Commands.runOnce(() -> {
-                RobotState.updateActiveStop(stop);
+                // RobotState.updateActiveStop(stop);
                 setHeight(stopHeight(stop));
                 scoreTimer.stop();
             }, this),
@@ -178,7 +175,7 @@ public class Elevator extends SubsystemBase {
         return IfNotBlocked(LoggedCommands.sequence("Move Elevator to stop",
             LoggedCommands.log(() -> "Next stop: " + nextStop),
             Commands.runOnce(() -> {
-                RobotState.updateActiveStop(nextStop);
+                // RobotState.updateActiveStop(nextStop);
                 setHeight(stopHeight(nextStop));
             }, this),
             LoggedCommands.idle("Idle to hold elevator", this)));
@@ -186,7 +183,7 @@ public class Elevator extends SubsystemBase {
 
     public void setNextStop(Stop stop) {
         DogLog.log("Elevator/Status", "Next stop = " + stop);
-        RobotState.updateNextStop(stop);
+        // RobotState.updateNextStop(stop);
         nextStop = stop;
     }
 
@@ -249,7 +246,7 @@ public class Elevator extends SubsystemBase {
                 // TODO Always flip?
                 if (!autoUp && Pose.distanceTo(Pose.flipIfRed(target)) <= PoseConstants.autoUpDistance) {
                     Stop stop = stopSupplier.get();
-                    RobotState.updateActiveStop(stop);
+                    // RobotState.updateActiveStop(stop);
                     setHeight(stopHeight(stop));
                     autoUp = true;
                 }
@@ -297,13 +294,10 @@ public class Elevator extends SubsystemBase {
     private void setPosition(double position) {
         stallCount = 0;
         desiredPosition = position;
-        if (RobotState.elevatorPathBlocked()) {
-            LoggedAlert.Error("Elevator", "Blocked", "Cannot move elevator while blocked");
-            return;
-        }
+        // TODO Handle blocking
         DogLog.log("Elevator/Status", "Move to position " + String.format("%1.2f", position));
         DogLog.log("Elevator/Set Position", position);
-        RobotState.setElevatorAtZero(false);
+        // RobotState.setElevatorAtZero(false);
         leftMotor.setControl(positionVoltage.withPosition(position));
     }
     
@@ -312,7 +306,8 @@ public class Elevator extends SubsystemBase {
     }
 
     private Stop safetyStop() {
-        return !RobotState.getFinalSensor() ? Stop.HOLD : Stop.SAFE;
+        // return !RobotState.getFinalSensor() ? Stop.HOLD : Stop.SAFE;
+        return Stop.SAFE;
     }
 
     private boolean isSafe(double height) {
@@ -377,11 +372,12 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command IfNotBlocked(Command command) {
-        return LoggedCommands.either("Block check then run " + command.getName(),
-            command,
-            LoggedCommands.runOnce("Blocked Elevator Warning",
-                () -> LoggedAlert.Warning("Elevator", "Blocked", "Block Elevator prevents running " + command.getName())),
-            () -> !RobotState.elevatorPathBlocked());
+        return command;
+        // return LoggedCommands.either("Block check then run " + command.getName(),
+        //     command,
+        //     LoggedCommands.runOnce("Blocked Elevator Warning",
+        //         () -> LoggedAlert.Warning("Elevator", "Blocked", "Block Elevator prevents running " + command.getName())),
+        //     () -> !RobotState.elevatorPathBlocked());
     }
 
     private void applyConfigs() {
@@ -450,12 +446,7 @@ public class Elevator extends SubsystemBase {
     }
     
     public void initDefaultCommand() {
-        setDefaultCommand(LoggedCommands.either("Elevator Default Command",
-            MoveToSafety(),
-            LoggedCommands.sequence("Defer Elevator Safety",
-                Commands.runOnce(() -> safetyDeferred = true),
-                LoggedCommands.idle("Idle to hold elevator", this)),
-            RobotState::elevatorDownAllowed));
+        setDefaultCommand(MoveToSafety());
     }
 
     @Override
@@ -471,23 +462,19 @@ public class Elevator extends SubsystemBase {
 
         // Handle exceptions in cases other than elevator at rest
         if (voltage != 0.0) {
-            if (RobotState.elevatorPathBlocked()) {
-                // Stop elevator when moving and blockage detected
-                LoggedAlert.Error("Elevator", "Blocked", "Elevator stopped due to blockage");
-                stop();
-            } else if (safetyDeferred && RobotState.elevatorDownAllowed()) {
-                // Moving elevator to safety was deferred, but is available now                
-                if (currentCommand != null) {
-                    currentCommand.cancel();
-                }
-            } else if (!isSafe() && !movingToSafety && !RobotState.raisedElevatorAllowable()) {
-                // Elevator is unsafe, not allowed to raised, and not already moving to safety
-                LoggedAlert.Warning("Elevator", "Safety", "Cancelling current command to return to safe position");
+            // if (RobotState.elevatorPathBlocked()) {
+            //     // Stop elevator when moving and blockage detected
+            //     LoggedAlert.Error("Elevator", "Blocked", "Elevator stopped due to blockage");
+            //     stop();
+            // } else if (!isSafe() && !movingToSafety && !RobotState.raisedElevatorAllowable()) {
+            //     // Elevator is unsafe, not allowed to raised, and not already moving to safety
+            //     LoggedAlert.Warning("Elevator", "Safety", "Cancelling current command to return to safe position");
                 
-                if (currentCommand != null) {
-                    currentCommand.cancel();
-                }
-            } else if (!inRange(position) && position == lastPosition) {
+            //     if (currentCommand != null) {
+            //         currentCommand.cancel();
+            //     }
+            // } else
+            if (!inRange(position) && position == lastPosition) {
                 // Motor not moving -- detect stalls
                 ++stallCount;
                 if (isStalled()) {
@@ -503,26 +490,13 @@ public class Elevator extends SubsystemBase {
         }
         lastPosition = position;
 
-        // TODO Can we move this into ScoreGamePiece command?
-        if (RobotState.coralScoring() && atStop(Stop.L4)) {
-            setHeight(Stop.L4_SCORE.height); // TODO Avoid repeatedly calling ... even though it might not be an issue?
-        }
-
-        if (RobotState.coralScoring() && atStop(Stop.L1)) {
-            if (!scoreTimer.isRunning()) {
-                scoreTimer.restart();
-            } else if (scoreTimer.hasElapsed(ElevatorConstants.L1RaiseDelay)) {
-                setHeight(Stop.L1_SCORE.height);
-            }
-        }
-
         // If we have Coral ready, and the Elevator is still at zero, cancel the current default command so that it runs again with the L1 default
-        if (RobotState.coralReady() && RobotState.getElevatorAtZero()) {
-            if (currentCommand != null) {
-                currentCommand.cancel();
-                RobotState.setElevatorAtZero(false);
-            }
-        }
+        // if (RobotState.coralReady() && RobotState.getElevatorAtZero()) {
+        //     if (currentCommand != null) {
+        //         currentCommand.cancel();
+        //         RobotState.setElevatorAtZero(false);
+        //     }
+        // }
         // TODO Lower Elevator if we don't have Coral?
 
         if (Math.abs(followDifference) >= positionDiffMax) {

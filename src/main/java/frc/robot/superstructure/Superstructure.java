@@ -1,17 +1,12 @@
 package frc.robot.superstructure;
 
-import static frc.robot.Options.optAutoReefAiming;
-import static frc.robot.Options.optL1Outside;
+import static frc.robot.Options.optAlgaeBargeOnly;
 import static frc.robot.Options.optInvertAlgae;
 import static frc.robot.Options.optMirrorAuto;
 
 import java.util.EnumMap;
 import java.util.Set;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -23,15 +18,12 @@ import frc.robot.commands.pidswerve.PIDSwerve;
 import frc.robot.commands.pidswerve.PIDSwerveConstants.PIDSpeed;
 import frc.robot.subsystems.controls.Controls;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.pose.PoseConstants;
-import frc.robot.subsystems.pose.PoseConstants.Cage;
 import frc.robot.subsystems.pose.PoseConstants.ReefFace;
 import frc.robot.subsystems.robotstate.RobotState;
-import frc.robot.subsystems.robotstate.RobotState.ClimbState;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants.CameraMode;
 
@@ -66,12 +58,7 @@ public class Superstructure extends SubsystemBase {
                             Commands.sequence(
                                 Commands.either(
                                     Commands.sequence(
-                                        // Commands.either(
-                                            // LoggedCommands.log("Skipping approach pose for L2/L3 due to proximity to reef"),
-                                            new PIDSwerve(Swerve.instance, Pose.instance, left ? face.approachLeft : face.approachRight, true, false, PIDSpeed.TURBO),
-                                            // new PIDSwerve(Swerve.instance, Pose.instance, left ? face.approachLeft : face.approachRight, true, false, PIDSpeed.FAST),
-                                            // () -> Pose.instance.getPose().getTranslation().getDistance(Constants.Pose.reefCenter) <= Constants.Pose.approachDistanceToReefCenter),
-                                        // new PIDSwerve(Swerve.instance, Pose.instance, left ? face.alignBonusLeft : face.alignBonusRight, true, true)
+                                        new PIDSwerve(Swerve.instance, Pose.instance, left ? face.approachLeft : face.approachRight, true, false, PIDSpeed.TURBO),
                                         new PIDSwerve(Swerve.instance, Pose.instance, left ? face.alignLeft : face.alignRight, true, true)
                                     ),
                                     Commands.sequence(
@@ -82,14 +69,8 @@ public class Superstructure extends SubsystemBase {
                                                 Swerve.instance.Stop(),
                                                 Elevator.instance.WaitForNearNext()),
                                             Elevator.instance::nearNextStop),
-                                        Commands.either(
-                                            Commands.either(
-                                                new PIDSwerve(Swerve.instance, Pose.instance, left ? face.leftL1Outside : face.rightL1Outside, true, true),
-                                                new PIDSwerve(Swerve.instance, Pose.instance, left ? face.leftL1 : face.rightL1, true, true),
-                                                optL1Outside::get),
-                                            new PIDSwerve(Swerve.instance, Pose.instance, left ? face.alignLeft : face.alignRight, true, true),
-                                            () -> RobotState.getNextStop() == Stop.L1
-                                        )),
+                                        new PIDSwerve(Swerve.instance, Pose.instance, left ? face.alignLeft : face.alignRight, true, true)
+                                    ),
                                     () -> false)), //RobotState.getNextStop() == Stop.L2 || RobotState.getNextStop() == Stop.L3)),
                             Commands.either(
                                 Commands.sequence(
@@ -100,40 +81,14 @@ public class Superstructure extends SubsystemBase {
                                 () -> DriverStation.isAutonomousEnabled() && DriverStation.getMatchTime() >= (AutoConstants.scoreCoralTimeout + AutoConstants.scoreCoralTimeLeft))),
                         Swerve.instance.Stop()),
                     Commands.sequence(
-                        Commands.either(
-                            LoggedCommands.log("Skip waiting for coral ready in turbo mode"),
-                            RobotState.WaitForCoralReady(),
-                            RobotState::getTurboMode),
+                        Superstructure.WaitForCoralReady(),
                         LoggedCommands.deadline("Wait for auto up",
                             Elevator.instance.WaitForNext(),
-                            Commands.either(
-                                Commands.either(
-                                    Elevator.instance.AutoElevatorUp(left ? face.leftL1Outside.getTranslation() : face.rightL1Outside.getTranslation()),
-                                    Elevator.instance.AutoElevatorUp(left ? face.leftL1.getTranslation() : face.rightL1.getTranslation()),
-                                    optL1Outside::get),
-                                Elevator.instance.AutoElevatorUp(left ? face.alignLeft.getTranslation() : face.alignRight.getTranslation()),
-                                // Elevator.instance.SmoothElevatorUp(left ? face.approachLeft.getTranslation() : face.approachRight.getTranslation()), // TODO Not always Smooth!
-                                () -> RobotState.getNextStop() == Stop.L1)))),
-                Commands.parallel(
-                    RobotState.ScoreGamePiece(),
-                    Commands.either(
-                        Commands.sequence(
-                            Commands.waitSeconds(ElevatorConstants.L1RaiseDelay),
-                            Commands.parallel(
-                                Elevator.instance.TimeBasedMove(Stop.L1_SCORE, 0.25),
-                                Commands.sequence(
-                                    Commands.waitSeconds(0.30),
-                                    Commands.either(
-                                        new PIDSwerve(Swerve.instance, Pose.instance, (left ? face.leftL1Outside : face.rightL1Outside).transformBy(new Transform2d(PoseConstants.L1MoveForward, left ? Units.inchesToMeters(0) : Units.inchesToMeters(0), Rotation2d.kZero)), true, true, PIDSpeed.FAST),
-                                        new PIDSwerve(Swerve.instance, Pose.instance, (left ? face.leftL1 : face.rightL1).transformBy(new Transform2d(PoseConstants.L1MoveForward, 0, Rotation2d.kZero)), true, true, PIDSpeed.FAST),
-                                        optL1Outside)))
-                        ),
-                        Commands.none(),
-                        () -> RobotState.getNextStop() == Stop.L1
-                    )
-                )),
+                            Elevator.instance.AutoElevatorUp(left ? face.alignLeft.getTranslation() : face.alignRight.getTranslation())))),
+                Superstructure.ScoreGamePiece()
+            ),
             LoggedCommands.log("Cannot score coral without coral"),
-            () -> RobotState.haveCoral() || RobotState.getTurboMode())
+            () -> RobotState.haveCoral())
         .handleInterrupt(() -> Vision.setCameraMode(CameraMode.DEFAULT));
     }
 
@@ -152,7 +107,7 @@ public class Superstructure extends SubsystemBase {
                     Controls.instance.TriggerRumble()),
                 LoggedCommands.sequence("Auto Align Middle " + face.toString(),
                     Vision.SwitchToFrontVision(),
-                    RobotState.IntakeAlgae(),
+                    Superstructure.IntakeAlgae(),
                     LoggedCommands.parallel("PID Align Middle " + face.toString(),
                         Commands.sequence(
                             new PIDSwerve(Swerve.instance, Pose.instance, face.approachMiddle, true, false),
@@ -168,23 +123,14 @@ public class Superstructure extends SubsystemBase {
                             optInvertAlgae)))),
             new PIDSwerve(Swerve.instance, Pose.instance, extendedBackup ? face.algaeBackupExtended : face.algaeBackupShort, true, false))
             .handleInterrupt(() -> {
-                if (!RobotState.haveAlgae()) RobotState.setNoAlgae();
+                // if (!RobotState.haveAlgae()) RobotState.setNoAlgae();
                 Vision.setCameraMode(CameraMode.DEFAULT);
             });
     }
 
-    private Command DeLollipop() {
-        return LoggedCommands.deadline("Acquire Algae from lollipop",
-                Commands.sequence(
-                    LoggedCommands.waitUntil("Wait for Algae", RobotState::haveAlgae),
-                    Controls.instance.TriggerRumble()),
-                RobotState.IntakeAlgae())
-            .handleInterrupt(() -> { if (!RobotState.haveAlgae()) RobotState.setNoAlgae(); });
-    }
-
     public Command SetStop(Stop stop) {
         return LoggedCommands.sequence("Set stop to " + stop,
-            RobotState.SetCoralMode(),
+            // RobotState.SetCoralMode(),
             Commands.runOnce(() -> Elevator.instance.setNextStop(stop)));
     }
 
@@ -207,29 +153,14 @@ public class Superstructure extends SubsystemBase {
                     Elevator.instance.Move(Stop.L4_SCORE),
                     LoggedCommands.sequence("Wait to release Algae",
                         LoggedCommands.waitUntil("Wait for Algae Release Point", () -> Elevator.instance.aboveStop(Stop.ALGAE_RELEASE)),
-                        RobotState.ScoreGamePiece())),
+                        Superstructure.ScoreGamePiece())),
                 Elevator.instance.FastZero()); // TODO Defer so that drive control returns?
-    }
-
-    private Command AlignToCage(Cage cage) {
-        Pose2d cageAlignPose = new Pose2d(cage.location(), Rotation2d.k180deg).transformBy(PoseConstants.cageOffset);
-
-        return LoggedCommands.sequence("Align to cage " + cage,
-            LoggedCommands.runOnce("Disable reef aiming", optAutoReefAiming::disable),
-            Vision.SwitchToRearVision(),
-            LoggedCommands.runOnce("Enable end game mode", () -> RobotState.setClimbState(ClimbState.STARTED)),
-            new PIDSwerve(Swerve.instance, Pose.instance, cageAlignPose.transformBy(PoseConstants.cageApproachOffset), true, false, PIDSpeed.FAST),
-            new PIDSwerve(Swerve.instance, Pose.instance, cageAlignPose, true, true, PIDSpeed.SLOW));
     }
 
     private Command ProcessorAlign() {
         return LoggedCommands.sequence("Align to processor",
             new PIDSwerve(Swerve.instance, Pose.instance, PoseConstants.processorApproach, true, false, PIDSpeed.FAST),
             new PIDSwerve(Swerve.instance, Pose.instance, PoseConstants.processorScore, true, true, PIDSpeed.FAST));
-    }
-
-    public Command AlignToNearestCage() {
-        return Commands.defer(() -> AlignToCage(Pose.instance.nearestCage()), Set.of(Swerve.instance));
     }
 
     public Command SmartScore(boolean left) {
@@ -239,12 +170,25 @@ public class Superstructure extends SubsystemBase {
                 Commands.either(
                     LoggedCommands.proxy(ProcessorAlign()),
                     LoggedCommands.proxy(BargeShot()),
-                    RobotState::algaeToProcessor),
-                Commands.either(
-                    LoggedCommands.proxy(Commands.select(left ? deAlgaefyLeftCommands : deAlgaefyRightCommands, () -> Pose.nearestFace(Pose.instance.getPose().getTranslation()))),
-                    DeLollipop(),
-                    optAutoReefAiming::get),
+                    () -> { return optAlgaeBargeOnly.get() || Pose.instance.nearProcessor(); }),
+                LoggedCommands.proxy(Commands.select(left ? deAlgaefyLeftCommands : deAlgaefyRightCommands, () -> Pose.nearestFace(Pose.instance.getPose().getTranslation()))),
                 RobotState::haveAlgae),
             RobotState::haveCoral);
+    }
+
+    public static Command IntakeAlgae() {
+        return LoggedCommands.print("Intake Algae", "TODO Implement Intake Algae");
+    }
+
+    public static Command ScoreGamePiece() {
+        return LoggedCommands.print("Score Game Piece", "TODO Implement Score Game Piece");
+    }
+
+    public static Command WaitForCoral() {
+        return LoggedCommands.print("Wait until coral", "TODO Implement Wait until coral is ready");
+    }
+
+    public static Command WaitForCoralReady() {
+        return LoggedCommands.print("Wait until coral is ready", "TODO Implement Wait until coral is ready");
     }
 }
