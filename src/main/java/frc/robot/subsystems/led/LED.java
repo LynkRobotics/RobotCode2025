@@ -113,8 +113,7 @@ public class LED extends SubsystemBase {
     public LED() {
         // Control both CANdles in the same way
         leds = new CANdleGroup(
-                new CANdle(LEDConstants.leftCandle, LEDConstants.canBus),
-                new CANdle(LEDConstants.rightCandle, LEDConstants.canBus));
+                new CANdle(LEDConstants.candleID, LEDConstants.canBus));
 
         // Set color on the CANdles themselves
         setColor(Color.lynk, 0, LEDConstants.startIdx);

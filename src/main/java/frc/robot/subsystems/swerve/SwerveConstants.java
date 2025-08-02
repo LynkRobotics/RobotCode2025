@@ -106,8 +106,8 @@ public class SwerveConstants {
 
     /* Front Left Module - Module 0 */
     public static final class Mod0 { 
-        public static final int driveMotorID = 1;
-        public static final int angleMotorID = 2;
+        public static final int driveMotorID = 0;
+        public static final int angleMotorID = 1;
         public static final int canCoderID = 0;
         public static final String canBusID = swerveCanBus;
         public static final Rotation2d angleOffset = Rotation2d.fromDegrees(Constants.isRocky ? -97.6 : 33.9 + 180.0);
@@ -117,8 +117,8 @@ public class SwerveConstants {
 
     /* Front Right Module - Module 1 */
     public static final class Mod1 { 
-        public static final int driveMotorID = 18;
-        public static final int angleMotorID = 19;
+        public static final int driveMotorID = 2;
+        public static final int angleMotorID = 3;
         public static final int canCoderID = 1;
         public static final String canBusID = swerveCanBus;
         public static final Rotation2d angleOffset = Rotation2d.fromDegrees(Constants.isRocky ? -38.8 : -72.2 + 180.0);
@@ -128,8 +128,8 @@ public class SwerveConstants {
         
     /* Back Left Module - Module 2 */
     public static final class Mod2 { 
-        public static final int driveMotorID = 8;
-        public static final int angleMotorID = 9;
+        public static final int driveMotorID = 4;
+        public static final int angleMotorID = 5;
         public static final int canCoderID = 2;
         public static final String canBusID = swerveCanBus;
         public static final Rotation2d angleOffset = Rotation2d.fromDegrees(Constants.isRocky ? 6.4 : 162.6 + 180.0);
@@ -139,8 +139,8 @@ public class SwerveConstants {
 
     /* Back Right Module - Module 3 */
     public static final class Mod3 { 
-        public static final int driveMotorID = 10;
-        public static final int angleMotorID = 11;
+        public static final int driveMotorID = 6;
+        public static final int angleMotorID = 7;
         public static final int canCoderID = 3;
         public static final String canBusID = swerveCanBus;
         public static final Rotation2d angleOffset = Rotation2d.fromDegrees(Constants.isRocky ? 52.9 : -25.4 + 180.0);

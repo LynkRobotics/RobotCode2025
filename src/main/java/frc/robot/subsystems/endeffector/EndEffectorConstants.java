@@ -5,8 +5,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class EndEffectorConstants {
     /* IDs */
-    public static final int positionMotorID = 20;
-    public static final int pieceMotorID = 21;
+    public static final int positionMotorID = 16;
+    public static final int pieceMotorID = 13;
 
     /* CANbus */
     public static final String canBus = "rio";

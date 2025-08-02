@@ -12,7 +12,7 @@ import frc.robot.Robot;
 import frc.robot.Constants;
 
 public class PoseConstants {
-    public static final int pigeonID = 1;
+    public static final int pigeonID = 0;
 
     public static final PIDController rotationPID = new PIDController(0.014, 0.0, 0.0); // kI was 0.050 for NCCMP 2024
     public static final double rotationKS = 0.02;

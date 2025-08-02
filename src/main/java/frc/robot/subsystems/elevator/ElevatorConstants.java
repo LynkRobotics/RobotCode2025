@@ -6,8 +6,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class ElevatorConstants {
     /* IDs */
-    public static final int leftID = 4;
-    public static final int rightID = 17;
+    public static final int mainID = 14;
+    public static final int followerID = 15;
     /* CANBus */
     public static final String canBus = "rio";
     /* Motor Config Values */

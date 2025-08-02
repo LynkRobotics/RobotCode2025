@@ -33,6 +33,7 @@ public class Intake extends SubsystemBase {
     /* Devices */
     private final TalonFX deployMotor;
     private final TalonFX intakeMotor;
+    private final TalonFX indexMotor;
 
     /* Control Requests */
     // private final VoltageOut intakeControl = new VoltageOut(IntakeConstants.intakeVoltage).withEnableFOC(true);
@@ -41,6 +42,7 @@ public class Intake extends SubsystemBase {
         /* Devices */
         deployMotor = new TalonFX(IntakeConstants.deployMotorID, IntakeConstants.canBus);
         intakeMotor = new TalonFX(IntakeConstants.intakeMotorID, IntakeConstants.canBus);
+        indexMotor = new TalonFX(IntakeConstants.indexMotorID, IntakeConstants.canBus);
 
         applyConfigs();
     }
@@ -58,6 +60,7 @@ public class Intake extends SubsystemBase {
         /* Apply motor Configs */
         deployMotor.getConfigurator().apply(motorConfig);
         intakeMotor.getConfigurator().apply(motorConfig);
+        indexMotor.getConfigurator().apply(motorConfig);
     }
 
     public Command Deploy() {
@@ -83,5 +86,7 @@ public class Intake extends SubsystemBase {
         DogLog.log("Intake/Deploy Position", deployMotor.getPosition().getValueAsDouble());
         DogLog.log("Intake/Intake Current", intakeMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("Intake/Intake Velocity", intakeMotor.getVelocity().getValueAsDouble());
+        DogLog.log("Intake/Index Current", indexMotor.getTorqueCurrent().getValueAsDouble());
+        DogLog.log("Intake/Index Velocity", indexMotor.getVelocity().getValueAsDouble());
     }
 }

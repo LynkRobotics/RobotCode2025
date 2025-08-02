@@ -12,8 +12,7 @@ import com.ctre.phoenix.led.RainbowAnimation;
 
 public class LEDConstants {
     /* IDs */
-    public static final int leftCandle = 0;
-    public static final int rightCandle = 1;
+    public static final int candleID = 21;
     /* CANbus */
     public static final String canBus = "rio";
     /* LED arrangement */

@@ -58,8 +58,8 @@ public class Elevator extends SubsystemBase {
     private final double positionDiffMax = 0.5;
 
     public Elevator() {
-        leftMotor = new TalonFX(ElevatorConstants.leftID, ElevatorConstants.canBus);
-        rightMotor = new TalonFX(ElevatorConstants.rightID, ElevatorConstants.canBus);
+        leftMotor = new TalonFX(ElevatorConstants.mainID, ElevatorConstants.canBus);
+        rightMotor = new TalonFX(ElevatorConstants.followerID, ElevatorConstants.canBus);
         applyConfigs();
 
         SmartDashboard.putData("Elevator/Raise", Raise());
@@ -415,7 +415,7 @@ public class Elevator extends SubsystemBase {
         leftMotor.stopMotor();
 
         // Set right motor to follow left, but opposite direction
-        rightMotor.setControl(new Follower(ElevatorConstants.leftID, true));
+        rightMotor.setControl(new Follower(ElevatorConstants.mainID, true));
     }
 
     public Command MoveToSafety() {
