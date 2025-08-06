@@ -84,7 +84,7 @@ public class Controls extends SubsystemBase{
         // Only used in case of automation failure
         moveElevator.whileTrue(Elevator.instance.GoToNext());
         zero.onTrue(Elevator.instance.Zero());
-        unjam.onTrue(Intake.instance.Reverse());
+        unjam.onTrue(Intake.instance.Expel());
         score.whileTrue(Superstructure.ScoreGamePiece()); // Also useful to dump Algae or put it into Processor
 
         L4.onTrue(Superstructure.instance.SetStop(Stop.L4));

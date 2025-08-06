@@ -4,35 +4,17 @@
 
 package frc.robot.subsystems.endeffector;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedCommands;
+import frc.robot.subsystems.endeffector.EndEffectorConstants.EEPosition;
 
 public class EndEffector extends SubsystemBase {
     public static final EndEffector instance = new EndEffector();
     
-    private enum EEPosition {
-        START(0.0),
-        L2_ALGAE(0.0),
-        L3_ALGAE(0.0),
-        GROUND_ALGAE(0.0),
-        BARGE_ALGAE(0.0),
-        CORAL_INTAKE(0.0),
-        L1_CORAL(0.0),
-        L23_CORAL(0.0),
-        L4_CORAL(0.0);
-
-        private double position;
-
-        EEPosition(double position) {
-            this.position = position;
-        }
-    };
-
     private EEPosition desiredPosition = EEPosition.START;
 
     /* Devices */
@@ -47,22 +29,9 @@ public class EndEffector extends SubsystemBase {
         positionMotor = new TalonFX(EndEffectorConstants.positionMotorID, EndEffectorConstants.canBus);
         pieceMotor = new TalonFX(EndEffectorConstants.pieceMotorID, EndEffectorConstants.canBus);
 
-        applyConfigs();
-    }
-
-    public void applyConfigs() {
-        /* Configure the EndAffector Motor */
-        var motorConfig = new TalonFXConfiguration();
-        /* Set EndAffector motor to Brake */
-        motorConfig.MotorOutput.NeutralMode = EndEffectorConstants.motorNeutralValue;
-        /* Set the motor direction */
-        motorConfig.MotorOutput.Inverted = EndEffectorConstants.motorOutputInverted;
-        /* Config the peak outputs */
-        motorConfig.Voltage.PeakForwardVoltage = EndEffectorConstants.peakForwardVoltage;
-        motorConfig.Voltage.PeakReverseVoltage = EndEffectorConstants.peakReverseVoltage;
-        /* Apply motor configs */
-        positionMotor.getConfigurator().apply(motorConfig);
-        pieceMotor.getConfigurator().apply(motorConfig);
+        /* Configs */
+        positionMotor.getConfigurator().apply(EndEffectorConstants.getPositionConfig());
+        pieceMotor.getConfigurator().apply(EndEffectorConstants.getPieceConfig());
     }
 
     private boolean inPosition() {

@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems.climber;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
@@ -24,26 +23,12 @@ public class Climber extends SubsystemBase {
     public Climber() {
         /* Devices */
         deployMotor = new TalonFX(ClimberConstants.deployMotorID, ClimberConstants.canBus);
+        deployMotor.getConfigurator().apply(ClimberConstants.getDeployMotorConfig());
         intakeMotor = new TalonFX(ClimberConstants.intakeMotorID, ClimberConstants.canBus);
+        intakeMotor.getConfigurator().apply(ClimberConstants.getIntakeMotorConfig());
 
         //SmartDashboard.putData(LoggedCommands.runOnce("Coast Climber", () -> motor.setNeutralMode(NeutralModeValue.Coast)).ignoringDisable(true));
         //SmartDashboard.putData(LoggedCommands.runOnce("Brake Climber", () -> motor.setNeutralMode(NeutralModeValue.Brake)).ignoringDisable(true));
-        applyConfigs();
-    }
-
-    public void applyConfigs() {
-        /* Configure the motor */
-        var motorConfig = new TalonFXConfiguration();
-        /* Set motor to brake control */
-        motorConfig.MotorOutput.NeutralMode = ClimberConstants.motorNeutralValue;
-        /* Set the motor direction */
-        motorConfig.MotorOutput.Inverted = ClimberConstants.motorOutputInverted;
-        /* Config the peak outputs */
-        motorConfig.Voltage.PeakForwardVoltage = ClimberConstants.peakForwardVoltage;
-        motorConfig.Voltage.PeakReverseVoltage = ClimberConstants.peakReverseVoltage;
-        /* Apply motor configs */
-        deployMotor.getConfigurator().apply(motorConfig);
-        intakeMotor.getConfigurator().apply(motorConfig);
     }
 
     public static Command Deploy() {
@@ -52,6 +37,10 @@ public class Climber extends SubsystemBase {
 
     public static Command Intake() {
         return LoggedCommands.print("Intake cage", "TODO Implement climber cage intake");
+    }
+
+    public static Command DeployAndIntake() {
+        return LoggedCommands.print("Deploy and Intake", "TODO Implement climber deploy and cage intake");
     }
 
     public static Command Retract() {

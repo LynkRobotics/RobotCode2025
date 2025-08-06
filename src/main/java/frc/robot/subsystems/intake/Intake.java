@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems.intake;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
@@ -36,7 +36,11 @@ public class Intake extends SubsystemBase {
     private final TalonFX indexMotor;
 
     /* Control Requests */
-    // private final VoltageOut intakeControl = new VoltageOut(IntakeConstants.intakeVoltage).withEnableFOC(true);
+    private final VoltageOut indexControl = new VoltageOut(IntakeConstants.indexVoltage).withEnableFOC(true);
+    private final VoltageOut indexExpelControl = new VoltageOut(IntakeConstants.indexExpelVoltage).withEnableFOC(true);
+    private final VoltageOut intakeStartControl = new VoltageOut(IntakeConstants.intakeStartVoltage).withEnableFOC(true);
+    private final VoltageOut intakeControl = new VoltageOut(IntakeConstants.intakeVoltage).withEnableFOC(true);
+    private final VoltageOut intakeExpelControl = new VoltageOut(IntakeConstants.intakeExpelVoltage).withEnableFOC(true);
 
     public Intake() {
         /* Devices */
@@ -44,31 +48,18 @@ public class Intake extends SubsystemBase {
         intakeMotor = new TalonFX(IntakeConstants.intakeMotorID, IntakeConstants.canBus);
         indexMotor = new TalonFX(IntakeConstants.indexMotorID, IntakeConstants.canBus);
 
-        applyConfigs();
-    }
-
-    public void applyConfigs() {
-        /* Configure the motor */
-        var motorConfig = new TalonFXConfiguration();
-        /* Set motor to brake control */
-        motorConfig.MotorOutput.NeutralMode = IntakeConstants.motorNeutralValue;
-        /* Set the motor direction */
-        motorConfig.MotorOutput.Inverted = IntakeConstants.motorOutputInverted;
-        /* Config the peak outputs */
-        motorConfig.Voltage.PeakForwardVoltage = IntakeConstants.peakForwardVoltage;
-        motorConfig.Voltage.PeakReverseVoltage = IntakeConstants.peakReverseVoltage;
-        /* Apply motor Configs */
-        deployMotor.getConfigurator().apply(motorConfig);
-        intakeMotor.getConfigurator().apply(motorConfig);
-        indexMotor.getConfigurator().apply(motorConfig);
+        /* Configs */
+        deployMotor.getConfigurator().apply(IntakeConstants.getDeployConfig());
+        intakeMotor.getConfigurator().apply(IntakeConstants.getIntakeConfig());
+        indexMotor.getConfigurator().apply(IntakeConstants.getIndexConfig());
     }
 
     public Command Deploy() {
         return LoggedCommands.print("Deploy Intake", "TODO Implement Intake deploy");
     }
 
-    public Command Reverse() {
-        return LoggedCommands.print("Reverse Intake", "TODO Implement Intake reverse");
+    public Command Expel() {
+        return LoggedCommands.print("Expel Intake", "TODO Implement Intake expel");
     }
 
     public Command Retract() {

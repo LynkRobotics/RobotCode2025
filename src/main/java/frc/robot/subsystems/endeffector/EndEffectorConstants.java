@@ -1,7 +1,15 @@
 package frc.robot.subsystems.endeffector;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Voltage;
+import frc.robot.Robot;
 
 public class EndEffectorConstants {
     /* IDs */
@@ -11,12 +19,115 @@ public class EndEffectorConstants {
     /* CANbus */
     public static final String canBus = "rio";
 
-    /* Motor Config Values */
-    public static final double peakForwardVoltage = 12.0; 
-    public static final double peakReverseVoltage = -12.0; 
-    public static final InvertedValue motorOutputInverted = InvertedValue.Clockwise_Positive;
-    public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
-
     /* Motor Control Values */
-    // public static final double algaeOutVoltage = -4.0;
+    private static final double coralRollerGearing = (7.5 / 1.0);
+	private static final double algaeRollerGearing = (6.0 / 1.0);
+    private static final double positionGearing = (48.0 / 10.0) * (64.0 / 18.0) * (48.0 / 18.0);
+
+	public static final Voltage algaeHoldVoltage = Units.Volts.of(1.0);
+	public static final Voltage algaeReefIntakeVoltage = Units.Volts.of(12.0);
+	public static final Voltage algaeGroundIntakeVoltage = Units.Volts.of(12.0);
+	public static final Voltage bargeAlgaeOuttakeVoltage = Units.Volts.of(-9.0);
+	public static final Voltage processorAlgaeOuttakeVoltage = Units.Volts.of(-3.0);
+	public static final Voltage spitVoltage = Units.Volts.of(-3.0);
+
+	public static final Voltage coralHoldVoltage = Units.Volts.of(1.0);
+	public static final Voltage coralIntakeVoltage = Units.Volts.of(6.0);
+
+	public static final Voltage coralOuttakeVoltageL1 = Units.Volts.of(-1.0); // Soft outtake
+    public static final Voltage coralOuttakeVoltageL2 = Units.Volts.of(-3.0);
+	public static final Voltage coralOuttakeVoltageL3 = Units.Volts.of(-3.0);
+	public static final Voltage coralOuttakeVoltageL4 = Units.Volts.of(-10.0);
+
+	public static final Current algaeStatorCurrentThreshold = Units.Amps.of(70.0);
+	public static final Current coralStatorCurrentThreshold = Units.Amps.of(60.0);
+
+    public static enum EEPosition {
+        L1(102.0),
+        L2(100.75),
+        L3(100.75),
+        L4(140.0),
+        BARGE(-218.0),
+        START(90.0),
+        CORAL_INTAKE(-90.0),
+        ALGAE_INTAKE(-90.0),
+        REEF_INTAKE(-100.0),
+        REEF_PREP(-60.0),
+        PROCESSOR(-90.0),
+        IDLE_AFTER_SCORING(-45.0),
+        ALGAE_HOLD(-120.0),
+        CORAL_HOLD(60.0),
+        CLIMB(130.0),
+        ALGAE_IMPACT(140.0),
+        CORAL_IMPACT(40.0);
+
+        public final Angle angle;
+
+        EEPosition(double value) {
+            this.angle = Units.Degrees.of(value);
+        }
+    }
+
+    public static final TalonFXConfiguration getPieceConfig() {
+		TalonFXConfiguration config = new TalonFXConfiguration();
+
+		config.Voltage.PeakForwardVoltage = 12.0;
+		config.Voltage.PeakReverseVoltage = -12.0;
+
+		config.CurrentLimits.StatorCurrentLimitEnable = Robot.isReal();
+		config.CurrentLimits.StatorCurrentLimit = 80.0;
+
+		config.CurrentLimits.SupplyCurrentLimitEnable = Robot.isReal();
+		config.CurrentLimits.SupplyCurrentLimit = 60.0;
+		config.CurrentLimits.SupplyCurrentLowerLimit = 60.0;
+		config.CurrentLimits.SupplyCurrentLowerTime = 1.0;
+
+		config.Feedback.SensorToMechanismRatio = coralRollerGearing;
+
+		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+		config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+		return config;
+	}
+
+    public static final TalonFXConfiguration getPositionConfig() {
+        TalonFXConfiguration config = new TalonFXConfiguration();
+
+        config.Slot0.kP = 75.0;
+		config.Slot0.kD = 2.5;
+		config.Slot0.kS = 0.05;
+
+		config.Slot0.kG = 0.2;
+
+		config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+
+		config.MotionMagic.MotionMagicCruiseVelocity = 2.0;
+		config.MotionMagic.MotionMagicAcceleration = 1.0;
+
+		config.Voltage.PeakForwardVoltage = 12.0;
+		config.Voltage.PeakReverseVoltage = -12.0;
+
+		config.CurrentLimits.StatorCurrentLimitEnable = Robot.isReal();
+		config.CurrentLimits.StatorCurrentLimit = 60.0;
+
+		config.CurrentLimits.SupplyCurrentLimitEnable = Robot.isReal();
+		config.CurrentLimits.SupplyCurrentLimit = 30.0;
+		config.CurrentLimits.SupplyCurrentLowerLimit = 30.0;
+		config.CurrentLimits.SupplyCurrentLowerTime = 0.1;
+
+		// config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+		// config.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+		// 		Units.Rotations.of(999.0).in(Units.Rotations);
+
+		// config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+		// config.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+		// 		Units.Rotations.of(-999.0).in(Units.Rotations);
+		// config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+		config.Feedback.SensorToMechanismRatio = positionGearing;
+
+        return config;
+    }
 }
