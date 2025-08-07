@@ -164,6 +164,65 @@ public class COTSTalonFXSwerveConstants {
                 public static final double X3_12 = (4.59 / 1.0);
             }
         }
+
+        public static final class SwerveX2t {
+            /** West Coast Products - SwerveX2t Flipped (Kraken X60)*/
+            //INFO: got these numebers from https://docs.wcproducts.com/wcp-swerve-x2/general-info/ratio-options
+            public static final COTSTalonFXSwerveConstants KrakenX60(double driveGearRatio){
+                double wheelDiameter = Units.inchesToMeters(4.0);
+        
+                /** (468 / 35) : 1 */
+                double angleGearRatio = (12.1 / 1.0);
+        
+                double angleKP = 100.0;
+                double angleKI = 0.0;
+                double angleKD = 0.0;
+        
+                InvertedValue driveMotorInvert = InvertedValue.CounterClockwise_Positive;
+                InvertedValue angleMotorInvert = InvertedValue.Clockwise_Positive;
+                SensorDirectionValue cancoderInvert = SensorDirectionValue.CounterClockwise_Positive;
+                return new COTSTalonFXSwerveConstants(wheelDiameter, angleGearRatio, driveGearRatio, angleKP, angleKI, angleKD, driveMotorInvert, angleMotorInvert, cancoderInvert);
+            }
+
+            public static final class driveRatios{
+                /** WCP SwerveX2t Flipped X1 - 10 Tooth - (7.97 : 1) */
+                public static final double X1_10 = (7.97 / 1.0);
+                
+                /** WCP SwerveX2t Flipped X1 - 11 Tooth - (7.98 : 1) */
+                public static final double X1_11 = (6.98 / 1.0);
+                
+                /** WCP SwerveX2t Flipped X1 - 12 Tooth - (6.39 : 1) */
+                public static final double X1_12 = (6.39 / 1.0);
+                
+                /** WCP SwerveX2t Flipped X2 - 10 Tooth - (6.82 : 1) */
+                public static final double X2_10 = (6.82 / 1.0);
+                
+                /** WCP SwerveX2t Flipped X2 - 11 Tooth - (6.20 : 1) */
+                public static final double X2_11 = (6.20 / 1.0);
+                
+                /** WCP SwerveX2t Flipped X2 - 12 Tooth - (5.68 : 1) */
+                public static final double X2_12 = (5.68 / 1.0);
+                
+                /** WCP SwerveX2t Flipped X3 - 10 Tooth - (6.48 : 1) */
+                public static final double X3_10 = (6.48 / 1.0);
+                
+                /** WCP SwerveX2t Flipped X3 - 11 Tooth - (5.89 : 1) */
+                public static final double X3_11 = (5.89 / 1.0);
+                
+                /** WCP SwerveX2t Flipped X3 - 12 Tooth - (5.40 : 1) */
+                public static final double X3_12 = (5.40 / 1.0);
+
+                /** WCP Swerve X2t Flipped X4 - 10 Tooth (5.67 : 1)*/
+                public static final double X4_10 = (5.67 / 1.0);
+
+                /** WCP Swerve X2t Flipped X4 - 11 Tooth (5.15 : 1)*/
+                public static final double X4_11 = (5.15 / 1.0);
+
+                /** WCP Swerve X2t Flipped X4 - 12 Tooth (4.73 : 1)*/
+                public static final double X4_12 = (4.73 / 1.0);
+            }
+
+        }
     }
 
     /** Swerve Drive Specialities */

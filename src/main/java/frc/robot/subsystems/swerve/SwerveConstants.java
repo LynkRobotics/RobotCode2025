@@ -15,9 +15,8 @@ import frc.robot.Constants;
 public class SwerveConstants {
     public static final String swerveCanBus = "lynk";
     public static final double slowMode = 0.3;
-
-    public static final COTSTalonFXSwerveConstants chosenModule =  
-        COTSTalonFXSwerveConstants.SDS.MK4i.KrakenX60(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L2);
+    
+    public static final COTSTalonFXSwerveConstants chosenModule = COTSTalonFXSwerveConstants.WCP.SwerveX2t.KrakenX60(COTSTalonFXSwerveConstants.WCP.SwerveX2t.driveRatios.X3_10);
 
     /* Drivetrain Constants */
     public static final double trackWidth = Units.inchesToMeters(Constants.isRocky ? 21.75 : 21.75);
@@ -83,7 +82,7 @@ public class SwerveConstants {
 
     /* Swerve Profiling Values */
     /** Meters per Second */
-    public static final double maxSpeed = Constants.isRocky ? 4.572 : 5.21208; 
+    public static final double maxSpeed = 4.925568; //WCP SwerveX2t for SubLyme
     /* These are theorectial values to start with, tune after
      * Kraken FOC (L1.0): ft/s = 12.4 | m/s = 3.77952
      * Kraken FOC (L1.5): ft/s = 14.2 | m/s = 4.32816
