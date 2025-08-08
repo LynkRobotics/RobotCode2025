@@ -31,9 +31,9 @@ public class PoseConstants {
     public static final double autoUpDistance = Units.inchesToMeters(38.0); // Increase for quicker auto scoring, but risky
     public static final double wingLength = Units.inchesToMeters(280);
 
-    public static final double robotFrameLength = Units.inchesToMeters(30);
-    public static final double robotFrameWidth = Units.inchesToMeters(27);
-    public static final double bumperWidth = Units.inchesToMeters(3.2);
+    public static final double robotFrameLength = Units.inchesToMeters(26.0);
+    public static final double robotFrameWidth = Units.inchesToMeters(26.0);
+    public static final double bumperWidth = Units.inchesToMeters(3.0);
     public static final double reefStandoff = Units.inchesToMeters(1.5);
     public static final double centerToFrontBumper = robotFrameLength / 2.0 + bumperWidth;
     public static final double reefOffset = centerToFrontBumper + reefStandoff;
@@ -155,19 +155,6 @@ public class PoseConstants {
     // Red MIDDLE = 9.19, 1.883
     // Red FAR = 9.19, 0.768
 
-    // Ashville
-    // Want X diff of 0.30 m?
-    // Blue CLOSE = 8.36 X 8.49, 5.23 X 5.09
-    // Blue MIDDLE = 8.47, 6.16
-    // Blue FAR =
-    // Red CLOSE = 9.11, 2.90
-    // Red MIDDLE = 9.07, 1.84
-    // Red FAR = X
-
-    // Mecklenburg
-    // Blue CLOSE = 8.35, 5.10   (8.774 - 0.42)
-    // Red CLOSE = 9.11, 2.95    (8.774 + 0.34)
-
-    public static final Transform2d cageOffset = new Transform2d(Units.inchesToMeters(8.0), 0, Rotation2d.kZero);
-    public static final Transform2d cageApproachOffset = new Transform2d(Units.inchesToMeters(16.0), 0, Rotation2d.kZero);
+    // public static final Transform2d cageOffset = new Transform2d(Units.inchesToMeters(8.0), 0, Rotation2d.kZero);
+    // public static final Transform2d cageApproachOffset = new Transform2d(Units.inchesToMeters(16.0), 0, Rotation2d.kZero);
 }
