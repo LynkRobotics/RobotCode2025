@@ -10,7 +10,7 @@ import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
 import frc.robot.Robot;
 import frc.robot.Constants;
-import frc.robot.subsystems.pose.PoseConstants;
+import frc.robot.Field;
 import frc.robot.subsystems.vision.VisionConstants.Camera;
 import frc.robot.subsystems.vision.VisionConstants.CameraMode;
 import edu.wpi.first.math.VecBuilder;
@@ -93,9 +93,9 @@ public class Vision extends SubsystemBase {
 
     public static boolean poseIsReasonable(Pose3d pose) {
         if (pose.getX() < -VisionConstants.fieldBorderMargin
-            || pose.getX() > PoseConstants.fieldLength + VisionConstants.fieldBorderMargin
+            || pose.getX() > Field.length + VisionConstants.fieldBorderMargin
             || pose.getY() < -VisionConstants.fieldBorderMargin
-            || pose.getY() > PoseConstants.fieldWidth + VisionConstants.fieldBorderMargin
+            || pose.getY() > Field.width + VisionConstants.fieldBorderMargin
             || pose.getZ() < -VisionConstants.maxZError
             || pose.getZ() > VisionConstants.maxZError) {
             return false;
@@ -186,7 +186,7 @@ public class Vision extends SubsystemBase {
     }
 
     private boolean hasAllianceTag(List<Short> fiducialIDs) {
-        final double fieldMiddle = PoseConstants.fieldLength / 2.0;
+        final double fieldMiddle = Field.length / 2.0;
         boolean isRed = Robot.isRed();
 
         for (Short fiducialID : fiducialIDs) {

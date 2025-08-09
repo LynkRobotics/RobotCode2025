@@ -21,14 +21,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.pose.PoseConstants.Cage;
 import frc.robot.subsystems.pose.PoseConstants.ReefFace;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.Robot;
 import frc.robot.autos.AutoConstants;
-import frc.robot.Constants;
+import frc.robot.Field;
 
 public class Pose extends SubsystemBase {
     public static final Pose instance = new Pose();
@@ -275,8 +274,8 @@ public class Pose extends SubsystemBase {
         Pose2d currentPose = flipIfRed(getPose());
         Pose2d targetPose;
 
-        if (currentPose.getX() > PoseConstants.fieldLength / 2.0) {
-            targetPose = new Pose2d(PoseConstants.fieldLength - PoseConstants.bargeShotX - adjustment, currentPose.getY(), Rotation2d.k180deg);
+        if (currentPose.getX() > Field.length / 2.0) {
+            targetPose = new Pose2d(Field.length - PoseConstants.bargeShotX - adjustment, currentPose.getY(), Rotation2d.k180deg);
             // targetPose = new Pose2d(currentPose.getX(), currentPose.getY(), Rotation2d.k180deg);
         } else {
             targetPose = new Pose2d(PoseConstants.bargeShotX + adjustment, currentPose.getY(), Rotation2d.kZero);
@@ -284,33 +283,6 @@ public class Pose extends SubsystemBase {
         }
 
         return flipIfRed(targetPose);
-    }
-
-    public Cage nearestCage() {
-        Translation2d location = flipIfRed(getPose().getTranslation());
-        Cage cage;
-        double bestDistance, distance;
-        
-        if (Constants.atHQ) {
-            cage = Cage.HQ;
-            bestDistance = location.getDistance(cage.location());
-        } else {
-            cage = Cage.CLOSE;
-            bestDistance = location.getDistance(cage.location());
-            distance = location.getDistance(Cage.MIDDLE.location());
-            if (distance < bestDistance) {
-                cage = Cage.MIDDLE;
-                bestDistance = distance;
-            }
-            distance = location.getDistance(Cage.FAR.location());
-            if (distance < bestDistance) {
-                cage = Cage.FAR;
-                bestDistance = distance;
-            }
-        }
-
-        DogLog.log("Pose/Cage", "Closest cage is " + cage + " at distance of " + String.format("%1.2f", bestDistance));
-        return cage;
     }
 
     public double visionDifference() {

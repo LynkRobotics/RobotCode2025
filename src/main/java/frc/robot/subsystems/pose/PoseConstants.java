@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Robot;
 import frc.robot.Constants;
+import frc.robot.Field;
 
 public class PoseConstants {
     public static final int pigeonID = 0;
@@ -20,20 +21,6 @@ public class PoseConstants {
 
     public static final double tiltWarning = 10.0;
     public static final double tiltError = 30.0;
-
-    // TODO Should probably split some things out into FieldConstants
-    public enum ReefLevel {
-        L1,
-        L2,
-        L3,
-        L4
-    }
-
-    // TODO What about AndyMark field?
-    // NOTE That FlippingUtil might need to be impacted
-    // TODO Consider using fieldLayout.getFieldLength(), etc.
-    public static final double fieldWidth = FlippingUtil.fieldSizeY; // Units.inchesToMeters(26*12 + 5);
-    public static final double fieldLength = FlippingUtil.fieldSizeX; // Units.inchesToMeters(57*12 + 6.875);
 
     public static final double reefElevatorZoneRadius = Units.inchesToMeters(80.0); // TODO Revisit
     public static final double autoUpDistance = Units.inchesToMeters(38.0); // Increase for quicker auto scoring, but risky
@@ -48,18 +35,18 @@ public class PoseConstants {
     public static final double reefExtraOffset = Units.inchesToMeters(9.0);
     public static final double bonusStandoff = Units.inchesToMeters(4.0);
 
-    public static final double processorAreaY = fieldWidth / 2.0 - 1.0;
+    public static final double processorAreaY = Field.width / 2.0 - 1.0;
     public static final Translation2d processor = Constants.atHQ ? new Translation2d(7.38, 0.46) : Constants.fieldLayout.getTagPose(16).get().toPose2d().getTranslation();
     public static final Pose2d processorScore = new Pose2d(processor.plus(new Translation2d(0.0, centerToFrontBumper)), Rotation2d.kCW_90deg);
     public static final double processorApproachOffset = Units.inchesToMeters(24.0);
     public static final Pose2d processorApproach = processorScore.transformBy(new Transform2d(-processorApproachOffset, 0.0, Rotation2d.kZero));
 
     // Locations from the Blue Alliance perspective
-    public static final Translation2d reefCenter = new Translation2d(Units.inchesToMeters(176.75), fieldWidth / 2.0);
+    public static final Translation2d reefCenter = new Translation2d(Units.inchesToMeters(176.75), Field.width / 2.0);
     public static final double reefToFaceDistance = reefCenter.getX() - Units.inchesToMeters(144.0);
     public static final double branchSeparation = Units.inchesToMeters(12.0 + 15.0 / 16.0);
     public static final double bargeShotDistanceFromCenter = Units.inchesToMeters(52.0);
-    public static final double bargeShotX = fieldLength / 2.0 - bargeShotDistanceFromCenter - centerToFrontBumper;
+    public static final double bargeShotX = Field.length / 2.0 - bargeShotDistanceFromCenter - centerToFrontBumper;
 
     // Offset to the reef face, not at the branches, but on the faces directly in front
     public static final Translation2d centerOffset = new Translation2d(reefToFaceDistance + reefOffset - reefStandoff, 0.0); // NOTE: Undo reef standoff for algae
@@ -119,50 +106,4 @@ public class PoseConstants {
         public final Pose2d alignBonusLeft, alignBonusRight;
         public final boolean algaeHigh;
     }
-
-    // Cage locations from 6328
-    public static enum Cage {
-        CLOSE(199.947), // 5.079 m
-        MIDDLE(242.855), // 6.169 m
-        FAR(286.779), // 7.284 m
-        HQ(8.16, 2.37);
-
-        private final Translation2d location;
-        private static final Translation2d redFudge = new Translation2d(0.00, 0.0);
-        private static final Translation2d blueFudge = new Translation2d(0.0, 0.0);
-
-        Cage(double yInches) {
-            // 8.774 m
-            location = new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(yInches));
-        }
-
-        Cage(double xMeters, double yMeters) {
-            location = new Translation2d(xMeters, yMeters);
-        }
-
-        public Translation2d location() {
-            // NOTE: This is prior to flipping to red
-            if (Robot.isRed()) {
-                return location.plus(redFudge);
-            } else {
-                return location.plus(blueFudge);
-            }
-        }
-    }
-
-    // 30 in / 2 + 3.2 in - 2.0 in = 16.2 in = 0.4115 m
-
-    // fieldSizeX = Units.feetToMeters(57.573); 17.548 m
-    // fieldSizeY = Units.feetToMeters(26.417); 8.052 m
-
-    // Hypothetical
-    // Blue CLOSE = 8.363, 5.08
-    // Blue MIDDLE = 8.363, 6.17
-    // Blue FAR = 8.363, 7.28
-    // Red CLOSE = 9.19, 2.97
-    // Red MIDDLE = 9.19, 1.883
-    // Red FAR = 9.19, 0.768
-
-    // public static final Transform2d cageOffset = new Transform2d(Units.inchesToMeters(8.0), 0, Rotation2d.kZero);
-    // public static final Transform2d cageApproachOffset = new Transform2d(Units.inchesToMeters(16.0), 0, Rotation2d.kZero);
 }
