@@ -1,6 +1,8 @@
 package frc.robot.subsystems.endeffector;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -24,23 +26,30 @@ public class EndEffectorConstants {
 	private static final double algaeRollerGearing = (6.0 / 1.0);
     private static final double positionGearing = (48.0 / 10.0) * (64.0 / 18.0) * (48.0 / 18.0);
 
-	public static final Voltage algaeHoldVoltage = Units.Volts.of(1.0);
-	public static final Voltage algaeReefIntakeVoltage = Units.Volts.of(12.0);
-	public static final Voltage algaeGroundIntakeVoltage = Units.Volts.of(12.0);
-	public static final Voltage bargeAlgaeOuttakeVoltage = Units.Volts.of(-9.0);
-	public static final Voltage processorAlgaeOuttakeVoltage = Units.Volts.of(-3.0);
-	public static final Voltage spitVoltage = Units.Volts.of(-3.0);
-
-	public static final Voltage coralHoldVoltage = Units.Volts.of(1.0);
-	public static final Voltage coralIntakeVoltage = Units.Volts.of(6.0);
-
-	public static final Voltage coralOuttakeVoltageL1 = Units.Volts.of(-1.0); // Soft outtake
-    public static final Voltage coralOuttakeVoltageL2 = Units.Volts.of(-3.0);
-	public static final Voltage coralOuttakeVoltageL3 = Units.Volts.of(-3.0);
-	public static final Voltage coralOuttakeVoltageL4 = Units.Volts.of(-10.0);
-
 	public static final Current algaeStatorCurrentThreshold = Units.Amps.of(70.0);
 	public static final Current coralStatorCurrentThreshold = Units.Amps.of(60.0);
+
+	public static enum EEControl {
+		CORAL_INTAKE(6.0),
+		CORAL_HOLD(1.0),
+		CORAL_L1(-1.0),
+		CORAL_L2(-3.0),
+		CORAL_L3(-3.0),
+		CORAL_L4(-10.0),
+		ALGAE_INTAKE(12.0),
+		ALGAE_HOLD(1.0),
+		ALGAE_BARGE_SCORE(-9.0),
+		ALGAE_PROCESSOR_SCORE(-3.0),
+		SPIT(-3.0);  // What is this?
+
+		private Voltage voltage;
+		public ControlRequest control;
+
+		EEControl(double voltage) {
+			this.voltage = Units.Volts.of(voltage);
+			this.control = new VoltageOut(this.voltage).withEnableFOC(false);
+		}
+	}
 
     public static enum EEPosition {
         L1(102.0),

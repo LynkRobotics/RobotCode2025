@@ -36,6 +36,10 @@ public class AlgaeRoller extends SubsystemBase {
         return LoggedCommands.print("Intake algae", "TODO Implement intake algae");
     }
 
+    public Command Retract() {
+        return LoggedCommands.print("Retract algae roller", "TODO Implement retract algae roller");
+    }
+
     public static Command GuideL1Coral() {
         return LoggedCommands.print("Guide L1 coral", "TODO Implement guide L1 coral");
     }

@@ -9,11 +9,29 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
+import frc.robot.subsystems.endeffector.EndEffectorConstants.EEControl;
 import frc.robot.subsystems.endeffector.EndEffectorConstants.EEPosition;
 
 public class EndEffector extends SubsystemBase {
     public static final EndEffector instance = new EndEffector();
+
+    public enum EEState {
+        EMPTY,
+        HAVE_ALGAE,
+        HAVE_CORAL
+    }
+    public EEState state = EEState.EMPTY;
+
+    public enum EEIntakeState {
+        STOPPED,
+        INTAKING_ALGAE,
+        SCORING_ALGAE,
+        INTAKING_CORAL,
+        SCORING_CORAL
+    }
+    public EEIntakeState intakeState = EEIntakeState.STOPPED;
     
     private EEPosition desiredPosition = EEPosition.START;
 
@@ -50,6 +68,34 @@ public class EndEffector extends SubsystemBase {
         return LoggedCommands.print("Score L4 Coral", "TODO Implement Score L4 Coral");
     }
 
+    public Command WaitForState(EEState desiredState) {
+        return LoggedCommands.waitUntil("Wait for EE state " + desiredState, () -> state == desiredState );
+    }
+
+    public Command StartAlgaeIntake() {
+        return LoggedCommands.runOnce("Start algae intake",
+            () ->{
+                if (state != EEState.EMPTY) {
+                    LoggedAlert.Error("End Effector", "Bad state", "End Effector state was not empty: " + state);
+                    state = EEState.EMPTY;
+                }
+                intakeState = EEIntakeState.INTAKING_ALGAE;
+                pieceMotor.setControl(EEControl.ALGAE_INTAKE.control);
+            }, this);
+    }
+
+    public Command StartCoralIntake() {
+        return LoggedCommands.runOnce("Start coral intake",
+            () ->{
+                if (state != EEState.EMPTY) {
+                    LoggedAlert.Error("End Effector", "Bad state", "End Effector state was not empty: " + state);
+                    state = EEState.EMPTY;
+                }
+                intakeState = EEIntakeState.INTAKING_CORAL;
+                pieceMotor.setControl(EEControl.CORAL_INTAKE.control);
+            }, this);
+    }
+
     @Override
     public void periodic() {
         Command currentCommand = getCurrentCommand();
@@ -66,5 +112,22 @@ public class EndEffector extends SubsystemBase {
         DogLog.log("EndEffector/Piece Motor/Velocity", pieceMotor.getVelocity().getValueAsDouble());
         DogLog.log("EndEffector/Piece Motor/RotorVelocity", pieceMotor.getRotorVelocity().getValueAsDouble());
         DogLog.log("EndEffector/Piece Motor/Motor Temp", pieceMotor.getDeviceTemp().getValueAsDouble());
+
+        DogLog.log("EndEffector/State", state.name());
+        DogLog.log("EndEffector/Intake State", intakeState.name());
+
+        if (intakeState == EEIntakeState.INTAKING_ALGAE) {
+            if (false) { // TODO Detect algae grab; remember to use debounce; wait 0.2s after detection (velocity below 2000 degrees per second or beam break)
+                state = EEState.HAVE_ALGAE;
+                pieceMotor.setControl(EEControl.ALGAE_HOLD.control);
+                intakeState = EEIntakeState.STOPPED;
+            }
+        } else if (intakeState == EEIntakeState.INTAKING_CORAL) {
+            if (false) { // TODO Detect coral grab; remember to use debounce
+                state = EEState.HAVE_CORAL;
+                pieceMotor.setControl(EEControl.CORAL_HOLD.control);
+                intakeState = EEIntakeState.STOPPED;
+            }
+        }
     }
 }

@@ -21,6 +21,14 @@ public class PoseConstants {
     public static final double tiltWarning = 10.0;
     public static final double tiltError = 30.0;
 
+    // TODO Should probably split some things out into FieldConstants
+    public enum ReefLevel {
+        L1,
+        L2,
+        L3,
+        L4
+    }
+
     // TODO What about AndyMark field?
     // NOTE That FlippingUtil might need to be impacted
     // TODO Consider using fieldLayout.getFieldLength(), etc.

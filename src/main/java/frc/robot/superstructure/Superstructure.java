@@ -15,9 +15,13 @@ import frc.lib.util.LoggedCommands;
 import frc.robot.autos.AutoConstants;
 import frc.robot.commands.pidswerve.PIDSwerve;
 import frc.robot.commands.pidswerve.PIDSwerveConstants.PIDSpeed;
+import frc.robot.subsystems.algaeroller.AlgaeRoller;
 import frc.robot.subsystems.controls.Controls;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
+import frc.robot.subsystems.endeffector.EndEffector;
+import frc.robot.subsystems.endeffector.EndEffector.EEState;
+import frc.robot.subsystems.endeffector.EndEffectorConstants.EEPosition;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.pose.PoseConstants;
@@ -95,6 +99,11 @@ public class Superstructure extends SubsystemBase {
         return DeAlgaefy(face, true);
     }
 
+    // Safely move End Effector (and Elevator) to required pose
+    public static Command SafeEEPose(EEPosition position, Stop stop) {
+        return LoggedCommands.print("Safe EE Pose", "TODO Implement Safe EE Pose");
+    }
+
     public static Command DeAlgaefy(ReefFace face, boolean extendedBackup) {
         Stop algaeStop = face.algaeHigh ? Stop.L3_ALGAE: Stop.L2_ALGAE;
         Stop algaeInvertStop = face.algaeHigh ? Stop.L2_ALGAE : Stop.L3_ALGAE;
@@ -102,24 +111,26 @@ public class Superstructure extends SubsystemBase {
         return LoggedCommands.sequence("Fully acquire Algae from " + face.toString(),
             LoggedCommands.deadline("Acquire Algae from " + face.toString(),
                 Commands.sequence(
-                    LoggedCommands.waitUntil("Wait for Algae", RobotState::haveAlgae),
+                    EndEffector.instance.WaitForState(EEState.HAVE_ALGAE),
                     Controls.instance.TriggerRumble()),
-                LoggedCommands.sequence("Auto Align Middle " + face.toString(),
+                Commands.sequence(
                     Vision.SwitchToFrontVision(),
-                    Superstructure.IntakeAlgae(),
-                    LoggedCommands.parallel("PID Align Middle " + face.toString(),
+                    EndEffector.instance.StartAlgaeIntake(),
+                    LoggedCommands.parallel("Prepare for reef algae intake",
                         Commands.sequence(
                             new PIDSwerve(Swerve.instance, Pose.instance, face.approachMiddle, true, false),
-                            new PIDSwerve(Swerve.instance, Pose.instance, face.alignMiddle, true, true),
-                            Swerve.instance.Stop()),
-                        Commands.either(
-                            LoggedCommands.deadline("Wait for auto up to " + algaeInvertStop,
-                                Elevator.instance.WaitForStop(algaeInvertStop),
-                                Elevator.instance.AutoElevatorUp(face.alignMiddle.getTranslation(), algaeInvertStop)),
-                            LoggedCommands.deadline("Wait for auto up to " + algaeStop,
-                                Elevator.instance.WaitForStop(algaeStop),
-                                Elevator.instance.AutoElevatorUp(face.alignMiddle.getTranslation(), algaeStop)),
-                            optInvertAlgae)))),
+                            Swerve.instance.Stop()                            
+                        ),
+                        Commands.sequence(
+                            Commands.either(
+                                SafeEEPose(EEPosition.ALGAE_INTAKE, algaeInvertStop),
+                                SafeEEPose(EEPosition.ALGAE_INTAKE, algaeStop),
+                                optInvertAlgae
+                            ),
+                            AlgaeRoller.instance.Retract()
+                        )),
+                    new PIDSwerve(Swerve.instance, Pose.instance, face.alignMiddle, true, true),
+                    Swerve.instance.Stop())),
             new PIDSwerve(Swerve.instance, Pose.instance, extendedBackup ? face.algaeBackupExtended : face.algaeBackupShort, true, false))
             .handleInterrupt(() -> {
                 // if (!RobotState.haveAlgae()) RobotState.setNoAlgae();
