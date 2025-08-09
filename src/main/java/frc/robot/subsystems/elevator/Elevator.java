@@ -2,10 +2,8 @@ package frc.robot.subsystems.elevator;
 
 import static frc.robot.Options.optServiceMode;
 
-import java.util.Set;
 import java.util.function.Supplier;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -14,8 +12,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
-// import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 // import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 // import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -36,8 +34,8 @@ import frc.robot.subsystems.robotstate.RobotState;
 public class Elevator extends SubsystemBase {
     public static final Elevator instance = new Elevator();
     
-    private final TalonFX leftMotor;
-    private final TalonFX rightMotor;
+    private final TalonFX mainMotor;
+    private final TalonFX followerMotor;
     private final VoltageOut voltageOut = new VoltageOut(0).withEnableFOC(true);
     // TODO Use MotionMagicVoltage?
     private final PositionVoltage positionVoltage = new PositionVoltage(0.0).withEnableFOC(true);
@@ -50,17 +48,18 @@ public class Elevator extends SubsystemBase {
     private double lastPosition = 0.0;
     private double desiredPosition = -1.0;
     private boolean zeroing = false;
-    private boolean movingToSafety = false;
-    private boolean safetyDeferred = false;
     private boolean autoUp = false;
     private Timer scoreTimer = new Timer();
     
     private final double positionDiffMax = 0.5;
 
     public Elevator() {
-        leftMotor = new TalonFX(ElevatorConstants.mainID, ElevatorConstants.canBus);
-        rightMotor = new TalonFX(ElevatorConstants.followerID, ElevatorConstants.canBus);
-        applyConfigs();
+        mainMotor = new TalonFX(ElevatorConstants.mainID, ElevatorConstants.canBus);
+        followerMotor = new TalonFX(ElevatorConstants.followerID, ElevatorConstants.canBus);
+
+        mainMotor.getConfigurator().apply(ElevatorConstants.getMotorConfig());
+        mainMotor.stopMotor();
+        followerMotor.setControl(new Follower(ElevatorConstants.mainID, true));
 
         SmartDashboard.putData("Elevator/Raise", Raise());
         SmartDashboard.putData("Elevator/Lower", Lower());
@@ -70,30 +69,20 @@ public class Elevator extends SubsystemBase {
         SmartDashboard.putNumber("Elevator/Direct Position", 0.0);
         SmartDashboard.putData("Elevator/Set Position", LoggedCommands.runOnce("Set Position", () -> { setPosition(SmartDashboard.getNumber("Elevator/Direct Position", 0.0));}));
         SmartDashboard.putNumber("Elevator/Direct Height", 0.0);
-        SmartDashboard.putData("Elevator/Set Height", LoggedCommands.runOnce("Set Height", () -> { setHeight(SmartDashboard.getNumber("Elevator/Direct Height", 12.0));}));
+        SmartDashboard.putData("Elevator/Set Height", LoggedCommands.runOnce("Set Height", () -> { setHeight(Units.Inches.of(SmartDashboard.getNumber("Elevator/Direct Height", 12.0)));}));
         SmartDashboard.putData("Elevator/Zero", Zero());
         SmartDashboard.putData("Elevator/SetZero", SetZero());
         SmartDashboard.putData("Elevator/FastZero", FastZero());
-        SmartDashboard.putNumber("Elevator/Smooth L4 Time", 5.0);
-        SmartDashboard.putData("Elevator/Smooth L4", Commands.defer(() -> TimeBasedMove(Stop.L4, SmartDashboard.getNumber("Elevator/Smooth L4 Time", 5.0)), Set.of(this)));
 
-        // double canvasWidth = Constants.Swerve.wheelBase * 1.5;
-        // double canvasHeight = Units.inchesToMeters(ElevatorConstants.maxHeight) * 1.25;
-        // Mechanism2d canvas = new Mechanism2d(canvasWidth, canvasHeight, new Color8Bit(Color.kLightGray));
-        // MechanismRoot2d origin = canvas.getRoot("elevator-root", canvasWidth / 2.0, 0);
-        // MechanismLigament2d offset = origin.append(new MechanismLigament2d("elevator-offset", canvasWidth / 2.0  - Units.inchesToMeters(ElevatorConstants.setback), 0.0, 1.0, new Color8Bit()));
-        // mechanism = offset.append(new MechanismLigament2d("elevator", Units.inchesToMeters(ElevatorConstants.baseHeight), 90.0, Units.inchesToMeters(ElevatorConstants.thickness), new Color8Bit(0xBF, 0x57, 0x00)));
-
-        // TODO Get mechanism working
-        // SmartDashboard.putData("Elevator/mechanism", canvas);
-        initDefaultCommand();
+        // TODO
+        // initDefaultCommand();
     }
 
     public void setAsZero() {
         DogLog.log("Elevator/Status", "Set as Zero");
         // RobotState.setElevatorAtZero(true);
-        leftMotor.setPosition(0);
-        rightMotor.setPosition(0);
+        mainMotor.setPosition(0);
+        followerMotor.setPosition(0);
     }
 
     public Command SetZero() {
@@ -142,7 +131,7 @@ public class Elevator extends SubsystemBase {
 
     private void stop() {
         DogLog.log("Elevator/Status", "Stopped");
-        leftMotor.stopMotor();
+        mainMotor.stopMotor();
     }
 
     private void setVoltage(double voltage) {
@@ -151,14 +140,12 @@ public class Elevator extends SubsystemBase {
         // TODO Handle blocking
         DogLog.log("Elevator/Status", "Set voltage " + String.format("%1.2f", voltage));
         // RobotState.setElevatorAtZero(false);
-        leftMotor.setControl(voltageOut.withOutput(voltage));
+        mainMotor.setControl(voltageOut.withOutput(voltage));
     }
 
-    // TODO Return from enum
-    private double stopHeight(Stop stop) {
-        double height = stop.height;
-
-        return height;
+    // TODO Use enum directly
+    private Distance stopHeight(Stop stop) {
+        return stop.height;
     }
 
     public Command Move(Stop stop) {
@@ -187,32 +174,6 @@ public class Elevator extends SubsystemBase {
         nextStop = stop;
     }
 
-    private Timer smoothTimer = new Timer();
-    private double smoothStartHeight = 0.0;
-
-    public Command SmoothMove(Stop stop, Supplier<Double> pctSupplier) {
-        return LoggedCommands.startRun("Smooth Move Elevator",
-        () -> {
-            smoothStartHeight = getHeight();
-            DogLog.log("Elevator/Smooth Start", smoothStartHeight);
-        },
-        () -> {
-            double pct = MathUtil.clamp(pctSupplier.get(), 0.0, 1.0);
-            double newHeight = smoothStartHeight + pct * (stop.height - smoothStartHeight);
-
-            DogLog.log("Elevator/Smooth Percent", pct);
-            DogLog.log("Elevator/Smooth New Height", newHeight);
-
-            setHeight(newHeight);
-        }, this);
-    }
-
-    public Command TimeBasedMove(Stop stop, double time) {
-        return LoggedCommands.sequence("Smooth Move Elevator by Time (" + String.format("%1.2f", time) + ")",
-            Commands.runOnce(() -> smoothTimer.restart()),
-            SmoothMove(stop, () -> smoothTimer.get() / time));
-    }
-
     public Command AutoElevatorUp(Translation2d target) {
         return AutoElevatorUp(target, () -> nextStop).withName("Auto Elevator Up to Next");
     }
@@ -220,24 +181,6 @@ public class Elevator extends SubsystemBase {
     public Command AutoElevatorUp(Translation2d target, Stop stop) {
         return AutoElevatorUp(target, () -> stop).withName("Auto Elevator Up to " + stop);
     };
-
-    // Smoothly raise the elevator as it approaches the target
-    public Command SmoothElevatorUp(Translation2d target) {
-        double closeEnough = Units.inchesToMeters(4.0); // TODO Base on PIDSwerve.roughPositionTolerance
-
-        return LoggedCommands.defer("Smooth Elevator Up to Target",
-            () -> {
-                Translation2d myTarget = Pose.flipIfRed(target);
-                double startingDistance = Pose.distanceTo(myTarget);
-
-                DogLog.log("Misc/Debug 0", startingDistance);
-                return SmoothMove(nextStop, () -> {
-                    DogLog.log("Misc/Debug 1", Pose.distanceTo(myTarget));
-                    DogLog.log("Misc/Debug 2", Math.max(0.0, Pose.distanceTo(myTarget) - closeEnough));
-                    return (1.0 - Math.max(0.0, Pose.distanceTo(myTarget) - closeEnough) / startingDistance);
-                });
-            }, Set.of(this));
-    }
 
     public Command AutoElevatorUp(Translation2d target, Supplier<Stop> stopSupplier) {
         return IfNotBlocked(LoggedCommands.startRun("Auto Elevator Up",
@@ -276,18 +219,18 @@ public class Elevator extends SubsystemBase {
     }
 
     // Set Elevator height to given position, provided in inches
-    private void setHeight(double height) {
-        if (height > ElevatorConstants.maxHeight) {
+    private void setHeight(Distance height) {
+        if (height.gt(ElevatorConstants.maxHeight)) {
             LoggedAlert.Warning("Elevator", "Elevator Range", "Requested elevator height too high");
             height = ElevatorConstants.maxHeight;
         }
-        if (height < ElevatorConstants.baseHeight) {
+        if (height.gt(ElevatorConstants.baseHeight)) {
             LoggedAlert.Warning("Elevator", "Elevator Range", "Requested elevator height too low");
             height = ElevatorConstants.baseHeight;
         }
         DogLog.log("Elevator/Status", "Move to height " + String.format("%1.1f", height));
 
-        double position = (height - ElevatorConstants.baseHeight) * ElevatorConstants.rotPerInch;
+        double position = height.minus(ElevatorConstants.baseHeight).in(Units.Inches) * ElevatorConstants.rotPerInch;
         setPosition(position);
     }
 
@@ -298,7 +241,7 @@ public class Elevator extends SubsystemBase {
         DogLog.log("Elevator/Status", "Move to position " + String.format("%1.2f", position));
         DogLog.log("Elevator/Set Position", position);
         // RobotState.setElevatorAtZero(false);
-        leftMotor.setControl(positionVoltage.withPosition(position));
+        mainMotor.setControl(positionVoltage.withPosition(position));
     }
     
     private boolean inRange(double position) {
@@ -310,8 +253,8 @@ public class Elevator extends SubsystemBase {
         return Stop.SAFE;
     }
 
-    private boolean isSafe(double height) {
-        return height < (safetyStop().height + ElevatorConstants.safetyMargin);
+    private boolean isSafe(Distance height) {
+        return height.lt(safetyStop().height.plus(ElevatorConstants.safetyMargin));
     }
 
     private boolean isSafe() {
@@ -319,7 +262,7 @@ public class Elevator extends SubsystemBase {
     }
 
     private double stopError(Stop stop) {
-        return Math.abs(stopHeight(stop) - getHeight());
+        return Math.abs(stopHeight(stop).minus(getHeight()).magnitude());
     }
 
     public boolean atStop(Stop stop) {
@@ -331,7 +274,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean aboveStop(Stop stop) {
-        return getHeight() > stopHeight(stop);
+        return getHeight().gt(stopHeight(stop));
     }
 
     public boolean nearStop(Stop stop) {
@@ -344,7 +287,7 @@ public class Elevator extends SubsystemBase {
 
     // Are potentially towards a stop? (limited use cases)
     public boolean towardsStop(Stop stop) {
-        return (getHeight() + ElevatorConstants.towardsMargin) >= stopHeight(stop);
+        return getHeight().plus(ElevatorConstants.towardsMargin).gte(stopHeight(stop));
     }
 
     public boolean atNextStop() {
@@ -359,16 +302,17 @@ public class Elevator extends SubsystemBase {
         return towardsStop(nextStop);
     }
 
-    private double getHeight(double position) {
-        return position / ElevatorConstants.rotPerInch + ElevatorConstants.baseHeight;
+    private Distance getHeight(double position) {
+        // TODO Reevaluate baseHeight, not used by 1678
+        return Units.Inches.of(position / ElevatorConstants.rotPerInch).plus(ElevatorConstants.baseHeight);
     }
 
-    private double getHeight() {
-        return getHeight(leftMotor.getPosition().getValueAsDouble());
+    private Distance getHeight() {
+        return getHeight(mainMotor.getPosition().getValueAsDouble());
     }
 
     public double raisedPercentage() {
-        return MathUtil.clamp((getHeight() - Stop.HOLD.height) / Stop.L4_SCORE.height, 0.0, 1.0);
+        return MathUtil.clamp(getHeight().minus(Stop.CORAL_HOLD.height).div(Stop.L4.height).magnitude(), 0.0, 1.0);
     }
 
     public Command IfNotBlocked(Command command) {
@@ -380,43 +324,6 @@ public class Elevator extends SubsystemBase {
         //     () -> !RobotState.elevatorPathBlocked());
     }
 
-    private void applyConfigs() {
-        // Configure the primary motor
-        var motorConfig = new TalonFXConfiguration();
-        motorConfig.MotorOutput.NeutralMode = ElevatorConstants.motorNeutralValue;
-        motorConfig.MotorOutput.Inverted = ElevatorConstants.motorOutputInverted;
-        motorConfig.Voltage.PeakForwardVoltage = ElevatorConstants.peakForwardVoltage;
-        motorConfig.Voltage.PeakReverseVoltage = ElevatorConstants.peakReverseVoltage;
-        motorConfig.CurrentLimits.StatorCurrentLimit = 80; //TODO: Test 
-        motorConfig.CurrentLimits.SupplyCurrentLimit = 120; //TODO: Make these constants
-        motorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        motorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-
-    
-        // PID & FF configuration
-        motorConfig.Slot0.kP = ElevatorConstants.kP;
-        motorConfig.Slot0.kI = ElevatorConstants.kI;
-        motorConfig.Slot0.kD = ElevatorConstants.kD;
-        motorConfig.Slot0.kS = ElevatorConstants.kS;
-        motorConfig.Slot0.kV = ElevatorConstants.kV;
-        motorConfig.Slot0.kA = ElevatorConstants.kA;
-        motorConfig.Slot0.kG = ElevatorConstants.kG;
-    
-        // Set Motion Magic settings
-        // var motionMagicConfigs = motorConfig.MotionMagic;
-        // motionMagicConfigs.MotionMagicCruiseVelocity = ElevatorConstants.cruiseVelocity;
-        // motionMagicConfigs.MotionMagicAcceleration = ElevatorConstants.acceleration;
-        // motionMagicConfigs.MotionMagicJerk = ElevatorConstants.jerk;
-    
-        // Apply motor config
-        leftMotor.getConfigurator().apply(motorConfig);
-
-        // Ensure that left motor begins stopped
-        leftMotor.stopMotor();
-
-        // Set right motor to follow left, but opposite direction
-        rightMotor.setControl(new Follower(ElevatorConstants.mainID, true));
-    }
 
     public Command MoveToSafety() {
         return Commands.either(
@@ -426,14 +333,14 @@ public class Elevator extends SubsystemBase {
                 Commands.idle(this)
             ),
             LoggedCommands.sequence("Move Elevator to Safety",
-                Commands.runOnce(() -> {
-                    movingToSafety = true;
-                    safetyDeferred = false;
-                }),
+                // Commands.runOnce(() -> {
+                //     movingToSafety = true;
+                //     safetyDeferred = false;
+                // }),
                 Commands.either(
                     LoggedCommands.deadline("Move to Hold position with Coral",
                         LoggedCommands.waitUntil("Wait for no Coral", () -> !RobotState.haveCoral()),
-                        Move(Stop.HOLD)),
+                        Move(Stop.CORAL_HOLD)),
                     LoggedCommands.sequence("Zero and Idle",
                         Commands.either(
                             Zero(),
@@ -441,7 +348,8 @@ public class Elevator extends SubsystemBase {
                             RobotState::haveAlgae),
                         LoggedCommands.idle("Elevator holding at zero", this)),
                     RobotState::coralReady))
-                    .handleInterrupt(() -> movingToSafety = false),
+                    // .handleInterrupt(() -> movingToSafety = false)
+                    ,
             optServiceMode::get);
     }
     
@@ -454,11 +362,11 @@ public class Elevator extends SubsystemBase {
         Command currentCommand = getCurrentCommand();
         DogLog.log("Elevator/Current Command", currentCommand == null ? "None" : currentCommand.getName());
 
-        double position = leftMotor.getPosition().getValueAsDouble();
-        double height = getHeight(position);
-        double followPosition = rightMotor.getPosition().getValueAsDouble();
+        double position = mainMotor.getPosition().getValueAsDouble();
+        Distance height = getHeight(position);
+        double followPosition = followerMotor.getPosition().getValueAsDouble();
         double followDifference = position - followPosition;
-        double voltage = leftMotor.getMotorVoltage().getValueAsDouble();
+        double voltage = mainMotor.getMotorVoltage().getValueAsDouble();
 
         // Handle exceptions in cases other than elevator at rest
         if (voltage != 0.0) {
@@ -506,13 +414,13 @@ public class Elevator extends SubsystemBase {
             // stop();
         }
 
-        DogLog.log("Elevator/height", height);
+        DogLog.log("Elevator/height", height.in(Units.Inches));
         DogLog.log("Elevator/leftPosition", position);
-        DogLog.log("Elevator/leftVelocity", leftMotor.getVelocity().getValueAsDouble());
+        DogLog.log("Elevator/leftVelocity", mainMotor.getVelocity().getValueAsDouble());
         DogLog.log("Elevator/leftVoltage", voltage);
         DogLog.log("Elevator/rightPosition", followPosition);
-        DogLog.log("Elevator/rightVelocity", rightMotor.getVelocity().getValueAsDouble());
-        DogLog.log("Elevator/rightVoltage", rightMotor.getMotorVoltage().getValueAsDouble());
+        DogLog.log("Elevator/rightVelocity", followerMotor.getVelocity().getValueAsDouble());
+        DogLog.log("Elevator/rightVoltage", followerMotor.getMotorVoltage().getValueAsDouble());
         DogLog.log("Elevator/stallCount", stallCount);
 
         SmartDashboard.putBoolean("Elevator/Stalled", isStalled());
@@ -520,7 +428,7 @@ public class Elevator extends SubsystemBase {
         SmartDashboard.putBoolean("Elevator/In Range", inRange(position));
 
         SmartDashboard.putBoolean("Elevator/Safe", isSafe(height));
-        SmartDashboard.putBoolean("Elevator/HOLD", atStop(Stop.HOLD));
+        // SmartDashboard.putBoolean("Elevator/HOLD", atStop(Stop.HOLD));
         SmartDashboard.putBoolean("Elevator/L1", atStop(Stop.L1));
         SmartDashboard.putBoolean("Elevator/L2", atStop(Stop.L2));
         SmartDashboard.putBoolean("Elevator/L3", atStop(Stop.L3));

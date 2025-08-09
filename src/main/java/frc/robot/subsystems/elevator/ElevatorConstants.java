@@ -1,7 +1,12 @@
 package frc.robot.subsystems.elevator;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Distance;
+import frc.robot.Robot;
 
 
 public class ElevatorConstants {
@@ -20,52 +25,85 @@ public class ElevatorConstants {
     public static final double thickness = 2.0; // Thickness of the elevator (only for Mechanism2d visualization)
     public static final double setback = 9.5; // Distance from front edge of robot (only for Mechanism2d visualization)
     public static final double bellyHeight = 0.755; // Height of the top surface of the belly pan from the ground
-    public static final double baseHeight = 12.0 + bellyHeight; // Height of elevator in inches when it is at zero position
-    public static final double maxHeight = 72.0 + bellyHeight; // Height that elevator should never exceed
+    public static final Distance baseHeight = Units.Inches.of(12.0 + bellyHeight); // TODO // Height of elevator in inches when it is at zero position
+    public static final Distance maxHeight = Units.Inches.of(63.0); // TODO 72.0 + bellyHeight; // Height that elevator should never exceed
     public static final double endEffectorHeight = 6.0; // Height of end effector "target" above elevator height
     public static final double rotPerInch = 0.704; // Rotations to drive elevator one inch
+    // public static final PerUnit<AngleUnit, DistanceUnit> rotperInch = PerUnit.combine(Units.Rotations.of(0.704), Units.Inches.of(1.0));
+    // TODO Reevaluate these values
 
-    public static final double safetyMargin = 1.5;   // How many inches away from safe mark to still be considered safe
+    public static final Distance safetyMargin = Units.Inches.of(1.5);   // How many inches away from safe mark to still be considered safe
     public static final double positionError = rotPerInch * 0.5; // Allowable rotation error to be considered in position
     public static final double positionCloseError = rotPerInch * 6.0; // Allowable rotation error to be considered in position
     public static final double stopError = 0.25;      // Allowable inches of error to be considered at a stop
     public static final double slowVoltage = 2.0;    // Volts to move slowly to zero
-    public static final double towardsMargin = 32.0; // inches
-
-    public static final double RPSperVolt = 7.9; // RPS increase with every volt
-    public static final double kP = 2.2; // output per unit of error in position (output/rotation)
-    public static final double kI = 0.0; // output per unit of integrated error in position (output/(rotation*s))
-    public static final double kD = 0.0; // output per unit of error in velocity (output/rps)
-    public static final double kS = 0.0; // output to overcome static friction (output)
-    public static final double kV = 1.0 / RPSperVolt; // output per unit of target velocity (output/rps)
-    public static final double kA = 0.0; // output per unit of target acceleration (output/(rps/s))
-    public static final double kG = 0.4; // output to overcome gravity
-    public static final double cruiseVelocity = 100.0; // RPS
-    public static final double acceleration = cruiseVelocity / 0.3; // Accelerate in 0.3 seconds
+    public static final Distance towardsMargin = Units.Inches.of(32.0);
 
     public static final double speedLimitAtMax = 0.30;
 
-    public enum Stop {
-        // Intake occurs at zero
-        SAFE     (ElevatorConstants.baseHeight + 5.0),
-        L1       (21.3 - ElevatorConstants.endEffectorHeight),
-        L1_SCORE (33.0 - ElevatorConstants.endEffectorHeight),
-        HOLD     (30.0 - ElevatorConstants.endEffectorHeight),
-        L2       (34.5 - ElevatorConstants.endEffectorHeight),
-        L2_ALGAE (38.0 - ElevatorConstants.endEffectorHeight), 
-        L3       (49.5 - ElevatorConstants.endEffectorHeight),
-        L3_ALGAE (53.5 - ElevatorConstants.endEffectorHeight),
-        ALGAE_RELEASE(63.5 - ElevatorConstants.endEffectorHeight),
-        L4       (74.5 - ElevatorConstants.endEffectorHeight),
-        L4_SCORE (77.0 - ElevatorConstants.endEffectorHeight);
+    private static final Distance algaeLiftDistance = Units.Inches.of(2.0);
 
-        Stop(double height) {
+    public enum Stop {
+        SAFE(Units.Inches.of(2.0)), // TODO Re-evaluate this position
+        L1(Units.Inches.of(0.0)),
+        L2(Units.Inches.of(6.3)),
+        L3(L2.height.plus(Units.Inches.of(16.0))),
+        L4(Units.Inches.of(60.25)),
+        CORAL_HOLD(Units.Inches.of(13.21)),
+        L2_ALGAE(Units.Inches.of(21.91)),
+        L3_ALGAE(L2_ALGAE.height.plus(Units.Inches.of(16.0))),
+        L2_ALGAELIFT(L2_ALGAE.height.plus(algaeLiftDistance)),
+        L3_ALGAELIFT(L3_ALGAE.height.plus(algaeLiftDistance)),
+        ALGAE_HOLD(Units.Inches.of(19.41)),
+        BARGE(Units.Inches.of(62.17));
+
+        Stop(Distance height) {
             this.height = height;
+            this.position = 0.0; // TODO Conversion
         }
 
-        public final double height;
+        public final Distance height;
+        public final double position;
     }
 
-    public static final double L1RaiseDelay = 0.3;
+    // public static final double L1RaiseDelay = 0.3;
     // public static final double standoffBoost = 1.5; // In inches
+
+    public static final double gearing = (3.0 / 1.0);
+
+	public static final TalonFXConfiguration getMotorConfig() {
+		TalonFXConfiguration config = new TalonFXConfiguration();
+
+		config.Slot0.kP = 16.3;
+		config.Slot0.kD = 0.5;
+		config.Slot0.kS = 0.45;
+		config.Slot0.kG = 0.35;
+
+		config.MotionMagic.MotionMagicCruiseVelocity = 20.0;
+
+		config.CurrentLimits.SupplyCurrentLimitEnable = Robot.isReal();
+		config.CurrentLimits.SupplyCurrentLimit = 80.0;
+		config.CurrentLimits.SupplyCurrentLowerLimit = 80.0;
+		config.CurrentLimits.SupplyCurrentLowerTime = 0.1;
+
+		config.CurrentLimits.StatorCurrentLimitEnable = true;
+		config.CurrentLimits.StatorCurrentLimit = 120.0;
+
+		config.Voltage.PeakForwardVoltage = 12.0;
+		config.Voltage.PeakReverseVoltage = -12.0;
+
+		// FXConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+		// FXConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+		// 		converter.toAngle(kNetHeight).in(Units.Rotations);
+
+		// FXConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+		// FXConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+		// 		converter.toAngle(kStowPosition).minus(Units.Degrees.of(10.0)).in(Units.Rotations);
+
+		config.Feedback.SensorToMechanismRatio = gearing;
+
+		config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+		return config;
+	}
 }

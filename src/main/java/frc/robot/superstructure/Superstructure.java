@@ -5,7 +5,6 @@ import static frc.robot.Options.optInvertAlgae;
 import static frc.robot.Options.optMirrorAuto;
 
 import java.util.EnumMap;
-import java.util.Set;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -144,17 +143,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     public Command BargeShot(double adjustment) {
-        return LoggedCommands.sequence("Score Algae into Barge",
-                Commands.defer(() -> new PIDSwerve(Swerve.instance, Pose.instance, Pose.instance.bargeShotPose(adjustment), false, false, PIDSpeed.TURBO).ignoreY(), Set.of(Swerve.instance)),
-                LoggedCommands.deadline("Toss Algae",
-                    Commands.sequence(
-                        Elevator.instance.WaitForStop(Stop.L4_SCORE)),
-                    Swerve.instance.HoldX(),
-                    Elevator.instance.Move(Stop.L4_SCORE),
-                    LoggedCommands.sequence("Wait to release Algae",
-                        LoggedCommands.waitUntil("Wait for Algae Release Point", () -> Elevator.instance.aboveStop(Stop.ALGAE_RELEASE)),
-                        Superstructure.ScoreGamePiece())),
-                Elevator.instance.FastZero()); // TODO Defer so that drive control returns?
+        return LoggedCommands.print("Barge shot", "TODO Implement barge shot");
     }
 
     private Command ProcessorAlign() {
