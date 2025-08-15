@@ -7,7 +7,8 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Distance;
 import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.Constants;
@@ -19,19 +20,19 @@ public class SwerveConstants {
     public static final COTSTalonFXSwerveConstants chosenModule = COTSTalonFXSwerveConstants.WCP.SwerveX2t.KrakenX60(COTSTalonFXSwerveConstants.WCP.SwerveX2t.driveRatios.X3_10);
 
     /* Drivetrain Constants */
-    public static final double trackWidth = Units.inchesToMeters(21.0);
+    public static final Distance trackWidth = Units.Inches.of(21.0);
     /* Center to Center distance of left and right modules in meters. */
-    public static final double wheelBase = Units.inchesToMeters(21.0);
+    public static final Distance wheelBase = Units.Inches.of(21.0);
     /* Center to Center distance of front and rear module wheels in meters. */
     public static final double wheelCircumference = chosenModule.wheelCircumference * 0.97845; // testing
 
     /* Swerve Kinematics 
      * No need to ever change this unless you are not doing a traditional rectangular/square 4 module swerve */
      public static final SwerveDriveKinematics swerveKinematics = new SwerveDriveKinematics(
-        new Translation2d(wheelBase / 2.0, trackWidth / 2.0),
-        new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
-        new Translation2d(-wheelBase / 2.0, trackWidth / 2.0),
-        new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0));
+        new Translation2d(wheelBase.div(2.0), trackWidth.div(2.0)),
+        new Translation2d(wheelBase.div(2.0), trackWidth.div(2.0).unaryMinus()),
+        new Translation2d(wheelBase.div(2.0).unaryMinus(), trackWidth.div(2.0)),
+        new Translation2d(wheelBase.div(2.0).unaryMinus(), trackWidth.div(2.0).unaryMinus()));
 
     /* Module Gear Ratios */
     public static final double driveGearRatio = chosenModule.driveGearRatio;
@@ -93,7 +94,7 @@ public class SwerveConstants {
      */
     /** Radians per Second */
     // public static final double maxAngularVelocity = 10.0; //TODO: This must be tuned to specific robot
-    public static final double driveRadius = Math.hypot(wheelBase, trackWidth) / 2.0;
+    public static final double driveRadius = Math.hypot(wheelBase.in(Units.Meters), trackWidth.in(Units.Meters)) / 2.0;
     public static final double maxAngularVelocity = maxSpeed / driveRadius;
 
     /* Neutral Modes */
