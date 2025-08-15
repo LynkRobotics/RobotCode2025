@@ -70,10 +70,12 @@ public class EndEffectorConstants {
         ALGAE_IMPACT(140.0),
         CORAL_IMPACT(40.0);
 
-        public final Angle angle;
+        private final Angle angle;
+		public double position;
 
         EEPosition(double value) {
             this.angle = Units.Degrees.of(value);
+			this.position = 0.0; // TODO Convert angle to motor +position
         }
     }
 

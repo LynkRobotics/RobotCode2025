@@ -8,9 +8,11 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
+import frc.robot.Field;
 import frc.robot.subsystems.endeffector.EndEffectorConstants.EEControl;
 import frc.robot.subsystems.endeffector.EndEffectorConstants.EEPosition;
 
@@ -56,16 +58,23 @@ public class EndEffector extends SubsystemBase {
         return false;
     }
 
-    public Command ScoreL1Coral() {
-        return LoggedCommands.print("Score L1 Coral", "TODO Implement Score L1 Coral");
-    }
+    public Command ExpelCoral(Field.ReefLevel level) {
+        EEControl control = switch (level) {
+            case L4 -> EEControl.CORAL_L4;
+            case L3 -> EEControl.CORAL_L3;
+            case L2 -> EEControl.CORAL_L2;
+            case L1 -> EEControl.CORAL_L1;
+        };
+        double postClearDelay = switch (level) {
+            case L2, L3 -> 0.18;
+            default -> 0.05;  
+        };
 
-    public Command ScoreL23Coral() {
-        return LoggedCommands.print("Score L2/L3 Coral", "TODO Implement Score L2/L3 Coral");
-    }
-
-    public Command ScoreL4Coral() {
-        return LoggedCommands.print("Score L4 Coral", "TODO Implement Score L4 Coral");
+        return LoggedCommands.sequence("Expel coral for " + level,
+            Commands.runOnce(() -> pieceMotor.setControl(control.control), this),
+            // TODO Wait for beam break
+            Commands.waitSeconds(postClearDelay),
+            Commands.runOnce(pieceMotor::stopMotor, this));
     }
 
     public Command WaitForState(EEState desiredState) {
