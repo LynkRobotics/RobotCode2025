@@ -19,9 +19,9 @@ public class SwerveConstants {
     public static final COTSTalonFXSwerveConstants chosenModule = COTSTalonFXSwerveConstants.WCP.SwerveX2t.KrakenX60(COTSTalonFXSwerveConstants.WCP.SwerveX2t.driveRatios.X3_10);
 
     /* Drivetrain Constants */
-    public static final double trackWidth = Units.inchesToMeters(Constants.isRocky ? 21.75 : 21.75); //SUBLYME TUNING
+    public static final double trackWidth = Units.inchesToMeters(21.0);
     /* Center to Center distance of left and right modules in meters. */
-    public static final double wheelBase = Units.inchesToMeters(Constants.isRocky ? 24.75 : 15.75); //SUBLYME TUNING
+    public static final double wheelBase = Units.inchesToMeters(21.0);
     /* Center to Center distance of front and rear module wheels in meters. */
     public static final double wheelCircumference = chosenModule.wheelCircumference * 0.97845; // testing
 
