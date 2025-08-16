@@ -37,11 +37,15 @@ public class AlgaeRollerContants {
 
 		config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
-		config.MotionMagic.MotionMagicCruiseVelocity = 100.0;
+		// TODO config.MotionMagic.MotionMagicCruiseVelocity = 100.0;
+		config.MotionMagic.MotionMagicCruiseVelocity = 5.0;
 		config.MotionMagic.MotionMagicAcceleration = 80.0;
 
-		config.Voltage.PeakForwardVoltage = 12.0;
-		config.Voltage.PeakReverseVoltage = -12.0;
+		// TODO
+		// config.Voltage.PeakForwardVoltage = 12.0;
+		// config.Voltage.PeakReverseVoltage = -12.0;
+		config.Voltage.PeakForwardVoltage = 2.0;
+		config.Voltage.PeakReverseVoltage = -2.0;
 
 		config.CurrentLimits.SupplyCurrentLimitEnable = true;
 		config.CurrentLimits.SupplyCurrentLimit = 40.0;

@@ -1,6 +1,8 @@
 package frc.robot.subsystems.elevator;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -64,10 +66,12 @@ public class ElevatorConstants {
         Stop(Distance height) {
             this.height = height;
             this.position = 0.0; // TODO Conversion
+            this.control = new MotionMagicExpoVoltage(position).withSlot(0).withEnableFOC(true);
         }
 
         public final Distance height;
         public final double position;
+        public final ControlRequest control;
     }
 
     // public static final double L1RaiseDelay = 0.3;
@@ -83,7 +87,8 @@ public class ElevatorConstants {
 		config.Slot0.kS = 0.45;
 		config.Slot0.kG = 0.35;
 
-		config.MotionMagic.MotionMagicCruiseVelocity = 20.0;
+		// TODO config.MotionMagic.MotionMagicCruiseVelocity = 20.0;
+		config.MotionMagic.MotionMagicCruiseVelocity = 0.5;
 
 		config.CurrentLimits.SupplyCurrentLimitEnable = Robot.isReal();
 		config.CurrentLimits.SupplyCurrentLimit = 80.0;
@@ -93,8 +98,11 @@ public class ElevatorConstants {
 		config.CurrentLimits.StatorCurrentLimitEnable = true;
 		config.CurrentLimits.StatorCurrentLimit = 120.0;
 
-		config.Voltage.PeakForwardVoltage = 12.0;
-		config.Voltage.PeakReverseVoltage = -12.0;
+        // TODO
+		// config.Voltage.PeakForwardVoltage = 12.0;
+		// config.Voltage.PeakReverseVoltage = -12.0;
+		config.Voltage.PeakForwardVoltage = 3.0;
+		config.Voltage.PeakReverseVoltage = -3.0;
 
 		// FXConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
 		// FXConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =

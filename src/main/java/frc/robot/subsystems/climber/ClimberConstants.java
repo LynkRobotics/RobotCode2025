@@ -38,8 +38,11 @@ public class ClimberConstants {
 		config.Slot0.kG = 0.0;
 		config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
-		config.MotionMagic.MotionMagicAcceleration = 1000;
-		config.MotionMagic.MotionMagicCruiseVelocity = 500;
+		// TODO
+		// config.MotionMagic.MotionMagicAcceleration = 1000;
+		// config.MotionMagic.MotionMagicCruiseVelocity = 500;
+		config.MotionMagic.MotionMagicAcceleration = 50;
+		config.MotionMagic.MotionMagicCruiseVelocity = 25;
 		config.MotionMagic.MotionMagicJerk = 100;
 
 		config.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -47,8 +50,11 @@ public class ClimberConstants {
 		config.CurrentLimits.SupplyCurrentLowerLimit = -80.0;
 		config.CurrentLimits.SupplyCurrentLowerTime = 0.1;
 
-		config.Voltage.PeakForwardVoltage = 12.0;
-		config.Voltage.PeakReverseVoltage = -12.0;
+		// TODO
+		// config.Voltage.PeakForwardVoltage = 12.0;
+		// config.Voltage.PeakReverseVoltage = -12.0;
+		config.Voltage.PeakForwardVoltage = 2.0;
+		config.Voltage.PeakReverseVoltage = -2.0;
 
 		// config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
 		// config.SoftwareLimitSwitch.ForwardSoftLimitThreshold =

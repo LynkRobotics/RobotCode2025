@@ -109,11 +109,15 @@ public class EndEffectorConstants {
 
 		config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
-		config.MotionMagic.MotionMagicCruiseVelocity = 2.0;
+		// TODO config.MotionMagic.MotionMagicCruiseVelocity = 2.0;
+		config.MotionMagic.MotionMagicCruiseVelocity = 0.2;
 		config.MotionMagic.MotionMagicAcceleration = 1.0;
 
-		config.Voltage.PeakForwardVoltage = 12.0;
-		config.Voltage.PeakReverseVoltage = -12.0;
+		// TODO
+		// config.Voltage.PeakForwardVoltage = 12.0;
+		// config.Voltage.PeakReverseVoltage = -12.0;
+		config.Voltage.PeakForwardVoltage = 2.0;
+		config.Voltage.PeakReverseVoltage = -2.0;
 
 		config.CurrentLimits.StatorCurrentLimitEnable = Robot.isReal();
 		config.CurrentLimits.StatorCurrentLimit = 60.0;

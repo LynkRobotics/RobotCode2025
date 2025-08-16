@@ -45,11 +45,15 @@ public class IntakeConstants {
 		config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 		config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 
-		config.MotionMagic.MotionMagicCruiseVelocity = 7.0;
+		// TODO config.MotionMagic.MotionMagicCruiseVelocity = 7.0;
+		config.MotionMagic.MotionMagicCruiseVelocity = 0.5;
 		config.MotionMagic.MotionMagicAcceleration = 15.0;
 
-		config.Voltage.PeakForwardVoltage = 12.0;
-		config.Voltage.PeakReverseVoltage = -12.0;
+		// TODO
+		// config.Voltage.PeakForwardVoltage = 12.0;
+		// config.Voltage.PeakReverseVoltage = -12.0;
+		config.Voltage.PeakForwardVoltage = 1.5;
+		config.Voltage.PeakReverseVoltage = -1.5;
 
 		config.CurrentLimits.SupplyCurrentLimitEnable = true;
 		config.CurrentLimits.SupplyCurrentLimit = 40.0;
