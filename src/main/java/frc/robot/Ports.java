@@ -2,17 +2,17 @@ package frc.robot;
 
 // Single code location to lay out all ports and buses, to ensure no conflicts
 public enum Ports {
-	ALGAE_DEPLOY(8, Bus.MECH),
-	ALGAE_ROLLERS(9, Bus.MECH),
-	CORAL_DEPLOY(10, Bus.MECH),
-	CORAL_ROLLERS(11, Bus.MECH),
-	INDEXER(12, Bus.MECH),
-	EE_PIECE(13, Bus.RIO),
-	EE_POSITION(16, Bus.RIO),
-	ELEVATOR_MAIN(14, Bus.MECH),
-	ELEVATOR_FOLLOWER(15, Bus.MECH),
-	CLIMBER_DEPLOY(17, Bus.MECH),
-	CLIMBER_ROLLERS(18, Bus.MECH),
+	ALGAE_DEPLOY(8, Bus.MECH), //Algae Pivot
+	ALGAE_ROLLERS(9, Bus.MECH), //Algae Intake
+	CORAL_DEPLOY(10, Bus.MECH), //Coral Intake 4bar
+	CORAL_ROLLERS(11, Bus.MECH), //Coral Intake
+	INDEXER(12, Bus.MECH), //Indexer
+	EE_PIECE(13, Bus.RIO), //End Effector
+	EE_POSITION(16, Bus.RIO), //End Effector Pivot
+	ELEVATOR_MAIN(14, Bus.MECH), //Elevator Inside
+	ELEVATOR_FOLLOWER(15, Bus.MECH), //Elevator Outside
+	CLIMBER_DEPLOY(17, Bus.MECH), //Climber Pivot
+	CLIMBER_ROLLERS(18, Bus.MECH), //Climber Intake
 	CANDLE(21, Bus.MECH);
 
     public enum Bus {
@@ -31,8 +31,8 @@ public enum Ports {
 	// EE_ALGAE_BEAMBREAK(0, "RioDigitalIn"),
 	// INDEXER_BEAMBREAK(8, "RioDigitalIn"),
 
-	// ENCODER_41T(4, "canivore1"),
-	// ENCODER_39T(5, "canivore1"),
+	// ENCODER_41T(4, "canivore1"), //Top End Effector
+	// ENCODER_39T(5, "canivore1"), //Bottom End Effector TODO: Confirm these two
 
 	// PHYSICAL_BUTTON(9, "RioDigitalIn");
 
