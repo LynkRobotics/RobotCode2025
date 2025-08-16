@@ -72,9 +72,9 @@ public class Robot extends TimedRobot {
         @SuppressWarnings("unused")
         Subsystem[] subsystems = new Subsystem[] {
             // Climber.instance,
-            // EndEffector.instance,
+            EndEffector.instance,
             // Elevator.instance,
-            // Intake.instance,
+            Intake.instance,
             // LED.instance,
             // RobotState.instance,
             Swerve.instance,

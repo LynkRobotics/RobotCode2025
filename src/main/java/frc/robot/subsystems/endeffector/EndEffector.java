@@ -128,6 +128,10 @@ public class EndEffector extends SubsystemBase {
         }
     }
 
+    public Command StopIntake() {
+        return LoggedCommands.runOnce("Stop intake", () -> pieceMotor.stopMotor(), this);
+    }
+
     @Override
     public void periodic() {
         Command currentCommand = getCurrentCommand();

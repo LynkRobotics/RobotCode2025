@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedCommands;
 import frc.robot.Ports;
@@ -56,7 +57,10 @@ public class Intake extends SubsystemBase {
     }
 
     public Command Deploy() {
-        return LoggedCommands.print("Deploy Intake", "TODO Implement Intake deploy");
+        return LoggedCommands.parallel("Deploy Intake", 
+        Commands.print("TODO Moving intake"), 
+        Commands.runOnce(() -> { intakeMotor.setControl(intakeControl); indexMotor.setControl(indexControl); }, this)
+        );
     }
 
     public Command Expel() {
@@ -64,7 +68,14 @@ public class Intake extends SubsystemBase {
     }
 
     public Command Retract() {
-        return LoggedCommands.print("Retract Intake", "TODO Implement Intake retract");
+        return LoggedCommands.parallel("Retract Intake", 
+        Commands.print("TODO Moving intake"), 
+        Commands.runOnce(() -> { intakeMotor.stopMotor(); indexMotor.stopMotor(); }, this)
+        );
+    }
+
+    public Command StopIntake() {
+        return LoggedCommands.runOnce("Stopping Coral Intake", null);
     }
 
     @Override

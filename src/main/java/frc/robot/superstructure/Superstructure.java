@@ -17,6 +17,7 @@ import frc.robot.commands.pidswerve.PIDSwerve;
 import frc.robot.commands.pidswerve.PIDSwerveConstants.PIDSpeed;
 import frc.robot.subsystems.algaeroller.AlgaeRoller;
 import frc.robot.subsystems.controls.Controls;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
 import frc.robot.subsystems.endeffector.EndEffector;
@@ -215,5 +216,19 @@ public class Superstructure extends SubsystemBase {
 
     public static Command WaitForCoralReady() {
         return LoggedCommands.print("Wait until coral is ready", "TODO Implement Wait until coral is ready");
+    }
+
+    public static Command IntakeCoral() {
+        return LoggedCommands.parallel("Intaking Coral", 
+            Intake.instance.Deploy(), 
+            EndEffector.instance.StartCoralIntake()
+            );
+    }
+
+    public static Command StopIntake() {
+        return LoggedCommands.parallel("Stopping coral intake",
+        Intake.instance.Retract(),
+        EndEffector.instance.StopIntake()
+        );
     }
 }
