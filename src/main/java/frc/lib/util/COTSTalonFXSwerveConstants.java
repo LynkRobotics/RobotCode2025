@@ -171,7 +171,6 @@ public class COTSTalonFXSwerveConstants {
             public static final COTSTalonFXSwerveConstants KrakenX60(double driveGearRatio){
                 double wheelDiameter = Units.inchesToMeters(4.0);
         
-                /** (468 / 35) : 1 */
                 double angleGearRatio = (12.1 / 1.0);
         
                 double angleKP = 100.0;
@@ -179,7 +178,7 @@ public class COTSTalonFXSwerveConstants {
                 double angleKD = 0.0;
         
                 InvertedValue driveMotorInvert = InvertedValue.CounterClockwise_Positive;
-                InvertedValue angleMotorInvert = InvertedValue.Clockwise_Positive;
+                InvertedValue angleMotorInvert = InvertedValue.CounterClockwise_Positive;
                 SensorDirectionValue cancoderInvert = SensorDirectionValue.CounterClockwise_Positive;
                 return new COTSTalonFXSwerveConstants(wheelDiameter, angleGearRatio, driveGearRatio, angleKP, angleKI, angleKD, driveMotorInvert, angleMotorInvert, cancoderInvert);
             }

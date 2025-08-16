@@ -2,7 +2,6 @@ package frc.robot.subsystems.swerve;
 
 import frc.lib.util.LoggedCommands;
 import frc.lib.util.SwerveModule;
-import frc.robot.Constants;
 import frc.robot.subsystems.pose.Pose;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -25,23 +24,12 @@ public class Swerve extends SubsystemBase {
     public SwerveModule[] mSwerveMods;
 
     public Swerve() {
-        // To use Latch in 2025, we need to reverse what the front of the robot is
-        if (Constants.isRocky) {
-            mSwerveMods = new SwerveModule[] {
-                new SwerveModule(0, SwerveConstants.Mod0.constants),
-                new SwerveModule(1, SwerveConstants.Mod1.constants),
-                new SwerveModule(2, SwerveConstants.Mod2.constants),
-                new SwerveModule(3, SwerveConstants.Mod3.constants)
-            };
-        } else {
-            mSwerveMods = new SwerveModule[] {
-                new SwerveModule(0, SwerveConstants.Mod3.constants),
-                new SwerveModule(1, SwerveConstants.Mod2.constants),
-                new SwerveModule(2, SwerveConstants.Mod1.constants),
-                new SwerveModule(3, SwerveConstants.Mod0.constants)
-            };
-        }
-
+        mSwerveMods = new SwerveModule[] {
+            new SwerveModule(0, SwerveConstants.Mod0.constants),
+            new SwerveModule(1, SwerveConstants.Mod1.constants),
+            new SwerveModule(2, SwerveConstants.Mod2.constants),
+            new SwerveModule(3, SwerveConstants.Mod3.constants)
+        };
         // SmartDashboard.putData("Swerve Drive", new Sendable() {
         //     @Override
         //     public void initSendable(SendableBuilder builder) {
@@ -59,8 +47,11 @@ public class Swerve extends SubsystemBase {
         //         builder.addDoubleProperty("Back Right Angle", () -> mSwerveMods[3].getPosition().angle.getRadians(), null);
         //         builder.addDoubleProperty("Back Right Velocity", () -> mSwerveMods[3].getState().speedMetersPerSecond, null);
 
-        //         builder.addDoubleProperty("Robot Angle", () -> s_Pose != null ? s_Pose.getGyroYaw().getRadians() : 0.0, null);            }
+        //         // builder.addDoubleProperty("Robot Angle", () -> Pose.instance != null ? Pose.instance.getGyroYaw().getRadians() : 0.0, null);
+        //     }
         // });
+
+        SmartDashboard.putData(LoggedCommands.runOnce("Sync Swerve to CANcoders", this::resetModulesToAbsolute, this).ignoringDisable(true));
     }
 
     public void drive(Translation2d translation, double rotation, boolean isOpenLoop) {
