@@ -44,7 +44,8 @@ public class ElevatorConstants {
     private static final Distance algaeLiftDistance = Units.Inches.of(2.0);
 
     public enum Stop {
-        SAFE(Units.Inches.of(2.0)), // TODO Re-evaluate this position
+        STOW(Units.Inches.of(0.0)),
+        SAFE(Units.Inches.of(1.5)),
         L1(Units.Inches.of(0.0)),
         L2(Units.Inches.of(6.3)),
         L3(L2.height.plus(Units.Inches.of(16.0))),
@@ -55,7 +56,10 @@ public class ElevatorConstants {
         L2_ALGAELIFT(L2_ALGAE.height.plus(algaeLiftDistance)),
         L3_ALGAELIFT(L3_ALGAE.height.plus(algaeLiftDistance)),
         ALGAE_HOLD(Units.Inches.of(19.41)),
-        BARGE(Units.Inches.of(62.17));
+        BARGE(Units.Inches.of(62.17)),
+        CLIMB(Units.Inches.of(12.0)),
+        CLEAR_LOW(Units.Inches.of(12.0)),  // End-effector cannot pivot below this mark (except in limited "high clear" range)
+        CLEAR_HIGH(Units.Inches.of(18.0)); // The Algae Roller must be deployed to a clear position below this mark
 
         Stop(Distance height) {
             this.height = height;

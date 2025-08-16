@@ -28,6 +28,12 @@ import frc.robot.subsystems.robotstate.RobotState;
 
 public class Elevator extends SubsystemBase {
     public static final Elevator instance = new Elevator();
+
+    public enum ClearState {
+        NOT_CLEAR,
+        CLEAR_LOW,
+        CLEAR_HIGH;
+    }
     
     private final TalonFX mainMotor;
     private final TalonFX followerMotor;
@@ -47,6 +53,8 @@ public class Elevator extends SubsystemBase {
     private Timer scoreTimer = new Timer();
     
     private final double positionDiffMax = 0.5;
+
+    private ClearState clearState = ClearState.NOT_CLEAR;
 
     public Elevator() {
         mainMotor = new TalonFX(ElevatorConstants.mainID, ElevatorConstants.canBus);
@@ -363,6 +371,15 @@ public class Elevator extends SubsystemBase {
         double followDifference = position - followPosition;
         double voltage = mainMotor.getMotorVoltage().getValueAsDouble();
 
+        // Determine clear state of Elevator
+        if (height.gt(Stop.CLEAR_HIGH.height)) {
+            clearState = ClearState.CLEAR_HIGH;
+        } else if (height.gt(Stop.CLEAR_LOW.height)) {
+            clearState = ClearState.CLEAR_LOW;
+        } else {
+            clearState = ClearState.NOT_CLEAR;
+        }
+
         // Handle exceptions in cases other than elevator at rest
         if (voltage != 0.0) {
             // if (RobotState.elevatorPathBlocked()) {
@@ -417,6 +434,7 @@ public class Elevator extends SubsystemBase {
         DogLog.log("Elevator/rightVelocity", followerMotor.getVelocity().getValueAsDouble());
         DogLog.log("Elevator/rightVoltage", followerMotor.getMotorVoltage().getValueAsDouble());
         DogLog.log("Elevator/stallCount", stallCount);
+        DogLog.log("Elevator/clearState", clearState.name());
 
         SmartDashboard.putBoolean("Elevator/Stalled", isStalled());
         SmartDashboard.putBoolean("Elevator/Moving", voltage != 0.0);

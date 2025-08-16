@@ -23,7 +23,9 @@ public class AlgaeRollerContants {
 	public static final Voltage expelVoltage = Units.Volts.of(-5.0);
 	public static final Voltage L1AssistVoltage = Units.Volts.of(3.5);
 
+	// TODO Determine values
     public static double retractedPosition = 0.0;
+	public static double clearPosition = 0.0;
     public static double deployedPosition = 0.0;
 
     public static TalonFXConfiguration getDeployMotorConfig() {

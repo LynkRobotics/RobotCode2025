@@ -32,6 +32,10 @@ public class AlgaeRoller extends SubsystemBase {
         return false; // TODO
     }
 
+    public static boolean isClear() {
+        return false; // TODO
+    }
+
     public static Command Intake() {
         return LoggedCommands.print("Intake algae", "TODO Implement intake algae");
     }

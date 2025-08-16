@@ -6,6 +6,8 @@ import static frc.robot.Options.optMirrorAuto;
 
 import java.util.EnumMap;
 
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -32,6 +34,30 @@ import frc.robot.subsystems.vision.VisionConstants.CameraMode;
 
 public class Superstructure extends SubsystemBase {
     public static final Superstructure instance = new Superstructure();
+
+    public static enum EEPose {
+        L1(EEPosition.L1, Stop.L1),
+        L2(EEPosition.L2, Stop.L2),
+        L3(EEPosition.L3, Stop.L3),
+        L4(EEPosition.L4, Stop.L4),
+        BARGE(EEPosition.BARGE, Stop.BARGE),
+        GROUND_INTAKE(EEPosition.CORAL_INTAKE, Stop.STOW),
+        REEF_INTAKE_L2(EEPosition.REEF_INTAKE, Stop.L2),
+        REEF_INTAKE_L3(EEPosition.REEF_INTAKE, Stop.L3),
+        // REEF_PREP
+        PROCESSOR(EEPosition.PROCESSOR, Stop.STOW),
+        ALGAE_HOLD(EEPosition.ALGAE_HOLD, Stop.ALGAE_HOLD),
+        CORAL_HOLD(EEPosition.CORAL_HOLD, Stop.CORAL_HOLD),
+        CLIMB(EEPosition.CLIMB, Stop.CLIMB);
+
+        public EEPosition position;
+		public Stop stop;
+
+        EEPose(EEPosition position, Stop stop) {
+            this.position = position;
+            this.stop = stop;
+        }
+    }
 
     EnumMap<ReefFace, Command> coralLeftCommands = new EnumMap<>(ReefFace.class);
     EnumMap<ReefFace, Command> coralRightCommands = new EnumMap<>(ReefFace.class);
@@ -100,6 +126,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     // Safely move End Effector (and Elevator) to required pose
+    // TODO Should this be a class?
     public static Command SafeEEPose(EEPosition position, Stop stop) {
         return LoggedCommands.print("Safe EE Pose", "TODO Implement Safe EE Pose");
     }
