@@ -21,7 +21,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
+import frc.robot.subsystems.algaeroller.AlgaeRoller;
 import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
+import frc.robot.subsystems.endeffector.EndEffector;
 import frc.robot.subsystems.pose.PoseConstants;
 import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.robotstate.RobotState;
@@ -55,6 +57,9 @@ public class Elevator extends SubsystemBase {
     private final double positionDiffMax = 0.5;
 
     private ClearState clearState = ClearState.NOT_CLEAR;
+
+    private Stop finalTarget = Stop.STOW;
+    private Stop currentTarget = finalTarget;
 
     public Elevator() {
         mainMotor = new TalonFX(ElevatorConstants.mainID, ElevatorConstants.canBus);
@@ -360,6 +365,15 @@ public class Elevator extends SubsystemBase {
         setDefaultCommand(MoveToSafety());
     }
 
+    public boolean isClear(ClearState desiredState) {
+        if (desiredState == ClearState.CLEAR_HIGH && clearState == ClearState.CLEAR_HIGH) {
+            return true;
+        } else if (desiredState == ClearState.CLEAR_LOW && (clearState == ClearState.CLEAR_LOW || clearState == ClearState.CLEAR_HIGH)) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void periodic() {
         Command currentCommand = getCurrentCommand();
@@ -379,6 +393,33 @@ public class Elevator extends SubsystemBase {
         } else {
             clearState = ClearState.NOT_CLEAR;
         }
+
+        if (finalTarget != currentTarget) {
+            // Must be moving down and need to make sure elements are clear
+
+            // TODO Handle the move up-and-down for withing CLEAR_LOW range
+            if (currentTarget == Stop.CLEAR_HIGH) {
+                // If we are headed for the CLEAR_HIGH stop, it's because we need to ensure that the algae roller is clear
+                // prior to dropping below the CLEAR_HIGH stop
+                if (AlgaeRoller.isClear()) {
+                    if (finalTarget.height.gt(Stop.CLEAR_LOW.height)) {
+                        currentTarget = finalTarget;
+                    } else {
+                        currentTarget = Stop.CLEAR_LOW;
+                    }
+                }
+            } else if (currentTarget == Stop.CLEAR_LOW) {
+                // If we are headed for the CLEAR_LOW stop, it's because we need to ensure that the pivot completes movement
+                // prior to dropping below the CLEAR_LOW stop
+                if (EndEffector.instance.inPosition()) {
+                    currentTarget = finalTarget;
+                }
+            } else {
+                LoggedAlert.Warning("Elevator", "Target", "Unexpected interim target: " + currentTarget);
+            }
+        }
+        DogLog.log("Elevator/Current Target", currentTarget.name());
+        DogLog.log("Elevator/Final Target", finalTarget.name());
 
         // Handle exceptions in cases other than elevator at rest
         if (voltage != 0.0) {

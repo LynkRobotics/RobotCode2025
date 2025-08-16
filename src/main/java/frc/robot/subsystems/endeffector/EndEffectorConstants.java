@@ -53,16 +53,13 @@ public class EndEffectorConstants {
 
     public static enum EEPosition {
         L1(102.0),
-        L2(100.75),
-        L3(100.75),
+        L23(100.75),
         L4(140.0),
         BARGE(-218.0),
         START(90.0),
-        CORAL_INTAKE(-90.0),
-        ALGAE_INTAKE(-90.0),
+        GROUND_INTAKE(-90.0),
         REEF_INTAKE(-100.0),
         REEF_PREP(-60.0),
-        PROCESSOR(-90.0),
         IDLE_AFTER_SCORING(-45.0),
         ALGAE_HOLD(-120.0),
         CORAL_HOLD(60.0),

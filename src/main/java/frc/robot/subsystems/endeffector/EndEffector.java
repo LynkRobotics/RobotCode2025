@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.endeffector;
 
+import java.util.concurrent.ThreadPoolExecutor.DiscardOldestPolicy;
+
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
@@ -13,6 +15,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
 import frc.robot.Field;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.Elevator.ClearState;
 import frc.robot.subsystems.endeffector.EndEffectorConstants.EEControl;
 import frc.robot.subsystems.endeffector.EndEffectorConstants.EEPosition;
 
@@ -36,6 +40,8 @@ public class EndEffector extends SubsystemBase {
     public EEIntakeState intakeState = EEIntakeState.STOPPED;
     
     private EEPosition desiredPosition = EEPosition.START;
+    private boolean atDesiredPosition = true;
+    private boolean waitingToPivot = false;
 
     /* Devices */
     private final TalonFX positionMotor;
@@ -54,8 +60,8 @@ public class EndEffector extends SubsystemBase {
         pieceMotor.getConfigurator().apply(EndEffectorConstants.getPieceConfig());
     }
 
-    private boolean inPosition() {
-        return false;
+    public boolean inPosition() {
+        return atDesiredPosition;
     }
 
     public Command ExpelCoral(Field.ReefLevel level) {
@@ -105,17 +111,37 @@ public class EndEffector extends SubsystemBase {
             }, this);
     }
 
+    public void move(EEPosition position) {
+        if (desiredPosition == position) {
+            // No change
+            return;
+        }
+        
+        desiredPosition = position;
+        atDesiredPosition = false;
+        if (Elevator.instance.isClear(ClearState.CLEAR_LOW)) {
+            waitingToPivot = false;
+            // TODO positionMotor.setControl();
+        } else {
+            waitingToPivot = true;
+        }
+    }
+
     @Override
     public void periodic() {
         Command currentCommand = getCurrentCommand();
+        double position = positionMotor.getPosition().getValueAsDouble();
+        double epsilon = 0.5; // TODO How close until we say we're at the desired position
+
         DogLog.log("EndEffector/Current Command", currentCommand == null ? "None" : currentCommand.getName());
         DogLog.log("EndEffector/Desired Position", desiredPosition.name());
+        DogLog.log("EndEffector/In Position", inPosition());
         DogLog.log("EndEffector/Position Motor/TorqueCurrent", positionMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("EndEffector/Position Motor/StatorCurrent", positionMotor.getStatorCurrent().getValueAsDouble());
         DogLog.log("EndEffector/Position Motor/Velocity", positionMotor.getVelocity().getValueAsDouble());
         DogLog.log("EndEffector/Position Motor/RotorVelocity", positionMotor.getRotorVelocity().getValueAsDouble());
         DogLog.log("EndEffector/Position Motor/Motor Temp", positionMotor.getDeviceTemp().getValueAsDouble());
-        DogLog.log("EndEffector/Position Motor/Position", positionMotor.getPosition().getValueAsDouble());
+        DogLog.log("EndEffector/Position Motor/Position", position);
         DogLog.log("EndEffector/Piece Motor/TorqueCurrent", pieceMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("EndEffector/Piece Motor/StatorCurrent", pieceMotor.getStatorCurrent().getValueAsDouble());
         DogLog.log("EndEffector/Piece Motor/Velocity", pieceMotor.getVelocity().getValueAsDouble());
@@ -125,6 +151,23 @@ public class EndEffector extends SubsystemBase {
         DogLog.log("EndEffector/State", state.name());
         DogLog.log("EndEffector/Intake State", intakeState.name());
 
+        if (!atDesiredPosition) {
+            if (Math.abs(desiredPosition.position - position) < epsilon) {
+                atDesiredPosition = true;
+            }
+        }
+        if (waitingToPivot) {
+            // TODO Do we need to worry about algae roller deploy?
+            if (atDesiredPosition) {
+                // Unclear how we'd get here, but if we are in position, there's no need to wait
+                waitingToPivot = false;
+            } else if (Elevator.instance.isClear(Elevator.ClearState.CLEAR_LOW)) {
+                // If the elevator is clear, we can pivot
+                waitingToPivot = false;
+                // TODO positionMotor.setControl();
+            }
+        }
+        
         if (intakeState == EEIntakeState.INTAKING_ALGAE) {
             if (false) { // TODO Detect algae grab; remember to use debounce; wait 0.2s after detection (velocity below 2000 degrees per second or beam break)
                 state = EEState.HAVE_ALGAE;

@@ -6,8 +6,6 @@ import static frc.robot.Options.optMirrorAuto;
 
 import java.util.EnumMap;
 
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -37,15 +35,15 @@ public class Superstructure extends SubsystemBase {
 
     public static enum EEPose {
         L1(EEPosition.L1, Stop.L1),
-        L2(EEPosition.L2, Stop.L2),
-        L3(EEPosition.L3, Stop.L3),
+        L2(EEPosition.L23, Stop.L2),
+        L3(EEPosition.L23, Stop.L3),
         L4(EEPosition.L4, Stop.L4),
         BARGE(EEPosition.BARGE, Stop.BARGE),
-        GROUND_INTAKE(EEPosition.CORAL_INTAKE, Stop.STOW),
+        GROUND_INTAKE(EEPosition.GROUND_INTAKE, Stop.STOW),
         REEF_INTAKE_L2(EEPosition.REEF_INTAKE, Stop.L2),
         REEF_INTAKE_L3(EEPosition.REEF_INTAKE, Stop.L3),
         // REEF_PREP
-        PROCESSOR(EEPosition.PROCESSOR, Stop.STOW),
+        PROCESSOR(EEPosition.GROUND_INTAKE, Stop.STOW),
         ALGAE_HOLD(EEPosition.ALGAE_HOLD, Stop.ALGAE_HOLD),
         CORAL_HOLD(EEPosition.CORAL_HOLD, Stop.CORAL_HOLD),
         CLIMB(EEPosition.CLIMB, Stop.CLIMB);
@@ -127,13 +125,13 @@ public class Superstructure extends SubsystemBase {
 
     // Safely move End Effector (and Elevator) to required pose
     // TODO Should this be a class?
-    public static Command SafeEEPose(EEPosition position, Stop stop) {
-        return LoggedCommands.print("Safe EE Pose", "TODO Implement Safe EE Pose");
+    public static Command SafeEEPose(EEPose pose) {
+        return LoggedCommands.print("Safe EE Pose", "TODO Implement Safe EE Pose for " + pose.name());
     }
 
     public static Command DeAlgaefy(ReefFace face, boolean extendedBackup) {
-        Stop algaeStop = face.algaeHigh ? Stop.L3_ALGAE: Stop.L2_ALGAE;
-        Stop algaeInvertStop = face.algaeHigh ? Stop.L2_ALGAE : Stop.L3_ALGAE;
+        EEPose algaePose = face.algaeHigh ? EEPose.REEF_INTAKE_L3 : EEPose.REEF_INTAKE_L2;
+        EEPose algaeInvertPose = face.algaeHigh ? EEPose.REEF_INTAKE_L2 : EEPose.REEF_INTAKE_L3;
 
         return LoggedCommands.sequence("Fully acquire Algae from " + face.toString(),
             LoggedCommands.deadline("Acquire Algae from " + face.toString(),
@@ -150,8 +148,8 @@ public class Superstructure extends SubsystemBase {
                         ),
                         Commands.sequence(
                             Commands.either(
-                                SafeEEPose(EEPosition.ALGAE_INTAKE, algaeInvertStop),
-                                SafeEEPose(EEPosition.ALGAE_INTAKE, algaeStop),
+                                SafeEEPose(algaeInvertPose),
+                                SafeEEPose(algaePose),
                                 optInvertAlgae
                             ),
                             AlgaeRoller.instance.Retract()
