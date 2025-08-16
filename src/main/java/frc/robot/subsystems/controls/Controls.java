@@ -82,18 +82,18 @@ public class Controls extends SubsystemBase{
         final Trigger alignmentToggle = driver.rightStick();
 
         // Only used in case of automation failure
-        moveElevator.whileTrue(Elevator.instance.GoToNext());
-        zero.onTrue(Elevator.instance.Zero());
-        unjam.onTrue(Intake.instance.Expel());
-        score.whileTrue(Superstructure.ScoreGamePiece()); // Also useful to dump Algae or put it into Processor
+        // moveElevator.whileTrue(Elevator.instance.GoToNext());
+        // zero.onTrue(Elevator.instance.Zero());
+        // unjam.onTrue(Intake.instance.Expel());
+        // score.whileTrue(Superstructure.ScoreGamePiece()); // Also useful to dump Algae or put it into Processor
 
         L4.onTrue(Superstructure.instance.SetStop(Stop.L4));
         L3.onTrue(Superstructure.instance.SetStop(Stop.L3));
         L2.onTrue(Superstructure.instance.SetStop(Stop.L2));
         L1.onTrue(Superstructure.instance.SetStop(Stop.L1));
 
-        goLeft.whileTrue(Superstructure.instance.SmartScore(true));
-        goRight.whileTrue(Superstructure.instance.SmartScore(false));
+        // goLeft.whileTrue(Superstructure.instance.SmartScore(true));
+        // goRight.whileTrue(Superstructure.instance.SmartScore(false));
 
         alignmentToggle.onTrue(LoggedCommands.runOnce("Toggle Alignment", optAutoReefAiming::toggle));
 
@@ -120,8 +120,8 @@ public class Controls extends SubsystemBase{
             //         LoggedCommands.runOnce("Test End", () -> LEDSubsystem.triggerError())));
         }
 
-        driver.povDown().onTrue(Climber.instance.DeployAndIntake());
-        driver.povUp().onTrue(Climber.instance.Retract());
+        // driver.povDown().onTrue(Climber.instance.DeployAndIntake());
+        // driver.povUp().onTrue(Climber.instance.Retract());
     }
 
     private double speedLimitFactor() {
