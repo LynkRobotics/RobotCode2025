@@ -1,28 +1,45 @@
 package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 
 public class IntakeConstants {
-    /* Motor Config Values */
-    public static final double peakForwardVoltage = 12.0; 
-    public static final double peakReverseVoltage = -12.0; 
-    public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
-    public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
+    public enum IntakePosition {
+        DEPLOYED(3.0),
+        RETRACTED(55.0),
+        FULL_STOW(83.0);
 
-    /* Motor Control Values */
+        public final Angle position;
+        public final ControlRequest control;
+
+        IntakePosition(double position) {
+            this.position = Units.Degrees.of(position);
+            this.control = new MotionMagicExpoVoltage(position).withEnableFOC(true);
+        }
+    }
+
     public static final double deployGearing = 40.0;
     public static final double indexGearing = 2.5;
     public static final double intakeGearing = (24.0 / 12.0);
+
+	public static final Voltage deployZeroingVoltage = Units.Volts.of(-1.0);
+	public static final Current deployStallCurrent = Units.Amps.of(-40.0);
+	public static final Time deployStallTime = Units.Seconds.of(0.2);
+
 	public static final Voltage indexVoltage = Units.Volts.of(10.0);
 	public static final Voltage indexExpelVoltage = Units.Volts.of(-8.0);
-    public static final Voltage intakeStartVoltage = Units.Volts.of(3.0);
+
 	public static final Voltage intakeVoltage = Units.Volts.of(-12.0);
 	public static final Voltage intakeExpelVoltage = Units.Volts.of(-12.0);
 
@@ -44,8 +61,8 @@ public class IntakeConstants {
 		// TODO
 		// config.Voltage.PeakForwardVoltage = 12.0;
 		// config.Voltage.PeakReverseVoltage = -12.0;
-		config.Voltage.PeakForwardVoltage = 1.5;
-		config.Voltage.PeakReverseVoltage = -1.5;
+		config.Voltage.PeakForwardVoltage = 2.0;
+		config.Voltage.PeakReverseVoltage = -2.0;
 
 		config.CurrentLimits.SupplyCurrentLimitEnable = true;
 		config.CurrentLimits.SupplyCurrentLimit = 40.0;
@@ -55,10 +72,10 @@ public class IntakeConstants {
 		config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
 		// config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-		// config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = kFullStowPosition.in(Units.Rotations);
+		// config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = IntakePosition.FULL_STOW.position.in(Units.Rotations);
 
 		// config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-		// config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = kDeployPosition.in(Units.Rotations);
+		// config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = IntakePosition.DEPLOYED.position.in(Units.Rotations);
 
         return config;
     }
