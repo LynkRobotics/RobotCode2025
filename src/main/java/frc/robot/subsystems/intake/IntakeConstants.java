@@ -10,14 +10,6 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Voltage;
 
 public class IntakeConstants {
-    /* IDs */
-    public static final int deployMotorID = 10;
-    public static final int intakeMotorID = 11;
-    public static final int indexMotorID = 12;
-
-    /* CANbus */
-    public static final String canBus = "rio";
-
     /* Motor Config Values */
     public static final double peakForwardVoltage = 12.0; 
     public static final double peakReverseVoltage = -12.0; 

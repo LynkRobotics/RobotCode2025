@@ -11,6 +11,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedCommands;
+import frc.robot.Ports;
 import frc.robot.subsystems.controls.Controls;
 
 public class Climber extends SubsystemBase {
@@ -25,9 +26,9 @@ public class Climber extends SubsystemBase {
 
     public Climber() {
         /* Devices */
-        deployMotor = new TalonFX(ClimberConstants.deployMotorID, ClimberConstants.canBus);
+        deployMotor = new TalonFX(Ports.CLIMBER_DEPLOY.id, Ports.CLIMBER_DEPLOY.bus.name);
         deployMotor.getConfigurator().apply(ClimberConstants.getDeployMotorConfig());
-        intakeMotor = new TalonFX(ClimberConstants.intakeMotorID, ClimberConstants.canBus);
+        intakeMotor = new TalonFX(Ports.CLIMBER_ROLLERS.id, Ports.CLIMBER_ROLLERS.bus.name);
         intakeMotor.getConfigurator().apply(ClimberConstants.getIntakeMotorConfig());
 
         //SmartDashboard.putData(LoggedCommands.runOnce("Coast Climber", () -> motor.setNeutralMode(NeutralModeValue.Coast)).ignoringDisable(true));

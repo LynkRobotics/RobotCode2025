@@ -7,6 +7,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedCommands;
+import frc.robot.Ports;
 
 public class AlgaeRoller extends SubsystemBase {
     public static final AlgaeRoller instance = new AlgaeRoller();
@@ -22,9 +23,9 @@ public class AlgaeRoller extends SubsystemBase {
     
     AlgaeRoller() {
         /* Devices */
-        deployMotor = new TalonFX(AlgaeRollerContants.deployMotorID, AlgaeRollerContants.canBus);
+        deployMotor = new TalonFX(Ports.ALGAE_DEPLOY.id, Ports.ALGAE_DEPLOY.bus.name);
         deployMotor.getConfigurator().apply(AlgaeRollerContants.getDeployMotorConfig());
-        rollerMotor = new TalonFX(AlgaeRollerContants.rollerMotorID, AlgaeRollerContants.canBus);
+        rollerMotor = new TalonFX(Ports.ALGAE_ROLLERS.id, Ports.ALGAE_ROLLERS.bus.name);
         rollerMotor.getConfigurator().apply(AlgaeRollerContants.getRollerMotorConfig());
     }
 

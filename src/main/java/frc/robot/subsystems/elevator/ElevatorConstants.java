@@ -12,11 +12,6 @@ import frc.robot.Robot;
 
 
 public class ElevatorConstants {
-    /* IDs */
-    public static final int mainID = 14;
-    public static final int followerID = 15;
-    /* CANBus */
-    public static final String canBus = "rio";
     /* Motor Config Values */
     public static final double peakForwardVoltage = 14;
     public static final double peakReverseVoltage = -14;

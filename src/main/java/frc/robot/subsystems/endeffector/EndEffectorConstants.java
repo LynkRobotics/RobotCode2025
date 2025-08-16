@@ -14,13 +14,6 @@ import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Robot;
 
 public class EndEffectorConstants {
-    /* IDs */
-    public static final int positionMotorID = 16;
-    public static final int pieceMotorID = 13;
-
-    /* CANbus */
-    public static final String canBus = "rio";
-
     /* Motor Control Values */
     private static final double coralRollerGearing = (7.5 / 1.0);
 	private static final double algaeRollerGearing = (6.0 / 1.0);

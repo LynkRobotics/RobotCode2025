@@ -9,13 +9,6 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Voltage;
 
 public class AlgaeRollerContants {
-    /* IDs */
-    public static final int deployMotorID = 8;
-    public static final int rollerMotorID = 9;
-
-    /* CANbus */
-    public static final String canBus = "rio";
-
     /* Motor Control Values */
     public static final double deployGearing = (62.0 / 8.0) * (68.0 / 18.0) * (15.0 / 9.0);
 	public static final double rollerGearing = (18.0 / 12.0);

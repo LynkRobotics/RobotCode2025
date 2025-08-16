@@ -10,13 +10,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 
 public class ClimberConstants {
-    /* IDs */
-    public static final int deployMotorID = 17;
-    public static final int intakeMotorID = 18;
-
-    /* CANbus */
-    public static final String canBus = "rio";
-
     /* Motor Config Values */
     public static final double intakeGearing = (18.0 / 12.0);
     public static final double deployGearing = (36.0 / 1.0);

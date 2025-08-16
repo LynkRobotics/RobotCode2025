@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
+import frc.robot.Ports;
 import frc.robot.subsystems.algaeroller.AlgaeRoller;
 import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
 import frc.robot.subsystems.endeffector.EndEffector;
@@ -62,12 +63,12 @@ public class Elevator extends SubsystemBase {
     private Stop currentTarget = finalTarget;
 
     public Elevator() {
-        mainMotor = new TalonFX(ElevatorConstants.mainID, ElevatorConstants.canBus);
-        followerMotor = new TalonFX(ElevatorConstants.followerID, ElevatorConstants.canBus);
+        mainMotor = new TalonFX(Ports.ELEVATOR_MAIN.id, Ports.ELEVATOR_MAIN.bus.name);
+        followerMotor = new TalonFX(Ports.ELEVATOR_FOLLOWER.id, Ports.ELEVATOR_FOLLOWER.bus.name);
 
         mainMotor.getConfigurator().apply(ElevatorConstants.getMotorConfig());
         mainMotor.stopMotor();
-        followerMotor.setControl(new Follower(ElevatorConstants.mainID, true));
+        followerMotor.setControl(new Follower(Ports.ELEVATOR_MAIN.id, true));
 
         SmartDashboard.putData("Elevator/Raise", Raise());
         SmartDashboard.putData("Elevator/Lower", Lower());

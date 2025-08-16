@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
 import frc.robot.Field;
+import frc.robot.Ports;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.Elevator.ClearState;
 import frc.robot.subsystems.endeffector.EndEffectorConstants.EEControl;
@@ -52,8 +53,8 @@ public class EndEffector extends SubsystemBase {
 
     public EndEffector() {
         /* Devices */
-        positionMotor = new TalonFX(EndEffectorConstants.positionMotorID, EndEffectorConstants.canBus);
-        pieceMotor = new TalonFX(EndEffectorConstants.pieceMotorID, EndEffectorConstants.canBus);
+        positionMotor = new TalonFX(Ports.EE_POSITION.id, Ports.EE_POSITION.bus.name);
+        pieceMotor = new TalonFX(Ports.EE_PIECE.id, Ports.EE_PIECE.bus.name);
 
         /* Configs */
         positionMotor.getConfigurator().apply(EndEffectorConstants.getPositionConfig());

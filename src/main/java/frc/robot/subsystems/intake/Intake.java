@@ -11,6 +11,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedCommands;
+import frc.robot.Ports;
 
 public class Intake extends SubsystemBase {
     public static final Intake instance = new Intake();
@@ -44,9 +45,9 @@ public class Intake extends SubsystemBase {
 
     public Intake() {
         /* Devices */
-        deployMotor = new TalonFX(IntakeConstants.deployMotorID, IntakeConstants.canBus);
-        intakeMotor = new TalonFX(IntakeConstants.intakeMotorID, IntakeConstants.canBus);
-        indexMotor = new TalonFX(IntakeConstants.indexMotorID, IntakeConstants.canBus);
+        deployMotor = new TalonFX(Ports.CORAL_DEPLOY.id, Ports.CORAL_DEPLOY.bus.name);
+        intakeMotor = new TalonFX(Ports.CORAL_ROLLERS.id, Ports.CORAL_ROLLERS.bus.name);
+        indexMotor = new TalonFX(Ports.INDEXER.id, Ports.INDEXER.bus.name);
 
         /* Configs */
         deployMotor.getConfigurator().apply(IntakeConstants.getDeployConfig());
