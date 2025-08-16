@@ -5,6 +5,7 @@ import static frc.robot.Options.optServiceMode;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -41,8 +42,8 @@ public class Elevator extends SubsystemBase {
     private final TalonFX mainMotor;
     private final TalonFX followerMotor;
     private final VoltageOut voltageOut = new VoltageOut(0).withEnableFOC(true);
-    // TODO Use MotionMagicVoltage?
     private final PositionVoltage positionVoltage = new PositionVoltage(0.0).withEnableFOC(true);
+    private final MotionMagicExpoVoltage positionControl = new MotionMagicExpoVoltage(0.0).withEnableFOC(true);
     // private final MechanismLigament2d mechanism;
 
     private Stop nextStop = Stop.SAFE;
@@ -50,7 +51,6 @@ public class Elevator extends SubsystemBase {
     private int stallCount = 0;
     private final int stallMax = 3;
     private double lastPosition = 0.0;
-    private double desiredPosition = -1.0;
     private boolean zeroing = false;
     private boolean autoUp = false;
     private Timer scoreTimer = new Timer();
@@ -145,7 +145,6 @@ public class Elevator extends SubsystemBase {
 
     private void setVoltage(double voltage) {
         stallCount = 0;
-        desiredPosition = -1.0;
         // TODO Handle blocking
         DogLog.log("Elevator/Status", "Set voltage " + String.format("%1.2f", voltage));
         // RobotState.setElevatorAtZero(false);
@@ -245,16 +244,16 @@ public class Elevator extends SubsystemBase {
 
     private void setPosition(double position) {
         stallCount = 0;
-        desiredPosition = position;
         // TODO Handle blocking
         DogLog.log("Elevator/Status", "Move to position " + String.format("%1.2f", position));
         DogLog.log("Elevator/Set Position", position);
         // RobotState.setElevatorAtZero(false);
-        mainMotor.setControl(positionVoltage.withPosition(position));
+        //mainMotor.setControl(positionVoltage.withPosition(position));
+        mainMotor.setControl(positionControl.withPosition(position));
     }
     
-    private boolean inRange(double position) {
-        return desiredPosition >= 0.0 && Math.abs(desiredPosition - position) <= ElevatorConstants.positionError;
+    public boolean atTarget() {
+        return Math.abs(mainMotor.getPosition().getValueAsDouble() - currentTarget.position) <= ElevatorConstants.positionError;
     }
 
     private Stop safetyStop() {
@@ -375,6 +374,11 @@ public class Elevator extends SubsystemBase {
         return false;
     }
 
+    private void setCurrentTarget(Stop target) {
+        currentTarget = target;
+        setPosition(currentTarget.position);
+    }
+
     @Override
     public void periodic() {
         Command currentCommand = getCurrentCommand();
@@ -436,7 +440,7 @@ public class Elevator extends SubsystemBase {
             //         currentCommand.cancel();
             //     }
             // } else
-            if (!inRange(position) && position == lastPosition) {
+            if (!atTarget() && position == lastPosition) {
                 // Motor not moving -- detect stalls
                 ++stallCount;
                 if (isStalled()) {
@@ -480,7 +484,7 @@ public class Elevator extends SubsystemBase {
 
         SmartDashboard.putBoolean("Elevator/Stalled", isStalled());
         SmartDashboard.putBoolean("Elevator/Moving", voltage != 0.0);
-        SmartDashboard.putBoolean("Elevator/In Range", inRange(position));
+        SmartDashboard.putBoolean("Elevator/At Target", atTarget());
 
         SmartDashboard.putBoolean("Elevator/Safe", isSafe(height));
         // SmartDashboard.putBoolean("Elevator/HOLD", atStop(Stop.HOLD));
