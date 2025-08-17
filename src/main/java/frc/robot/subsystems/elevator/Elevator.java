@@ -377,7 +377,7 @@ public class Elevator extends SubsystemBase {
     }
 
     private void setCurrentTarget(Stop target, boolean requireAlgaeBarClear) {
-        if (requireAlgaeBarClear && !AlgaeRoller.isClear()) {
+        if (requireAlgaeBarClear && !AlgaeRoller.instance.isClear()) {
             // Set the target but not the set position (the current set position must be safe)
             waitingOnAlgaeBarClear = true;
             DogLog.log("Elevator/Status", "New target (once clear): " + target + " <- " + currentTarget);
@@ -450,7 +450,7 @@ public class Elevator extends SubsystemBase {
         }
 
         // Check if we aren't moving towards the current target because we need to wait for the algae bar to be clear
-        if (waitingOnAlgaeBarClear && AlgaeRoller.isClear()) {
+        if (waitingOnAlgaeBarClear && AlgaeRoller.instance.isClear()) {
             // We are unblocked, and now can move towards the intended target
             waitingOnAlgaeBarClear = false;
             mainMotor.setControl(currentTarget.control);
@@ -464,7 +464,7 @@ public class Elevator extends SubsystemBase {
             if (currentTarget == Stop.CLEAR_HIGH) {
                 // If we are headed for the CLEAR_HIGH stop, it's because we need to ensure that the algae roller is clear
                 // prior to dropping below the CLEAR_HIGH stop
-                if (AlgaeRoller.isClear()) {
+                if (AlgaeRoller.instance.isClear()) {
                     // Potentially stop at CLEAR_LOW to ensure that the end effector completes pivoting first
                     // Note that we don't need to check the Algae Roller because we checked it already
                     if (finalTarget.height.lt(Stop.CLEAR_LOW.height)) {

@@ -1,11 +1,14 @@
 package frc.robot.subsystems.algaeroller;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 
 public class AlgaeRollerContants {
@@ -16,10 +19,23 @@ public class AlgaeRollerContants {
 	public static final Voltage expelVoltage = Units.Volts.of(-5.0);
 	public static final Voltage L1AssistVoltage = Units.Volts.of(3.5);
 
-	// TODO Determine values
-    public static double retractedPosition = 0.0;
-	public static double clearPosition = 0.0;
-    public static double deployedPosition = 0.0;
+	public static final Angle epsilon = Units.Rotations.of(0.5); // How close to be to setpoint to be considered at setpoint
+
+	public static enum AlgaeRollerPosition {
+		STOWED(90.0),
+		PROCESSOR(70.0),
+		CLEAR(65.0),
+		L1_SCORE(55.0),
+		DEPLOYED(23.0);
+
+		public final Angle position;
+		public final ControlRequest control;
+
+		private AlgaeRollerPosition(double degrees) {
+			position = Units.Degrees.of(degrees);
+			control = new MotionMagicExpoVoltage(position).withEnableFOC(true);
+		}
+	}
 
     public static TalonFXConfiguration getDeployMotorConfig() {
 		TalonFXConfiguration config = new TalonFXConfiguration();
@@ -30,15 +46,11 @@ public class AlgaeRollerContants {
 
 		config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
-		// TODO config.MotionMagic.MotionMagicCruiseVelocity = 100.0;
-		config.MotionMagic.MotionMagicCruiseVelocity = 5.0;
+		config.MotionMagic.MotionMagicCruiseVelocity = 100.0;
 		config.MotionMagic.MotionMagicAcceleration = 80.0;
 
-		// TODO
-		// config.Voltage.PeakForwardVoltage = 12.0;
-		// config.Voltage.PeakReverseVoltage = -12.0;
-		config.Voltage.PeakForwardVoltage = 2.0;
-		config.Voltage.PeakReverseVoltage = -2.0;
+		config.Voltage.PeakForwardVoltage = 12.0;
+		config.Voltage.PeakReverseVoltage = -12.0;
 
 		config.CurrentLimits.SupplyCurrentLimitEnable = true;
 		config.CurrentLimits.SupplyCurrentLimit = 40.0;
@@ -49,11 +61,11 @@ public class AlgaeRollerContants {
 
 		config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-		// config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-		// config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = kStowPosition.in(Units.Rotations);
+		config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+		config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = AlgaeRollerPosition.STOWED.position.in(Units.Rotations);
 
-		// config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-		// config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -1000;
+		config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+		config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -1000;
 
 		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
