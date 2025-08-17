@@ -3,21 +3,15 @@ package frc.robot.subsystems.elevator;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
-import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.Robot;
 
 
 public class ElevatorConstants {
-    /* Motor Config Values */
-    public static final double peakForwardVoltage = 14;
-    public static final double peakReverseVoltage = -14;
-    public static final InvertedValue motorOutputInverted = InvertedValue.CounterClockwise_Positive;
-    public static final NeutralModeValue motorNeutralValue = NeutralModeValue.Brake;
-
     // NOTE Elevator height is measured from the ground to top of the carriage
     public static final double thickness = 2.0; // Thickness of the elevator (only for Mechanism2d visualization)
     public static final double setback = 9.5; // Distance from front edge of robot (only for Mechanism2d visualization)
@@ -25,9 +19,10 @@ public class ElevatorConstants {
     public static final Distance baseHeight = Units.Inches.of(12.0 + bellyHeight); // TODO // Height of elevator in inches when it is at zero position
     public static final Distance maxHeight = Units.Inches.of(63.0); // TODO 72.0 + bellyHeight; // Height that elevator should never exceed
     public static final double endEffectorHeight = 6.0; // Height of end effector "target" above elevator height
-    public static final double rotPerInch = 0.704; // Rotations to drive elevator one inch
     // public static final PerUnit<AngleUnit, DistanceUnit> rotperInch = PerUnit.combine(Units.Rotations.of(0.704), Units.Inches.of(1.0));
     // TODO Reevaluate these values
+
+    public static final double rotPerInch = 4.35 / 29.25; // Rotations to drive elevator one inch
 
     public static final Distance safetyMargin = Units.Inches.of(1.5);   // How many inches away from safe mark to still be considered safe
     public static final double positionError = rotPerInch * 0.5; // Allowable rotation error to be considered in position
@@ -60,12 +55,12 @@ public class ElevatorConstants {
 
         Stop(Distance height) {
             this.height = height;
-            this.position = 0.0; // TODO Conversion
+            this.position = Units.Rotations.of(height.in(Units.Inches) * rotPerInch);
             this.control = new MotionMagicExpoVoltage(position).withSlot(0).withEnableFOC(true);
         }
 
         public final Distance height;
-        public final double position;
+        public final Angle position;
         public final ControlRequest control;
     }
 
@@ -82,8 +77,7 @@ public class ElevatorConstants {
 		config.Slot0.kS = 0.45;
 		config.Slot0.kG = 0.35;
 
-		// TODO config.MotionMagic.MotionMagicCruiseVelocity = 20.0;
-		config.MotionMagic.MotionMagicCruiseVelocity = 0.5;
+		config.MotionMagic.MotionMagicCruiseVelocity = 20.0;
 
 		config.CurrentLimits.SupplyCurrentLimitEnable = Robot.isReal();
 		config.CurrentLimits.SupplyCurrentLimit = 80.0;
@@ -93,19 +87,14 @@ public class ElevatorConstants {
 		config.CurrentLimits.StatorCurrentLimitEnable = true;
 		config.CurrentLimits.StatorCurrentLimit = 120.0;
 
-        // TODO
-		// config.Voltage.PeakForwardVoltage = 12.0;
-		// config.Voltage.PeakReverseVoltage = -12.0;
-		config.Voltage.PeakForwardVoltage = 3.0;
-		config.Voltage.PeakReverseVoltage = -3.0;
+		config.Voltage.PeakForwardVoltage = 12.0;
+		config.Voltage.PeakReverseVoltage = -12.0;
 
-		// FXConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-		// FXConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-		// 		converter.toAngle(kNetHeight).in(Units.Rotations);
+		config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+		config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Stop.BARGE.position.in(Units.Rotations);
 
-		// FXConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-		// FXConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-		// 		converter.toAngle(kStowPosition).minus(Units.Degrees.of(10.0)).in(Units.Rotations);
+        config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Stop.STOW.position.minus(Units.Degrees.of(10.0)).in(Units.Rotations);
 
 		config.Feedback.SensorToMechanismRatio = gearing;
 

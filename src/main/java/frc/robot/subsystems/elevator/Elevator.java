@@ -68,7 +68,7 @@ public class Elevator extends SubsystemBase {
 
         mainMotor.getConfigurator().apply(ElevatorConstants.getMotorConfig());
         mainMotor.stopMotor();
-        followerMotor.setControl(new Follower(Ports.ELEVATOR_MAIN.id, true));
+        followerMotor.setControl(new Follower(Ports.ELEVATOR_MAIN.id, false));
 
         SmartDashboard.putData("Elevator/Raise", Raise());
         SmartDashboard.putData("Elevator/Lower", Lower());
@@ -82,6 +82,11 @@ public class Elevator extends SubsystemBase {
         SmartDashboard.putData("Elevator/Zero", Zero());
         SmartDashboard.putData("Elevator/SetZero", SetZero());
         SmartDashboard.putData("Elevator/FastZero", FastZero());
+
+        SmartDashboard.putData("Elevator/Move to L1", LoggedCommands.runOnce("Move to L1", () -> moveTo(Stop.L1), this));
+        SmartDashboard.putData("Elevator/Move to L2", LoggedCommands.runOnce("Move to L2", () -> moveTo(Stop.L2), this));
+        SmartDashboard.putData("Elevator/Move to L3", LoggedCommands.runOnce("Move to L3", () -> moveTo(Stop.L3), this));
+        SmartDashboard.putData("Elevator/Move to L4", LoggedCommands.runOnce("Move to L4", () -> moveTo(Stop.L4), this));
 
         // TODO
         // initDefaultCommand();
@@ -145,7 +150,6 @@ public class Elevator extends SubsystemBase {
 
     private void setVoltage(double voltage) {
         stallCount = 0;
-        // TODO Handle blocking
         DogLog.log("Elevator/Status", "Set voltage " + String.format("%1.2f", voltage));
         // RobotState.setElevatorAtZero(false);
         mainMotor.setControl(voltageOut.withOutput(voltage));
@@ -253,7 +257,7 @@ public class Elevator extends SubsystemBase {
     }
     
     public boolean atTarget() {
-        return Math.abs(mainMotor.getPosition().getValueAsDouble() - currentTarget.position) <= ElevatorConstants.positionError;
+        return mainMotor.getPosition().getValue().minus(currentTarget.position).abs(Units.Rotations) <= ElevatorConstants.positionError;
     }
 
     private Stop safetyStop() {
@@ -377,13 +381,14 @@ public class Elevator extends SubsystemBase {
     private void setCurrentTarget(Stop target) {
         DogLog.log("Elevator/Status", "Current target: " + target + " <- " + currentTarget);
         currentTarget = target;
-        setPosition(currentTarget.position);
+        mainMotor.setControl(currentTarget.control);
     }
 
     public void moveTo(Stop target) {
         DogLog.log("Elevator/Status", "Final target: " + target + " <- " + finalTarget);
         finalTarget = target;
 
+        // TODO Intelligence about moving through zones 
         if (target == currentTarget) {
             return;
         }
@@ -484,12 +489,13 @@ public class Elevator extends SubsystemBase {
         }
 
         DogLog.log("Elevator/height", height.in(Units.Inches));
-        DogLog.log("Elevator/leftPosition", position);
-        DogLog.log("Elevator/leftVelocity", mainMotor.getVelocity().getValueAsDouble());
-        DogLog.log("Elevator/leftVoltage", voltage);
-        DogLog.log("Elevator/rightPosition", followPosition);
-        DogLog.log("Elevator/rightVelocity", followerMotor.getVelocity().getValueAsDouble());
-        DogLog.log("Elevator/rightVoltage", followerMotor.getMotorVoltage().getValueAsDouble());
+        DogLog.log("Elevator/mainPosition", position);
+        DogLog.log("Elevator/mainPosition (degrees)", mainMotor.getPosition().getValue().in(Units.Degrees));
+        DogLog.log("Elevator/mainVelocity", mainMotor.getVelocity().getValueAsDouble());
+        DogLog.log("Elevator/mainVoltage", voltage);
+        DogLog.log("Elevator/followPosition", followPosition);
+        DogLog.log("Elevator/followVelocity", followerMotor.getVelocity().getValueAsDouble());
+        DogLog.log("Elevator/followoltage", followerMotor.getMotorVoltage().getValueAsDouble());
         DogLog.log("Elevator/stallCount", stallCount);
         DogLog.log("Elevator/clearState", clearState.name());
 
