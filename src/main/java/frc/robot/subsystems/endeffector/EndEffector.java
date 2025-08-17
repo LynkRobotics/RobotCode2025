@@ -4,12 +4,14 @@
 
 package frc.robot.subsystems.endeffector;
 
-import java.util.concurrent.ThreadPoolExecutor.DiscardOldestPolicy;
-
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -49,6 +51,8 @@ public class EndEffector extends SubsystemBase {
     private final TalonFX positionMotor;
     private final TalonFX pieceMotor;
     private final CANdi candi;
+    private final CANcoder directCancoder;
+    private final CANcoder gearedCancoder;
 
     /* Control Requests */
     // private final VoltageOut algaeControl = new VoltageOut(EndEffectorConstants.algaeVoltage).withEnableFOC(false);
@@ -58,11 +62,18 @@ public class EndEffector extends SubsystemBase {
         positionMotor = new TalonFX(Ports.EE_POSITION.id, Ports.EE_POSITION.bus.name);
         pieceMotor = new TalonFX(Ports.EE_PIECE.id, Ports.EE_PIECE.bus.name);
         candi = new CANdi(Ports.EE_CANDI.id, Ports.EE_CANDI.bus.name);
+        directCancoder = new CANcoder(Ports.ENCODER_41T.id, Ports.ENCODER_41T.bus.name);
+        gearedCancoder = new CANcoder(Ports.ENCODER_40T.id, Ports.ENCODER_40T.bus.name);
 
         /* Configs */
         positionMotor.getConfigurator().apply(EndEffectorConstants.getPositionConfig());
         pieceMotor.getConfigurator().apply(EndEffectorConstants.getPieceConfig());
         candi.getConfigurator().apply(EndEffectorConstants.getCANdiConfig());
+        directCancoder.getConfigurator().apply(EndEffectorConstants.getDirect41TCancoderConfig());
+        gearedCancoder.getConfigurator().apply(EndEffectorConstants.getGeared40TCancoderConfig());
+
+        // directCancoder.setPosition(directCancoder.getAbsolutePosition().getValue());
+        // setCurrentPosition(directCancoder.getAbsolutePosition().getValue());
     }
 
     public boolean inPosition() {
@@ -144,11 +155,22 @@ public class EndEffector extends SubsystemBase {
         return !candi.getS2Closed().getValue();
     }
 
+    public Angle getAbsolutePosition() {
+		Angle positionRemainder = directCancoder.getAbsolutePosition().getValue();
+		Angle gearedEncoderPos = gearedCancoder.getAbsolutePosition().getValue();
+		Angle gearedEncoder0RotsPosition = positionRemainder.times(EndEffectorConstants.gearedCancoderGearing);
+		Angle diff = gearedEncoderPos.minus(gearedEncoder0RotsPosition);
+		Angle diffRemainder = Units.Radians.of(MathUtil.angleModulus(diff.in(Units.Radians)));
+		long fullRotations = Math.round(diffRemainder.in(Units.Rotations) / (EndEffectorConstants.gearedCancoderGearing - 1.0));
+		Angle absolutePosition = positionRemainder.plus(Units.Rotations.of(fullRotations));
+		return absolutePosition;
+	}
+
     @Override
     public void periodic() {
         Command currentCommand = getCurrentCommand();
-        double position = positionMotor.getPosition().getValueAsDouble();
-        double epsilon = 0.5; // TODO How close until we say we're at the desired position
+        Angle position = positionMotor.getPosition().getValue();
+        Angle epsilon = Units.Rotations.of(0.5); // TODO How close until we say we're at the desired position
 
         DogLog.log("EndEffector/Current Command", currentCommand == null ? "None" : currentCommand.getName());
         DogLog.log("EndEffector/Desired Position", desiredPosition.name());
@@ -158,7 +180,7 @@ public class EndEffector extends SubsystemBase {
         DogLog.log("EndEffector/Position Motor/Velocity", positionMotor.getVelocity().getValueAsDouble());
         DogLog.log("EndEffector/Position Motor/RotorVelocity", positionMotor.getRotorVelocity().getValueAsDouble());
         DogLog.log("EndEffector/Position Motor/Motor Temp", positionMotor.getDeviceTemp().getValueAsDouble());
-        DogLog.log("EndEffector/Position Motor/Position", position);
+        DogLog.log("EndEffector/Position Motor/Position (degrees)", position.in(Units.Degrees));
         DogLog.log("EndEffector/Piece Motor/TorqueCurrent", pieceMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("EndEffector/Piece Motor/StatorCurrent", pieceMotor.getStatorCurrent().getValueAsDouble());
         DogLog.log("EndEffector/Piece Motor/Velocity", pieceMotor.getVelocity().getValueAsDouble());
@@ -172,8 +194,21 @@ public class EndEffector extends SubsystemBase {
         DogLog.log("EndEffector/State", state.name());
         DogLog.log("EndEffector/Intake State", intakeState.name());
 
+        DogLog.log("EndEffector/CANcoder Top 41T Abs Pos (deg)", directCancoder.getAbsolutePosition().getValue().in(Units.Degrees));
+        DogLog.log("EndEffector/CANcoder Top 41T Abs Pos (rot)", directCancoder.getAbsolutePosition().getValue().in(Units.Rotations));
+        DogLog.log("EndEffector/CANcoder Bot 40T Abs Pos (deg)", gearedCancoder.getAbsolutePosition().getValue().in(Units.Degrees));
+        DogLog.log("EndEffector/CANcoder Bot 40T Abs Pos (rot)", gearedCancoder.getAbsolutePosition().getValue().in(Units.Rotations));
+        DogLog.log("EndEffector/CANcoder Top 41T Pos (deg)", directCancoder.getPosition().getValue().in(Units.Degrees));
+        DogLog.log("EndEffector/CANcoder Top 41T Pos (rot)", directCancoder.getPosition().getValue().in(Units.Rotations));
+        DogLog.log("EndEffector/CANcoder Bot 40T Pos (deg)", gearedCancoder.getPosition().getValue().in(Units.Degrees));
+        DogLog.log("EndEffector/CANcoder Bot 40T Pos (rot)", gearedCancoder.getPosition().getValue().in(Units.Rotations));
+
+        DogLog.log("EndEffector/Absolute position (deg)", getAbsolutePosition().in(Units.Degrees));
+        DogLog.log("EndEffector/Absolute position (rot)", getAbsolutePosition().in(Units.Rotations));
+
         if (!atDesiredPosition) {
-            if (Math.abs(desiredPosition.position - position) < epsilon) {
+            // TODO Debounce?
+            if (desiredPosition.position.minus(position).abs(Units.Degrees) < epsilon.in(Units.Degrees)) {
                 atDesiredPosition = true;
             }
         }

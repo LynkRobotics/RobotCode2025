@@ -1,14 +1,17 @@
 package frc.robot.subsystems.endeffector;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CANdiConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.S1CloseStateValue;
 import com.ctre.phoenix6.signals.S2CloseStateValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
@@ -22,6 +25,7 @@ public class EndEffectorConstants {
     private static final double coralRollerGearing = (7.5 / 1.0);
 	private static final double algaeRollerGearing = (6.0 / 1.0);
     private static final double positionGearing = (48.0 / 10.0) * (64.0 / 18.0) * (48.0 / 18.0);
+	public static final double gearedCancoderGearing = 41.0 / 40.0; // Not 39.0 like 1678
 
 	public static final Current algaeStatorCurrentThreshold = Units.Amps.of(70.0);
 	public static final Current coralStatorCurrentThreshold = Units.Amps.of(60.0);
@@ -67,12 +71,12 @@ public class EndEffectorConstants {
         ALGAE_IMPACT(140.0),
         CORAL_IMPACT(40.0);
 
-        private final Angle angle;
-		public double position;
+        public final Angle position;
+		public final ControlRequest control;
 
-        EEPosition(double value) {
-            this.angle = Units.Degrees.of(value);
-			this.position = 0.0; // TODO Convert angle to motor +position
+        EEPosition(double degrees) {
+            position = Units.Degrees.of(degrees);
+			control = new MotionMagicExpoVoltage(position).withEnableFOC(true);
         }
     }
 
@@ -150,6 +154,22 @@ public class EndEffectorConstants {
         config.DigitalInputs.S1CloseState = S1CloseStateValue.CloseWhenNotHigh;
         config.DigitalInputs.S2CloseState = S2CloseStateValue.CloseWhenNotHigh;
 
+		return config;
+	}
+
+	public static CANcoderConfiguration getGeared40TCancoderConfig() {
+		CANcoderConfiguration config = new CANcoderConfiguration();
+		config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
+		config.MagnetSensor.MagnetOffset = 0.057373046875;
+		config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+		return config;
+	}
+
+	public static CANcoderConfiguration getDirect41TCancoderConfig() {
+		CANcoderConfiguration config = new CANcoderConfiguration();
+		config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
+		config.MagnetSensor.MagnetOffset = 0.366455078125;
+		config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
 		return config;
 	}
 }
