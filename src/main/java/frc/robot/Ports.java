@@ -9,6 +9,7 @@ public enum Ports {
 	INDEXER(12, Bus.MECH), //Indexer
 	EE_PIECE(13, Bus.RIO), //End Effector
 	EE_POSITION(16, Bus.RIO), //End Effector Pivot
+	EE_CANDI(0, Bus.RIO), //End Effector CANdi
 	ELEVATOR_MAIN(14, Bus.MECH), //Elevator Inside
 	ELEVATOR_FOLLOWER(15, Bus.MECH), //Elevator Outside
 	CLIMBER_DEPLOY(17, Bus.MECH), //Climber Pivot

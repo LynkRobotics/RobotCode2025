@@ -6,6 +6,7 @@ package frc.robot.subsystems.endeffector;
 
 import java.util.concurrent.ThreadPoolExecutor.DiscardOldestPolicy;
 
+import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
@@ -47,6 +48,7 @@ public class EndEffector extends SubsystemBase {
     /* Devices */
     private final TalonFX positionMotor;
     private final TalonFX pieceMotor;
+    private final CANdi candi;
 
     /* Control Requests */
     // private final VoltageOut algaeControl = new VoltageOut(EndEffectorConstants.algaeVoltage).withEnableFOC(false);
@@ -55,10 +57,12 @@ public class EndEffector extends SubsystemBase {
         /* Devices */
         positionMotor = new TalonFX(Ports.EE_POSITION.id, Ports.EE_POSITION.bus.name);
         pieceMotor = new TalonFX(Ports.EE_PIECE.id, Ports.EE_PIECE.bus.name);
+        candi = new CANdi(Ports.EE_CANDI.id, Ports.EE_CANDI.bus.name);
 
         /* Configs */
         positionMotor.getConfigurator().apply(EndEffectorConstants.getPositionConfig());
         pieceMotor.getConfigurator().apply(EndEffectorConstants.getPieceConfig());
+        candi.getConfigurator().apply(EndEffectorConstants.getCANdiConfig());
     }
 
     public boolean inPosition() {
@@ -132,6 +136,14 @@ public class EndEffector extends SubsystemBase {
         return LoggedCommands.runOnce("Stop intake", () -> pieceMotor.stopMotor(), this);
     }
 
+    public boolean coralDetected() {
+        return !candi.getS1Closed().getValue();
+    }
+
+    public boolean algaeDetected() {
+        return !candi.getS2Closed().getValue();
+    }
+
     @Override
     public void periodic() {
         Command currentCommand = getCurrentCommand();
@@ -152,6 +164,10 @@ public class EndEffector extends SubsystemBase {
         DogLog.log("EndEffector/Piece Motor/Velocity", pieceMotor.getVelocity().getValueAsDouble());
         DogLog.log("EndEffector/Piece Motor/RotorVelocity", pieceMotor.getRotorVelocity().getValueAsDouble());
         DogLog.log("EndEffector/Piece Motor/Motor Temp", pieceMotor.getDeviceTemp().getValueAsDouble());
+
+        DogLog.log("EndEffector/CANdi connected", candi.isConnected());
+        DogLog.log("EndEffector/Coral detected", coralDetected());
+        DogLog.log("EndEffector/Algae detected", algaeDetected());
 
         DogLog.log("EndEffector/State", state.name());
         DogLog.log("EndEffector/Intake State", intakeState.name());
@@ -180,7 +196,8 @@ public class EndEffector extends SubsystemBase {
                 intakeState = EEIntakeState.STOPPED;
             }
         } else if (intakeState == EEIntakeState.INTAKING_CORAL) {
-            if (false) { // TODO Detect coral grab; remember to use debounce
+            // TODO Also check to stall?
+            if (coralDetected()) { // TODO Use debounce
                 state = EEState.HAVE_CORAL;
                 pieceMotor.setControl(EEControl.CORAL_HOLD.control);
                 intakeState = EEIntakeState.STOPPED;

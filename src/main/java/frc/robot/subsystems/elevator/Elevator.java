@@ -375,8 +375,19 @@ public class Elevator extends SubsystemBase {
     }
 
     private void setCurrentTarget(Stop target) {
+        DogLog.log("Elevator/Status", "Current target: " + target + " <- " + currentTarget);
         currentTarget = target;
         setPosition(currentTarget.position);
+    }
+
+    public void moveTo(Stop target) {
+        DogLog.log("Elevator/Status", "Final target: " + target + " <- " + finalTarget);
+        finalTarget = target;
+
+        if (target == currentTarget) {
+            return;
+        }
+        setCurrentTarget(target);
     }
 
     @Override

@@ -220,15 +220,25 @@ public class Superstructure extends SubsystemBase {
 
     public static Command IntakeCoral() {
         return LoggedCommands.parallel("Intaking Coral", 
-            Intake.instance.Deploy(), 
-            EndEffector.instance.StartCoralIntake()
-            );
+            Intake.instance.Deploy(),
+            EndEffector.instance.StartCoralIntake(),
+            Commands.sequence(
+                Commands.waitUntil(() -> EndEffector.instance.coralDetected()),
+                Controls.instance.TriggerRumble()))
+            .finallyDo((interrupted) -> {
+                Intake.instance.Expel().schedule(); // TODO Make this a fixed command instead of new object?
+                if (!interrupted) { // Means we got coral
+                    // Move into coral ready position
+                } else {
+                    EndEffector.instance.StopIntake().schedule();
+                }
+            });
     }
 
     public static Command StopIntake() {
         return LoggedCommands.parallel("Stopping coral intake",
-        Intake.instance.Retract(),
-        EndEffector.instance.StopIntake()
+            Intake.instance.Expel(),
+            EndEffector.instance.StopIntake()
         );
     }
 }

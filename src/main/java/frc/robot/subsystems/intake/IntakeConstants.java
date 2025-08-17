@@ -23,9 +23,9 @@ public class IntakeConstants {
         public final Angle position;
         public final ControlRequest control;
 
-        IntakePosition(double position) {
-            this.position = Units.Degrees.of(position);
-            this.control = new MotionMagicExpoVoltage(position).withEnableFOC(true);
+        IntakePosition(double degrees) {
+            position = Units.Degrees.of(degrees);
+            control = new MotionMagicExpoVoltage(position).withEnableFOC(true);
         }
     }
 
@@ -39,7 +39,7 @@ public class IntakeConstants {
 
 	public static final Voltage indexVoltage = Units.Volts.of(10.0);
 	public static final Voltage indexExpelVoltage = Units.Volts.of(-8.0);
-	public static final Time expelTime = Units.Seconds.of(1.0);
+	public static final Time expelTime = Units.Seconds.of(0.5);
 
 	public static final Voltage intakeVoltage = Units.Volts.of(-12.0);
 	public static final Voltage intakeExpelVoltage = Units.Volts.of(-12.0);
@@ -55,15 +55,11 @@ public class IntakeConstants {
 		config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 		config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 
-		// TODO config.MotionMagic.MotionMagicCruiseVelocity = 7.0;
-		config.MotionMagic.MotionMagicCruiseVelocity = 3.0;
+		config.MotionMagic.MotionMagicCruiseVelocity = 7.0;
 		config.MotionMagic.MotionMagicAcceleration = 15.0;
 
-		// TODO
-		// config.Voltage.PeakForwardVoltage = 12.0;
-		// config.Voltage.PeakReverseVoltage = -12.0;
-		config.Voltage.PeakForwardVoltage = 2.0;
-		config.Voltage.PeakReverseVoltage = -2.0;
+		config.Voltage.PeakForwardVoltage = 12.0;
+		config.Voltage.PeakReverseVoltage = -12.0;
 
 		config.CurrentLimits.SupplyCurrentLimitEnable = true;
 		config.CurrentLimits.SupplyCurrentLimit = 40.0;
@@ -72,11 +68,11 @@ public class IntakeConstants {
 
 		config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-		// config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-		// config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = IntakePosition.FULL_STOW.position.in(Units.Rotations);
+		config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+		config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = IntakePosition.FULL_STOW.position.in(Units.Rotations);
 
-		// config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-		// config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = IntakePosition.DEPLOYED.position.in(Units.Rotations);
+		config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+		config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = IntakePosition.DEPLOYED.position.in(Units.Rotations);
 
         return config;
     }

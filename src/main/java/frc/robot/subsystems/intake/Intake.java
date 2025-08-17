@@ -51,11 +51,11 @@ public class Intake extends SubsystemBase {
 
         SmartDashboard.putData("Intake/Zero Deploy", ZeroIntake());
         SmartDashboard.putData("Intake/Move to DEPLOYED",
-            LoggedCommands.runOnce("Move Intake to DEPLOYED", () -> { deployMotor.setPosition(IntakePosition.DEPLOYED.position); }, this));
+            LoggedCommands.runOnce("Move Intake to DEPLOYED", () -> { deployMotor.setControl(IntakePosition.DEPLOYED.control); }, this));
         SmartDashboard.putData("Intake/Move to RETRACTED",
-            LoggedCommands.runOnce("Move Intake to RETRACTED", () -> { deployMotor.setPosition(IntakePosition.RETRACTED.position); }, this));
+            LoggedCommands.runOnce("Move Intake to RETRACTED", () -> { deployMotor.setControl(IntakePosition.RETRACTED.control); }, this));
         SmartDashboard.putData("Intake/Move to FULL_STOW",
-            LoggedCommands.runOnce("Move Intake to FULL_STOW", () -> { deployMotor.setPosition(IntakePosition.FULL_STOW.position); }, this));
+            LoggedCommands.runOnce("Move Intake to FULL_STOW", () -> { deployMotor.setControl(IntakePosition.FULL_STOW.control); }, this));
 
         deployMotor.setPosition(IntakePosition.FULL_STOW.position);
         // deployMotor.setControl(desiredState.control);
@@ -85,21 +85,16 @@ public class Intake extends SubsystemBase {
     }
 
     public Command Deploy() {
-        return LoggedCommands.runOnce("Deploy Intake", this::runDeploy, this).finallyDo((interrupted) -> runExpel());
+        return LoggedCommands.runOnce("Deploy Intake", this::runDeploy, this);
     }
 
-    // TODO Needed?
     public Command Expel() {
         return LoggedCommands.runOnce("Expel from Intake", this::runExpel, this);
     }
 
-    // TODO Needed?
-    public Command Retract() {
-        return LoggedCommands.parallel("Retract Intake", 
-            Commands.print("TODO Moving intake"), 
-            Commands.runOnce(() -> { intakeMotor.stopMotor(); indexMotor.stopMotor(); }, this)
-        );
-    }
+    // public Command Stop() {
+    //     return LoggedCommands.runOnce("Stop Intake", this::stopIntake, this);
+    // }
 
     // Gently deploy intake until it stalls to recalibrate the zero position
     public Command ZeroIntake() {

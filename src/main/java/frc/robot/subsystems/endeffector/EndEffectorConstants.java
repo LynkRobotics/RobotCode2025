@@ -1,15 +1,19 @@
 package frc.robot.subsystems.endeffector;
 
+import com.ctre.phoenix6.configs.CANdiConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.S1CloseStateValue;
+import com.ctre.phoenix6.signals.S2CloseStateValue;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Robot;
 
@@ -21,6 +25,9 @@ public class EndEffectorConstants {
 
 	public static final Current algaeStatorCurrentThreshold = Units.Amps.of(70.0);
 	public static final Current coralStatorCurrentThreshold = Units.Amps.of(60.0);
+
+	public static final Time coralSensorDebounce = Units.Seconds.of(0.04);
+	public static final Time algaeSensorDebounce = Units.Seconds.of(0.09);
 
 	public static enum EEControl {
 		CORAL_INTAKE(6.0),
@@ -135,4 +142,13 @@ public class EndEffectorConstants {
 
         return config;
     }
+
+	public static final CANdiConfiguration getCANdiConfig() {
+		CANdiConfiguration config = new CANdiConfiguration();
+
+        config.DigitalInputs.S1CloseState = S1CloseStateValue.CloseWhenNotHigh;
+        config.DigitalInputs.S2CloseState = S2CloseStateValue.CloseWhenNotHigh;
+
+		return config;
+	}
 }

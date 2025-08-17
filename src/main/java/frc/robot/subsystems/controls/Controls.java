@@ -82,7 +82,7 @@ public class Controls extends SubsystemBase{
         final Trigger alignmentToggle = driver.rightStick();
 
         // Only used in case of automation failure
-        intakeCoral.whileTrue(Superstructure.IntakeCoral()).onFalse(Superstructure.StopIntake());
+        intakeCoral.whileTrue(Superstructure.IntakeCoral()); //.onFalse(Superstructure.StopIntake());
         // zero.onTrue(Elevator.instance.Zero());
         // unjam.onTrue(Intake.instance.Expel());
         // score.whileTrue(Superstructure.ScoreGamePiece()); // Also useful to dump Algae or put it into Processor
