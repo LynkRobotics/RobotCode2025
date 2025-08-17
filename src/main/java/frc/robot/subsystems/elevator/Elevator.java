@@ -6,7 +6,6 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -14,6 +13,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -42,18 +42,16 @@ public class Elevator extends SubsystemBase {
     private final TalonFX mainMotor;
     private final TalonFX followerMotor;
     private final VoltageOut voltageOut = new VoltageOut(0).withEnableFOC(true);
-    private final PositionVoltage positionVoltage = new PositionVoltage(0.0).withEnableFOC(true);
     private final MotionMagicExpoVoltage positionControl = new MotionMagicExpoVoltage(0.0).withEnableFOC(true);
-    // private final MechanismLigament2d mechanism;
 
     private Stop nextStop = Stop.SAFE;
 
+    // Debounce instead?
     private int stallCount = 0;
     private final int stallMax = 3;
     private double lastPosition = 0.0;
     private boolean zeroing = false;
     private boolean autoUp = false;
-    private Timer scoreTimer = new Timer();
     
     private final double positionDiffMax = 0.5;
 
@@ -61,6 +59,7 @@ public class Elevator extends SubsystemBase {
 
     private Stop finalTarget = Stop.STOW;
     private Stop currentTarget = finalTarget;
+    private boolean waitingOnAlgaeBarClear = false;
 
     public Elevator() {
         mainMotor = new TalonFX(Ports.ELEVATOR_MAIN.id, Ports.ELEVATOR_MAIN.bus.name);
@@ -165,7 +164,6 @@ public class Elevator extends SubsystemBase {
             Commands.runOnce(() -> {
                 // RobotState.updateActiveStop(stop);
                 setHeight(stopHeight(stop));
-                scoreTimer.stop();
             }, this),
             LoggedCommands.idle("Idle to hold elevator", this)));
     }
@@ -378,10 +376,18 @@ public class Elevator extends SubsystemBase {
         return false;
     }
 
-    private void setCurrentTarget(Stop target) {
-        DogLog.log("Elevator/Status", "Current target: " + target + " <- " + currentTarget);
+    private void setCurrentTarget(Stop target, boolean requireAlgaeBarClear) {
+        if (requireAlgaeBarClear && !AlgaeRoller.isClear()) {
+            // Set the target but not the set position (the current set position must be safe)
+            waitingOnAlgaeBarClear = true;
+            DogLog.log("Elevator/Status", "New target (once clear): " + target + " <- " + currentTarget);
+        } else {
+            // Either we don't need the algae bar to be clear, or it is clear
+            waitingOnAlgaeBarClear = false;
+            mainMotor.setControl(target.control);
+            DogLog.log("Elevator/Status", "New target: " + target + " <- " + currentTarget);
+        }
         currentTarget = target;
-        mainMotor.setControl(currentTarget.control);
     }
 
     public void moveTo(Stop target) {
@@ -390,9 +396,37 @@ public class Elevator extends SubsystemBase {
 
         // TODO Intelligence about moving through zones 
         if (target == currentTarget) {
+            // Trivially, we are already there or at least moving there next, so
+            // there's not need to adjust the setpoint
             return;
         }
-        setCurrentTarget(target);
+
+        Angle currentPosition = mainMotor.getPosition().getValue();
+        Angle targetPosition = target.position;
+        boolean goingUp = currentPosition.lt(targetPosition);
+
+        if (goingUp) {
+            // We need to wait for the algae bar to be clear if we are below the CLEAR_HIGH mark
+            setCurrentTarget(target, currentPosition.lt(Stop.CLEAR_HIGH.position));
+        } else if (currentPosition.gt(Stop.CLEAR_HIGH.position)) {
+            // We are moving down, towards the CLEAR_HIGH mark, so ensure that
+            // we don't go past until we are sure we are clear (checked in periodic())
+            setCurrentTarget(Stop.CLEAR_HIGH, false);
+        } else if (currentPosition.gt(Stop.CLEAR_LOW.position)) {
+            // We are moving down, towards the CLEAR_LOW mark, so ensure that
+            // we don't go past until we are sure we are clear (checked in periodic())
+            setCurrentTarget(Stop.CLEAR_LOW, true);
+        } else {
+            // Check if the End Effector needs to pivot
+            if (!EndEffector.instance.inPosition()) {
+                // If the End Effector is waiting to pivot, we need to move to CLEAR_LOW
+                // to enable it to pivot before moving to our final target
+                setCurrentTarget(Stop.CLEAR_LOW, true);
+            } else {
+                // The End Effector is already in position, so we can move to our target
+                setCurrentTarget(target, true);
+            }
+        }
     }
 
     @Override
@@ -415,28 +449,41 @@ public class Elevator extends SubsystemBase {
             clearState = ClearState.NOT_CLEAR;
         }
 
-        if (finalTarget != currentTarget) {
-            // Must be moving down and need to make sure elements are clear
+        // Check if we aren't moving towards the current target because we need to wait for the algae bar to be clear
+        if (waitingOnAlgaeBarClear && AlgaeRoller.isClear()) {
+            // We are unblocked, and now can move towards the intended target
+            waitingOnAlgaeBarClear = false;
+            mainMotor.setControl(currentTarget.control);
+            DogLog.log("Elevator/Status", "Unblocked for target: " + currentTarget);
+        }
 
+        // Check if we are moving towards an interim target due to requirements that must
+        // be met before moving to the final target
+        if (finalTarget != currentTarget) {
             // TODO Handle the move up-and-down for withing CLEAR_LOW range
             if (currentTarget == Stop.CLEAR_HIGH) {
                 // If we are headed for the CLEAR_HIGH stop, it's because we need to ensure that the algae roller is clear
                 // prior to dropping below the CLEAR_HIGH stop
                 if (AlgaeRoller.isClear()) {
-                    if (finalTarget.height.gt(Stop.CLEAR_LOW.height)) {
-                        currentTarget = finalTarget;
+                    // Potentially stop at CLEAR_LOW to ensure that the end effector completes pivoting first
+                    // Note that we don't need to check the Algae Roller because we checked it already
+                    if (finalTarget.height.lt(Stop.CLEAR_LOW.height)) {
+                        setCurrentTarget(Stop.CLEAR_LOW, false);
                     } else {
-                        currentTarget = Stop.CLEAR_LOW;
+                        currentTarget = finalTarget;
+                        setCurrentTarget(finalTarget, false);
                     }
-                }
-            } else if (currentTarget == Stop.CLEAR_LOW) {
-                // If we are headed for the CLEAR_LOW stop, it's because we need to ensure that the pivot completes movement
-                // prior to dropping below the CLEAR_LOW stop
+                } // We'll hold at CLEAR_HIGH until the algae bar is clear
+            }
+            
+            // If we are headed for the CLEAR_LOW stop, it's because we need to ensure that the pivot completes movement
+            // prior to dropping below the CLEAR_LOW stop
+            if (currentTarget == Stop.CLEAR_LOW) {
                 if (EndEffector.instance.inPosition()) {
-                    currentTarget = finalTarget;
+                    // We don't need to check the Algae Roller because we must have passed requirements
+                    // already since we were already targeting CLEAR_LOW, which is below CLEAR_HIGH
+                    setCurrentTarget(finalTarget, false);
                 }
-            } else {
-                LoggedAlert.Warning("Elevator", "Target", "Unexpected interim target: " + currentTarget);
             }
         }
         DogLog.log("Elevator/Current Target", currentTarget.name());
@@ -472,15 +519,6 @@ public class Elevator extends SubsystemBase {
         }
         lastPosition = position;
 
-        // If we have Coral ready, and the Elevator is still at zero, cancel the current default command so that it runs again with the L1 default
-        // if (RobotState.coralReady() && RobotState.getElevatorAtZero()) {
-        //     if (currentCommand != null) {
-        //         currentCommand.cancel();
-        //         RobotState.setElevatorAtZero(false);
-        //     }
-        // }
-        // TODO Lower Elevator if we don't have Coral?
-
         if (Math.abs(followDifference) >= positionDiffMax) {
             // This seems to be a semi-normal experience, perhaps due to latency in reporting motor position at faster speeds
             // The motors are mechanically connected, so it really should be impossible to actually be out of sync
@@ -510,7 +548,5 @@ public class Elevator extends SubsystemBase {
         SmartDashboard.putBoolean("Elevator/L3", atStop(Stop.L3));
         SmartDashboard.putBoolean("Elevator/L4", atStop(Stop.L4));
         SmartDashboard.putString("Elevator/Next Stop", nextStop.toString());
-
-        // mechanism.setLength(Units.inchesToMeters(height));
     }
 }
