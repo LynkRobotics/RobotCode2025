@@ -134,7 +134,8 @@ public class EndEffectorConstants {
 		// config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
 		// config.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
 		// 		Units.Rotations.of(-999.0).in(Units.Rotations);
-		// config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+		
+		config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
 		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
