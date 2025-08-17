@@ -39,6 +39,7 @@ public class IntakeConstants {
 
 	public static final Voltage indexVoltage = Units.Volts.of(10.0);
 	public static final Voltage indexExpelVoltage = Units.Volts.of(-8.0);
+	public static final Time expelTime = Units.Seconds.of(1.0);
 
 	public static final Voltage intakeVoltage = Units.Volts.of(-12.0);
 	public static final Voltage intakeExpelVoltage = Units.Volts.of(-12.0);
@@ -55,7 +56,7 @@ public class IntakeConstants {
 		config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 
 		// TODO config.MotionMagic.MotionMagicCruiseVelocity = 7.0;
-		config.MotionMagic.MotionMagicCruiseVelocity = 0.5;
+		config.MotionMagic.MotionMagicCruiseVelocity = 3.0;
 		config.MotionMagic.MotionMagicAcceleration = 15.0;
 
 		// TODO

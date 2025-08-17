@@ -21,6 +21,7 @@ import frc.robot.subsystems.intake.IntakeConstants.IntakePosition;
 public class Intake extends SubsystemBase {
     public static final Intake instance = new Intake();
     public static final Timer stallTimer = new Timer();
+    public static final Timer expelTimer = new Timer();
 
     private IntakePosition desiredState = IntakePosition.RETRACTED;
     private boolean atDesiredState = true;
@@ -49,23 +50,50 @@ public class Intake extends SubsystemBase {
         indexMotor.getConfigurator().apply(IntakeConstants.getIndexConfig());
 
         SmartDashboard.putData("Intake/Zero Deploy", ZeroIntake());
+        SmartDashboard.putData("Intake/Move to DEPLOYED",
+            LoggedCommands.runOnce("Move Intake to DEPLOYED", () -> { deployMotor.setPosition(IntakePosition.DEPLOYED.position); }, this));
+        SmartDashboard.putData("Intake/Move to RETRACTED",
+            LoggedCommands.runOnce("Move Intake to RETRACTED", () -> { deployMotor.setPosition(IntakePosition.RETRACTED.position); }, this));
+        SmartDashboard.putData("Intake/Move to FULL_STOW",
+            LoggedCommands.runOnce("Move Intake to FULL_STOW", () -> { deployMotor.setPosition(IntakePosition.FULL_STOW.position); }, this));
 
         deployMotor.setPosition(IntakePosition.FULL_STOW.position);
         // deployMotor.setControl(desiredState.control);
     }
 
+    private void runDeploy() {
+        DogLog.log("Intake/Status", "Deploying Intake");
+        expelTimer.stop();
+        deployMotor.setControl(IntakePosition.DEPLOYED.control);
+        intakeMotor.setControl(intakeControl);
+        indexMotor.setControl(indexControl);
+    }
+
+    private void runExpel() {
+        DogLog.log("Intake/Status", "Expelling Intake");
+        deployMotor.setControl(IntakePosition.DEPLOYED.control);
+        intakeMotor.setControl(intakeExpelControl);
+        indexMotor.setControl(indexExpelControl);
+        expelTimer.restart();
+    }
+
+    private void stopIntake() {
+        DogLog.log("Intake/Status", "Expelling Intake");
+        intakeMotor.stopMotor();
+        indexMotor.stopMotor();
+        deployMotor.setControl(IntakePosition.RETRACTED.control);
+    }
+
     public Command Deploy() {
-        return LoggedCommands.runOnce("Deploy Intake", () -> {
-            deployMotor.setControl(IntakePosition.DEPLOYED.control);
-            intakeMotor.setControl(intakeControl);
-            indexMotor.setControl(indexControl); 
-        }, this);
+        return LoggedCommands.runOnce("Deploy Intake", this::runDeploy, this).finallyDo((interrupted) -> runExpel());
     }
 
+    // TODO Needed?
     public Command Expel() {
-        return LoggedCommands.print("Expel Intake", "TODO Implement Intake expel");
+        return LoggedCommands.runOnce("Expel from Intake", this::runExpel, this);
     }
 
+    // TODO Needed?
     public Command Retract() {
         return LoggedCommands.parallel("Retract Intake", 
             Commands.print("TODO Moving intake"), 
@@ -73,14 +101,13 @@ public class Intake extends SubsystemBase {
         );
     }
 
-    public Command StopIntake() {
-        return LoggedCommands.runOnce("Stopping Coral Intake", null);
-    }
-
     // Gently deploy intake until it stalls to recalibrate the zero position
     public Command ZeroIntake() {
         return LoggedCommands.sequence("Zeroing Coral Intake",
-            Commands.runOnce(() -> deployMotor.setControl(deployZeroingControl), this),
+            Commands.runOnce(() -> {
+                expelTimer.stop();
+                deployMotor.setControl(deployZeroingControl);
+            }, this),
             Commands.waitUntil(() -> stallTimer.isRunning() && stallTimer.hasElapsed(IntakeConstants.deployStallTime.in(Units.Seconds))),
             LoggedCommands.runOnce("Stop intake deploy", () -> {
                 deployMotor.stopMotor();
@@ -96,7 +123,8 @@ public class Intake extends SubsystemBase {
         DogLog.log("Intake/At Desired State", atDesiredState);
         DogLog.log("Intake/Deploy Current", deployMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("Intake/Deploy Velocity", deployMotor.getVelocity().getValueAsDouble());
-        DogLog.log("Intake/Deploy Position", deployMotor.getPosition().getValueAsDouble());
+        DogLog.log("Intake/Deploy Position (Rotations)", deployMotor.getPosition().getValue().in(Units.Rotations));
+        DogLog.log("Intake/Deploy Position (Degrees)", deployMotor.getPosition().getValue().in(Units.Degrees));
         DogLog.log("Intake/Intake Current", intakeMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("Intake/Intake Velocity", intakeMotor.getVelocity().getValueAsDouble());
         DogLog.log("Intake/Index Current", indexMotor.getTorqueCurrent().getValueAsDouble());
@@ -109,6 +137,12 @@ public class Intake extends SubsystemBase {
             }
         } else if (stallTimer.isRunning()) {
             stallTimer.stop();
+        }
+
+        // If the expel timer has elapsed, end expel and reset deploy position
+        if (expelTimer.isRunning() && expelTimer.hasElapsed(IntakeConstants.expelTime.in(Units.Seconds))) {
+            expelTimer.stop();
+            stopIntake();
         }
     }
 }
