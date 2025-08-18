@@ -48,7 +48,17 @@ public class AlgaeRoller extends SubsystemBase {
     }
 
     public boolean isClear() {
-        return deployMotor.getPosition().getValue().gte(AlgaeRollerPosition.CLEAR.position.plus(AlgaeRollerContants.epsilon));
+        return deployMotor.getPosition().getValue().lte(AlgaeRollerPosition.CLEAR.position.plus(AlgaeRollerContants.epsilon));
+    }
+
+    public void ensureClear() {
+        if (!isClear()) {
+            moveTo(AlgaeRollerPosition.CLEAR);
+        }
+    }
+
+    public Command TriggerAtleastClear() {
+        return LoggedCommands.runOnce("Ensure algae bar clear", this::ensureClear, this);
     }
 
     private void moveTo(AlgaeRollerPosition position) {
@@ -76,7 +86,8 @@ public class AlgaeRoller extends SubsystemBase {
     public void periodic() {
         Command currentCommand = getCurrentCommand();
         DogLog.log("Algae Roller/Current Command", currentCommand == null ? "None" : currentCommand.getName());
-        DogLog.log("Algae Roller/Fully Deployed", fullyDeployed());
+        DogLog.log("Algae Roller/Fully Deployed?", fullyDeployed());
+        DogLog.log("Algae Roller/Clear?", isClear());
         DogLog.log("Algae Roller/Deploy Current", deployMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("Algae Roller/Deploy Velocity", deployMotor.getVelocity().getValueAsDouble());
         DogLog.log("Algae Roller/Deploy Position (rotations)", deployMotor.getPosition().getValue().in(Units.Rotations));

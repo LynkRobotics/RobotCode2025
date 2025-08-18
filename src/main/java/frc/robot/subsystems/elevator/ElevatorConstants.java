@@ -35,6 +35,8 @@ public class ElevatorConstants {
 
     private static final Distance algaeLiftDistance = Units.Inches.of(2.0);
 
+    public static final Distance epsilonThreshold = Units.Inches.of(1.0);
+
     public enum Stop {
         STOW(Units.Inches.of(0.0)),
         SAFE(Units.Inches.of(1.5)),

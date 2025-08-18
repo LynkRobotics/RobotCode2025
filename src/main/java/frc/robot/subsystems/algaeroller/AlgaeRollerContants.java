@@ -19,7 +19,7 @@ public class AlgaeRollerContants {
 	public static final Voltage expelVoltage = Units.Volts.of(-5.0);
 	public static final Voltage L1AssistVoltage = Units.Volts.of(3.5);
 
-	public static final Angle epsilon = Units.Rotations.of(0.5); // How close to be to setpoint to be considered at setpoint
+	public static final Angle epsilon = Units.Degrees.of(8.0); // TODO From Citrus, but too generous?
 
 	public static enum AlgaeRollerPosition {
 		STOWED(90.0),

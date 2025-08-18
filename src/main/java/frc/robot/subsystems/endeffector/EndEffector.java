@@ -81,6 +81,7 @@ public class EndEffector extends SubsystemBase {
         for (EEPosition position : EEPosition.values()) {
             SmartDashboard.putData("EndEffector/Move to " + position, LoggedCommands.runOnce("Move to " + position, () ->moveTo(position), this));;
         }
+        SmartDashboard.putData("EndEffector/Expel Coral L3", ExpelCoral(Field.ReefLevel.L3));
     }
 
     public boolean inPosition() {
@@ -150,6 +151,10 @@ public class EndEffector extends SubsystemBase {
         }
     }
 
+    public Command TriggerMoveTo(EEPosition position) {
+        return LoggedCommands.runOnce("Move to EE position " + position, () -> moveTo(position), this);
+    }
+
     public Command StopIntake() {
         return LoggedCommands.runOnce("Stop intake", () -> pieceMotor.stopMotor(), this);
     }
@@ -182,7 +187,6 @@ public class EndEffector extends SubsystemBase {
     public void periodic() {
         Command currentCommand = getCurrentCommand();
         Angle position = positionMotor.getPosition().getValue();
-        Angle epsilon = Units.Rotations.of(0.5); // TODO How close until we say we're at the desired position
 
         DogLog.log("EndEffector/Current Command", currentCommand == null ? "None" : currentCommand.getName());
         DogLog.log("EndEffector/Desired Position", desiredPosition.name());
@@ -221,12 +225,11 @@ public class EndEffector extends SubsystemBase {
 
         if (!atDesiredPosition) {
             // TODO Debounce?
-            if (desiredPosition.position.minus(position).abs(Units.Degrees) < epsilon.in(Units.Degrees)) {
+            if (desiredPosition.position.minus(position).abs(Units.Degrees) < EndEffectorConstants.pivotEpsilon.in(Units.Degrees)) {
                 atDesiredPosition = true;
             }
         }
         if (waitingToPivot) {
-            // TODO Do we need to worry about algae roller deploy?
             if (atDesiredPosition) {
                 // Unclear how we'd get here, but if we are in position, there's no need to wait
                 waitingToPivot = false;

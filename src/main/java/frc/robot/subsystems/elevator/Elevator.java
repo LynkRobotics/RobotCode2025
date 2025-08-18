@@ -80,7 +80,7 @@ public class Elevator extends SubsystemBase {
         SmartDashboard.putData("Elevator/Set Height", LoggedCommands.runOnce("Set Height", () -> { setHeight(Units.Inches.of(SmartDashboard.getNumber("Elevator/Direct Height", 12.0)));}));
         SmartDashboard.putData("Elevator/Zero", Zero());
         SmartDashboard.putData("Elevator/SetZero", SetZero());
-        SmartDashboard.putData("Elevator/FastZero", FastZero());
+        // SmartDashboard.putData("Elevator/FastZero", FastZero());
 
         SmartDashboard.putData("Elevator/Move to L1", LoggedCommands.runOnce("Move to L1", () -> moveTo(Stop.L1), this));
         SmartDashboard.putData("Elevator/Move to L2", LoggedCommands.runOnce("Move to L2", () -> moveTo(Stop.L2), this));
@@ -114,13 +114,13 @@ public class Elevator extends SubsystemBase {
             SetZero()));
     }
 
-    public Command FastZero() {
-        return IfNotBlocked(LoggedCommands.sequence("Fast Zero",
-            Commands.deadline(
-                LoggedCommands.waitUntil("Wait for elevator in safe zone", this::isSafe),
-                Move(Stop.SAFE)),
-            Zero()));
-    }
+    // public Command FastZero() {
+    //     return IfNotBlocked(LoggedCommands.sequence("Fast Zero",
+    //         Commands.deadline(
+    //             LoggedCommands.waitUntil("Wait for elevator in safe zone", this::isSafe),
+    //             Move(Stop.SAFE)),
+    //         Zero()));
+    // }
 
     public Command Raise() {
         return LoggedCommands.runOnce("Raise Elevator", 
@@ -159,13 +159,8 @@ public class Elevator extends SubsystemBase {
         return stop.height;
     }
 
-    public Command Move(Stop stop) {
-        return IfNotBlocked(LoggedCommands.sequence("Move Elevator to " + stop,
-            Commands.runOnce(() -> {
-                // RobotState.updateActiveStop(stop);
-                setHeight(stopHeight(stop));
-            }, this),
-            LoggedCommands.idle("Idle to hold elevator", this)));
+    public Command TriggerMoveTo(Stop stop) {
+        return LoggedCommands.runOnce("Move elevator to " + stop, () -> moveTo(stop), this);
     }
 
     public Command GoToNext() {
@@ -314,7 +309,7 @@ public class Elevator extends SubsystemBase {
 
     private Distance getHeight(double position) {
         // TODO Reevaluate baseHeight, not used by 1678
-        return Units.Inches.of(position / ElevatorConstants.rotPerInch).plus(ElevatorConstants.baseHeight);
+        return Units.Inches.of(position / ElevatorConstants.rotPerInch); //.plus(ElevatorConstants.baseHeight);
     }
 
     private Distance getHeight() {
@@ -350,11 +345,11 @@ public class Elevator extends SubsystemBase {
                 Commands.either(
                     LoggedCommands.deadline("Move to Hold position with Coral",
                         LoggedCommands.waitUntil("Wait for no Coral", () -> !RobotState.haveCoral()),
-                        Move(Stop.CORAL_HOLD)),
+                        TriggerMoveTo(Stop.CORAL_HOLD)),
                     LoggedCommands.sequence("Zero and Idle",
                         Commands.either(
                             Zero(),
-                            FastZero(),
+                            Zero(), //FastZero(),
                             RobotState::haveAlgae),
                         LoggedCommands.idle("Elevator holding at zero", this)),
                     RobotState::coralReady))
@@ -441,9 +436,9 @@ public class Elevator extends SubsystemBase {
         double voltage = mainMotor.getMotorVoltage().getValueAsDouble();
 
         // Determine clear state of Elevator
-        if (height.gt(Stop.CLEAR_HIGH.height)) {
+        if (height.gt(Stop.CLEAR_HIGH.height.minus(ElevatorConstants.epsilonThreshold))) {
             clearState = ClearState.CLEAR_HIGH;
-        } else if (height.gt(Stop.CLEAR_LOW.height)) {
+        } else if (height.gt(Stop.CLEAR_LOW.height.minus(ElevatorConstants.epsilonThreshold))) {
             clearState = ClearState.CLEAR_LOW;
         } else {
             clearState = ClearState.NOT_CLEAR;

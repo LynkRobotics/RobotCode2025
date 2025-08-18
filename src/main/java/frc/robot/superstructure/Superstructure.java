@@ -7,6 +7,7 @@ import static frc.robot.Options.optMirrorAuto;
 import java.util.EnumMap;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,6 +20,7 @@ import frc.robot.subsystems.algaeroller.AlgaeRoller;
 import frc.robot.subsystems.controls.Controls;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.Elevator.ClearState;
 import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
 import frc.robot.subsystems.endeffector.EndEffector;
 import frc.robot.subsystems.endeffector.EndEffector.EEState;
@@ -67,6 +69,22 @@ public class Superstructure extends SubsystemBase {
         for (ReefFace face: ReefFace.values()) {
             setFaceCommands(face);
         }
+
+        for (EEPose pose: EEPose.values()) {
+            // SmartDashboard.putData("Superstructure/Move EE to " + pose, LoggedCommands.runOnce("Move EE to " + pose, () ->moveTo(pose),
+            //     AlgaeRoller.instance, EndEffector.instance, Elevator.instance));
+            SmartDashboard.putData("Superstructure/Move EE to " + pose, MoveToEEPose(pose));
+        }
+    }
+
+    private Command MoveToEEPose(EEPose pose) {
+        return LoggedCommands.sequence("Move to EE Pose " + pose.name(),
+            Commands.either(
+                AlgaeRoller.instance.TriggerAtleastClear(),
+                Commands.none(),
+                () -> pose.stop.position.lte(Stop.CLEAR_HIGH.position) || !Elevator.instance.isClear(ClearState.CLEAR_HIGH)),
+            EndEffector.instance.TriggerMoveTo(pose.position),
+            Elevator.instance.TriggerMoveTo(pose.stop));
     }
 
     private void setFaceCommands(ReefFace face) {

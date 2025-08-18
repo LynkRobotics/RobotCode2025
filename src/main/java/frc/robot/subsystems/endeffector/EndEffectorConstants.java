@@ -25,10 +25,11 @@ public class EndEffectorConstants {
     private static final double coralRollerGearing = (7.5 / 1.0);
 	private static final double algaeRollerGearing = (6.0 / 1.0);
     private static final double positionGearing = (48.0 / 10.0) * (64.0 / 18.0) * (48.0 / 18.0);
-	public static final double gearedCancoderGearing = 41.0 / 40.0; // Not 39.0 like 1678
+	public static final double gearedCancoderGearing = 41.0 / 40.0; // Not 39.0 like 1678, due to CAD...
 
 	public static final Current algaeStatorCurrentThreshold = Units.Amps.of(70.0);
 	public static final Current coralStatorCurrentThreshold = Units.Amps.of(60.0);
+	public static final Angle pivotEpsilon = Units.Degrees.of(2.0);
 
 	public static final Time coralSensorDebounce = Units.Seconds.of(0.04);
 	public static final Time algaeSensorDebounce = Units.Seconds.of(0.09);
