@@ -113,15 +113,11 @@ public class EndEffectorConstants {
 
 		config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
-		// TODO config.MotionMagic.MotionMagicCruiseVelocity = 2.0;
-		config.MotionMagic.MotionMagicCruiseVelocity = 0.2;
+		config.MotionMagic.MotionMagicCruiseVelocity = 2.0;
 		config.MotionMagic.MotionMagicAcceleration = 1.0;
 
-		// TODO
-		// config.Voltage.PeakForwardVoltage = 12.0;
-		// config.Voltage.PeakReverseVoltage = -12.0;
-		config.Voltage.PeakForwardVoltage = 2.0;
-		config.Voltage.PeakReverseVoltage = -2.0;
+		config.Voltage.PeakForwardVoltage = 12.0;
+		config.Voltage.PeakReverseVoltage = -12.0;
 
 		config.CurrentLimits.StatorCurrentLimitEnable = Robot.isReal();
 		config.CurrentLimits.StatorCurrentLimit = 60.0;
@@ -131,13 +127,13 @@ public class EndEffectorConstants {
 		config.CurrentLimits.SupplyCurrentLowerLimit = 30.0;
 		config.CurrentLimits.SupplyCurrentLowerTime = 0.1;
 
-		// config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-		// config.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-		// 		Units.Rotations.of(999.0).in(Units.Rotations);
+		config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+		config.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+				Units.Rotations.of(999.0).in(Units.Rotations);
 
-		// config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-		// config.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-		// 		Units.Rotations.of(-999.0).in(Units.Rotations);
+		config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+		config.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+				Units.Rotations.of(-999.0).in(Units.Rotations);
 		
 		config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 

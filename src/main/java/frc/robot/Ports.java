@@ -14,7 +14,9 @@ public enum Ports {
 	ELEVATOR_FOLLOWER(15, Bus.MECH), //Elevator Outside
 	CLIMBER_DEPLOY(17, Bus.MECH), //Climber Pivot
 	CLIMBER_ROLLERS(18, Bus.MECH), //Climber Intake
-	CANDLE(21, Bus.MECH);
+	CANDLE(21, Bus.MECH),
+	ENCODER_41T(4, Bus.RIO), // Top End Effector (direct)
+	ENCODER_40T(5, Bus.RIO); // Bottom End Effector (geared)
 
     public enum Bus {
         RIO("rio"),
@@ -31,9 +33,6 @@ public enum Ports {
 	// EE_CORAL_BREAMBREAK(1, "RioDigitalIn"),
 	// EE_ALGAE_BEAMBREAK(0, "RioDigitalIn"),
 	// INDEXER_BEAMBREAK(8, "RioDigitalIn"),
-
-	// ENCODER_41T(4, "canivore1"), //Top End Effector
-	// ENCODER_39T(5, "canivore1"), //Bottom End Effector TODO: Confirm these two
 
 	// PHYSICAL_BUTTON(9, "RioDigitalIn");
 

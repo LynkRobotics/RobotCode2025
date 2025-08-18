@@ -12,6 +12,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,8 +20,8 @@ import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
 import frc.robot.Field;
 import frc.robot.Ports;
+import frc.robot.subsystems.algaeroller.AlgaeRoller;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.Elevator.ClearState;
 import frc.robot.subsystems.endeffector.EndEffectorConstants.EEControl;
 import frc.robot.subsystems.endeffector.EndEffectorConstants.EEPosition;
 
@@ -72,8 +73,14 @@ public class EndEffector extends SubsystemBase {
         directCancoder.getConfigurator().apply(EndEffectorConstants.getDirect41TCancoderConfig());
         gearedCancoder.getConfigurator().apply(EndEffectorConstants.getGeared40TCancoderConfig());
 
-        // directCancoder.setPosition(directCancoder.getAbsolutePosition().getValue());
-        // setCurrentPosition(directCancoder.getAbsolutePosition().getValue());
+        Angle directAbsPosition = directCancoder.getAbsolutePosition().getValue();
+        directCancoder.setPosition(directAbsPosition);
+        positionMotor.setPosition(directAbsPosition);
+
+        // For basic debugging
+        for (EEPosition position : EEPosition.values()) {
+            SmartDashboard.putData("EndEffector/Move to " + position, LoggedCommands.runOnce("Move to " + position, () ->moveTo(position), this));;
+        }
     }
 
     public boolean inPosition() {
@@ -127,7 +134,7 @@ public class EndEffector extends SubsystemBase {
             }, this);
     }
 
-    public void move(EEPosition position) {
+    public void moveTo(EEPosition position) {
         if (desiredPosition == position) {
             // No change
             return;
@@ -135,9 +142,9 @@ public class EndEffector extends SubsystemBase {
         
         desiredPosition = position;
         atDesiredPosition = false;
-        if (Elevator.instance.isClear(ClearState.CLEAR_LOW)) {
+        if (okToMove()) {
             waitingToPivot = false;
-            // TODO positionMotor.setControl();
+            positionMotor.setControl(desiredPosition.control);
         } else {
             waitingToPivot = true;
         }
@@ -153,6 +160,11 @@ public class EndEffector extends SubsystemBase {
 
     public boolean algaeDetected() {
         return !candi.getS2Closed().getValue();
+    }
+
+    private boolean okToMove() {
+        return Elevator.instance.isClear(Elevator.ClearState.CLEAR_LOW) &&
+            (Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH) || AlgaeRoller.instance.isClear());
     }
 
     public Angle getAbsolutePosition() {
@@ -175,6 +187,7 @@ public class EndEffector extends SubsystemBase {
         DogLog.log("EndEffector/Current Command", currentCommand == null ? "None" : currentCommand.getName());
         DogLog.log("EndEffector/Desired Position", desiredPosition.name());
         DogLog.log("EndEffector/In Position", inPosition());
+        DogLog.log("EndEffector/Waiting to Pivot", waitingToPivot);
         DogLog.log("EndEffector/Position Motor/TorqueCurrent", positionMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("EndEffector/Position Motor/StatorCurrent", positionMotor.getStatorCurrent().getValueAsDouble());
         DogLog.log("EndEffector/Position Motor/Velocity", positionMotor.getVelocity().getValueAsDouble());
@@ -217,10 +230,10 @@ public class EndEffector extends SubsystemBase {
             if (atDesiredPosition) {
                 // Unclear how we'd get here, but if we are in position, there's no need to wait
                 waitingToPivot = false;
-            } else if (Elevator.instance.isClear(Elevator.ClearState.CLEAR_LOW)) {
-                // If the elevator is clear, we can pivot
+            } else if (okToMove()) {
+                // Conditionals now allow for movement
                 waitingToPivot = false;
-                // TODO positionMotor.setControl();
+                positionMotor.setControl(desiredPosition.control);
             }
         }
         
