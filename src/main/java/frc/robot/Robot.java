@@ -71,7 +71,7 @@ public class Robot extends TimedRobot {
         // Ensure all subsystems get instantiated, and in order as necessary
         @SuppressWarnings("unused")
         Subsystem[] subsystems = new Subsystem[] {
-            // Climber.instance,
+            Climber.instance,
             EndEffector.instance,
             // Elevator.instance,
             Intake.instance,

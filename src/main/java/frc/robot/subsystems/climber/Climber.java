@@ -4,14 +4,21 @@
 
 package frc.robot.subsystems.climber;
 
+import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedCommands;
 import frc.robot.Ports;
+import frc.robot.subsystems.climber.ClimberConstants.ClimberPosition;
 import frc.robot.subsystems.controls.Controls;
 
 public class Climber extends SubsystemBase {
@@ -22,7 +29,10 @@ public class Climber extends SubsystemBase {
     private final TalonFX intakeMotor;
 
     /* Control Requests */
-    private final VoltageOut intakeControl = new VoltageOut(ClimberConstants.intakeVoltage);
+    private final ControlRequest intakeControl = new VoltageOut(ClimberConstants.intakeVoltage);
+    private final ControlRequest resetControl = new VoltageOut(ClimberConstants.resetVoltage);
+
+    private final Debouncer stallDebouncer = new Debouncer(ClimberConstants.stallPeriod.in(Units.Seconds));
 
     public Climber() {
         /* Devices */
@@ -31,18 +41,56 @@ public class Climber extends SubsystemBase {
         intakeMotor = new TalonFX(Ports.CLIMBER_ROLLERS.id, Ports.CLIMBER_ROLLERS.bus.name);
         intakeMotor.getConfigurator().apply(ClimberConstants.getIntakeMotorConfig());
 
-        //SmartDashboard.putData(LoggedCommands.runOnce("Coast Climber", () -> motor.setNeutralMode(NeutralModeValue.Coast)).ignoringDisable(true));
-        //SmartDashboard.putData(LoggedCommands.runOnce("Brake Climber", () -> motor.setNeutralMode(NeutralModeValue.Brake)).ignoringDisable(true));
+        deployMotor.setPosition(ClimberPosition.STOWED.angle);
+        deployMotor.setControl(ClimberPosition.CLEAR.control);
+
+        SmartDashboard.putData("Climber/Start Reset", StartReset());
+        SmartDashboard.putData("Climber/Stop Reset", StopReset());
+        SmartDashboard.putData("Climber/Deploy", Deploy());
+        SmartDashboard.putData("Climber/Clear", Clear());
+        SmartDashboard.putData("Climber/Stow", Stow());
+        SmartDashboard.putData("Climber/Intake", Intake());
+        SmartDashboard.putData("Climber/Intake Until Stalled", IntakeUntilStalled());
+    }
+
+    private Command StartReset() {
+        return LoggedCommands.runOnce("Start Climber Reset", () -> deployMotor.setControl(resetControl), this);
+    }
+
+    private Command StopReset() {
+        return LoggedCommands.runOnce("Stop Climber Reset", () -> {
+            deployMotor.stopMotor();
+            deployMotor.setNeutralMode(NeutralModeValue.Coast);
+        }, this);
     }
 
     private Command Deploy() {
-        return LoggedCommands.print("Deploy climber", "TODO Implement climber deploy");
-        // TODO move with magic motion
+        return LoggedCommands.runOnce("Deploy climber", () -> {
+            deployMotor.setControl(ClimberPosition.DEPLOYED.control);
+        }, this);
+    }
+
+    private Command Stow() {
+        return LoggedCommands.runOnce("Stow climber", () -> {
+            deployMotor.setControl(ClimberPosition.STOWED.control);
+        }, this);
+    }
+
+    private Command Clear() {
+        return LoggedCommands.runOnce("Clear climber", () -> {
+            deployMotor.setControl(ClimberPosition.CLEAR.control);
+        }, this);
     }
 
     private Command Intake() {
-        intakeMotor.setControl(intakeControl);
-        return LoggedCommands.print("Intake cage", "TODO Implement climber cage intake");
+        return LoggedCommands.runOnce("Intake climber", () -> intakeMotor.setControl(intakeControl), this);
+    }
+
+    private Command IntakeUntilStalled() {
+        return LoggedCommands.sequence("Intake climber until stalled",
+            Intake(),
+            Commands.waitUntil(this::intakeStalled),
+            LoggedCommands.runOnce("Stop stalled climber", () -> intakeMotor.stopMotor(), this));
     }
 
     public Command DeployAndIntake() {
@@ -70,14 +118,21 @@ public class Climber extends SubsystemBase {
         // In superstructue, then move intake into full stow position
     }
 
+    private boolean intakeStalled() {
+        return stallDebouncer.calculate(intakeMotor.getTorqueCurrent().getValue().gt(ClimberConstants.currentStallThreshold));
+    }
+
     @Override
     public void periodic() {
         Command currentCommand = getCurrentCommand();
         DogLog.log("Climber/Current Command", currentCommand == null ? "None" : currentCommand.getName());
         DogLog.log("Climber/Deploy Current", deployMotor.getTorqueCurrent().getValueAsDouble());
+        DogLog.log("Climber/Deploy Voltage", deployMotor.getMotorVoltage().getValueAsDouble());
         DogLog.log("Climber/Deploy Velocity", deployMotor.getVelocity().getValueAsDouble());
         DogLog.log("Climber/Deploy Position", deployMotor.getPosition().getValueAsDouble());
         DogLog.log("Climber/Intake Current", intakeMotor.getTorqueCurrent().getValueAsDouble());
-        DogLog.log("Climber/Intake Velocity", intakeMotor.getVelocity().getValueAsDouble());
+        DogLog.log("Climber/Intake Velocity RPM", intakeMotor.getVelocity().getValue().in(Units.RPM));
+        DogLog.log("Climber/Intake Velocity RPS", intakeMotor.getVelocity().getValue().in(Units.RotationsPerSecond));
+        DogLog.log("Climber/Intake Stalled", intakeStalled());
     }
 }
