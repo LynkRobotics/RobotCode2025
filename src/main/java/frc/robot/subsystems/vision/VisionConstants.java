@@ -5,8 +5,7 @@ import java.util.EnumMap;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
-import frc.robot.subsystems.pose.PoseConstants;
+import edu.wpi.first.units.Units;
 
 public class VisionConstants {
     public static final double fieldBorderMargin = 0.25; // Reject poses this far outside the field
@@ -20,26 +19,12 @@ public class VisionConstants {
     public static double angularStdDevBaseline = 2.0; // Radians
 
     public enum Camera {
-        LEFT  ("AprilTag Left", new Transform3d(
-            new Translation3d(PoseConstants.robotFrameLength / 2.0 - Units.inchesToMeters(2.772),
-            PoseConstants.robotFrameWidth / 2.0 - Units.inchesToMeters(4.843),
-                Units.inchesToMeters(8.46)),
-            new Rotation3d(Units.degreesToRadians(1.3), Units.degreesToRadians(-15.5), Units.degreesToRadians(-30)))),
-        CENTER("AprilTag Center", new Transform3d(
-            new Translation3d(PoseConstants.robotFrameLength / 2.0 - Units.inchesToMeters(6.958),
-                0.0,
-                Units.inchesToMeters(6.55)),
-            new Rotation3d(Units.degreesToRadians(0.9), Units.degreesToRadians(-20.3), Units.degreesToRadians(0)))),
-        RIGHT ("AprilTag Right", new Transform3d(
-            new Translation3d(PoseConstants.robotFrameLength / 2.0 - Units.inchesToMeters(2.772),
-                -PoseConstants.robotFrameWidth / 2.0 + Units.inchesToMeters(4.843),
-                Units.inchesToMeters(8.46)),
-            new Rotation3d(Units.degreesToRadians(0.8), Units.degreesToRadians(-14.0), Units.degreesToRadians(30)))),
-        REAR ("AprilTag Rear", new Transform3d(
-            new Translation3d(PoseConstants.robotFrameLength / 2.0 - Units.inchesToMeters(12.94),
-                -PoseConstants.robotFrameWidth / 2.0 + Units.inchesToMeters(2.75),
-                Units.inchesToMeters(39.6)),
-            new Rotation3d(0.0, Units.degreesToRadians(-8.5), Units.degreesToRadians(180.0))));
+        FRONT("AprilTagCam", new Transform3d(
+            new Translation3d(Units.Inches.of(-3.22), Units.Inches.of(9.443), Units.Inches.of(9.127)),
+            new Rotation3d(Units.Degree.of(0), Units.Degree.of(-12.0), Units.Degree.of(156.0)))),
+        REAR("Detection Cam", new Transform3d(
+            new Translation3d(Units.Inches.of(-0.109), Units.Inches.of(-4.550), Units.Inches.of(39.230)),
+			new Rotation3d(Units.Degree.of(0.0), Units.Degree.of(-33.0), Units.Degree.of(0.0))));
     
         public final String name;
         public final Transform3d robotToCamera;
@@ -51,19 +36,16 @@ public class VisionConstants {
     }
 
     public static final Camera[] camerasAvailable = Camera.values();
-    // public static final Camera[] camerasAvailable = { Camera.CENTER };
 
     public enum CameraMode {
-        DEFAULT(0.9, 0.75, 0.9, 2.0),
-        FRONT(1.0, 0.5, 1.0, Double.POSITIVE_INFINITY),
-        REAR(9.0, 9.0, 9.0, 0.01); // TODO Check other values between 0.1 and 0.001 -- changed linearStdDev since
+        DEFAULT(1.0, Double.POSITIVE_INFINITY),
+        FRONT(1.0, Double.POSITIVE_INFINITY),
+        REAR(1.0, Double.POSITIVE_INFINITY);
 
         private final EnumMap<Camera, Double> stddev = new EnumMap<>(Camera.class);
 
-        CameraMode(double left, double center, double right, double rear) {
-            stddev.put(Camera.LEFT, left);
-            stddev.put(Camera.CENTER, center);
-            stddev.put(Camera.RIGHT, right);
+        CameraMode(double front, double rear) {
+            stddev.put(Camera.FRONT, front);
             stddev.put(Camera.REAR, rear);
         }
 

@@ -78,7 +78,7 @@ public class Robot extends TimedRobot {
             // LED.instance,
             // RobotState.instance,
             Swerve.instance,
-            // Vision.instance,
+            Vision.instance,
             Pose.instance,
             // Controls.instance,
             // Superstructure.instance,
