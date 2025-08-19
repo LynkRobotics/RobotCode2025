@@ -20,8 +20,8 @@ public class VisionConstants {
 
     public enum Camera {
         FRONT("AprilTagCam", new Transform3d(
-            new Translation3d(Units.Inches.of(-3.22), Units.Inches.of(9.443), Units.Inches.of(9.127)),
-            new Rotation3d(Units.Degree.of(0), Units.Degree.of(-12.0), Units.Degree.of(156.0)))),
+            new Translation3d(Units.Inches.of(-3.0), Units.Inches.of(-10.5), Units.Inches.of(8.375)), 
+            new Rotation3d(Units.Degree.of(0), Units.Degree.of(-11.2), Units.Degree.of(156.0)))),
         REAR("Detection Cam", new Transform3d(
             new Translation3d(Units.Inches.of(-0.109), Units.Inches.of(-4.550), Units.Inches.of(39.230)),
 			new Rotation3d(Units.Degree.of(0.0), Units.Degree.of(-33.0), Units.Degree.of(0.0))));
