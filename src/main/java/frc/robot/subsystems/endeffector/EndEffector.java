@@ -261,14 +261,15 @@ public class EndEffector extends SubsystemBase {
         }
         
         if (intakeState == EEIntakeState.INTAKING_ALGAE) {
-            if (false) { // TODO Detect algae grab; remember to use debounce; wait 0.2s after detection (velocity below 2000 degrees per second or beam break)
+            // TODO Also check stall
+            if (algaeDetected()) { // TODO Wait 0.2s after detection -- can't we just bump the debounce up?
                 state = EEState.HAVE_ALGAE;
                 pieceMotor.setControl(EEControl.ALGAE_HOLD.control);
                 intakeState = EEIntakeState.STOPPED;
             }
         } else if (intakeState == EEIntakeState.INTAKING_CORAL) {
             // TODO Also check to stall?
-            if (coralDetected()) { // TODO Use debounce
+            if (coralDetected()) {
                 state = EEState.HAVE_CORAL;
                 pieceMotor.setControl(EEControl.CORAL_HOLD.control);
                 intakeState = EEIntakeState.STOPPED;

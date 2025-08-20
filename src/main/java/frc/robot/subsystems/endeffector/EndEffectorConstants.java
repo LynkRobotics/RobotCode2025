@@ -23,7 +23,7 @@ import frc.robot.Robot;
 public class EndEffectorConstants {
     /* Motor Control Values */
     private static final double coralRollerGearing = (7.5 / 1.0);
-	private static final double algaeRollerGearing = (6.0 / 1.0);
+	// UNUSED private static final double algaeRollerGearing = (6.0 / 1.0);
     private static final double positionGearing = (48.0 / 10.0) * (64.0 / 18.0) * (48.0 / 18.0);
 	public static final double gearedCancoderGearing = 41.0 / 40.0; // Not 39.0 like 1678, due to CAD...
 
