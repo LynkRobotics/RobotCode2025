@@ -73,15 +73,15 @@ public class Robot extends TimedRobot {
         Subsystem[] subsystems = new Subsystem[] {
             Climber.instance,
             EndEffector.instance,
-            // Elevator.instance,
+            Elevator.instance,
             Intake.instance,
             // LED.instance,
             // RobotState.instance,
             Swerve.instance,
             Vision.instance,
             Pose.instance,
-            // Controls.instance,
-            // Superstructure.instance,
+            Controls.instance,
+            Superstructure.instance,
             // Autos.instance
         };
         
