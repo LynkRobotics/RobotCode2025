@@ -1,5 +1,6 @@
 package frc.robot.subsystems.algaeroller;
 
+import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -21,9 +22,9 @@ public class AlgaeRoller extends SubsystemBase {
     private final TalonFX rollerMotor;
     
     /* Control Requests */    
-    private final VoltageOut intakeControl = new VoltageOut(AlgaeRollerContants.intakeVoltage).withEnableFOC(true);
-    private final VoltageOut expelControl = new VoltageOut(AlgaeRollerContants.expelVoltage).withEnableFOC(true);
-    private final VoltageOut L1AssistControl = new VoltageOut(AlgaeRollerContants.L1AssistVoltage).withEnableFOC(true);
+    private final ControlRequest intakeControl = new VoltageOut(AlgaeRollerContants.intakeVoltage).withEnableFOC(true);
+    private final ControlRequest expelControl = new VoltageOut(AlgaeRollerContants.expelVoltage).withEnableFOC(true);
+    private final ControlRequest L1AssistControl = new VoltageOut(AlgaeRollerContants.L1AssistVoltage).withEnableFOC(true);
 
     boolean waitingToStow = false;
     
@@ -80,11 +81,15 @@ public class AlgaeRoller extends SubsystemBase {
     }
 
     public Command TriggerStowWhenAble() {
-        return LoggedCommands.runOnce("Stow algae roller", this::stowWhenAble, this);
+        return LoggedCommands.runOnce("Stow algae roller when able", this::stowWhenAble, this);
     }
 
-    public static Command Intake() {
-        return LoggedCommands.print("Intake algae", "TODO Implement intake algae");
+    public Command TriggerStow() {
+        return LoggedCommands.runOnce("Stow algae roller", () -> moveTo(AlgaeRollerPosition.STOWED), this);
+    }
+
+    public Command Intake() {
+        return LoggedCommands.runOnce("Intake algae", () -> rollerMotor.setControl(intakeControl), this);
     }
 
     public static Command GuideL1Coral() {
