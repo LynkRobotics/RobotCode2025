@@ -51,7 +51,8 @@ public class SwerveConstants {
     public static final double angleCurrentThresholdTime = 0.1;
     public static final boolean angleEnableCurrentLimit = true;
 
-    public static final int driveCurrentLimit = 80; 
+    public static final int driveStatorCurrentLimit = 80; 
+    public static final int driveSupplyCurrentLimit = 60;
     public static final int driveCurrentThreshold = 60; 
     public static final double driveCurrentThresholdTime = 0.1;
     public static final boolean driveEnableCurrentLimit = true;

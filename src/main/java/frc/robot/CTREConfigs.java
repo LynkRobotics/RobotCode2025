@@ -43,9 +43,12 @@ public final class CTREConfigs {
 
         /* Current Limiting */
         swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimitEnable = SwerveConstants.driveEnableCurrentLimit;
-        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimit = SwerveConstants.driveCurrentLimit;
+        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimit = SwerveConstants.driveSupplyCurrentLimit;
         swerveDriveFXConfig.CurrentLimits.SupplyCurrentLowerLimit = SwerveConstants.driveCurrentThreshold;
         swerveDriveFXConfig.CurrentLimits.SupplyCurrentLowerTime = SwerveConstants.driveCurrentThresholdTime;
+
+        swerveDriveFXConfig.CurrentLimits.StatorCurrentLimitEnable = SwerveConstants.driveEnableCurrentLimit;
+        swerveDriveFXConfig.CurrentLimits.StatorCurrentLimit = SwerveConstants.driveStatorCurrentLimit;
 
         /* PID Config */
         swerveDriveFXConfig.Slot0.kP = SwerveConstants.driveKP;
