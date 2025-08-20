@@ -27,6 +27,8 @@ public class AlgaeRoller extends SubsystemBase {
     private final ControlRequest L1AssistControl = new VoltageOut(AlgaeRollerContants.L1AssistVoltage).withEnableFOC(true);
 
     boolean waitingToStow = false;
+
+    AlgaeRollerPosition currentTarget;
     
     AlgaeRoller() {
         /* Devices */
@@ -35,20 +37,33 @@ public class AlgaeRoller extends SubsystemBase {
         rollerMotor = new TalonFX(Ports.ALGAE_ROLLERS.id, Ports.ALGAE_ROLLERS.bus.name);
         rollerMotor.getConfigurator().apply(AlgaeRollerContants.getRollerMotorConfig());
 
+        // Expect to begin in STOWED position and hold it
         deployMotor.setPosition(AlgaeRollerPosition.STOWED.position);
-        deployMotor.setControl(AlgaeRollerPosition.STOWED.control);
+        setTarget(AlgaeRollerPosition.STOWED);
 
-        SmartDashboard.putData("Algae Roller/Move to STOWED", LoggedCommands.runOnce("Move to STOWED", () -> moveTo(AlgaeRollerPosition.STOWED), this));
-        SmartDashboard.putData("Algae Roller/Move to PROCESSOR", LoggedCommands.runOnce("Move to PROCESSOR", () -> moveTo(AlgaeRollerPosition.PROCESSOR), this));
-        SmartDashboard.putData("Algae Roller/Move to CLEAR", LoggedCommands.runOnce("Move to CLEAR", () -> moveTo(AlgaeRollerPosition.CLEAR), this));
-        SmartDashboard.putData("Algae Roller/Move to L1_SCORE", LoggedCommands.runOnce("Move to L1_SCORE", () -> moveTo(AlgaeRollerPosition.L1_SCORE), this));
-        SmartDashboard.putData("Algae Roller/Move to DEPLOYED", LoggedCommands.runOnce("Move to DEPLOYED", () -> moveTo(AlgaeRollerPosition.DEPLOYED), this));
+        // Debugging help
+        for (AlgaeRollerPosition position : AlgaeRollerPosition.values()) {
+            SmartDashboard.putData("Algae Roller/Move to " + position.name(), LoggedCommands.runOnce("Move to " + position.name(), () -> moveTo(position), this));
+        }
     }
 
     // TODO Add Zero() method / Command
+    private void setTarget(AlgaeRollerPosition position) {
+        DogLog.log("Algae Roller/Status", "Setting target to " + position.name());
+        currentTarget = position;
+        deployMotor.setControl(position.control);
+    }
 
-    public static boolean fullyDeployed() {
-        return false; // TODO
+    private boolean atTarget() {
+        return isNear(currentTarget);
+    }
+
+    public Command WaitForTarget() {
+        return LoggedCommands.waitUntil("Wait for algae bar target", this::atTarget);
+    }
+
+    private boolean isNear(AlgaeRollerPosition position) {
+        return deployMotor.getPosition().getValue().minus(position.position).abs(Units.Rotations) <= AlgaeRollerContants.epsilon.in(Units.Rotations);
     }
 
     public boolean isClear() {
@@ -92,19 +107,18 @@ public class AlgaeRoller extends SubsystemBase {
         return LoggedCommands.runOnce("Intake algae", () -> rollerMotor.setControl(intakeControl), this);
     }
 
-    public static Command GuideL1Coral() {
-        return LoggedCommands.print("Guide L1 coral", "TODO Implement guide L1 coral");
+    public Command Expel() {
+        return LoggedCommands.runOnce("Expel algae", () -> rollerMotor.setControl(expelControl), this);
     }
 
-    public static Command ClearElevatorPath() {
-        return LoggedCommands.print("Clear elevator path", "TODO Implement clear elevator path");
+    public Command GuideL1Coral() {
+        return LoggedCommands.runOnce("Guide L1 coral", () -> rollerMotor.setControl(L1AssistControl), this);
     }
 
     @Override
     public void periodic() {
         Command currentCommand = getCurrentCommand();
         DogLog.log("Algae Roller/Current Command", currentCommand == null ? "None" : currentCommand.getName());
-        DogLog.log("Algae Roller/Fully Deployed?", fullyDeployed());
         DogLog.log("Algae Roller/Clear?", isClear());
         DogLog.log("Algae Roller/Waiting to stow?", waitingToStow);
         DogLog.log("Algae Roller/Deploy Current", deployMotor.getTorqueCurrent().getValueAsDouble());
