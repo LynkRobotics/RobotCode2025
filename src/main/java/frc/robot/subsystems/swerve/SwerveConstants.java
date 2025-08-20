@@ -11,7 +11,6 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
 import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
-import frc.robot.Constants;
 import frc.robot.Ports;
 
 public class SwerveConstants {

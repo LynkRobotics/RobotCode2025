@@ -17,6 +17,7 @@ import frc.robot.autos.AutoConstants;
 import frc.robot.commands.pidswerve.PIDSwerve;
 import frc.robot.commands.pidswerve.PIDSwerveConstants.PIDSpeed;
 import frc.robot.subsystems.algaeroller.AlgaeRoller;
+import frc.robot.subsystems.algaeroller.AlgaeRollerContants.AlgaeRollerPosition;
 import frc.robot.subsystems.controls.Controls;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.elevator.Elevator;
@@ -73,11 +74,11 @@ public class Superstructure extends SubsystemBase {
         for (EEPose pose: EEPose.values()) {
             // SmartDashboard.putData("Superstructure/Move EE to " + pose, LoggedCommands.runOnce("Move EE to " + pose, () ->moveTo(pose),
             //     AlgaeRoller.instance, EndEffector.instance, Elevator.instance));
-            SmartDashboard.putData("Superstructure/Move EE to " + pose, MoveToEEPose(pose));
+            SmartDashboard.putData("Superstructure/Move EE to " + pose, TriggerMoveToEEPose(pose));
         }
     }
 
-    private Command MoveToEEPose(EEPose pose) {
+    private Command TriggerMoveToEEPose(EEPose pose) {
         return LoggedCommands.sequence("Move to EE Pose " + pose.name(),
             Commands.either(
                 AlgaeRoller.instance.TriggerAtleastClear(),
@@ -85,6 +86,10 @@ public class Superstructure extends SubsystemBase {
                 () -> pose.stop.position.lte(Stop.CLEAR_HIGH.position) || !Elevator.instance.isClear(ClearState.CLEAR_HIGH)),
             EndEffector.instance.TriggerMoveTo(pose.position),
             Elevator.instance.TriggerMoveTo(pose.stop));
+    }
+
+    private Command WaitForEEPose() {
+        return LoggedCommands.waitUntil("Wait for EE Pose", () -> EndEffector.instance.inPosition() && Elevator.instance.atTarget());
     }
 
     private void setFaceCommands(ReefFace face) {
@@ -171,7 +176,7 @@ public class Superstructure extends SubsystemBase {
                                 SafeEEPose(algaePose),
                                 optInvertAlgae
                             ),
-                            AlgaeRoller.instance.Retract()
+                            AlgaeRoller.instance.TriggerStowWhenAble()
                         )),
                     new PIDSwerve(Swerve.instance, Pose.instance, face.alignMiddle, true, true),
                     Swerve.instance.Stop())),
@@ -236,18 +241,42 @@ public class Superstructure extends SubsystemBase {
         return LoggedCommands.print("Wait until coral is ready", "TODO Implement Wait until coral is ready");
     }
 
-    public static Command IntakeCoral() {
-        return LoggedCommands.parallel("Intaking Coral", 
-            Intake.instance.Deploy(),
-            EndEffector.instance.StartCoralIntake(),
-            Commands.sequence(
-                Commands.waitUntil(() -> EndEffector.instance.coralDetected()),
-                Controls.instance.TriggerRumble()))
+    public Command CoralHold() {
+        return LoggedCommands.print("Coral hold", "TODO Implement Coral hold");
+    }
+
+    public Command AlgaeHold() {
+        return LoggedCommands.print("Algae hold", "TODO Implement Algae hold");
+    }
+
+    public Command SmartIntake() {
+        return Commands.either(
+            AlgaeHold(),
+            Commands.either(
+                CoralHold(),
+                IntakeCoral(),
+                () -> EndEffector.instance.haveCoral()),
+            () -> EndEffector.instance.haveAlgae());
+    }
+
+    private Command IntakeExpel = Intake.instance.Expel();
+
+    private Command IntakeCoral() {
+        // NOTE: Must not be holding any game piece already!
+        return LoggedCommands.sequence("Intaking Coral",
+            TriggerMoveToEEPose(EEPose.GROUND_INTAKE),
+            WaitForEEPose(),
+            Commands.parallel(
+                EndEffector.instance.StartCoralIntake(),
+                Intake.instance.Deploy()),
+            EndEffector.instance.WaitForState(EEState.HAVE_CORAL),
+            TriggerMoveToEEPose(EEPose.CORAL_HOLD),
+            AlgaeRoller.instance.TriggerStowWhenAble(), // Will happen asynchronously as soon as possible
+            Controls.instance.TriggerRumble())
             .finallyDo((interrupted) -> {
-                Intake.instance.Expel().schedule(); // TODO Make this a fixed command instead of new object?
-                if (!interrupted) { // Means we got coral
-                    // Move into coral ready position
-                } else {
+                IntakeExpel.schedule(); // TODO Make this a fixed command instead of new object?
+                if (interrupted) {
+                    // We didn't get coral, so stop the intake
                     EndEffector.instance.StopIntake().schedule();
                 }
             });

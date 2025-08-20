@@ -389,13 +389,6 @@ public class Elevator extends SubsystemBase {
         DogLog.log("Elevator/Status", "Final target: " + target + " <- " + finalTarget);
         finalTarget = target;
 
-        // TODO Intelligence about moving through zones 
-        if (target == currentTarget) {
-            // Trivially, we are already there or at least moving there next, so
-            // there's not need to adjust the setpoint
-            return;
-        }
-
         Angle currentPosition = mainMotor.getPosition().getValue();
         Angle targetPosition = target.position;
         boolean goingUp = currentPosition.lt(targetPosition);
@@ -531,6 +524,7 @@ public class Elevator extends SubsystemBase {
         DogLog.log("Elevator/followoltage", followerMotor.getMotorVoltage().getValueAsDouble());
         DogLog.log("Elevator/stallCount", stallCount);
         DogLog.log("Elevator/clearState", clearState.name());
+        DogLog.log("Elevator/atTarget", atTarget());
 
         SmartDashboard.putBoolean("Elevator/Stalled", isStalled());
         SmartDashboard.putBoolean("Elevator/Moving", voltage != 0.0);

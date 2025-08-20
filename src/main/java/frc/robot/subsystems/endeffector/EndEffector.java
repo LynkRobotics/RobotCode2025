@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,7 +34,7 @@ public class EndEffector extends SubsystemBase {
         HAVE_ALGAE,
         HAVE_CORAL
     }
-    public EEState state = EEState.EMPTY;
+    private EEState state = EEState.EMPTY;
 
     public enum EEIntakeState {
         STOPPED,
@@ -47,6 +48,9 @@ public class EndEffector extends SubsystemBase {
     private EEPosition desiredPosition = EEPosition.START;
     private boolean atDesiredPosition = true;
     private boolean waitingToPivot = false;
+
+    private Debouncer coralDebouncer = new Debouncer(EndEffectorConstants.coralSensorDebounce.in(Units.Seconds), Debouncer.DebounceType.kBoth);
+    private Debouncer algaeDebouncer = new Debouncer(EndEffectorConstants.algaeSensorDebounce.in(Units.Seconds), Debouncer.DebounceType.kBoth);
 
     /* Devices */
     private final TalonFX positionMotor;
@@ -107,6 +111,14 @@ public class EndEffector extends SubsystemBase {
             Commands.runOnce(pieceMotor::stopMotor, this));
     }
 
+    public boolean haveCoral() {
+        return state == EEState.HAVE_CORAL;
+    }
+
+    public boolean haveAlgae() {
+        return state == EEState.HAVE_ALGAE;
+    }
+
     public Command WaitForState(EEState desiredState) {
         return LoggedCommands.waitUntil("Wait for EE state " + desiredState, () -> state == desiredState );
     }
@@ -159,12 +171,20 @@ public class EndEffector extends SubsystemBase {
         return LoggedCommands.runOnce("Stop intake", () -> pieceMotor.stopMotor(), this);
     }
 
-    public boolean coralDetected() {
+    private boolean coralDetectedRaw() {
         return !candi.getS1Closed().getValue();
     }
 
-    public boolean algaeDetected() {
+    private boolean coralDetected() {
+        return coralDebouncer.calculate(coralDetectedRaw());
+    }
+
+    private boolean algaeDetectedRaw() {
         return !candi.getS2Closed().getValue();
+    }
+
+    private boolean algaeDetected() {
+        return algaeDebouncer.calculate(algaeDetectedRaw());
     }
 
     private boolean okToMove() {
@@ -252,6 +272,17 @@ public class EndEffector extends SubsystemBase {
                 state = EEState.HAVE_CORAL;
                 pieceMotor.setControl(EEControl.CORAL_HOLD.control);
                 intakeState = EEIntakeState.STOPPED;
+            }
+        }
+        if (state == EEState.HAVE_CORAL) {
+            if (!coralDetected()) {
+                state = EEState.EMPTY;
+                DogLog.log("EndEffector/Status", "Coral lost");
+            }
+        } else if (state == EEState.HAVE_ALGAE) {
+            if (!algaeDetected()) {
+                state = EEState.EMPTY;
+                DogLog.log("EndEffector/Status", "Algae lost");
             }
         }
     }

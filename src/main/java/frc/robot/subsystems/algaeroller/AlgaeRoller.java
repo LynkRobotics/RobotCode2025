@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedCommands;
 import frc.robot.Ports;
 import frc.robot.subsystems.algaeroller.AlgaeRollerContants.AlgaeRollerPosition;
+import frc.robot.subsystems.elevator.Elevator;
 
 public class AlgaeRoller extends SubsystemBase {
     public static final AlgaeRoller instance = new AlgaeRoller();
@@ -23,6 +24,8 @@ public class AlgaeRoller extends SubsystemBase {
     private final VoltageOut intakeControl = new VoltageOut(AlgaeRollerContants.intakeVoltage).withEnableFOC(true);
     private final VoltageOut expelControl = new VoltageOut(AlgaeRollerContants.expelVoltage).withEnableFOC(true);
     private final VoltageOut L1AssistControl = new VoltageOut(AlgaeRollerContants.L1AssistVoltage).withEnableFOC(true);
+
+    boolean waitingToStow = false;
     
     AlgaeRoller() {
         /* Devices */
@@ -51,9 +54,18 @@ public class AlgaeRoller extends SubsystemBase {
         return deployMotor.getPosition().getValue().lte(AlgaeRollerPosition.CLEAR.position.plus(AlgaeRollerContants.epsilon));
     }
 
-    public void ensureClear() {
+    private void ensureClear() {
         if (!isClear()) {
             moveTo(AlgaeRollerPosition.CLEAR);
+        }
+    }
+
+    private void stowWhenAble() {
+        if (Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH)) {
+            moveTo(AlgaeRollerPosition.STOWED);
+        } else {
+            DogLog.log("Algae Roller/Status", "Delaying stow due to elevator position");
+            waitingToStow = true;
         }
     }
 
@@ -63,15 +75,16 @@ public class AlgaeRoller extends SubsystemBase {
 
     private void moveTo(AlgaeRollerPosition position) {
         DogLog.log("Algae Roller/Status", "Moving to " + position.name());
+        waitingToStow = false;
         deployMotor.setControl(position.control);
+    }
+
+    public Command TriggerStowWhenAble() {
+        return LoggedCommands.runOnce("Stow algae roller", this::stowWhenAble, this);
     }
 
     public static Command Intake() {
         return LoggedCommands.print("Intake algae", "TODO Implement intake algae");
-    }
-
-    public Command Retract() {
-        return LoggedCommands.print("Retract algae roller", "TODO Implement retract algae roller");
     }
 
     public static Command GuideL1Coral() {
@@ -88,11 +101,16 @@ public class AlgaeRoller extends SubsystemBase {
         DogLog.log("Algae Roller/Current Command", currentCommand == null ? "None" : currentCommand.getName());
         DogLog.log("Algae Roller/Fully Deployed?", fullyDeployed());
         DogLog.log("Algae Roller/Clear?", isClear());
+        DogLog.log("Algae Roller/Waiting to stow?", waitingToStow);
         DogLog.log("Algae Roller/Deploy Current", deployMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("Algae Roller/Deploy Velocity", deployMotor.getVelocity().getValueAsDouble());
         DogLog.log("Algae Roller/Deploy Position (rotations)", deployMotor.getPosition().getValue().in(Units.Rotations));
         DogLog.log("Algae Roller/Deploy Position (degress)", deployMotor.getPosition().getValue().in(Units.Degrees));
         DogLog.log("Algae Roller/Intake Current", rollerMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("Algae Roller/Intake Velocity", rollerMotor.getVelocity().getValueAsDouble());
+
+        if (waitingToStow && Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH)) {
+            moveTo(AlgaeRollerPosition.STOWED);
+        }
     }
 }
