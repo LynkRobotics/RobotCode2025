@@ -8,8 +8,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Time;
 import frc.robot.Robot;
-
 
 public class ElevatorConstants {
     // NOTE Elevator height is measured from the ground to top of the carriage
@@ -23,6 +23,8 @@ public class ElevatorConstants {
     // TODO Reevaluate these values
 
     public static final double rotPerInch = 4.35 / 29.25; // Rotations to drive elevator one inch
+    public static final Time stallTimeout = Units.Seconds.of(0.06);
+    public static final Distance autoZeroHeight = Units.Inches.of(2.0);
 
     public static final Distance safetyMargin = Units.Inches.of(1.5);   // How many inches away from safe mark to still be considered safe
     public static final double positionError = rotPerInch * 0.5; // Allowable rotation error to be considered in position
@@ -39,7 +41,6 @@ public class ElevatorConstants {
 
     public enum Stop {
         STOW(Units.Inches.of(0.0)),
-        SAFE(Units.Inches.of(1.5)),
         L1(Units.Inches.of(0.0)),
         L2(Units.Inches.of(6.3)),
         L3(L2.height.plus(Units.Inches.of(16.0))),
