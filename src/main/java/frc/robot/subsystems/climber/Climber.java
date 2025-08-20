@@ -93,12 +93,10 @@ public class Climber extends SubsystemBase {
             LoggedCommands.runOnce("Stop stalled climber", () -> intakeMotor.stopMotor(), this));
     }
 
-    public Command DeployAndIntake() {
-        return LoggedCommands.deadline("Deploy and Intake climber", 
-            WaitForIntake(),
+    public Command GrabCage() {
+        return LoggedCommands.sequence("Grab Cage",
             Deploy(),
-            Intake()
-        );
+            IntakeUntilStalled());
     }
 
     private Command WaitForIntake() {

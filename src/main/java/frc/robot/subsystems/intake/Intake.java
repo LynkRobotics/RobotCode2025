@@ -78,7 +78,7 @@ public class Intake extends SubsystemBase {
     }
 
     private void stopIntake() {
-        DogLog.log("Intake/Status", "Expelling Intake");
+        DogLog.log("Intake/Status", "Stopping Intake");
         intakeMotor.stopMotor();
         indexMotor.stopMotor();
         deployMotor.setControl(IntakePosition.RETRACTED.control);
@@ -92,9 +92,9 @@ public class Intake extends SubsystemBase {
         return LoggedCommands.runOnce("Expel from Intake", this::runExpel, this);
     }
 
-    // public Command Stop() {
-    //     return LoggedCommands.runOnce("Stop Intake", this::stopIntake, this);
-    // }
+    public Command Stop() {
+        return LoggedCommands.runOnce("Stop Intake", this::stopIntake, this);
+    }
 
     // Gently deploy intake until it stalls to recalibrate the zero position
     public Command ZeroIntake() {

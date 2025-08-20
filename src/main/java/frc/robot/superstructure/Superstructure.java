@@ -18,6 +18,7 @@ import frc.robot.commands.pidswerve.PIDSwerve;
 import frc.robot.commands.pidswerve.PIDSwerveConstants.PIDSpeed;
 import frc.robot.subsystems.algaeroller.AlgaeRoller;
 import frc.robot.subsystems.algaeroller.AlgaeRollerContants.AlgaeRollerPosition;
+import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.controls.Controls;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.elevator.Elevator;
@@ -287,5 +288,16 @@ public class Superstructure extends SubsystemBase {
             Intake.instance.Expel(),
             EndEffector.instance.StopIntake()
         );
+    }
+
+    public Command GrabCage() {
+        // TODO Reject if holding coral (need to expel it first)
+        return LoggedCommands.sequence("Grab cage",
+            // Ensure all rollers idle
+            TriggerMoveToEEPose(EEPose.GROUND_INTAKE),
+            Intake.instance.Stop(), // TODO Only if no coral in index
+            WaitForEEPose(),
+            AlgaeRoller.instance.TriggerStow(),
+            Climber.instance.GrabCage());
     }
 }
