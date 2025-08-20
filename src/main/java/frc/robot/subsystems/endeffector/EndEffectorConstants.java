@@ -157,7 +157,7 @@ public class EndEffectorConstants {
 	public static CANcoderConfiguration getGeared40TCancoderConfig() {
 		CANcoderConfiguration config = new CANcoderConfiguration();
 		config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
-		config.MagnetSensor.MagnetOffset = 0.057373046875;
+		config.MagnetSensor.MagnetOffset = 0.22412109375;
 		config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
 		return config;
 	}
@@ -165,7 +165,7 @@ public class EndEffectorConstants {
 	public static CANcoderConfiguration getDirect41TCancoderConfig() {
 		CANcoderConfiguration config = new CANcoderConfiguration();
 		config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
-		config.MagnetSensor.MagnetOffset = 0.366455078125;
+		config.MagnetSensor.MagnetOffset = 0.1650390625;
 		config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
 		return config;
 	}
