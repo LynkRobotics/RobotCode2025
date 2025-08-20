@@ -20,7 +20,7 @@ public class LoggedAlert {
         String formattedLog = new String(subsystem + ": " + "Error: " + title + ": " + msg);
         DogLog.logFault(formattedLog, AlertType.kError);
         DogLog.logFault(formattedLog);
-        LED.triggerError(); //TODO: i dont really like subsystem calls in util classes
+        // TODO LED.triggerError(); //TODO: i dont really like subsystem calls in util classes
     }
 
     /**
@@ -35,7 +35,7 @@ public class LoggedAlert {
         String formattedLog = new String(subsystem + ": " + "Warning: " + title + ": " + msg);
         DogLog.logFault(formattedLog, AlertType.kWarning);
         DogLog.logFault(formattedLog);
-        LED.triggerWarning();
+        // TODO LED.triggerWarning();
     }
 
     /**
@@ -50,6 +50,6 @@ public class LoggedAlert {
         String formattedLog = new String(subsystem + ": " + "Info: " + title + ": " + msg);
         DogLog.logFault(formattedLog, AlertType.kWarning);
         DogLog.logFault(formattedLog);
-        LED.triggerInfo();
+        // TODO LED.triggerInfo();
     }
 }
