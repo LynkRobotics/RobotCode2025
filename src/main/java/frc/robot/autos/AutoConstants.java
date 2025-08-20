@@ -46,7 +46,7 @@ public final class AutoConstants {
             1.916, // 3847 Spectrum Vex GripLock v2 CoF
             DCMotor.getKrakenX60Foc(1),
             SwerveConstants.chosenModule.driveGearRatio,
-            SwerveConstants.driveCurrentLimit,
+            SwerveConstants.driveStatorCurrentLimit,
             1),
         new Translation2d(SwerveConstants.wheelBase.div(2.0), SwerveConstants.trackWidth.div(2.0)),
         new Translation2d(SwerveConstants.wheelBase.div(2.0), SwerveConstants.trackWidth.div(2.0).unaryMinus()),
