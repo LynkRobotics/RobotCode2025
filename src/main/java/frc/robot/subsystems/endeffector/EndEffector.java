@@ -106,7 +106,7 @@ public class EndEffector extends SubsystemBase {
 
         return LoggedCommands.sequence("Expel coral for " + level,
             Commands.runOnce(() -> pieceMotor.setControl(control.control), this),
-            // TODO Wait for beam break
+            LoggedCommands.waitUntil("Wait for coral to clear", () -> state == EEState.EMPTY),
             Commands.waitSeconds(postClearDelay),
             Commands.runOnce(pieceMotor::stopMotor, this));
     }
@@ -247,6 +247,10 @@ public class EndEffector extends SubsystemBase {
             // TODO Debounce?
             if (desiredPosition.position.minus(position).abs(Units.Degrees) < EndEffectorConstants.pivotEpsilon.in(Units.Degrees)) {
                 atDesiredPosition = true;
+                // Hack if necessary to reseed the desired position
+                // if (desiredPosition == EEPosition.GROUND_INTAKE) {
+                //     positionMotor.setPosition(directCancoder.getAbsolutePosition().getValue());            
+                // }
             }
         }
         if (waitingToPivot) {
