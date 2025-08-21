@@ -167,8 +167,8 @@ public class Autos extends SubsystemBase {
         ReefFace mirroredFace = AutoConstants.mirroredFaces.get(face);
 
         return Commands.either(
-            Superstructure.DeAlgaefy(mirroredFace, extendedBackup),
-            Superstructure.DeAlgaefy(face, extendedBackup),
+            Superstructure.instance.DeAlgaefy(mirroredFace, extendedBackup),
+            Superstructure.instance.DeAlgaefy(face, extendedBackup),
             Superstructure.instance::shouldMirror);
     }
 

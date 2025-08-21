@@ -30,9 +30,7 @@ import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.pose.PoseConstants;
 import frc.robot.subsystems.pose.PoseConstants.ReefFace;
-import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionConstants.CameraMode;
-import frc.robot.Field.ReefLevel;;
+import frc.robot.Field.ReefLevel;
 
 public class Superstructure extends SubsystemBase {
     public static final Superstructure instance = new Superstructure();
@@ -45,9 +43,10 @@ public class Superstructure extends SubsystemBase {
         L4(EEPosition.L4, Stop.L4),
         BARGE(EEPosition.BARGE, Stop.BARGE),
         GROUND_INTAKE(EEPosition.GROUND_INTAKE, Stop.STOW),
-        REEF_INTAKE_L2(EEPosition.REEF_INTAKE, Stop.L2),
-        REEF_INTAKE_L3(EEPosition.REEF_INTAKE, Stop.L3),
-        // REEF_PREP
+        REEF_INTAKE_L2(EEPosition.REEF_INTAKE, Stop.L2_ALGAE),
+        REEF_INTAKE_L2_LIFT(EEPosition.REEF_INTAKE, Stop.L2_ALGAELIFT),
+        REEF_INTAKE_L3(EEPosition.REEF_INTAKE, Stop.L3_ALGAE),
+        REEF_INTAKE_L3_LIFT(EEPosition.REEF_INTAKE, Stop.L3_ALGAELIFT),
         PROCESSOR(EEPosition.GROUND_INTAKE, Stop.STOW),
         ALGAE_HOLD(EEPosition.ALGAE_HOLD, Stop.ALGAE_HOLD),
         CORAL_HOLD(EEPosition.CORAL_HOLD, Stop.CORAL_HOLD),
@@ -170,48 +169,42 @@ public class Superstructure extends SubsystemBase {
             EndEffector.instance::haveCoral);
     }
 
-    public static Command DeAlgaefy(ReefFace face) {
+    public Command DeAlgaefy(ReefFace face) {
         return DeAlgaefy(face, true);
     }
 
-    // Safely move End Effector (and Elevator) to required pose
-    // TODO Should this be a class?
-    public static Command SafeEEPose(EEPose pose) {
-        return LoggedCommands.print("Safe EE Pose", "TODO Implement Safe EE Pose for " + pose.name());
-    }
-
-    public static Command DeAlgaefy(ReefFace face, boolean extendedBackup) {
+    public Command DeAlgaefy(ReefFace face, boolean extendedBackup) {
         EEPose algaePose = face.algaeHigh ? EEPose.REEF_INTAKE_L3 : EEPose.REEF_INTAKE_L2;
         EEPose algaeInvertPose = face.algaeHigh ? EEPose.REEF_INTAKE_L2 : EEPose.REEF_INTAKE_L3;
+        EEPose algaeLiftPose = face.algaeHigh ? EEPose.REEF_INTAKE_L3_LIFT : EEPose.REEF_INTAKE_L2_LIFT;
+        EEPose algaeInvertLiftPose = face.algaeHigh ? EEPose.REEF_INTAKE_L2_LIFT : EEPose.REEF_INTAKE_L3_LIFT;
 
         return LoggedCommands.sequence("Fully acquire Algae from " + face.toString(),
             LoggedCommands.deadline("Acquire Algae from " + face.toString(),
                 Commands.sequence(
-                    EndEffector.instance.WaitForState(EEState.HAVE_ALGAE),
+                    EndEffector.instance.WaitForAlgae(),
                     Controls.instance.TriggerRumble()),
                 Commands.sequence(
-                    Vision.SwitchToFrontVision(),
-                    EndEffector.instance.StartAlgaeIntake(),
-                    LoggedCommands.parallel("Prepare for reef algae intake",
+                    LoggedCommands.deadline("Reef algae prep",
+                        Commands.sequence(
+                            EndEffector.instance.StartAlgaeIntake(),
+                            Commands.either(
+                                TriggerMoveToEEPose(algaeInvertPose),
+                                TriggerMoveToEEPose(algaePose),
+                                optInvertAlgae),
+                            AlgaeRoller.instance.TriggerStowWhenStopped(),
+                            WaitForEEPose()),
                         Commands.sequence(
                             new PIDSwerve(Swerve.instance, Pose.instance, face.approachAlgaeMiddle, true, false),
                             Swerve.instance.Stop()                            
-                        ),
-                        Commands.sequence(
-                            Commands.either(
-                                SafeEEPose(algaeInvertPose),
-                                SafeEEPose(algaePose),
-                                optInvertAlgae
-                            ),
-                            AlgaeRoller.instance.TriggerStowWhenStopped()
                         )),
                     new PIDSwerve(Swerve.instance, Pose.instance, face.alignAlgaeMiddle, true, true),
                     Swerve.instance.Stop())),
-            new PIDSwerve(Swerve.instance, Pose.instance, extendedBackup ? face.algaeBackupExtended : face.algaeBackupShort, true, false))
-            .handleInterrupt(() -> {
-                // if (!RobotState.haveAlgae()) RobotState.setNoAlgae();
-                Vision.setCameraMode(CameraMode.DEFAULT);
-            });
+            Commands.either(
+                TriggerMoveToEEPose(algaeInvertLiftPose),
+                TriggerMoveToEEPose(algaeLiftPose),
+                optInvertAlgae),    
+            new PIDSwerve(Swerve.instance, Pose.instance, extendedBackup ? face.algaeBackupExtended : face.algaeBackupShort, true, false));
     }
 
     public Command SetStop(Stop stop) {
