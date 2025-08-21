@@ -130,7 +130,7 @@ public class Intake extends SubsystemBase {
         DogLog.log("Intake/Index Velocity", indexMotor.getVelocity().getValueAsDouble());
 
         // Detect intake deployment stalls by checking the current
-        if (stallDebouncer.calculate(deployMotor.getTorqueCurrent().getValue().gt(IntakeConstants.deployStallCurrent))) {
+        if (stallDebouncer.calculate(deployMotor.getTorqueCurrent().getValue().lt(IntakeConstants.deployStallCurrent))) {
             if (zeroing) {
                 DogLog.log("Intake/Status", "Intake deploy zeroing complete");
                 zeroing = false;
