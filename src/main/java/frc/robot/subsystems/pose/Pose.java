@@ -188,13 +188,13 @@ public class Pose extends SubsystemBase {
 
     public static Rotation2d reefBearing(Translation2d position) {
         Translation2d reefCenter = flipIfRed(PoseConstants.reefCenter);
-        Translation2d relativePosition = reefCenter.minus(position);
+        Translation2d relativePosition = position.minus(reefCenter);
 
         return relativePosition.getAngle();
     }
 
     public static ReefFace nearestFace(Translation2d position) {
-        Rotation2d reefBearing = flipIfRed(reefBearing(position));
+        Rotation2d reefBearing = flipIfRed(reefBearing(position)).rotateBy(Rotation2d.k180deg); // Built when we would face the reef
         double bearingAngle = MathUtil.inputModulus(reefBearing.getDegrees(), -180, 180);
 
         if (bearingAngle > 150 || bearingAngle < -150) {
