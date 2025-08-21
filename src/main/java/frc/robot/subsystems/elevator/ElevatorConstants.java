@@ -42,6 +42,7 @@ public class ElevatorConstants {
     public enum Stop {
         STOW(Units.Inches.of(0.0)),
         L1(Units.Inches.of(0.0)),
+        FEED_ALGAE(Units.Inches.of(2.0)),
         L2(Units.Inches.of(6.3)),
         L3(L2.height.plus(Units.Inches.of(16.0))),
         L4(Units.Inches.of(60.25)),

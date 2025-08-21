@@ -42,7 +42,8 @@ public class Superstructure extends SubsystemBase {
         L3(EEPosition.L23, Stop.L3),
         L4(EEPosition.L4, Stop.L4),
         BARGE(EEPosition.BARGE, Stop.BARGE),
-        GROUND_INTAKE(EEPosition.GROUND_INTAKE, Stop.STOW),
+        GROUND_CORAL(EEPosition.GROUND_INTAKE, Stop.STOW),
+        GROUND_ALGAE(EEPosition.GROUND_INTAKE, Stop.FEED_ALGAE),
         REEF_INTAKE_L2(EEPosition.REEF_INTAKE, Stop.L2_ALGAE),
         REEF_INTAKE_L2_LIFT(EEPosition.REEF_INTAKE, Stop.L2_ALGAELIFT),
         REEF_INTAKE_L3(EEPosition.REEF_INTAKE, Stop.L3_ALGAE),
@@ -162,7 +163,7 @@ public class Superstructure extends SubsystemBase {
                         //     Elevator.instance.WaitForNext(),
                         //     Elevator.instance.AutoElevatorUp(left ? face.alignCoralLeft.getTranslation() : face.alignCoralRight.getTranslation())))),
                 Superstructure.PlaceCoral(),
-                TriggerMoveToEEPose(EEPose.GROUND_INTAKE),
+                TriggerMoveToEEPose(EEPose.GROUND_CORAL),
                 AlgaeRoller.instance.TriggerStowWhenStopped()
             ),
             LoggedCommands.log("Cannot score coral without coral"),
@@ -290,7 +291,7 @@ public class Superstructure extends SubsystemBase {
     private Command IntakeCoral() {
         // NOTE: Must not be holding any game piece already!
         return LoggedCommands.sequence("Intaking Coral",
-            TriggerMoveToEEPose(EEPose.GROUND_INTAKE),
+            TriggerMoveToEEPose(EEPose.GROUND_CORAL),
             WaitForEEPose(),
             Commands.parallel(
                 EndEffector.instance.StartCoralIntake(),
@@ -319,7 +320,7 @@ public class Superstructure extends SubsystemBase {
         // TODO Reject if holding coral (need to expel it first)
         return LoggedCommands.sequence("Grab cage",
             // Ensure all rollers idle
-            TriggerMoveToEEPose(EEPose.GROUND_INTAKE),
+            TriggerMoveToEEPose(EEPose.GROUND_CORAL),
             Intake.instance.Stop(), // TODO Only if no coral in index
             WaitForEEPose(),
             AlgaeRoller.instance.TriggerStow(),
@@ -332,7 +333,7 @@ public class Superstructure extends SubsystemBase {
                 EndEffector.instance.WaitForAlgae(),
                 Commands.sequence(
                     AlgaeRoller.instance.TriggerDeploy(),
-                    TriggerMoveToEEPose(EEPose.GROUND_INTAKE),
+                    TriggerMoveToEEPose(EEPose.GROUND_ALGAE),
                     WaitForEEPose(),
                     EndEffector.instance.StartAlgaeIntake(),
                     AlgaeRoller.instance.StartIntake())),
