@@ -26,7 +26,8 @@ public class AlgaeRollerContants {
 		PROCESSOR(70.0),
 		CLEAR(65.0),
 		L1_SCORE(55.0),
-		DEPLOYED(23.0);
+		DEPLOYED(23.0),
+		ALGAE_CLEAR(40.0);
 
 		public final Angle position;
 		public final ControlRequest control;
