@@ -157,6 +157,7 @@ public class Superstructure extends SubsystemBase {
                         Swerve.instance.Stop()),
                     Commands.sequence(
                         TriggerMoveToActiveCoral(),
+                        AlgaeRoller.instance.TriggerStowWhenStopped(),
                         WaitForEEPose())),
                         // LoggedCommands.deadline("Wait for auto up",
                         //     Elevator.instance.WaitForNext(),
