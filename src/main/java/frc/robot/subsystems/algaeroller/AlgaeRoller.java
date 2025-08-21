@@ -26,7 +26,8 @@ public class AlgaeRoller extends SubsystemBase {
     private final ControlRequest expelControl = new VoltageOut(AlgaeRollerContants.expelVoltage).withEnableFOC(true);
     private final ControlRequest L1AssistControl = new VoltageOut(AlgaeRollerContants.L1AssistVoltage).withEnableFOC(true);
 
-    boolean waitingToStow = false;
+    boolean waitingForClear = false;
+    boolean waitingForStop = false;
 
     AlgaeRollerPosition currentTarget;
     
@@ -76,12 +77,21 @@ public class AlgaeRoller extends SubsystemBase {
         }
     }
 
-    private void stowWhenAble() {
+    private void stowWhenClear() {
         if (Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH)) {
             moveTo(AlgaeRollerPosition.STOWED);
         } else {
             DogLog.log("Algae Roller/Status", "Delaying stow due to elevator position");
-            waitingToStow = true;
+            waitingForClear = true;
+        }
+    }
+
+    private void stowWhenStopped() {
+        if (Elevator.instance.atTarget()) {
+            moveTo(AlgaeRollerPosition.STOWED);
+        } else {
+            DogLog.log("Algae Roller/Status", "Delaying stow due to elevator movement");
+            waitingForStop = true;
         }
     }
 
@@ -91,12 +101,16 @@ public class AlgaeRoller extends SubsystemBase {
 
     private void moveTo(AlgaeRollerPosition position) {
         DogLog.log("Algae Roller/Status", "Moving to " + position.name());
-        waitingToStow = false;
+        waitingForClear = waitingForStop = false;
         deployMotor.setControl(position.control);
     }
 
-    public Command TriggerStowWhenAble() {
-        return LoggedCommands.runOnce("Stow algae roller when able", this::stowWhenAble, this);
+    public Command TriggerStowWhenClear() {
+        return LoggedCommands.runOnce("Stow algae roller when clear", this::stowWhenClear, this);
+    }
+
+    public Command TriggerStowWhenStopped() {
+        return LoggedCommands.runOnce("Stow algae roller when stopped", this::stowWhenStopped, this);
     }
 
     public Command TriggerStow() {
@@ -120,7 +134,8 @@ public class AlgaeRoller extends SubsystemBase {
         Command currentCommand = getCurrentCommand();
         DogLog.log("Algae Roller/Current Command", currentCommand == null ? "None" : currentCommand.getName());
         DogLog.log("Algae Roller/Clear?", isClear());
-        DogLog.log("Algae Roller/Waiting to stow?", waitingToStow);
+        DogLog.log("Algae Roller/Waiting for clear?", waitingForClear);
+        DogLog.log("Algae Roller/Waiting for stop?", waitingForStop);
         DogLog.log("Algae Roller/Deploy Current", deployMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("Algae Roller/Deploy Velocity", deployMotor.getVelocity().getValueAsDouble());
         DogLog.log("Algae Roller/Deploy Position (rotations)", deployMotor.getPosition().getValue().in(Units.Rotations));
@@ -128,7 +143,9 @@ public class AlgaeRoller extends SubsystemBase {
         DogLog.log("Algae Roller/Intake Current", rollerMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("Algae Roller/Intake Velocity", rollerMotor.getVelocity().getValueAsDouble());
 
-        if (waitingToStow && Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH)) {
+        if (waitingForClear && Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH)) {
+            moveTo(AlgaeRollerPosition.STOWED);
+        } else if (waitingForStop && Elevator.instance.atTarget()) {
             moveTo(AlgaeRollerPosition.STOWED);
         }
     }

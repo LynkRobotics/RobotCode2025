@@ -4,8 +4,6 @@ import static frc.robot.Options.optAutoReefAiming;
 
 import java.util.function.Supplier;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,16 +12,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.LoggedCommands;
-import frc.lib.util.LoggedAlert;
 import frc.robot.Constants;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
-import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
 import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.superstructure.Superstructure;
 import frc.robot.commands.TeleopSwerve;
-import frc.robot.commands.pidswerve.PIDSwerve;
+import frc.robot.Field.ReefLevel;
 
 public class Controls extends SubsystemBase{
     public static final Controls instance = new Controls();
@@ -89,13 +85,13 @@ public class Controls extends SubsystemBase{
         // unjam.onTrue(Intake.instance.Expel());
         // score.whileTrue(Superstructure.ScoreGamePiece()); // Also useful to dump Algae or put it into Processor
 
-        L4.onTrue(Superstructure.instance.SetStop(Stop.L4));
-        L3.onTrue(Superstructure.instance.SetStop(Stop.L3));
-        L2.onTrue(Superstructure.instance.SetStop(Stop.L2));
-        L1.onTrue(Superstructure.instance.SetStop(Stop.L1));
+        L4.onTrue(Superstructure.SetActiveReefLevel(ReefLevel.L4));
+        L3.onTrue(Superstructure.SetActiveReefLevel(ReefLevel.L3));
+        L2.onTrue(Superstructure.SetActiveReefLevel(ReefLevel.L2));
+        L1.onTrue(Superstructure.SetActiveReefLevel(ReefLevel.L1));
 
-        // goLeft.whileTrue(Superstructure.instance.SmartScore(true));
-        // goRight.whileTrue(Superstructure.instance.SmartScore(false));
+        goLeft.whileTrue(Superstructure.instance.SmartScore(true));
+        goRight.whileTrue(Superstructure.instance.SmartScore(false));
 
         alignmentToggle.onTrue(LoggedCommands.runOnce("Toggle Alignment", optAutoReefAiming::toggle));
 

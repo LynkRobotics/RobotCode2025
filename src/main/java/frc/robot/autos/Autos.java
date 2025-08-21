@@ -137,7 +137,7 @@ public class Autos extends SubsystemBase {
                         Elevator.instance.WaitForNext(),
                         Elevator.instance::atNextStop)),
                 LoggedCommands.proxy(RaiseElevatorAtDistance(raiseDistance))),
-            Superstructure.ScoreGamePiece());
+            Superstructure.PlaceCoral());
     }
 
     private Command MaybeWaitForCoral() {
@@ -158,8 +158,8 @@ public class Autos extends SubsystemBase {
         ReefFace mirroredFace = AutoConstants.mirroredFaces.get(face);
 
         return Commands.either(
-            Superstructure.ScoreCoral(mirroredFace, !left),
-            Superstructure.ScoreCoral(face, left),
+            Superstructure.instance.ScoreCoral(mirroredFace, !left),
+            Superstructure.instance.ScoreCoral(face, left),
             Superstructure.instance::shouldMirror);
     }
 

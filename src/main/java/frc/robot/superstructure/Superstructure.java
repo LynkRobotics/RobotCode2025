@@ -30,12 +30,13 @@ import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.pose.PoseConstants;
 import frc.robot.subsystems.pose.PoseConstants.ReefFace;
-import frc.robot.subsystems.robotstate.RobotState;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants.CameraMode;
+import frc.robot.Field.ReefLevel;;
 
 public class Superstructure extends SubsystemBase {
     public static final Superstructure instance = new Superstructure();
+    private static ReefLevel activeReefLevel = ReefLevel.L4;
 
     public static enum EEPose {
         L1(EEPosition.L1, Stop.L1),
@@ -88,6 +89,10 @@ public class Superstructure extends SubsystemBase {
             Swerve.instance.Stop()));
     }
 
+    public static Command SetActiveReefLevel(ReefLevel level) {
+        return LoggedCommands.runOnce("Change active reef level to " + level, () -> activeReefLevel = level);
+    }
+
     private Command TriggerMoveToEEPose(EEPose pose) {
         return LoggedCommands.sequence("Move to EE Pose " + pose.name(),
             Commands.either(
@@ -96,6 +101,16 @@ public class Superstructure extends SubsystemBase {
                 () -> pose.stop.position.lte(Stop.CLEAR_HIGH.position) || !Elevator.instance.isClear(ClearState.CLEAR_HIGH)),
             EndEffector.instance.TriggerMoveTo(pose.position),
             Elevator.instance.TriggerMoveTo(pose.stop));
+    }
+
+    private Command TriggerMoveToActiveCoral() {
+        return Commands.either(
+            TriggerMoveToEEPose(EEPose.L2),
+            Commands.either(
+                TriggerMoveToEEPose(EEPose.L3),
+                TriggerMoveToEEPose(EEPose.L4),
+                () -> activeReefLevel == ReefLevel.L3),
+            () -> activeReefLevel == ReefLevel.L2);
     }
 
     private Command WaitForEEPose() {
@@ -109,17 +124,16 @@ public class Superstructure extends SubsystemBase {
         deAlgaefyRightCommands.put(face, DeAlgaefy(face));
     }
     
-    public static Command ScoreCoral(ReefFace face, boolean left) {
+    public Command ScoreCoral(ReefFace face, boolean left) {
         return Commands.either(
             LoggedCommands.sequence("Auto Align " + (left ? "Left " : "Right ") + face.toString() + " & Score",
                 LoggedCommands.parallel("PID Align " + (left ? "Left " : "Right ") + face.toString(),
                     Commands.sequence(
-                        Vision.SwitchToFrontVision(),
                         Commands.race(
                             Commands.sequence(
                                 Commands.either(
                                     Commands.sequence(
-                                        new PIDSwerve(Swerve.instance, Pose.instance, left ? face.approachCoralLeft : face.approachCoralRight, true, false, PIDSpeed.TURBO),
+                                        // new PIDSwerve(Swerve.instance, Pose.instance, left ? face.approachCoralLeft : face.approachCoralRight, true, false, PIDSpeed.TURBO),
                                         new PIDSwerve(Swerve.instance, Pose.instance, left ? face.alignCoralLeft : face.alignCoralRight, true, true)
                                     ),
                                     Commands.sequence(
@@ -132,7 +146,7 @@ public class Superstructure extends SubsystemBase {
                                             Elevator.instance::nearNextStop),
                                         new PIDSwerve(Swerve.instance, Pose.instance, left ? face.alignCoralLeft : face.alignCoralRight, true, true)
                                     ),
-                                    () -> false)), //RobotState.getNextStop() == Stop.L2 || RobotState.getNextStop() == Stop.L3)),
+                                    () -> true)), //RobotState.getNextStop() == Stop.L2 || RobotState.getNextStop() == Stop.L3)),
                             Commands.either(
                                 Commands.sequence(
                                     LoggedCommands.waitSeconds("Score coral watchdog", AutoConstants.scoreCoralTimeout),
@@ -142,15 +156,17 @@ public class Superstructure extends SubsystemBase {
                                 () -> DriverStation.isAutonomousEnabled() && DriverStation.getMatchTime() >= (AutoConstants.scoreCoralTimeout + AutoConstants.scoreCoralTimeLeft))),
                         Swerve.instance.Stop()),
                     Commands.sequence(
-                        Superstructure.WaitForCoralReady(),
-                        LoggedCommands.deadline("Wait for auto up",
-                            Elevator.instance.WaitForNext(),
-                            Elevator.instance.AutoElevatorUp(left ? face.alignCoralLeft.getTranslation() : face.alignCoralRight.getTranslation())))),
-                Superstructure.ScoreGamePiece()
+                        TriggerMoveToActiveCoral(),
+                        WaitForEEPose())),
+                        // LoggedCommands.deadline("Wait for auto up",
+                        //     Elevator.instance.WaitForNext(),
+                        //     Elevator.instance.AutoElevatorUp(left ? face.alignCoralLeft.getTranslation() : face.alignCoralRight.getTranslation())))),
+                Superstructure.PlaceCoral(),
+                TriggerMoveToEEPose(EEPose.GROUND_INTAKE),
+                AlgaeRoller.instance.TriggerStowWhenStopped()
             ),
             LoggedCommands.log("Cannot score coral without coral"),
-            () -> RobotState.haveCoral())
-        .handleInterrupt(() -> Vision.setCameraMode(CameraMode.DEFAULT));
+            EndEffector.instance::haveCoral);
     }
 
     public static Command DeAlgaefy(ReefFace face) {
@@ -186,7 +202,7 @@ public class Superstructure extends SubsystemBase {
                                 SafeEEPose(algaePose),
                                 optInvertAlgae
                             ),
-                            AlgaeRoller.instance.TriggerStowWhenAble()
+                            AlgaeRoller.instance.TriggerStowWhenStopped()
                         )),
                     new PIDSwerve(Swerve.instance, Pose.instance, face.alignAlgaeMiddle, true, true),
                     Swerve.instance.Stop())),
@@ -231,16 +247,22 @@ public class Superstructure extends SubsystemBase {
                     LoggedCommands.proxy(BargeShot()),
                     () -> { return optAlgaeBargeOnly.get() || Pose.instance.nearProcessor(); }),
                 LoggedCommands.proxy(Commands.select(left ? deAlgaefyLeftCommands : deAlgaefyRightCommands, () -> Pose.nearestFace(Pose.instance.getPose().getTranslation()))),
-                RobotState::haveAlgae),
-            RobotState::haveCoral);
+                EndEffector.instance::haveAlgae),
+            EndEffector.instance::haveCoral);
     }
 
     public static Command IntakeAlgae() {
         return LoggedCommands.print("Intake Algae", "TODO Implement Intake Algae");
     }
 
-    public static Command ScoreGamePiece() {
-        return LoggedCommands.print("Score Game Piece", "TODO Implement Score Game Piece");
+    public static Command PlaceCoral() {
+        return LoggedCommands.either("Place Coral",
+            EndEffector.instance.ExpelCoral(ReefLevel.L2),
+            Commands.either(
+                EndEffector.instance.ExpelCoral(ReefLevel.L3),
+                EndEffector.instance.ExpelCoral(ReefLevel.L4),
+                () -> activeReefLevel == ReefLevel.L3),
+            () -> activeReefLevel == ReefLevel.L2);
     }
 
     public static Command WaitForCoral() {
@@ -281,7 +303,7 @@ public class Superstructure extends SubsystemBase {
                 Intake.instance.Deploy()),
             EndEffector.instance.WaitForState(EEState.HAVE_CORAL),
             TriggerMoveToEEPose(EEPose.CORAL_HOLD),
-            AlgaeRoller.instance.TriggerStowWhenAble(), // Will happen asynchronously as soon as possible
+            AlgaeRoller.instance.TriggerStowWhenStopped(), // Will happen asynchronously as soon as possible
             Controls.instance.TriggerRumble())
             .finallyDo((interrupted) -> {
                 IntakeExpel.schedule(); // TODO Make this a fixed command instead of new object?
