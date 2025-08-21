@@ -8,6 +8,8 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,8 +22,11 @@ import frc.robot.subsystems.intake.IntakeConstants.IntakePosition;
 
 public class Intake extends SubsystemBase {
     public static final Intake instance = new Intake();
-    public static final Timer stallTimer = new Timer();
-    public static final Timer expelTimer = new Timer();
+    
+    private static final Timer expelTimer = new Timer();
+
+    private static final Debouncer stallDebouncer = new Debouncer(IntakeConstants.deployStallTime.in(Units.Seconds), DebounceType.kRising);
+    private static boolean zeroing = false;
 
     private IntakePosition desiredState = IntakePosition.RETRACTED;
     private boolean atDesiredState = true;
@@ -57,8 +62,17 @@ public class Intake extends SubsystemBase {
         SmartDashboard.putData("Intake/Move to FULL_STOW",
             LoggedCommands.runOnce("Move Intake to FULL_STOW", () -> { deployMotor.setControl(IntakePosition.FULL_STOW.control); }, this));
 
-        deployMotor.setPosition(IntakePosition.FULL_STOW.position);
+        // We *should* be fully stowed, but given all the testing we do, also zero to start
+        deployMotor.setPosition(desiredState.position);
+        startZero();
+
+        // We could start by holding the state *if* we didn't start by zeroing
         // deployMotor.setControl(desiredState.control);
+    }
+
+    private void startZero() {
+        zeroing = true;
+        deployMotor.setControl(deployZeroingControl);
     }
 
     private void runDeploy() {
@@ -98,16 +112,7 @@ public class Intake extends SubsystemBase {
 
     // Gently deploy intake until it stalls to recalibrate the zero position
     public Command ZeroIntake() {
-        return LoggedCommands.sequence("Zeroing Coral Intake",
-            Commands.runOnce(() -> {
-                expelTimer.stop();
-                deployMotor.setControl(deployZeroingControl);
-            }, this),
-            Commands.waitUntil(() -> stallTimer.isRunning() && stallTimer.hasElapsed(IntakeConstants.deployStallTime.in(Units.Seconds))),
-            LoggedCommands.runOnce("Stop intake deploy", () -> {
-                deployMotor.stopMotor();
-                deployMotor.setPosition(IntakePosition.DEPLOYED.position);
-            }, this));
+        return LoggedCommands.runOnce("Triggering zero of Coral Intake", this::startZero, this);
     }
 
     @Override
@@ -126,12 +131,17 @@ public class Intake extends SubsystemBase {
         DogLog.log("Intake/Index Velocity", indexMotor.getVelocity().getValueAsDouble());
 
         // Detect intake deployment stalls by checking the current
-        if (deployMotor.getTorqueCurrent().getValue().lt(IntakeConstants.deployStallCurrent)) {
-            if (!stallTimer.isRunning()) {
-                stallTimer.restart();
+        if (stallDebouncer.calculate(deployMotor.getTorqueCurrent().getValue().gt(IntakeConstants.deployStallCurrent))) {
+            if (zeroing) {
+                DogLog.log("Intake/Status", "Intake deploy zeroing complete");
+                zeroing = false;
+                deployMotor.stopMotor();
+                deployMotor.setPosition(IntakePosition.DEPLOYED.position);
+                deployMotor.setControl(desiredState.control); // Return to the desiredState
+            } else {
+                DogLog.log("Intake/Status", "Intake deploy stall detected");
+                deployMotor.stopMotor();
             }
-        } else if (stallTimer.isRunning()) {
-            stallTimer.stop();
         }
 
         // If the expel timer has elapsed, end expel and reset deploy position

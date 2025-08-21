@@ -34,7 +34,7 @@ public class IntakeConstants {
     public static final double intakeGearing = (24.0 / 12.0);
 
 	public static final Voltage deployZeroingVoltage = Units.Volts.of(-1.0);
-	public static final Current deployStallCurrent = Units.Amps.of(-40.0);
+	public static final Current deployStallCurrent = Units.Amps.of(-35.0);
 	public static final Time deployStallTime = Units.Seconds.of(0.2);
 
 	public static final Voltage indexVoltage = Units.Volts.of(10.0);
