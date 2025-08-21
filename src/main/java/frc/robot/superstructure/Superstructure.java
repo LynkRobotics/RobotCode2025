@@ -336,6 +336,7 @@ public class Superstructure extends SubsystemBase {
                     TriggerMoveToEEPose(EEPose.GROUND_ALGAE),
                     WaitForEEPose(),
                     EndEffector.instance.StartAlgaeIntake(),
+                    AlgaeRoller.instance.TriggerDeploy(),
                     AlgaeRoller.instance.StartIntake())),
             AlgaeRoller.instance.StopIntake(),
             TriggerMoveToEEPose(EEPose.ALGAE_HOLD),
