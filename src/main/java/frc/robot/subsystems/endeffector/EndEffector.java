@@ -283,11 +283,22 @@ public class EndEffector extends SubsystemBase {
             if (!coralDetected()) {
                 state = EEState.EMPTY;
                 DogLog.log("EndEffector/Status", "Coral lost");
+                pieceMotor.stopMotor();
             }
         } else if (state == EEState.HAVE_ALGAE) {
             if (!algaeDetected()) {
                 state = EEState.EMPTY;
                 DogLog.log("EndEffector/Status", "Algae lost");
+            }
+        } else {
+            if (coralDetected()) {
+                state = EEState.HAVE_CORAL;
+                DogLog.log("EndEffector/Status", "Coral surprisingly detected");
+                pieceMotor.setControl(EEControl.CORAL_HOLD.control);
+            } else if (algaeDetected()) {
+                state = EEState.HAVE_ALGAE;
+                DogLog.log("EndEffector/Status", "Algae surprisingly detected");
+                pieceMotor.setControl(EEControl.ALGAE_HOLD.control);
             }
         }
     }
