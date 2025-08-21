@@ -377,7 +377,7 @@ public class Elevator extends SubsystemBase {
         DogLog.log("Elevator/Final Target", finalTarget.name());
 
         // Handle exceptions in cases other than elevator at rest
-        stalled = stallDebouncer.calculate(voltage != 0.0 && position == lastPosition && !atTarget());
+        stalled = stallDebouncer.calculate(voltage != 0.0 && position == lastPosition && !waitingOnAlgaeBarClear && !atTarget());
         if (stalled) {
             if (currentTarget.height.baseUnitMagnitude() == 0.0 && height.lt(ElevatorConstants.autoZeroHeight)) {
                 DogLog.log("Elevator/Status", "Auto-zeroing due to stall");
