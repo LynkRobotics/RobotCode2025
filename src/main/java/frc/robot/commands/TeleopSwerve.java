@@ -5,10 +5,14 @@ import frc.robot.Robot;
 import frc.robot.Constants;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConstants;
+import frc.robot.subsystems.endeffector.EndEffector;
+import frc.robot.subsystems.pose.Pose;
 
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -20,8 +24,8 @@ public class TeleopSwerve extends LoggedCommandBase {
     private final DoubleSupplier strafeSup;
     private final DoubleSupplier rotationSup;
     private DoubleSupplier speedLimitSupplier;
-    // private boolean autoAiming = false;
-    // private Rotation2d lastAngle = null;
+    private boolean autoAiming = false;
+    private Rotation2d lastAngle = null;
 
     public TeleopSwerve(Swerve s_Swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, DoubleSupplier speedLimitSupplier) {
         super();
@@ -58,28 +62,28 @@ public class TeleopSwerve extends LoggedCommandBase {
             strafeVal *= -1.0;
         }
 
-        // Automatically aim at reef when applicable
-        // if (optAutoReefAiming.get() && Math.abs(rotationVal) < Constants.aimingOverride && !RobotState.haveAlgae() && !RobotState.scoredAlgaeRecently()) {
-        //     Pose2d pose = Pose.instance.getPose();
-        //     Translation2d position = pose.getTranslation();
-        //     Rotation2d rotation = pose.getRotation();
-        //     if (Pose.inWing(position)) {
-        //         Rotation2d bearing = Pose.reefBearing(position);
+        // Automatically aim at reef when holding coral
+        if (optAutoReefAiming.get() && Math.abs(rotationVal) < Constants.aimingOverride && EndEffector.instance.haveCoral()) {
+            Pose2d pose = Pose.instance.getPose();
+            Translation2d position = pose.getTranslation();
+            Rotation2d rotation = pose.getRotation();
+            if (Pose.inWing(position)) {
+                Rotation2d bearing = Pose.reefBearing(position);
                 
-        //         if (!autoAiming) {
-        //             Pose.angleErrorReset();
-        //             autoAiming = true;
-        //         } else {
-        //             Rotation2d angleError = bearing.minus(lastAngle);
-        //             rotationVal = Pose.angleErrorToSpeed(angleError);
-        //         }
-        //         lastAngle = rotation;
-        //     } else {
-        //         autoAiming = false;
-        //     }
-        // } else {
-            // autoAiming = false;
-        // }
+                if (!autoAiming) {
+                    Pose.angleErrorReset();
+                    autoAiming = true;
+                } else {
+                    Rotation2d angleError = bearing.minus(lastAngle);
+                    rotationVal = Pose.angleErrorToSpeed(angleError);
+                }
+                lastAngle = rotation;
+            } else {
+                autoAiming = false;
+            }
+        } else {
+            autoAiming = false;
+        }
 
         /* Drive */
         s_Swerve.drive(
