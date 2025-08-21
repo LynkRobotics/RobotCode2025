@@ -19,6 +19,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -93,9 +94,9 @@ public class Vision extends SubsystemBase {
 
     public static boolean poseIsReasonable(Pose3d pose) {
         if (pose.getX() < -VisionConstants.fieldBorderMargin
-            || pose.getX() > Field.length + VisionConstants.fieldBorderMargin
+            || pose.getX() > Field.length.in(Units.Meters) + VisionConstants.fieldBorderMargin
             || pose.getY() < -VisionConstants.fieldBorderMargin
-            || pose.getY() > Field.width + VisionConstants.fieldBorderMargin
+            || pose.getY() > Field.width.in(Units.Meters) + VisionConstants.fieldBorderMargin
             || pose.getZ() < -VisionConstants.maxZError
             || pose.getZ() > VisionConstants.maxZError) {
             return false;
@@ -186,7 +187,7 @@ public class Vision extends SubsystemBase {
     }
 
     private boolean hasAllianceTag(List<Short> fiducialIDs) {
-        final double fieldMiddle = Field.length / 2.0;
+        final double fieldMiddle = Field.length.div(2.0).in(Units.Meters);
         boolean isRed = Robot.isRed();
 
         for (Short fiducialID : fiducialIDs) {

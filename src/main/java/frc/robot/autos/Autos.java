@@ -92,7 +92,7 @@ public class Autos extends SubsystemBase {
     private Command PathWithRaise(String pathName, ReefFace face, boolean left) {
         return LoggedCommands.deadline("Follow Path with Raise",
             PathCommand(pathName),
-            Elevator.instance.AutoElevatorUp(left ? face.alignLeft.getTranslation() : face.alignRight.getTranslation())
+            Elevator.instance.AutoElevatorUp(left ? face.alignCoralLeft.getTranslation() : face.alignCoralRight.getTranslation())
         ); 
     }
 
@@ -127,8 +127,8 @@ public class Autos extends SubsystemBase {
                     LoggedCommands.proxy(PathCommand(path)),
                     WaitForTowardsNext(),
                     Commands.either(
-                        LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, left ? AutoConstants.mirroredFaces.get(face).alignRight : AutoConstants.mirroredFaces.get(face).alignLeft, true, true).fastAlign()),
-                        LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, left ? face.alignLeft : face.alignRight, true, true).fastAlign()),
+                        LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, left ? AutoConstants.mirroredFaces.get(face).alignCoralRight : AutoConstants.mirroredFaces.get(face).alignCoralLeft, true, true).fastAlign()),
+                        LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, left ? face.alignCoralLeft : face.alignCoralRight, true, true).fastAlign()),
                         Superstructure.instance::shouldMirror
                     ),
                     LoggedCommands.proxy(Swerve.instance.Stop()),
@@ -193,7 +193,7 @@ public class Autos extends SubsystemBase {
             GoGetCoral("D to CS"),
             LoggedCommands.proxy(PathCommand("CS to near B")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
-            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.AB.approachRight, true, false)))
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.AB.approachCoralRight, true, false)))
         .handleInterrupt(() -> Vision.setCameraMode(CameraMode.DEFAULT));
 
         startingPaths.put(autoECDB, "Start towards EF");
@@ -210,7 +210,7 @@ public class Autos extends SubsystemBase {
             LoggedCommands.proxy(FastScoreCoral("Fast - CS to D", ReefFace.CD, false, 3.56)),
             GoGetCoral("Fast - D to CS"),
             LoggedCommands.proxy(FastScoreCoral("Fast - CS to B", ReefFace.AB, false, 2.91)),
-            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.AB.approachMiddle, true, false)))
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.AB.approachAlgaeMiddle, true, false)))
         .handleInterrupt(() -> Vision.setCameraMode(CameraMode.DEFAULT));
 
         startingPaths.put(fastFour, "Fast - Start to E");
@@ -239,7 +239,7 @@ public class Autos extends SubsystemBase {
                     LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, true))
                 ),
                 () -> Constants.atHQ),
-            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.AB.approachMiddle, true, false)),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.AB.approachAlgaeMiddle, true, false)),
             LoggedCommands.proxy(Swerve.instance.Stop()))
         .handleInterrupt(() -> Vision.setCameraMode(CameraMode.DEFAULT));
 
@@ -272,7 +272,7 @@ public class Autos extends SubsystemBase {
                     LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, true))
                 ),
                 () -> Constants.atHQ),
-            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.AB.approachMiddle, true, false)),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.AB.approachAlgaeMiddle, true, false)),
             LoggedCommands.proxy(Swerve.instance.Stop()))
         .handleInterrupt(() -> Vision.setCameraMode(CameraMode.DEFAULT));
 
@@ -289,7 +289,7 @@ public class Autos extends SubsystemBase {
                 Superstructure.instance.SetStop(Stop.L4),
             LoggedCommands.proxy(PathCommand("Start to near G")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.GH, true)),
-            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.GH.approachMiddle, true, false)),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.GH.approachAlgaeMiddle, true, false)),
             LoggedCommands.proxy(DealgaefyMaybeMirror(ReefFace.GH, false)),
             LoggedCommands.proxy(PathCommand("GH to Barge Shot")),
             LoggedCommands.proxy(Superstructure.instance.BargeShot()),

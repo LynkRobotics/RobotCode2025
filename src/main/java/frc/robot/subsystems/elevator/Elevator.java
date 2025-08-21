@@ -158,7 +158,7 @@ public class Elevator extends SubsystemBase {
             () -> autoUp = false,
             () -> {
                 // TODO Always flip?
-                if (!autoUp && Pose.distanceTo(Pose.flipIfRed(target)) <= PoseConstants.autoUpDistance) {
+                if (!autoUp && Pose.distanceTo(Pose.flipIfRed(target)) <= PoseConstants.autoUpDistance.in(Units.Meter)) {
                     Stop stop = stopSupplier.get();
                     // RobotState.updateActiveStop(stop);
                     setHeight(stop.height);

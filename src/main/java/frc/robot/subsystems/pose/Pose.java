@@ -19,6 +19,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.pose.PoseConstants.ReefFace;
@@ -239,7 +240,7 @@ public class Pose extends SubsystemBase {
     }
 
     public static boolean inReefElevatorZone(Translation2d position) {
-        return reefDistance(position) <= PoseConstants.reefElevatorZoneRadius;
+        return reefDistance(position) <= PoseConstants.reefElevatorZoneRadius.in(Units.Meters);
     }
 
     public boolean inReefElevatorZone() {
@@ -247,7 +248,7 @@ public class Pose extends SubsystemBase {
     }
 
     public static boolean elevatorDownAllowed(Translation2d position) {
-        return reefDistance(position) >= PoseConstants.elevatorNoDownDistance;
+        return true; // TODO reefDistance(position) >= PoseConstants.elevatorNoDownDistance.in(Units.Meters);
     }
 
     public boolean elevatorDownAllowed() {
@@ -255,7 +256,7 @@ public class Pose extends SubsystemBase {
     }
 
     public static boolean inWing(Translation2d position) {
-        return flipIfRed(position).getX() <= PoseConstants.wingLength;
+        return flipIfRed(position).getX() <= PoseConstants.wingLength.in(Units.Meters);
     }
 
     public boolean isUpright() {
@@ -267,18 +268,18 @@ public class Pose extends SubsystemBase {
     public boolean nearProcessor() {
         Translation2d position = flipIfRed(getPose().getTranslation());
 
-        return position.getY() < PoseConstants.processorAreaY;
+        return position.getMeasureY().lt(PoseConstants.processorAreaY);
     }
 
     public Pose2d bargeShotPose(double adjustment) {
         Pose2d currentPose = flipIfRed(getPose());
         Pose2d targetPose;
 
-        if (currentPose.getX() > Field.length / 2.0) {
-            targetPose = new Pose2d(Field.length - PoseConstants.bargeShotX - adjustment, currentPose.getY(), Rotation2d.k180deg);
+        if (currentPose.getMeasureX().gt(Field.length.div(2.0))) {
+            targetPose = new Pose2d(Field.length.minus(PoseConstants.bargeShotX).minus(Units.Meters.of(adjustment)), currentPose.getMeasureY(), Rotation2d.k180deg);
             // targetPose = new Pose2d(currentPose.getX(), currentPose.getY(), Rotation2d.k180deg);
         } else {
-            targetPose = new Pose2d(PoseConstants.bargeShotX + adjustment, currentPose.getY(), Rotation2d.kZero);
+            targetPose = new Pose2d(PoseConstants.bargeShotX.plus(Units.Meters.of(adjustment)), currentPose.getMeasureY(), Rotation2d.kZero);
             // targetPose = new Pose2d(currentPose.getX(), currentPose.getY(), Rotation2d.kZero);
         }
 

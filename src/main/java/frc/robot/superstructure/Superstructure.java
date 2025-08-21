@@ -17,7 +17,6 @@ import frc.robot.autos.AutoConstants;
 import frc.robot.commands.pidswerve.PIDSwerve;
 import frc.robot.commands.pidswerve.PIDSwerveConstants.PIDSpeed;
 import frc.robot.subsystems.algaeroller.AlgaeRoller;
-import frc.robot.subsystems.algaeroller.AlgaeRollerContants.AlgaeRollerPosition;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.controls.Controls;
 import frc.robot.subsystems.intake.Intake;
@@ -77,6 +76,16 @@ public class Superstructure extends SubsystemBase {
             //     AlgaeRoller.instance, EndEffector.instance, Elevator.instance));
             SmartDashboard.putData("Superstructure/Move EE to " + pose, TriggerMoveToEEPose(pose));
         }
+
+        SmartDashboard.putData("Align C", LoggedCommands.sequence("Align C",
+            new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.CD.alignCoralLeft, true, true),
+            Swerve.instance.Stop()));
+        SmartDashboard.putData("Align D", LoggedCommands.sequence("Align D",
+            new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.CD.alignCoralRight, true, true),
+            Swerve.instance.Stop()));
+        SmartDashboard.putData("Align CD algae", LoggedCommands.sequence("Align D",
+            new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.CD.alignAlgaeMiddle, true, true),
+            Swerve.instance.Stop()));
     }
 
     private Command TriggerMoveToEEPose(EEPose pose) {
@@ -110,18 +119,18 @@ public class Superstructure extends SubsystemBase {
                             Commands.sequence(
                                 Commands.either(
                                     Commands.sequence(
-                                        new PIDSwerve(Swerve.instance, Pose.instance, left ? face.approachLeft : face.approachRight, true, false, PIDSpeed.TURBO),
-                                        new PIDSwerve(Swerve.instance, Pose.instance, left ? face.alignLeft : face.alignRight, true, true)
+                                        new PIDSwerve(Swerve.instance, Pose.instance, left ? face.approachCoralLeft : face.approachCoralRight, true, false, PIDSpeed.TURBO),
+                                        new PIDSwerve(Swerve.instance, Pose.instance, left ? face.alignCoralLeft : face.alignCoralRight, true, true)
                                     ),
                                     Commands.sequence(
-                                        new PIDSwerve(Swerve.instance, Pose.instance, left ? face.approachLeft : face.approachRight, true, false, PIDSpeed.FAST), //, Constants.maxVisionDiffCoral),
+                                        new PIDSwerve(Swerve.instance, Pose.instance, left ? face.approachCoralLeft : face.approachCoralRight, true, false, PIDSpeed.FAST), //, Constants.maxVisionDiffCoral),
                                         Commands.either(
                                             LoggedCommands.log("Elevator reached stop in time"),
                                             LoggedCommands.sequence("Pause to wait for elevator to catch up",
                                                 Swerve.instance.Stop(),
                                                 Elevator.instance.WaitForNearNext()),
                                             Elevator.instance::nearNextStop),
-                                        new PIDSwerve(Swerve.instance, Pose.instance, left ? face.alignLeft : face.alignRight, true, true)
+                                        new PIDSwerve(Swerve.instance, Pose.instance, left ? face.alignCoralLeft : face.alignCoralRight, true, true)
                                     ),
                                     () -> false)), //RobotState.getNextStop() == Stop.L2 || RobotState.getNextStop() == Stop.L3)),
                             Commands.either(
@@ -136,7 +145,7 @@ public class Superstructure extends SubsystemBase {
                         Superstructure.WaitForCoralReady(),
                         LoggedCommands.deadline("Wait for auto up",
                             Elevator.instance.WaitForNext(),
-                            Elevator.instance.AutoElevatorUp(left ? face.alignLeft.getTranslation() : face.alignRight.getTranslation())))),
+                            Elevator.instance.AutoElevatorUp(left ? face.alignCoralLeft.getTranslation() : face.alignCoralRight.getTranslation())))),
                 Superstructure.ScoreGamePiece()
             ),
             LoggedCommands.log("Cannot score coral without coral"),
@@ -168,7 +177,7 @@ public class Superstructure extends SubsystemBase {
                     EndEffector.instance.StartAlgaeIntake(),
                     LoggedCommands.parallel("Prepare for reef algae intake",
                         Commands.sequence(
-                            new PIDSwerve(Swerve.instance, Pose.instance, face.approachMiddle, true, false),
+                            new PIDSwerve(Swerve.instance, Pose.instance, face.approachAlgaeMiddle, true, false),
                             Swerve.instance.Stop()                            
                         ),
                         Commands.sequence(
@@ -179,7 +188,7 @@ public class Superstructure extends SubsystemBase {
                             ),
                             AlgaeRoller.instance.TriggerStowWhenAble()
                         )),
-                    new PIDSwerve(Swerve.instance, Pose.instance, face.alignMiddle, true, true),
+                    new PIDSwerve(Swerve.instance, Pose.instance, face.alignAlgaeMiddle, true, true),
                     Swerve.instance.Stop())),
             new PIDSwerve(Swerve.instance, Pose.instance, extendedBackup ? face.algaeBackupExtended : face.algaeBackupShort, true, false))
             .handleInterrupt(() -> {
