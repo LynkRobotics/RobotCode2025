@@ -86,10 +86,10 @@ public class Controls extends SubsystemBase{
         // unjam.onTrue(Intake.instance.Expel());
         // score.whileTrue(Superstructure.ScoreGamePiece()); // Also useful to dump Algae or put it into Processor
 
-        L4.onTrue(Superstructure.SetActiveReefLevel(ReefLevel.L4));
-        L3.onTrue(Superstructure.SetActiveReefLevel(ReefLevel.L3));
-        L2.onTrue(Superstructure.SetActiveReefLevel(ReefLevel.L2));
-        L1.onTrue(Superstructure.SetActiveReefLevel(ReefLevel.L1));
+        L4.onTrue(Superstructure.instance.SetActiveReefLevel(ReefLevel.L4));
+        L3.onTrue(Superstructure.instance.SetActiveReefLevel(ReefLevel.L3));
+        L2.onTrue(Superstructure.instance.SetActiveReefLevel(ReefLevel.L2));
+        L1.onTrue(Superstructure.instance.SetActiveReefLevel(ReefLevel.L1));
 
         goLeft.whileTrue(Superstructure.instance.SmartScore(true));
         goRight.whileTrue(Superstructure.instance.SmartScore(false));

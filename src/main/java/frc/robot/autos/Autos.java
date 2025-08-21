@@ -137,7 +137,7 @@ public class Autos extends SubsystemBase {
                         Elevator.instance.WaitForNext(),
                         Elevator.instance::atNextStop)),
                 LoggedCommands.proxy(RaiseElevatorAtDistance(raiseDistance))),
-            Superstructure.PlaceCoral());
+            Superstructure.instance.PlaceCoral());
     }
 
     private Command MaybeWaitForCoral() {

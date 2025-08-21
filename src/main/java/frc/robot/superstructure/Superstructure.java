@@ -34,7 +34,7 @@ import frc.robot.Field.ReefLevel;
 
 public class Superstructure extends SubsystemBase {
     public static final Superstructure instance = new Superstructure();
-    private static ReefLevel activeReefLevel = ReefLevel.L4;
+    private ReefLevel activeReefLevel = ReefLevel.L4;
 
     public static enum EEPose {
         L1(EEPosition.L1, Stop.L1),
@@ -89,7 +89,7 @@ public class Superstructure extends SubsystemBase {
             Swerve.instance.Stop()));
     }
 
-    public static Command SetActiveReefLevel(ReefLevel level) {
+    public Command SetActiveReefLevel(ReefLevel level) {
         return LoggedCommands.runOnce("Change active reef level to " + level, () -> activeReefLevel = level);
     }
 
@@ -162,7 +162,7 @@ public class Superstructure extends SubsystemBase {
                         // LoggedCommands.deadline("Wait for auto up",
                         //     Elevator.instance.WaitForNext(),
                         //     Elevator.instance.AutoElevatorUp(left ? face.alignCoralLeft.getTranslation() : face.alignCoralRight.getTranslation())))),
-                Superstructure.PlaceCoral(),
+                PlaceCoral(),
                 TriggerMoveToEEPose(EEPose.GROUND_CORAL),
                 AlgaeRoller.instance.TriggerStowWhenStopped()
             ),
@@ -250,7 +250,7 @@ public class Superstructure extends SubsystemBase {
         return LoggedCommands.print("Intake Algae", "TODO Implement Intake Algae");
     }
 
-    public static Command PlaceCoral() {
+    public Command PlaceCoral() {
         return LoggedCommands.either("Place Coral",
             EndEffector.instance.ExpelCoral(ReefLevel.L2),
             Commands.either(
