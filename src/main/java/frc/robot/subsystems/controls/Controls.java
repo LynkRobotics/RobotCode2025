@@ -4,6 +4,8 @@ import static frc.robot.Options.optAutoReefAiming;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.LoggedCommands;
+import frc.lib.util.LoggedAlert;
 import frc.robot.Constants;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
@@ -20,6 +23,7 @@ import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.superstructure.Superstructure;
 import frc.robot.commands.TeleopSwerve;
+import frc.robot.commands.pidswerve.PIDSwerve;
 
 public class Controls extends SubsystemBase{
     public static final Controls instance = new Controls();
@@ -98,10 +102,12 @@ public class Controls extends SubsystemBase{
         if (Constants.atHQ) {
             // driver.povUp().whileTrue(
             //     Commands.sequence(
-            //         new PIDSwerve(s_Swerve, s_Pose, new Pose2d(4.48, 1.67, Rotation2d.fromDegrees(91)), false, false),
-            //         s_Swerve.Stop(),
-            //         Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached Debug Position")),
-            //         Commands.runOnce(() -> LEDSubsystem.triggerError())));
+            //         new PIDSwerve(Swerve.instance, Pose.instance, new Pose2d(0.0, 0.0, Rotation2d.kZero), false, true),
+            //         // new PIDSwerve(Swerve.instance, Pose.instance, new Pose2d(4.52, 1.71, Rotation2d.fromDegrees(-90.4)), false, true),
+            //         Swerve.instance.Stop(),
+            //         Commands.runOnce(() -> LoggedAlert.Info("Debug", "In Position", "Reached Debug Position"))
+            //         // Commands.runOnce(() -> LEDSubsystem.triggerError())
+            //         ));
             // driver.povRight().onTrue(
             //     LoggedCommands.sequence("Test Drive -- 5 meters",
             //         Commands.runOnce(() -> s_Pose.setPose(new Pose2d(2.0, 7.0, Rotation2d.kZero))),

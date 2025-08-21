@@ -102,7 +102,7 @@ public class Climber extends SubsystemBase {
     private Command WaitForIntake() {
         return LoggedCommands.sequence("Wait for Intake",
             LoggedCommands.waitUntil("Wait for intake motor stalled", () -> false /* TODO intakeMotor.isStalled() */),
-            LoggedCommands.run("Stop climber intake due to stall", intakeMotor::stopMotor, this),
+            LoggedCommands.runOnce("Stop climber intake due to stall", intakeMotor::stopMotor, this),
             LoggedCommands.waitSeconds("Post climber intake delay", 0.5),
             Controls.instance.TriggerRumble(),
             LoggedCommands.print("Flash LEDs", "TODO Flash LEDs"));

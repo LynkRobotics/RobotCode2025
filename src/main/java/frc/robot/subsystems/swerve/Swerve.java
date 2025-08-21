@@ -52,6 +52,11 @@ public class Swerve extends SubsystemBase {
         // });
 
         SmartDashboard.putData(LoggedCommands.runOnce("Sync Swerve to CANcoders", this::resetModulesToAbsolute, this).ignoringDisable(true));
+
+        SmartDashboard.putData("Drive Test", LoggedCommands.sequence("Drive Test",
+            LoggedCommands.runOnce("Move forward", () -> drive(new Translation2d(0.25, 0.0).times(SwerveConstants.maxSpeed), 0.0, true), this),
+            Commands.waitSeconds(2.0),
+            Stop()));
     }
 
     public void drive(Translation2d translation, double rotation, boolean isOpenLoop) {

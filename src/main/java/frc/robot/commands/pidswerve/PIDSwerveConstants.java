@@ -3,8 +3,8 @@ package frc.robot.commands.pidswerve;
 import frc.robot.subsystems.swerve.SwerveConstants;
 
 public class PIDSwerveConstants {
-    public static final double translationKP = 0.070;
-    public static final double roughTranslationKP = 0.10;
+    public static final double translationKP = 0.050;
+    public static final double roughTranslationKP = 0.07;
     public static final double positionTolerance = 1.0; // inches
     public static final double roughPositionTolerance = 2.5; // inches
     public static final double positionKS = 0.02;
