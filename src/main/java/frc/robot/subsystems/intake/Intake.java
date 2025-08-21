@@ -25,7 +25,7 @@ public class Intake extends SubsystemBase {
     private static final Timer expelTimer = new Timer();
 
     private static final Debouncer stallDebouncer = new Debouncer(IntakeConstants.deployStallTime.in(Units.Seconds), DebounceType.kRising);
-    private static boolean zeroing = false;
+    private boolean zeroing = false;
 
     private IntakePosition desiredState = IntakePosition.RETRACTED;
     private boolean atDesiredState = true;
@@ -36,7 +36,7 @@ public class Intake extends SubsystemBase {
     private final TalonFX indexMotor;
 
     /* Control Requests */
-    private final VoltageOut deployZeroingControl = new VoltageOut(IntakeConstants.deployZeroingVoltage).withEnableFOC(false);
+    private final VoltageOut deployZeroingControl = new VoltageOut(IntakeConstants.deployZeroingVoltage).withEnableFOC(true);
     private final VoltageOut indexControl = new VoltageOut(IntakeConstants.indexVoltage).withEnableFOC(true);
     private final VoltageOut indexExpelControl = new VoltageOut(IntakeConstants.indexExpelVoltage).withEnableFOC(true);
     private final VoltageOut intakeControl = new VoltageOut(IntakeConstants.intakeVoltage).withEnableFOC(true);
@@ -62,7 +62,7 @@ public class Intake extends SubsystemBase {
             LoggedCommands.runOnce("Move Intake to FULL_STOW", () -> { deployMotor.setControl(IntakePosition.FULL_STOW.control); }, this));
 
         // We *should* be fully stowed, but given all the testing we do, also zero to start
-        deployMotor.setPosition(desiredState.position);
+        deployMotor.setPosition(IntakePosition.FULL_STOW.position);
         startZero();
 
         // We could start by holding the state *if* we didn't start by zeroing
@@ -120,6 +120,7 @@ public class Intake extends SubsystemBase {
         DogLog.log("Intake/Current Command", currentCommand == null ? "None" : currentCommand.getName());
         DogLog.log("Intake/Desired State", desiredState.name());
         DogLog.log("Intake/At Desired State", atDesiredState);
+        DogLog.log("Intake/Zeroing?", zeroing);
         DogLog.log("Intake/Deploy Current", deployMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("Intake/Deploy Velocity", deployMotor.getVelocity().getValueAsDouble());
         DogLog.log("Intake/Deploy Position (Rotations)", deployMotor.getPosition().getValue().in(Units.Rotations));
