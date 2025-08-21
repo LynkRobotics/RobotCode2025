@@ -117,8 +117,23 @@ public class AlgaeRoller extends SubsystemBase {
         return LoggedCommands.runOnce("Stow algae roller", () -> moveTo(AlgaeRollerPosition.STOWED), this);
     }
 
-    public Command Intake() {
+    public Command StartIntake() {
         return LoggedCommands.runOnce("Intake algae", () -> rollerMotor.setControl(intakeControl), this);
+    }
+
+    public Command StopIntake() {
+        return LoggedCommands.runOnce("Stop algae intake", () -> rollerMotor.stopMotor(), this);
+    }
+
+    public Command StopAndClear() {
+        return LoggedCommands.runOnce("Stop algae intake and move to clear", () -> {
+            rollerMotor.stopMotor();
+            moveTo(AlgaeRollerPosition.CLEAR);
+        }, this);
+    }
+
+    public Command TriggerDeploy() {
+        return LoggedCommands.runOnce("Deploy algae intake", () -> moveTo(AlgaeRollerPosition.DEPLOYED), this);
     }
 
     public Command Expel() {

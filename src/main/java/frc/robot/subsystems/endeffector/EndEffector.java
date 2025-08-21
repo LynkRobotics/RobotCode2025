@@ -203,6 +203,10 @@ public class EndEffector extends SubsystemBase {
 		return absolutePosition;
 	}
 
+    public Command WaitForAlgae() {
+        return LoggedCommands.waitUntil("Wait for algae intake", () -> state == EEState.HAVE_ALGAE);
+    }
+
     @Override
     public void periodic() {
         Command currentCommand = getCurrentCommand();
@@ -266,7 +270,7 @@ public class EndEffector extends SubsystemBase {
         
         if (intakeState == EEIntakeState.INTAKING_ALGAE) {
             // TODO Also check stall
-            if (algaeDetected()) { // TODO Wait 0.2s after detection -- can't we just bump the debounce up?
+            if (algaeDetected()) { // TODO Wait 0.2s before/after detection? can't we just bump the debounce up?
                 state = EEState.HAVE_ALGAE;
                 pieceMotor.setControl(EEControl.ALGAE_HOLD.control);
                 intakeState = EEIntakeState.STOPPED;

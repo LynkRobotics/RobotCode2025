@@ -332,4 +332,20 @@ public class Superstructure extends SubsystemBase {
             AlgaeRoller.instance.TriggerStow(),
             Climber.instance.GrabCage());
     }
+
+    public Command IntakeGroundAlgae() {
+        return LoggedCommands.sequence("Intake ground algae",
+            Commands.deadline(
+                EndEffector.instance.WaitForAlgae(),
+                Commands.sequence(
+                    AlgaeRoller.instance.TriggerDeploy(),
+                    TriggerMoveToEEPose(EEPose.GROUND_INTAKE),
+                    WaitForEEPose(),
+                    EndEffector.instance.StartAlgaeIntake(),
+                    AlgaeRoller.instance.StartIntake())),
+            AlgaeRoller.instance.StopIntake(),
+            TriggerMoveToEEPose(EEPose.ALGAE_HOLD),
+            AlgaeRoller.instance.TriggerStowWhenStopped())
+            .handleInterrupt(() -> AlgaeRoller.instance.StopAndClear().schedule());
+    }
 }

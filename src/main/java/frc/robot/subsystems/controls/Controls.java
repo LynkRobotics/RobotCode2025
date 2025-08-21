@@ -68,7 +68,7 @@ public class Controls extends SubsystemBase{
     public void configureButtonBindings() {
         /* Driver Buttons */
         final Trigger intakeCoral = driver.leftBumper();
-        // final Trigger intakeGroundAlgae = driver.rightBumper();
+        final Trigger intakeGroundAlgae = driver.rightBumper();
         final Trigger goLeft = driver.leftTrigger();
         final Trigger goRight = driver.rightTrigger();
         final Trigger L4 = driver.y();
@@ -79,8 +79,9 @@ public class Controls extends SubsystemBase{
         // final Trigger unjam = driver.back();
         final Trigger alignmentToggle = driver.rightStick();
 
-        // Only used in case of automation failure
         intakeCoral.whileTrue(Superstructure.instance.SmartIntake());
+        intakeGroundAlgae.whileTrue(Superstructure.instance.IntakeGroundAlgae());
+
         // zero.onTrue(Elevator.instance.Zero());
         // unjam.onTrue(Intake.instance.Expel());
         // score.whileTrue(Superstructure.ScoreGamePiece()); // Also useful to dump Algae or put it into Processor
