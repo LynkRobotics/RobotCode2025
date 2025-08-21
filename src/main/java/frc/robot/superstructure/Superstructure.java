@@ -269,11 +269,15 @@ public class Superstructure extends SubsystemBase {
     }
 
     public Command CoralHold() {
-        return LoggedCommands.print("Coral hold", "TODO Implement Coral hold");
+        return LoggedCommands.sequence("Hold coral",
+            TriggerMoveToEEPose(EEPose.CORAL_HOLD),
+            AlgaeRoller.instance.TriggerStowWhenStopped());
     }
 
     public Command AlgaeHold() {
-        return LoggedCommands.print("Algae hold", "TODO Implement Algae hold");
+        return LoggedCommands.sequence("Hold algae",
+            TriggerMoveToEEPose(EEPose.ALGAE_HOLD),
+            AlgaeRoller.instance.TriggerStowWhenStopped());
     }
 
     public Command SmartIntake() {
