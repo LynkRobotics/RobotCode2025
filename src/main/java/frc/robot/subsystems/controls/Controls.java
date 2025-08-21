@@ -68,15 +68,15 @@ public class Controls extends SubsystemBase{
     public void configureButtonBindings() {
         /* Driver Buttons */
         final Trigger intakeCoral = driver.leftBumper();
-        final Trigger intakeGroundAlgae = driver.rightBumper();
+        // final Trigger intakeGroundAlgae = driver.rightBumper();
         final Trigger goLeft = driver.leftTrigger();
         final Trigger goRight = driver.rightTrigger();
         final Trigger L4 = driver.y();
         final Trigger L3 = driver.x();
         final Trigger L2 = driver.b();
         final Trigger L1 = driver.a();
-        final Trigger zero = driver.start();
-        final Trigger unjam = driver.back();
+        // final Trigger zero = driver.start();
+        // final Trigger unjam = driver.back();
         final Trigger alignmentToggle = driver.rightStick();
 
         // Only used in case of automation failure

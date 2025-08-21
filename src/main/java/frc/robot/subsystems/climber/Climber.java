@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedCommands;
 import frc.robot.Ports;
 import frc.robot.subsystems.climber.ClimberConstants.ClimberPosition;
-import frc.robot.subsystems.controls.Controls;
 
 public class Climber extends SubsystemBase {
     public static final Climber instance = new Climber();
@@ -99,14 +98,14 @@ public class Climber extends SubsystemBase {
             IntakeUntilStalled());
     }
 
-    private Command WaitForIntake() {
-        return LoggedCommands.sequence("Wait for Intake",
-            LoggedCommands.waitUntil("Wait for intake motor stalled", () -> false /* TODO intakeMotor.isStalled() */),
-            LoggedCommands.runOnce("Stop climber intake due to stall", intakeMotor::stopMotor, this),
-            LoggedCommands.waitSeconds("Post climber intake delay", 0.5),
-            Controls.instance.TriggerRumble(),
-            LoggedCommands.print("Flash LEDs", "TODO Flash LEDs"));
-    }
+    // private Command WaitForIntake() {
+    //     return LoggedCommands.sequence("Wait for Intake",
+    //         LoggedCommands.waitUntil("Wait for intake motor stalled", () -> false /* TODO intakeMotor.isStalled() */),
+    //         LoggedCommands.runOnce("Stop climber intake due to stall", intakeMotor::stopMotor, this),
+    //         LoggedCommands.waitSeconds("Post climber intake delay", 0.5),
+    //         Controls.instance.TriggerRumble(),
+    //         LoggedCommands.print("Flash LEDs", "TODO Flash LEDs"));
+    // }
 
     public Command Retract() {
         intakeMotor.stopMotor();
