@@ -81,8 +81,8 @@ public class Elevator extends SubsystemBase {
         SmartDashboard.putData("Elevator/Move to L3", LoggedCommands.runOnce("Move to L3", () -> moveTo(Stop.L3), this));
         SmartDashboard.putData("Elevator/Move to L4", LoggedCommands.runOnce("Move to L4", () -> moveTo(Stop.L4), this));
 
-        // TODO
-        // initDefaultCommand();
+        setAsZero();
+        moveTo(Stop.STOW);
     }
 
     public void setAsZero() {
