@@ -49,7 +49,7 @@ public class PoseConstants {
     public static final Distance bargeShotX = Field.length.div(2.0).minus(bargeShotDistanceFromCenter).minus(centerToFrontBumper); // X position of the barge shot
 
     // Offset to the reef face, not at the branches, but on the faces directly in front
-    public static final Translation2d algaeOffset = new Translation2d(algaeAdditionalOffset, Units.Meters.zero());
+    public static final Translation2d algaeOffset = new Translation2d(algaeAdditionalOffset, Units.Inches.of(5.5));
     private static final Translation2d centerCoralOffset = new Translation2d(reefToFaceDistance.plus(reefCoralOffset), Units.Meters.zero());
     private static final Translation2d centerAlgaeOffset = centerCoralOffset.plus(algaeOffset);
     private static final Translation2d branchOffset = new Translation2d(Units.Meter.zero(), branchSeparation.div(2.0));
