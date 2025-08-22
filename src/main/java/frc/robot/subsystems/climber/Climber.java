@@ -45,10 +45,6 @@ public class Climber extends SubsystemBase {
 
         SmartDashboard.putData("Climber/Start Reset", StartReset());
         SmartDashboard.putData("Climber/Stop Reset", StopReset());
-        SmartDashboard.putData("Climber/Deploy", Deploy());
-        SmartDashboard.putData("Climber/Clear", Clear());
-        SmartDashboard.putData("Climber/Stow", Stow());
-        SmartDashboard.putData("Climber/Intake", Intake());
     }
 
     private Command StartReset() {
@@ -68,15 +64,9 @@ public class Climber extends SubsystemBase {
         }, this);
     }
 
-    private Command Stow() {
-        return LoggedCommands.runOnce("Stow climber", () -> {
-            deployMotor.setControl(ClimberPosition.STOWED.control);
-        }, this);
-    }
-
-    private Command Clear() {
-        return LoggedCommands.runOnce("Clear climber", () -> {
-            deployMotor.setControl(ClimberPosition.CLEAR.control);
+    private Command FullyStow() {
+        return LoggedCommands.runOnce("Fully stow climber", () -> {
+            deployMotor.setControl(ClimberPosition.FULLY_STOWED.control);
         }, this);
     }
 
@@ -98,21 +88,21 @@ public class Climber extends SubsystemBase {
     public Command Retract() {
         return LoggedCommands.sequence("Retract climber",
             LoggedCommands.runOnce("Stop climber intake", () -> intakeMotor.stopMotor(), this),
-            Stow());
+            FullyStow());
     }
 
     public Command RetractAndWait() {
         return LoggedCommands.sequence("Retract climber and wait",
             Retract(),
-            LoggedCommands.waitUntil("Wait until stowed", this::isStowed));
+            LoggedCommands.waitUntil("Wait until stowed", this::isFullyStowed));
     }
 
     private boolean intakeStalled() {
         return stallDebouncer.calculate(intakeMotor.getTorqueCurrent().getValue().gt(ClimberConstants.currentStallThreshold));
     }
 
-    private boolean isStowed() {
-        return deployMotor.getPosition().getValue().minus(ClimberPosition.STOWED.angle).abs(Units.Rotations) <= ClimberPosition.EPISILON.angle.in(Units.Rotations);
+    private boolean isFullyStowed() {
+        return deployMotor.getPosition().getValue().minus(ClimberPosition.FULLY_STOWED.angle).abs(Units.Rotations) <= ClimberPosition.EPISILON.angle.in(Units.Rotations);
     }
 
     @Override

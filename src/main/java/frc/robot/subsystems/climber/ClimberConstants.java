@@ -27,10 +27,11 @@ public class ClimberConstants {
     public static final Distance drumDiameter = Units.Inches.of(0.675);
 
 	public static enum ClimberPosition {
+		FULLY_STOWED(10.5),
 		STOWED(10.948),
-		DEPLOYED(18.78),
+		DEPLOYED(19.8),
 		CLEAR(STOWED.distance.plus(Units.Inches.of(0.5)).in(Units.Inches)),
-		EPISILON(1.9);
+		EPISILON(1.5);
 
 		public final Distance distance;
 		public final Angle angle;
@@ -71,7 +72,7 @@ public class ClimberConstants {
 		// Cannot reset climber with this
 		// config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
 		// config.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-		// 	ClimberPosition.STOWED.angle.in(Units.Rotations);
+		// 	ClimberPosition.FULLY_STOWED.angle.in(Units.Rotations);
 
 		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 		config.Feedback.SensorToMechanismRatio = deployGearing;
