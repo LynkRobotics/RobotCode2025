@@ -17,6 +17,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.superstructure.Superstructure;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.Field.ReefLevel;
@@ -75,15 +76,15 @@ public class Controls extends SubsystemBase{
         final Trigger L3 = driver.x();
         final Trigger L2 = driver.b();
         final Trigger L1 = driver.a();
-        // final Trigger zero = driver.start();
-        // final Trigger unjam = driver.back();
+        // final Trigger reset = driver.back();
+        final Trigger expel = driver.start();
         final Trigger alignmentToggle = driver.rightStick();
 
         intakeCoral.whileTrue(Superstructure.instance.SmartIntake());
         intakeGroundAlgae.whileTrue(Superstructure.instance.IntakeGroundAlgae());
 
         // zero.onTrue(Elevator.instance.Zero());
-        // unjam.onTrue(Intake.instance.Expel());
+        expel.whileTrue(Intake.instance.ExpelForever()).onFalse(Intake.instance.Stop());
         // score.whileTrue(Superstructure.ScoreGamePiece()); // Also useful to dump Algae or put it into Processor
 
         L4.onTrue(Superstructure.instance.SetActiveReefLevel(ReefLevel.L4));

@@ -14,6 +14,7 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedCommands;
 import frc.robot.Ports;
@@ -90,6 +91,13 @@ public class Intake extends SubsystemBase {
         expelTimer.restart();
     }
 
+    private void runExpelForever() {
+        DogLog.log("Intake/Status", "Expelling Intake until stopped");
+        deployMotor.setControl(IntakePosition.DEPLOYED.control);
+        intakeMotor.setControl(intakeExpelControl);
+        indexMotor.setControl(indexExpelControl);
+    }
+
     private void stopIntake() {
         DogLog.log("Intake/Status", "Stopping Intake");
         intakeMotor.stopMotor();
@@ -103,6 +111,12 @@ public class Intake extends SubsystemBase {
 
     public Command Expel() {
         return LoggedCommands.runOnce("Expel from Intake", this::runExpel, this);
+    }
+
+    public Command ExpelForever() {
+        return LoggedCommands.sequence("Expel from Intake",
+            Commands.runOnce(this::runExpelForever, this),
+            Commands.idle());
     }
 
     public Command Stop() {
