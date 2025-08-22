@@ -39,11 +39,11 @@ public final class AutoConstants {
     // TODO Find out why this doesn't work
     public static final RobotConfig robotConfig = new RobotConfig(
         Mass.ofRelativeUnits(Constants.isRocky ? 145.0 : 132.0, Pounds),
-        MomentOfInertia.ofRelativeUnits(Constants.isRocky ? 8.224 : 7.267, KilogramSquareMeters),
+        MomentOfInertia.ofRelativeUnits(6, KilogramSquareMeters), //6 kg m ^2: 1678 Choreo Constant
         new ModuleConfig(
             SwerveConstants.wheelCircumference / (Math.PI * 2.0),
-            SwerveConstants.maxSpeed * 0.95, // Leave a little headroom for inefficiencies
-            1.916, // 3847 Spectrum Vex GripLock v2 CoF
+            SwerveConstants.maxSpeed, 
+            1.1, // 1678 Choreo Constant
             DCMotor.getKrakenX60Foc(1),
             SwerveConstants.chosenModule.driveGearRatio,
             SwerveConstants.driveStatorCurrentLimit,
