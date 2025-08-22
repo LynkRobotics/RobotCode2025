@@ -384,8 +384,9 @@ public class Elevator extends SubsystemBase {
                 }
             }
         }
-        DogLog.log("Elevator/Current Target", currentTarget.name());
         DogLog.log("Elevator/Final Target", finalTarget.name());
+        DogLog.log("Elevator/Current Target", currentTarget.name());
+        DogLog.log("Elevator/Current Target (rot)", currentTarget.position.in(Units.Rotations));
 
         // Handle exceptions in cases other than elevator at rest
         stalled = stallDebouncer.calculate(voltage != 0.0 && position == lastPosition && !waitingOnAlgaeBarClear && !atTarget());
@@ -421,9 +422,7 @@ public class Elevator extends SubsystemBase {
         DogLog.log("Elevator/atTarget", atTarget());
         DogLog.log("Elevator/stalled", isStalled());
 
-        SmartDashboard.putBoolean("Elevator/Moving", voltage != 0.0);
         SmartDashboard.putBoolean("Elevator/At Target", atTarget());
-
         SmartDashboard.putBoolean("Elevator/L1", atStop(Stop.L1));
         SmartDashboard.putBoolean("Elevator/L2", atStop(Stop.L2));
         SmartDashboard.putBoolean("Elevator/L3", atStop(Stop.L3));
