@@ -52,6 +52,7 @@ public class ElevatorConstants {
         L2_ALGAELIFT(L2_ALGAE.height.plus(algaeLiftDistance)),
         L3_ALGAELIFT(L3_ALGAE.height.plus(algaeLiftDistance)),
         ALGAE_HOLD(Units.Inches.of(19.41)),
+        BARGE_PREP(Units.Inches.of(30.0)),
         BARGE(Units.Inches.of(62.17)),
         CLIMB(Units.Inches.of(12.0)),
         CLEAR_LOW(Units.Inches.of(12.0)),  // End-effector cannot pivot below this mark (except in limited "high clear" range)

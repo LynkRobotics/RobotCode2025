@@ -41,6 +41,7 @@ public class Superstructure extends SubsystemBase {
         L2(EEPosition.L23, Stop.L2),
         L3(EEPosition.L23, Stop.L3),
         L4(EEPosition.L4, Stop.L4),
+        BARGE_PREP(EEPosition.BARGE, Stop.BARGE_PREP),
         BARGE(EEPosition.BARGE, Stop.BARGE),
         GROUND_CORAL(EEPosition.GROUND_INTAKE, Stop.STOW),
         GROUND_ALGAE(EEPosition.GROUND_INTAKE, Stop.FEED_ALGAE),
@@ -73,20 +74,8 @@ public class Superstructure extends SubsystemBase {
         }
 
         for (EEPose pose: EEPose.values()) {
-            // SmartDashboard.putData("Superstructure/Move EE to " + pose, LoggedCommands.runOnce("Move EE to " + pose, () ->moveTo(pose),
-            //     AlgaeRoller.instance, EndEffector.instance, Elevator.instance));
             SmartDashboard.putData("Superstructure/Move EE to " + pose, TriggerMoveToEEPose(pose));
         }
-
-        SmartDashboard.putData("Align C", LoggedCommands.sequence("Align C",
-            new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.CD.alignCoralLeft, true, true),
-            Swerve.instance.Stop()));
-        SmartDashboard.putData("Align D", LoggedCommands.sequence("Align D",
-            new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.CD.alignCoralRight, true, true),
-            Swerve.instance.Stop()));
-        SmartDashboard.putData("Align CD algae", LoggedCommands.sequence("Align D",
-            new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.CD.alignAlgaeMiddle, true, true),
-            Swerve.instance.Stop()));
     }
 
     public Command SetActiveReefLevel(ReefLevel level) {
@@ -224,11 +213,11 @@ public class Superstructure extends SubsystemBase {
                             new PIDSwerve(Swerve.instance, Pose.instance, face.approachAlgaeMiddle, true, false),
                             Swerve.instance.Stop()                            
                         )),
-                    new PIDSwerve(Swerve.instance, Pose.instance, face.alignAlgaeMiddle, true, true),
+                    new PIDSwerve(Swerve.instance, Pose.instance, face.alignAlgae, true, true),
                     Swerve.instance.Stop())),
             Commands.either(
-                TriggerMoveToEEPose(algaeInvertLiftPose),
-                TriggerMoveToEEPose(algaeLiftPose),
+                TriggerMoveToEEPoseDirect(algaeInvertLiftPose),
+                TriggerMoveToEEPoseDirect(algaeLiftPose),
                 optInvertAlgae),    
             new PIDSwerve(Swerve.instance, Pose.instance, extendedBackup ? face.algaeBackupExtended : face.algaeBackupShort, true, false));
     }
@@ -244,12 +233,12 @@ public class Superstructure extends SubsystemBase {
         return optMirrorAuto.get() && DriverStation.isAutonomousEnabled();
     }
 
-    public Command BargeShot() {
-        return BargeShot(0.0);
-    }
-
-    public Command BargeShot(double adjustment) {
-        return LoggedCommands.print("Barge shot", "TODO Implement barge shot");
+    public Command PrepBargeShot() {
+        return LoggedCommands.sequence("Prepare barge shot",
+        TriggerMoveToEEPose(EEPose.BARGE_PREP),
+        AlgaeRoller.instance.TriggerStowWhenClear(),
+        WaitForEEPose(),
+        TriggerMoveToEEPoseDirect(EEPose.BARGE));
     }
 
     private Command ProcessorAlign() {
@@ -263,9 +252,9 @@ public class Superstructure extends SubsystemBase {
             LoggedCommands.proxy(Commands.select(left ? coralLeftCommands : coralRightCommands, () -> Pose.nearestFace(Pose.instance.getPose().getTranslation()))),
             Commands.either(
                 Commands.either(
+                    LoggedCommands.proxy(PrepBargeShot()),
                     LoggedCommands.proxy(ProcessorAlign()),
-                    LoggedCommands.proxy(BargeShot()),
-                    () -> { return optAlgaeBargeOnly.get() || Pose.instance.nearProcessor(); }),
+                    () -> { return optAlgaeBargeOnly.get() || !Pose.instance.nearProcessor(); }),
                 LoggedCommands.proxy(Commands.select(left ? deAlgaefyLeftCommands : deAlgaefyRightCommands, () -> Pose.nearestFace(Pose.instance.getPose().getTranslation()))),
                 EndEffector.instance::haveAlgae),
             EndEffector.instance::haveCoral);
@@ -283,6 +272,20 @@ public class Superstructure extends SubsystemBase {
                 EndEffector.instance.ExpelCoral(ReefLevel.L4),
                 () -> activeReefLevel == ReefLevel.L3),
             () -> activeReefLevel == ReefLevel.L2);
+    }
+
+    public Command PlacePiece() {
+        return LoggedCommands.either("Place game piece",
+            PlaceCoral(),
+            PlaceBargeAlgae(),
+            () -> EndEffector.instance.haveCoral());
+    }
+
+    public Command PlaceBargeAlgae() {
+        return LoggedCommands.sequence("Place barge algae",
+            EndEffector.instance.PlaceBargeAlgae(),
+            TriggerMoveToEEPose(EEPose.GROUND_CORAL),
+            AlgaeRoller.instance.TriggerStowWhenStopped());
     }
 
     public static Command WaitForCoral() {

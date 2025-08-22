@@ -9,6 +9,6 @@ public final class Options {
     public static final TunableOption optBackupPush = new TunableOption("Back Up in Auto", false);
     public static final TunableOption optMirrorAuto = new TunableOption("Mirror Auto to Left", false);
     public static final TunableOption optAutoReefAiming = new TunableOption("Automatically Aim at Reef", true);
-    public static final TunableOption optAlgaeBargeOnly = new TunableOption("Algae into Barge Only", false);
+    public static final TunableOption optAlgaeBargeOnly = new TunableOption("Algae into Barge Only", true); // TODO Until we have processor implemented
     public static final TunableOption optInvertAlgae = new TunableOption("Invert Algae Location", false);
 }

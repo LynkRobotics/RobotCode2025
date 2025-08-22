@@ -94,6 +94,7 @@ public class Controls extends SubsystemBase{
 
         goLeft.whileTrue(Superstructure.instance.SmartScore(true));
         goRight.whileTrue(Superstructure.instance.SmartScore(false));
+        goLeft.and(goRight).onTrue(Superstructure.instance.PlacePiece());
 
         alignmentToggle.onTrue(LoggedCommands.runOnce("Toggle Alignment", optAutoReefAiming::toggle));
 

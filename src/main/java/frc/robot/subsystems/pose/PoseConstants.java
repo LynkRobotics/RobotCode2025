@@ -29,11 +29,12 @@ public class PoseConstants {
     public static final Distance robotFrameWidth = Units.Inches.of(26.0);
     public static final Distance bumperWidth = Units.Inches.of(2.75);
 
-    public static final Distance centerToFrontBumper = robotFrameLength.div(2.0).plus(bumperWidth);
-    public static final Distance reefCoralStandoff = Units.Inches.of(4.7); // How far between bumper and reef when scoring 
-    public static final Distance reefCoralOffset = centerToFrontBumper.plus(reefCoralStandoff);
-    public static final Distance reefApproachOffset = Units.Inches.of(9.0); // How far away from the desired position to approach first
-    public static final Distance algaeAdditionalOffset = Units.Inches.of(1.307); // How much further away is Algae than Coral
+    private static final Distance centerToFrontBumper = robotFrameLength.div(2.0).plus(bumperWidth);
+    private static final Distance reefCoralStandoff = Units.Inches.of(4.7); // How far between bumper and reef when scoring coral
+    private static final Distance reefCoralOffset = centerToFrontBumper.plus(reefCoralStandoff);
+    private static final Distance reefAlgaeStandoff = Units.Inches.of(-2.5); // How far between bumper and reef when intaking algae
+    private static final Distance reefAlgaeOffset = centerToFrontBumper.plus(reefAlgaeStandoff);
+    private static final Distance reefApproachOffset = Units.Inches.of(6.0); // How far away from the desired position to approach first
 
     public static final Distance processorAreaY = Field.width.div(2.0).minus(Units.Meters.of(1.0)); // What portion of the field do we defined as "near the processor (instead of barge)"
     public static final Translation2d processor = Constants.atHQ ? new Translation2d(7.38, 0.46) : Constants.fieldLayout.getTagPose(16).get().toPose2d().getTranslation();
@@ -43,20 +44,19 @@ public class PoseConstants {
 
     // Locations from the Blue Alliance perspective
     public static final Translation2d reefCenter = new Translation2d(Units.Inches.of(176.75), Field.width.div(2.0)); // Position of the center of the reef
-    public static final Distance reefToFaceDistance = reefCenter.getMeasureX().minus(Units.Inches.of(144.0)); // Distance from center of reef to center of reef face
-    public static final Distance branchSeparation = Units.Inches.of(12.0 + 15.0 / 16.0); // Center-to-center separation between reef branches on the same face
-    public static final Distance bargeShotDistanceFromCenter = Units.Inches.of(52.0); // How far from the center of field to our bumper for the barge shot
+    private static final Distance reefToFaceDistance = reefCenter.getMeasureX().minus(Units.Inches.of(144.0)); // Distance from center of reef to center of reef face
+    private static final Distance branchSeparation = Units.Inches.of(12.0 + 15.0 / 16.0); // Center-to-center separation between reef branches on the same face
+    private static final Distance bargeShotDistanceFromCenter = Units.Inches.of(52.0); // How far from the center of field to our bumper for the barge shot
     public static final Distance bargeShotX = Field.length.div(2.0).minus(bargeShotDistanceFromCenter).minus(centerToFrontBumper); // X position of the barge shot
 
     // Offset to the reef face, not at the branches, but on the faces directly in front
-    public static final Translation2d algaeOffset = new Translation2d(algaeAdditionalOffset, Units.Inches.of(5.5));
+    private static final Translation2d algaeOffset = new Translation2d(reefToFaceDistance.plus(reefAlgaeOffset), Units.Inches.of(3.0));
     private static final Translation2d centerCoralOffset = new Translation2d(reefToFaceDistance.plus(reefCoralOffset), Units.Meters.zero());
-    private static final Translation2d centerAlgaeOffset = centerCoralOffset.plus(algaeOffset);
     private static final Translation2d branchOffset = new Translation2d(Units.Meter.zero(), branchSeparation.div(2.0));
     private static final Translation2d leftCoralOffset = centerCoralOffset.minus(branchOffset);
     private static final Translation2d rightCoralOffset = centerCoralOffset.plus(branchOffset);
     private static final Translation2d approachOffset = new Translation2d(reefApproachOffset, Units.Meters.zero());
-    private static final Translation2d centerApproachOffset = centerAlgaeOffset.plus(approachOffset);
+    private static final Translation2d centerApproachOffset = algaeOffset.plus(approachOffset);
     private static final Translation2d leftApproachOffset = leftCoralOffset.plus(approachOffset);
     private static final Translation2d rightApproachOffset = rightCoralOffset.plus(approachOffset);
     public static final double approachDistanceToReefCenter = centerApproachOffset.getDistance(reefCenter);
@@ -78,7 +78,7 @@ public class PoseConstants {
 
         ReefFace(double directionDegrees, boolean algaeHigh) {
             directionFromCenter = Rotation2d.fromDegrees(directionDegrees);
-            alignAlgaeMiddle = new Pose2d(reefCenter.plus(centerAlgaeOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.kZero));
+            alignAlgae = new Pose2d(reefCenter.plus(algaeOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.kZero));
             alignCoralLeft = new Pose2d(reefCenter.plus(leftCoralOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.kZero));
             // leftL1 = alignLeft.transformBy(leftL1Transform);
             // leftL1Outside = alignLeft.transformBy(leftL1OutsideTransform);
@@ -94,7 +94,7 @@ public class PoseConstants {
         }
 
         public final Rotation2d directionFromCenter;
-        public final Pose2d alignCoralLeft, alignAlgaeMiddle, alignCoralRight;
+        public final Pose2d alignCoralLeft, alignAlgae, alignCoralRight;
         // public final Pose2d leftL1, rightL1;
         // public final Pose2d leftL1Outside, rightL1Outside;
         public final Pose2d approachCoralLeft, approachAlgaeMiddle, approachCoralRight;

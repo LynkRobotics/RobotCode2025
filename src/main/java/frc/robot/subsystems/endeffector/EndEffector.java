@@ -221,6 +221,14 @@ public class EndEffector extends SubsystemBase {
         return LoggedCommands.waitUntil("Wait for algae intake", () -> state == EEState.HAVE_ALGAE);
     }
 
+    public Command PlaceBargeAlgae() {
+        return LoggedCommands.sequence("Place barge algae",
+            LoggedCommands.runOnce("Expel algae into barge", () -> pieceMotor.setControl(EEControl.ALGAE_BARGE_SCORE.control), this),
+            Commands.waitSeconds(0.3),
+            LoggedCommands.runOnce("Stop motor", () -> pieceMotor.stopMotor(), this))
+            .handleInterrupt(() -> pieceMotor.stopMotor());
+    }
+
     @Override
     public void periodic() {
         Command currentCommand = getCurrentCommand();

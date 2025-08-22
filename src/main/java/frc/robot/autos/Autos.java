@@ -292,10 +292,10 @@ public class Autos extends SubsystemBase {
             LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.GH.approachAlgaeMiddle, true, false)),
             LoggedCommands.proxy(DealgaefyMaybeMirror(ReefFace.GH, false)),
             LoggedCommands.proxy(PathCommand("GH to Barge Shot")),
-            LoggedCommands.proxy(Superstructure.instance.BargeShot()),
+            // LoggedCommands.proxy(Superstructure.instance.BargeShot()),
             LoggedCommands.proxy(PathCommand("Barge Shot to near IJ")),
             LoggedCommands.proxy(DealgaefyMaybeMirror(ReefFace.IJ, false)), 
-            LoggedCommands.proxy(Superstructure.instance.BargeShot(-Units.inchesToMeters(5))), // Ensure we are shy of the line at the end of auto
+            // LoggedCommands.proxy(Superstructure.instance.BargeShot(-Units.inchesToMeters(5))), // Ensure we are shy of the line at the end of auto
             LoggedCommands.deferredProxy("Backup after barge shot", 
                 () -> new PIDSwerve(Swerve.instance, Pose.instance, Pose.instance.getPose().transformBy(new Transform2d(-Units.inchesToMeters(18.0), 0.0, Rotation2d.kZero)), false, false)),
             LoggedCommands.proxy(Swerve.instance.Stop()));
