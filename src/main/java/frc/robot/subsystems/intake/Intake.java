@@ -122,6 +122,7 @@ public class Intake extends SubsystemBase {
         DogLog.log("Intake/At Desired State", atDesiredState);
         DogLog.log("Intake/Zeroing?", zeroing);
         DogLog.log("Intake/Deploy Current", deployMotor.getTorqueCurrent().getValueAsDouble());
+        DogLog.log("Intake/Deploy Voltage", deployMotor.getMotorVoltage().getValueAsDouble());
         DogLog.log("Intake/Deploy Velocity", deployMotor.getVelocity().getValueAsDouble());
         DogLog.log("Intake/Deploy Position (Rotations)", deployMotor.getPosition().getValue().in(Units.Rotations));
         DogLog.log("Intake/Deploy Position (Degrees)", deployMotor.getPosition().getValue().in(Units.Degrees));

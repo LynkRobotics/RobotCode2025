@@ -103,14 +103,39 @@ public class Superstructure extends SubsystemBase {
             Elevator.instance.TriggerMoveTo(pose.stop));
     }
 
+    private Command TriggerMoveToEEPoseDirect(EEPose pose) {
+        return LoggedCommands.sequence("Move directly to EE Pose " + pose.name(),
+            EndEffector.instance.TriggerMoveTo(pose.position),
+            Elevator.instance.TriggerMoveToDirect(pose.stop));
+    }
+
     private Command TriggerMoveToActiveCoral() {
         return Commands.either(
-            TriggerMoveToEEPose(EEPose.L2),
             Commands.either(
-                TriggerMoveToEEPose(EEPose.L3),
-                TriggerMoveToEEPose(EEPose.L4),
-                () -> activeReefLevel == ReefLevel.L3),
-            () -> activeReefLevel == ReefLevel.L2);
+                TriggerMoveToEEPoseDirect(EEPose.L1),
+                Commands.either(
+                    Commands.sequence(
+                        AlgaeRoller.instance.TriggerStowWhenClear(),
+                        TriggerMoveToEEPose(EEPose.L4)),
+                    Commands.sequence(
+                        AlgaeRoller.instance.TriggerStow(),
+                        Commands.either(
+                            TriggerMoveToEEPoseDirect(EEPose.L2),
+                            TriggerMoveToEEPoseDirect(EEPose.L3),
+                            () -> activeReefLevel == ReefLevel.L2)),
+                    () -> activeReefLevel == ReefLevel.L4),
+                () -> activeReefLevel == ReefLevel.L1),
+            Commands.either(
+                TriggerMoveToEEPose(EEPose.L1),
+                Commands.either(
+                    TriggerMoveToEEPose(EEPose.L4),
+                    Commands.either(
+                        TriggerMoveToEEPose(EEPose.L2),
+                        TriggerMoveToEEPose(EEPose.L3),
+                        () -> activeReefLevel == ReefLevel.L2),
+                    () -> activeReefLevel == ReefLevel.L4),
+                () -> activeReefLevel == ReefLevel.L1),
+            () -> EndEffector.instance.inHighClearRange());
     }
 
     private Command WaitForEEPose() {

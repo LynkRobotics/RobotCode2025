@@ -108,7 +108,14 @@ public class EndEffector extends SubsystemBase {
             Commands.runOnce(() -> pieceMotor.setControl(control.control), this),
             LoggedCommands.waitUntil("Wait for coral to clear", () -> state == EEState.EMPTY),
             Commands.waitSeconds(postClearDelay),
-            Commands.runOnce(pieceMotor::stopMotor, this));
+            Commands.runOnce(pieceMotor::stopMotor, this))
+            .handleInterrupt(() -> {
+                if (haveCoral()) {
+                    pieceMotor.setControl(EEControl.CORAL_HOLD.control);
+                } else {
+                    pieceMotor.stopMotor();
+                }
+            });
     }
 
     public boolean haveCoral() {
@@ -188,8 +195,15 @@ public class EndEffector extends SubsystemBase {
     }
 
     private boolean okToMove() {
-        return Elevator.instance.isClear(Elevator.ClearState.CLEAR_LOW) &&
-            (Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH) || AlgaeRoller.instance.isClear());
+        return (Elevator.instance.isClear(Elevator.ClearState.CLEAR_LOW) &&
+            (Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH) || AlgaeRoller.instance.isClear())) ||
+            inHighClearRange();
+    }
+
+    public boolean inHighClearRange() {
+        Angle position = positionMotor.getPosition().getValue();
+
+        return position.gte(EEPosition.HIGH_CLEAR_START.position) && position.lte(EEPosition.HIGH_CLEAR_END.position);
     }
 
     public Angle getAbsolutePosition() {
@@ -287,7 +301,6 @@ public class EndEffector extends SubsystemBase {
             if (!coralDetected()) {
                 state = EEState.EMPTY;
                 DogLog.log("EndEffector/Status", "Coral lost");
-                pieceMotor.stopMotor();
             }
         } else if (state == EEState.HAVE_ALGAE) {
             if (!algaeDetected()) {

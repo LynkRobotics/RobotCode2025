@@ -69,8 +69,8 @@ public class EndEffectorConstants {
         ALGAE_HOLD(-120.0),
         CORAL_HOLD(60.0),
         CLIMB(130.0),
-        ALGAE_IMPACT(140.0),
-        CORAL_IMPACT(40.0);
+		HIGH_CLEAR_START(50.0),
+		HIGH_CLEAR_END(105.0);
 
         public final Angle position;
 		public final ControlRequest control;

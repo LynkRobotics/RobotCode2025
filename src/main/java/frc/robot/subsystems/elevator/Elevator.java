@@ -129,6 +129,10 @@ public class Elevator extends SubsystemBase {
         return LoggedCommands.runOnce("Move elevator to " + stop, () -> moveTo(stop), this);
     }
 
+    public Command TriggerMoveToDirect(Stop stop) {
+        return LoggedCommands.runOnce("Move elevator direcly to " + stop, () -> moveTo(stop, true), this);
+    }
+
     public Command GoToNext() {
         return LoggedCommands.sequence("Move Elevator to stop",
             LoggedCommands.log(() -> "Next stop: " + nextStop),
@@ -285,6 +289,10 @@ public class Elevator extends SubsystemBase {
     }
 
     public void moveTo(Stop target) {
+        moveTo(target, false);
+    }
+
+    public void moveTo(Stop target, boolean direct) {
         DogLog.log("Elevator/Status", "Final target: " + target + " <- " + finalTarget);
         finalTarget = target;
 
@@ -292,7 +300,10 @@ public class Elevator extends SubsystemBase {
         Angle targetPosition = target.position;
         boolean goingUp = currentPosition.lt(targetPosition);
 
-        if (goingUp) {
+        if (direct) {
+            // We are explicitly asking to move directly to a position
+            setCurrentTarget(target, false);
+        } else if(goingUp) {
             // We need to wait for the algae bar to be clear if we are below the CLEAR_HIGH mark
             setCurrentTarget(target, currentPosition.lt(Stop.CLEAR_HIGH.position));
         } else if (currentPosition.gt(Stop.CLEAR_HIGH.position)) {
