@@ -9,9 +9,11 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 
-public class AlgaeRollerContants {
+public class AlgaeRollerConstants {
     /* Motor Control Values */
     public static final double deployGearing = (62.0 / 8.0) * (68.0 / 18.0) * (15.0 / 9.0);
 	public static final double rollerGearing = (18.0 / 12.0);
@@ -20,6 +22,9 @@ public class AlgaeRollerContants {
 	public static final Voltage L1AssistVoltage = Units.Volts.of(3.5);
 
 	public static final Angle epsilon = Units.Degrees.of(8.0); // TODO From Citrus, but too generous?
+	public static final Time deployStallTime = Units.Seconds.of(0.1);
+	public static final Voltage deployZeroingVoltage = Units.Volts.of(2.0);
+	public static final Current deployStallCurrent = Units.Amps.of(35.0);
 
 	public static enum AlgaeRollerPosition {
 		STOWED(90.0),

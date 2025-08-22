@@ -5,13 +5,15 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedCommands;
 import frc.robot.Ports;
-import frc.robot.subsystems.algaeroller.AlgaeRollerContants.AlgaeRollerPosition;
+import frc.robot.subsystems.algaeroller.AlgaeRollerConstants.AlgaeRollerPosition;
 import frc.robot.subsystems.elevator.Elevator;
 
 public class AlgaeRoller extends SubsystemBase {
@@ -21,26 +23,31 @@ public class AlgaeRoller extends SubsystemBase {
     private final TalonFX deployMotor;
     private final TalonFX rollerMotor;
     
-    /* Control Requests */    
-    private final ControlRequest intakeControl = new VoltageOut(AlgaeRollerContants.intakeVoltage).withEnableFOC(true);
-    private final ControlRequest expelControl = new VoltageOut(AlgaeRollerContants.expelVoltage).withEnableFOC(true);
-    private final ControlRequest L1AssistControl = new VoltageOut(AlgaeRollerContants.L1AssistVoltage).withEnableFOC(true);
+    /* Control Requests */
+    private final ControlRequest deployZeroingControl = new VoltageOut(AlgaeRollerConstants.deployZeroingVoltage).withEnableFOC(true);
+    private final ControlRequest intakeControl = new VoltageOut(AlgaeRollerConstants.intakeVoltage).withEnableFOC(true);
+    private final ControlRequest expelControl = new VoltageOut(AlgaeRollerConstants.expelVoltage).withEnableFOC(true);
+    private final ControlRequest L1AssistControl = new VoltageOut(AlgaeRollerConstants.L1AssistVoltage).withEnableFOC(true);
+
+    private static final Debouncer stallDebouncer = new Debouncer(AlgaeRollerConstants.deployStallTime.in(Units.Seconds), DebounceType.kRising);
+    private boolean zeroing = false;
 
     boolean waitingForClear = false;
     boolean waitingForStop = false;
 
-    AlgaeRollerPosition currentTarget;
+    AlgaeRollerPosition currentTarget = AlgaeRollerPosition.STOWED;
     
     AlgaeRoller() {
         /* Devices */
         deployMotor = new TalonFX(Ports.ALGAE_DEPLOY.id, Ports.ALGAE_DEPLOY.bus.name);
-        deployMotor.getConfigurator().apply(AlgaeRollerContants.getDeployMotorConfig());
+        deployMotor.getConfigurator().apply(AlgaeRollerConstants.getDeployMotorConfig());
         rollerMotor = new TalonFX(Ports.ALGAE_ROLLERS.id, Ports.ALGAE_ROLLERS.bus.name);
-        rollerMotor.getConfigurator().apply(AlgaeRollerContants.getRollerMotorConfig());
+        rollerMotor.getConfigurator().apply(AlgaeRollerConstants.getRollerMotorConfig());
 
         // Expect to begin in STOWED position and hold it
         deployMotor.setPosition(AlgaeRollerPosition.STOWED.position);
-        setTarget(AlgaeRollerPosition.STOWED);
+        // startZero();
+        moveTo(AlgaeRollerPosition.STOWED);
 
         // Debugging help
         for (AlgaeRollerPosition position : AlgaeRollerPosition.values()) {
@@ -48,9 +55,18 @@ public class AlgaeRoller extends SubsystemBase {
         }
     }
 
-    // TODO Add Zero() method / Command
-    private void setTarget(AlgaeRollerPosition position) {
-        DogLog.log("Algae Roller/Status", "Setting target to " + position.name());
+    public void startZero() {
+        zeroing = true;
+        deployMotor.setControl(deployZeroingControl);
+    }
+
+    public Command Zero() {
+        return LoggedCommands.runOnce("Triggering zero of Algae Roller", this::startZero, this);
+    }
+
+    private void moveTo(AlgaeRollerPosition position) {
+        DogLog.log("Algae Roller/Status", "Moving to " + position.name());
+        waitingForClear = waitingForStop = false;
         currentTarget = position;
         deployMotor.setControl(position.control);
     }
@@ -64,11 +80,11 @@ public class AlgaeRoller extends SubsystemBase {
     }
 
     private boolean isNear(AlgaeRollerPosition position) {
-        return deployMotor.getPosition().getValue().minus(position.position).abs(Units.Rotations) <= AlgaeRollerContants.epsilon.in(Units.Rotations);
+        return deployMotor.getPosition().getValue().minus(position.position).abs(Units.Rotations) <= AlgaeRollerConstants.epsilon.in(Units.Rotations);
     }
 
     public boolean isClear() {
-        return deployMotor.getPosition().getValue().lte(AlgaeRollerPosition.CLEAR.position.plus(AlgaeRollerContants.epsilon));
+        return deployMotor.getPosition().getValue().lte(AlgaeRollerPosition.CLEAR.position.plus(AlgaeRollerConstants.epsilon));
     }
 
     private void ensureClear() {
@@ -97,12 +113,6 @@ public class AlgaeRoller extends SubsystemBase {
 
     public Command TriggerAtleastClear() {
         return LoggedCommands.runOnce("Ensure algae bar clear", this::ensureClear, this);
-    }
-
-    private void moveTo(AlgaeRollerPosition position) {
-        DogLog.log("Algae Roller/Status", "Moving to " + position.name());
-        waitingForClear = waitingForStop = false;
-        deployMotor.setControl(position.control);
     }
 
     public Command TriggerStowWhenClear() {
@@ -148,15 +158,32 @@ public class AlgaeRoller extends SubsystemBase {
     public void periodic() {
         Command currentCommand = getCurrentCommand();
         DogLog.log("Algae Roller/Current Command", currentCommand == null ? "None" : currentCommand.getName());
+        DogLog.log("Algae Roller/Current target", currentTarget);
+        DogLog.log("Algae Roller/Current target (rot)", currentTarget.position.in(Units.Rotations));
+        DogLog.log("Algae Roller/Zeroing?", zeroing);
         DogLog.log("Algae Roller/Clear?", isClear());
         DogLog.log("Algae Roller/Waiting for clear?", waitingForClear);
         DogLog.log("Algae Roller/Waiting for stop?", waitingForStop);
         DogLog.log("Algae Roller/Deploy Current", deployMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("Algae Roller/Deploy Velocity", deployMotor.getVelocity().getValueAsDouble());
         DogLog.log("Algae Roller/Deploy Position (rotations)", deployMotor.getPosition().getValue().in(Units.Rotations));
-        DogLog.log("Algae Roller/Deploy Position (degress)", deployMotor.getPosition().getValue().in(Units.Degrees));
+        DogLog.log("Algae Roller/Deploy Position (degrees)", deployMotor.getPosition().getValue().in(Units.Degrees));
         DogLog.log("Algae Roller/Intake Current", rollerMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("Algae Roller/Intake Velocity", rollerMotor.getVelocity().getValueAsDouble());
+
+        // Detect deployment stalls by checking the current
+        if (stallDebouncer.calculate(deployMotor.getTorqueCurrent().getValue().gt(AlgaeRollerConstants.deployStallCurrent))) {
+            if (zeroing) {
+                DogLog.log("Algae Roller/Status", "Deploy zeroing complete");
+                zeroing = false;
+                deployMotor.stopMotor();
+                deployMotor.setPosition(AlgaeRollerPosition.STOWED.position);
+                deployMotor.setControl(currentTarget.control); // Return to the intended target
+            } else {
+                DogLog.log("Algae Roller/Status", "Deploy stall detected");
+                deployMotor.stopMotor();
+            }
+        }
 
         if (waitingForClear && Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH)) {
             moveTo(AlgaeRollerPosition.STOWED);
