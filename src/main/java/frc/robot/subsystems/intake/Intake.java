@@ -105,6 +105,13 @@ public class Intake extends SubsystemBase {
         deployMotor.setControl(IntakePosition.RETRACTED.control);
     }
 
+    private void fullStow() {
+        DogLog.log("Intake/Status", "Fully stowing Intake");
+        intakeMotor.stopMotor();
+        indexMotor.stopMotor();
+        deployMotor.setControl(IntakePosition.FULL_STOW.control);
+    }
+
     public Command Deploy() {
         return LoggedCommands.runOnce("Deploy Intake", this::runDeploy, this);
     }
@@ -121,6 +128,10 @@ public class Intake extends SubsystemBase {
 
     public Command Stop() {
         return LoggedCommands.runOnce("Stop Intake", this::stopIntake, this);
+    }
+
+    public Command FullStow() {
+        return LoggedCommands.runOnce("Fully stow Intake", this::fullStow, this);
     }
 
     // Gently deploy intake until it stalls to recalibrate the zero position

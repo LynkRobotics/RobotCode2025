@@ -14,10 +14,10 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedCommands;
 import frc.robot.Ports;
+import frc.robot.subsystems.controls.Controls;
 import frc.robot.subsystems.climber.ClimberConstants.ClimberPosition;
 
 public class Climber extends SubsystemBase {
@@ -49,7 +49,6 @@ public class Climber extends SubsystemBase {
         SmartDashboard.putData("Climber/Clear", Clear());
         SmartDashboard.putData("Climber/Stow", Stow());
         SmartDashboard.putData("Climber/Intake", Intake());
-        SmartDashboard.putData("Climber/Intake Until Stalled", IntakeUntilStalled());
     }
 
     private Command StartReset() {
@@ -85,38 +84,35 @@ public class Climber extends SubsystemBase {
         return LoggedCommands.runOnce("Intake climber", () -> intakeMotor.setControl(intakeControl), this);
     }
 
-    private Command IntakeUntilStalled() {
-        return LoggedCommands.sequence("Intake climber until stalled",
-            Intake(),
-            Commands.waitUntil(this::intakeStalled),
-            LoggedCommands.runOnce("Stop stalled climber", () -> intakeMotor.stopMotor(), this));
-    }
-
     public Command GrabCage() {
         return LoggedCommands.sequence("Grab Cage",
             Deploy(),
-            IntakeUntilStalled());
+            Intake(),
+            LoggedCommands.waitSeconds("Pre-intake delay", 1.5),
+            LoggedCommands.waitUntil("Wait until climber intake stalled", this::intakeStalled),
+            LoggedCommands.waitSeconds("Post-intake delay", 0.5),
+            Controls.instance.TriggerRumble(),
+            LoggedCommands.print("Flash LEDs", "TODO Flash LEDs"));
     }
 
-    // private Command WaitForIntake() {
-    //     return LoggedCommands.sequence("Wait for Intake",
-    //         LoggedCommands.waitUntil("Wait for intake motor stalled", () -> false /* TODO intakeMotor.isStalled() */),
-    //         LoggedCommands.runOnce("Stop climber intake due to stall", intakeMotor::stopMotor, this),
-    //         LoggedCommands.waitSeconds("Post climber intake delay", 0.5),
-    //         Controls.instance.TriggerRumble(),
-    //         LoggedCommands.print("Flash LEDs", "TODO Flash LEDs"));
-    // }
-
     public Command Retract() {
-        intakeMotor.stopMotor();
-        return LoggedCommands.print("Retract climber", "TODO Implement climber retract");
-        // TODO move with magic motion
-        // Idle rollers and move to pull position
-        // In superstructue, then move intake into full stow position
+        return LoggedCommands.sequence("Retract climber",
+            LoggedCommands.runOnce("Stop climber intake", () -> intakeMotor.stopMotor(), this),
+            Stow());
+    }
+
+    public Command RetractAndWait() {
+        return LoggedCommands.sequence("Retract climber and wait",
+            Retract(),
+            LoggedCommands.waitUntil("Wait until stowed", this::isStowed));
     }
 
     private boolean intakeStalled() {
         return stallDebouncer.calculate(intakeMotor.getTorqueCurrent().getValue().gt(ClimberConstants.currentStallThreshold));
+    }
+
+    private boolean isStowed() {
+        return deployMotor.getPosition().getValue().minus(ClimberPosition.STOWED.angle).abs(Units.Rotations) <= ClimberPosition.EPISILON.angle.in(Units.Rotations);
     }
 
     @Override

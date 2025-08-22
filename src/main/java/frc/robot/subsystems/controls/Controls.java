@@ -122,8 +122,8 @@ public class Controls extends SubsystemBase{
             //         LoggedCommands.runOnce("Test End", () -> LEDSubsystem.triggerError())));
         }
 
-        // driver.povDown().onTrue(Climber.instance.DeployAndIntake());
-        // driver.povUp().onTrue(Climber.instance.Retract());
+        driver.povDown().onTrue(Superstructure.instance.GrabCage());
+        driver.povUp().onTrue(Superstructure.instance.Climb());
     }
 
     private double speedLimitFactor() {

@@ -348,12 +348,19 @@ public class Superstructure extends SubsystemBase {
     public Command GrabCage() {
         // TODO Reject if holding coral (need to expel it first)
         return LoggedCommands.sequence("Grab cage",
-            // Ensure all rollers idle
+            AlgaeRoller.instance.StopAndClear(),
             TriggerMoveToEEPose(EEPose.GROUND_CORAL),
-            Intake.instance.Stop(), // TODO Only if no coral in index
+            EndEffector.instance.StopIntake(),
+            Intake.instance.Stop(),
             WaitForEEPose(),
             AlgaeRoller.instance.TriggerStow(),
             Climber.instance.GrabCage());
+    }
+
+    public Command Climb() {
+        return LoggedCommands.sequence("Climb",
+            Climber.instance.RetractAndWait(),
+            Intake.instance.FullStow());
     }
 
     public Command IntakeGroundAlgae() {

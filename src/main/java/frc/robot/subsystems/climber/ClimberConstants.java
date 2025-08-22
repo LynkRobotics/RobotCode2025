@@ -29,7 +29,8 @@ public class ClimberConstants {
 	public static enum ClimberPosition {
 		STOWED(10.948),
 		DEPLOYED(18.78),
-		CLEAR(STOWED.distance.plus(Units.Inches.of(0.5)).in(Units.Inches));
+		CLEAR(STOWED.distance.plus(Units.Inches.of(0.5)).in(Units.Inches)),
+		EPISILON(1.9);
 
 		public final Distance distance;
 		public final Angle angle;
