@@ -7,7 +7,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 
 public final class Constants {
-    public static final boolean atHQ = true; //TODO: consider a field calibration option to allow NT broadcasting
+    public static final boolean atHQ = false; //TODO: consider a field calibration option to allow NT broadcasting
     public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     public static final double stickDeadband = 0.1;
     public static final double driveStickSensitivity = 1.00; 
