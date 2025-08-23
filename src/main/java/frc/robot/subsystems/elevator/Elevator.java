@@ -426,6 +426,7 @@ public class Elevator extends SubsystemBase {
         DogLog.log("Elevator/atTarget", atTarget());
         DogLog.log("Elevator/stalled", isStalled());
 
+        SmartDashboard.putNumber("Elevator/Stall Count", stallCount);
         SmartDashboard.putBoolean("Elevator/At Target", atTarget());
         SmartDashboard.putBoolean("Elevator/L1", atStop(Stop.L1));
         SmartDashboard.putBoolean("Elevator/L2", atStop(Stop.L2));
