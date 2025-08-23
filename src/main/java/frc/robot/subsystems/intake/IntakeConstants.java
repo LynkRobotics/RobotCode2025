@@ -29,6 +29,8 @@ public class IntakeConstants {
         }
     }
 
+	public static final double intakeSlowMode = 0.8; // How much to slow speed when intaking
+
     public static final double deployGearing = 40.0;
     public static final double indexGearing = 2.5;
     public static final double intakeGearing = (24.0 / 12.0);

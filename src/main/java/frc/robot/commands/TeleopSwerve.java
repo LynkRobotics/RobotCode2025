@@ -9,6 +9,8 @@ import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.Climber.ClimbState;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.endeffector.EndEffector;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.pose.Pose;
 
 import java.util.function.DoubleSupplier;
@@ -93,7 +95,8 @@ public class TeleopSwerve extends LoggedCommandBase {
             // new Translation2d(translationVal, strafeVal).times(speedLimitSupplier.getAsDouble()).times(SwerveConstants.maxSpeed).times((RobotState.intakingAlgae() || (RobotState.getClimbState() != ClimbState.NONE)) ? SwerveConstants.slowMode : 1.0),
             // rotationVal * SwerveConstants.maxAngularVelocity * speedLimitSupplier.getAsDouble() * (RobotState.haveAlgae() ? Constants.algaeSlowRot : 1.0) * ((RobotState.intakingAlgae() || (RobotState.getClimbState() != ClimbState.NONE)) ? SwerveConstants.slowMode : 1.0),
             new Translation2d(translationVal, strafeVal).times(speedLimitSupplier.getAsDouble()).times(SwerveConstants.maxSpeed)
-                .times((Elevator.instance.shouldLimitSpeed() || Climber.instance.getClimbState() != ClimbState.NONE) ? SwerveConstants.slowMode : 1.0),
+                .times((Elevator.instance.shouldLimitSpeed() || Climber.instance.getClimbState() != ClimbState.NONE) ? SwerveConstants.slowMode : 1.0)
+                .times(Intake.instance.intaking() ? IntakeConstants.intakeSlowMode : 1.0),
             rotationVal * SwerveConstants.maxAngularVelocity * speedLimitSupplier.getAsDouble(),
             true
         );
