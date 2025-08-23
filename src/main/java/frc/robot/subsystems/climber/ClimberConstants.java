@@ -27,7 +27,7 @@ public class ClimberConstants {
     public static final Distance drumDiameter = Units.Inches.of(0.675);
 
 	public static enum ClimberPosition {
-		FULLY_STOWED(10.5),
+		FULLY_STOWED(9.75),
 		STOWED(10.948),
 		DEPLOYED(19.8),
 		CLEAR(STOWED.distance.plus(Units.Inches.of(0.5)).in(Units.Inches)),
