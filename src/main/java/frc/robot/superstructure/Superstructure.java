@@ -82,7 +82,7 @@ public class Superstructure extends SubsystemBase {
         return LoggedCommands.runOnce("Change active reef level to " + level, () -> activeReefLevel = level);
     }
 
-    private Command TriggerMoveToEEPose(EEPose pose) {
+    public Command TriggerMoveToEEPose(EEPose pose) {
         return LoggedCommands.sequence("Move to EE Pose " + pose.name(),
             Commands.either(
                 AlgaeRoller.instance.TriggerAtleastClear(),
@@ -329,6 +329,25 @@ public class Superstructure extends SubsystemBase {
 
     private Command IntakeExpel = Intake.instance.Expel();
 
+    public Command StartCoralIntake() {
+        return LoggedCommands.sequence("Start Coral Intake",
+            TriggerMoveToEEPose(EEPose.GROUND_CORAL),
+            AlgaeRoller.instance.TriggerStowWhenStopped(),
+            WaitForEEPose(),
+            Commands.parallel(
+                EndEffector.instance.StartCoralIntake(),
+                Intake.instance.Deploy()));
+    }
+
+    public Command FinishCoralIntake() {
+        return LoggedCommands.sequence("Finish Coral Intake",
+        EndEffector.instance.StopIntake(),
+        Intake.instance.Stop(),
+        TriggerMoveToEEPose(EEPose.CORAL_HOLD),
+        AlgaeRoller.instance.TriggerStowWhenStopped());
+    }
+
+    // TODO Use StartCoralIntake() && Finish Coral Intake
     private Command IntakeCoral() {
         // NOTE: Must not be holding any game piece already!
         return LoggedCommands.sequence("Intaking Coral",

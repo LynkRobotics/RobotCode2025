@@ -29,6 +29,7 @@ import frc.robot.Robot;
 import frc.robot.commands.pidswerve.PIDSwerve;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
+import frc.robot.subsystems.endeffector.EndEffector;
 import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.pose.PoseConstants.ReefFace;
 import frc.robot.subsystems.robotstate.RobotState;
@@ -36,7 +37,9 @@ import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants.CameraMode;
 import frc.robot.superstructure.Superstructure;
+import frc.robot.superstructure.Superstructure.EEPose;
 import frc.robot.Field.ReefLevel;
+import frc.robot.autos.AutoConstants.AutoPose;
 
 public class Autos extends SubsystemBase {
     public static final Autos instance = new Autos();
@@ -336,6 +339,62 @@ public class Autos extends SubsystemBase {
 
         startingPaths.put(autoEOnly, "Start towards EF");
         addAutoCommand(chooser, autoEOnly);
+
+        Command autoELolli = LoggedCommands.sequence("[Sublyme] E + Lollipops",
+            LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
+            Commands.either(
+                LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
+                LoggedCommands.log("Skip back up option"),
+                optBackupPush::get),
+            Superstructure.instance.SetActiveReefLevel(ReefLevel.L4),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.EF_APPROACH.pose, true, false)),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
+            LoggedCommands.proxy(Superstructure.instance.TriggerMoveToEEPose(EEPose.GROUND_CORAL)),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.EF_CLEAR.pose, true, false)),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.LOLLIPOP1_APPROACH.pose, true, false)),
+            LoggedCommands.proxy(Superstructure.instance.StartCoralIntake()),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.LOLLIPOP1_THROUGH.pose, true, false)),
+            LoggedCommands.proxy(Superstructure.instance.FinishCoralIntake()),
+            Commands.either(LoggedCommands.proxy(Superstructure.instance.CoralHold()), Commands.none(), () -> EndEffector.instance.haveCoral()),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.AB_APPROACH.pose, true, false)),
+            Commands.either(
+                Commands.sequence(
+                    LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
+                    LoggedCommands.proxy(Superstructure.instance.TriggerMoveToEEPose(EEPose.GROUND_CORAL)),
+                    LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.AB_APPROACH.pose, true, false))),
+                Commands.none(),
+                () -> EndEffector.instance.haveCoral()),
+            LoggedCommands.proxy(Superstructure.instance.StartCoralIntake()),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.LOLLIPOP2_THROUGH.pose, true, false)),
+            LoggedCommands.proxy(Superstructure.instance.FinishCoralIntake()),
+            Commands.either(LoggedCommands.proxy(Superstructure.instance.CoralHold()), Commands.none(), () -> EndEffector.instance.haveCoral()),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.AB_APPROACH.pose, true, false)),
+            Commands.either(
+                Commands.sequence(
+                    LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, true)),
+                    LoggedCommands.proxy(Superstructure.instance.TriggerMoveToEEPose(EEPose.GROUND_CORAL)),
+                    LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.AB_APPROACH.pose, true, false))),
+                Commands.none(),
+                () -> EndEffector.instance.haveCoral()),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.LOLLIPOP3_APPROACH.pose, true, false)),
+            LoggedCommands.proxy(Superstructure.instance.StartCoralIntake()),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.LOLLIPOP3_THROUGH.pose, true, false)),
+            LoggedCommands.proxy(Superstructure.instance.FinishCoralIntake()),
+            Commands.either(LoggedCommands.proxy(Superstructure.instance.CoralHold()), Commands.none(), () -> EndEffector.instance.haveCoral()),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.AB_APPROACH.pose, true, false)),
+            Superstructure.instance.SetActiveReefLevel(ReefLevel.L2),
+            Commands.either(
+                Commands.sequence(
+                    LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, true)),
+                    LoggedCommands.proxy(Superstructure.instance.TriggerMoveToEEPose(EEPose.GROUND_CORAL)),
+                    LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.AB_APPROACH.pose, true, false))),
+                Commands.none(),
+                () -> EndEffector.instance.haveCoral()),
+            Superstructure.instance.SetActiveReefLevel(ReefLevel.L4),
+            LoggedCommands.proxy(Swerve.instance.Stop()));
+
+        startingPaths.put(autoELolli, "Start towards EF");
+        addAutoCommand(chooser, autoELolli);
 
         Command autoDebug = LoggedCommands.sequence("Debug Drive",
             LoggedCommands.proxy(PathCommand("Debug Drive")),
