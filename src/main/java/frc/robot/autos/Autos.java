@@ -435,8 +435,8 @@ public class Autos extends SubsystemBase {
 
     private Command IfHaveCoral(Command... commands) {
         return Commands.either(
-            Commands.none(),
             Commands.sequence(commands),
+            Commands.none(),
             () -> EndEffector.instance.haveCoral());
     }
 
