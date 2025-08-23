@@ -392,4 +392,8 @@ public class Superstructure extends SubsystemBase {
             AlgaeRoller.instance.TriggerStowWhenStopped())
             .handleInterrupt(() -> AlgaeRoller.instance.StopAndClear().schedule());
     }
+
+    public ReefLevel activeReefLevel() {
+        return activeReefLevel;
+    }
 }

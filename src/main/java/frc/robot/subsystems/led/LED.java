@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedCommands;
+import frc.robot.subsystems.endeffector.EndEffector;
+import frc.robot.superstructure.Superstructure;
 import frc.lib.util.CANdleGroup;
 
 public class LED extends SubsystemBase {
@@ -94,11 +96,11 @@ public class LED extends SubsystemBase {
         MANUAL(new LEDConfig(Color.hightideTeal)),
         SLOWMODE(new LEDConfig(Color.dimYellow)),
         CORAL_L1(new LEDConfig(Color.magenta, 0.25)),
-        CORAL_L1OUTSIDE(new LEDConfig(Color.cheesyBlue, 0.25)),
+        // CORAL_L1OUTSIDE(new LEDConfig(Color.cheesyBlue, 0.25)),
         CORAL_L2(new LEDConfig(Color.green, 0.50)),
         CORAL_L3(new LEDConfig(Color.magenta, 0.75)),
         CORAL_L4(new LEDConfig(Color.green, 1.00)),
-        CORAL_UNKNOWN(new LEDConfig(Color.dim)),
+        CORAL_INTAKING(new LEDConfig(Color.lynk, true)),
         ALGAE_INTAKING(new LEDConfig(Color.cheesyBlue, true)),
         ALGAE(new LEDConfig(Color.cheesyBlue)),
         ENDGAME(new LEDConfig(LEDConstants.endGameAnimation)),
@@ -220,31 +222,23 @@ public class LED extends SubsystemBase {
                     //     state = LEDState.CLIMBED;
                     // } else if (climbState == ClimbState.STARTED) {
                     //     state = LEDState.SLOWMODE;
-                    // } else if (RobotState.haveAlgae()) {
-                    //     state = LEDState.ALGAE;
-                    // } else if (RobotState.intakingAlgae()) {
-                    //     state = LEDState.ALGAE_INTAKING;
-                    // } else if (RobotState.haveCoral()) {
-                    //     switch (RobotState.getNextStop()) {
-                    //         case L1:
-                    //             state = optL1Outside.get() ? LEDState.CORAL_L1OUTSIDE : LEDState.CORAL_L1;
-                    //             break;
-                    //         case L2:
-                    //             state = LEDState.CORAL_L2;
-                    //             break;
-                    //         case L3:
-                    //             state = LEDState.CORAL_L3;
-                    //             break;
-                    //         case L4:
-                    //         case L4_SCORE:
-                    //             state = LEDState.CORAL_L4;
-                    //             break;
-                    //         default:
-                    //             state = LEDState.CORAL_UNKNOWN;
-                    //     }
+                    if (EndEffector.instance.haveAlgae()) {
+                        state = LEDState.ALGAE;
+                    } else if (EndEffector.instance.intakingAlgae()) {
+                        state = LEDState.ALGAE_INTAKING;
+                    } else if (EndEffector.instance.intakingCoral()) {
+                        state = LEDState.CORAL_INTAKING;
+                    } else if (EndEffector.instance.haveCoral()) {
+                        state = switch (Superstructure.instance.activeReefLevel()) {
+                            case L1 -> LEDState.CORAL_L1;
+                            // case L1 -> optL1Outside.get() ? LEDState.CORAL_L1OUTSIDE : LEDState.CORAL_L1;
+                            case L2 -> LEDState.CORAL_L2;
+                            case L3 -> LEDState.CORAL_L3;
+                            case L4 -> LEDState.CORAL_L4;
+                        };
                     // } else {
                     //     state = optAutoReefAiming.get() ? LEDState.NORMAL : LEDState.MANUAL;
-                    // }        
+                    }        
                 }
             }
         }

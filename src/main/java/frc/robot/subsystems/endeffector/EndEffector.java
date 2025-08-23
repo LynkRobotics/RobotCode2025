@@ -127,6 +127,14 @@ public class EndEffector extends SubsystemBase {
         return state == EEState.HAVE_ALGAE;
     }
 
+    public boolean intakingAlgae() {
+        return intakeState == EEIntakeState.INTAKING_ALGAE;
+    }
+
+    public boolean intakingCoral() {
+        return intakeState == EEIntakeState.INTAKING_CORAL;
+    }
+
     public Command WaitForState(EEState desiredState) {
         return LoggedCommands.waitUntil("Wait for EE state " + desiredState, () -> state == desiredState );
     }
