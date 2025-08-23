@@ -24,7 +24,7 @@ public class ElevatorConstants {
 
     public static final double rotPerInch = 4.35 / 29.25; // Rotations to drive elevator one inch
     public static final Time stallTimeout = Units.Seconds.of(0.06);
-    public static final Distance autoZeroHeight = Units.Inches.of(2.0);
+    public static final Distance autoZeroHeight = Units.Inches.of(6.0);
 
     public static final Distance safetyMargin = Units.Inches.of(1.5);   // How many inches away from safe mark to still be considered safe
     public static final double positionError = rotPerInch * 0.5; // Allowable rotation error to be considered in position
