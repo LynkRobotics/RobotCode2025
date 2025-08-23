@@ -185,7 +185,7 @@ public class Intake extends SubsystemBase {
         }
 
         // If the expel timer has elapsed, end expel and reset deploy position
-        if (expelTimer.isRunning() && expelTimer.hasElapsed(IntakeConstants.expelTime.in(Units.Seconds))) {
+        if (expelTimer.isRunning()) { // Remove for now: && expelTimer.hasElapsed(IntakeConstants.expelTime.in(Units.Seconds))) {
             expelTimer.stop();
             stopIntake();
         }
