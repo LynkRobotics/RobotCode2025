@@ -30,6 +30,7 @@ public class Intake extends SubsystemBase {
 
     private IntakePosition desiredState = IntakePosition.RETRACTED;
     private boolean atDesiredState = true;
+    private boolean intaking = false;
 
     /* Devices */
     private final TalonFX deployMotor;
@@ -55,12 +56,10 @@ public class Intake extends SubsystemBase {
         indexMotor.getConfigurator().apply(IntakeConstants.getIndexConfig());
 
         SmartDashboard.putData("Intake/Zero Deploy", ZeroIntake());
-        SmartDashboard.putData("Intake/Move to DEPLOYED",
-            LoggedCommands.runOnce("Move Intake to DEPLOYED", () -> { deployMotor.setControl(IntakePosition.DEPLOYED.control); }, this));
-        SmartDashboard.putData("Intake/Move to RETRACTED",
-            LoggedCommands.runOnce("Move Intake to RETRACTED", () -> { deployMotor.setControl(IntakePosition.RETRACTED.control); }, this));
-        SmartDashboard.putData("Intake/Move to FULL_STOW",
-            LoggedCommands.runOnce("Move Intake to FULL_STOW", () -> { deployMotor.setControl(IntakePosition.FULL_STOW.control); }, this));
+        for (IntakePosition position : IntakePosition.values()) {
+            SmartDashboard.putData("Intake/Move to " + position,
+                LoggedCommands.runOnce("Move Intake to " + position, () -> { deployMotor.setControl(position.control); }, this));
+        }
 
         // We *should* be fully stowed, but given all the testing we do, also zero to start
         deployMotor.setPosition(IntakePosition.FULL_STOW.position);
@@ -75,41 +74,55 @@ public class Intake extends SubsystemBase {
         deployMotor.setControl(deployZeroingControl);
     }
 
+    private void setDeploy(IntakePosition state) {
+        desiredState = state;
+        deployMotor.setControl(desiredState.control);
+    }
+
+    public boolean intaking() {
+        return intaking;
+    }
+
     private void runDeploy() {
         DogLog.log("Intake/Status", "Deploying Intake");
         expelTimer.stop();
-        deployMotor.setControl(IntakePosition.DEPLOYED.control);
+        setDeploy(IntakePosition.DEPLOYED);
         intakeMotor.setControl(intakeControl);
+        intaking = true;
         indexMotor.setControl(indexControl);
     }
 
     private void runExpel() {
         DogLog.log("Intake/Status", "Expelling Intake");
-        deployMotor.setControl(IntakePosition.DEPLOYED.control);
+        setDeploy(IntakePosition.DEPLOYED);
         intakeMotor.setControl(intakeExpelControl);
+        intaking = false;
         indexMotor.setControl(indexExpelControl);
         expelTimer.restart();
     }
 
     private void runExpelForever() {
         DogLog.log("Intake/Status", "Expelling Intake until stopped");
-        deployMotor.setControl(IntakePosition.DEPLOYED.control);
+        setDeploy(IntakePosition.DEPLOYED);
         intakeMotor.setControl(intakeExpelControl);
+        intaking = false;
         indexMotor.setControl(indexExpelControl);
     }
 
     private void stopIntake() {
         DogLog.log("Intake/Status", "Stopping Intake");
         intakeMotor.stopMotor();
+        intaking = false;
         indexMotor.stopMotor();
-        deployMotor.setControl(IntakePosition.RETRACTED.control);
+        setDeploy(IntakePosition.RETRACTED);
     }
 
     private void fullStow() {
         DogLog.log("Intake/Status", "Fully stowing Intake");
         intakeMotor.stopMotor();
+        intaking = false;
         indexMotor.stopMotor();
-        deployMotor.setControl(IntakePosition.FULL_STOW.control);
+        setDeploy(IntakePosition.FULL_STOW);
     }
 
     public Command Deploy() {
