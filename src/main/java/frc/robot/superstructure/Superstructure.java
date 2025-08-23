@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
+import frc.lib.util.TunableOption;
 import frc.robot.autos.AutoConstants;
 import frc.robot.commands.pidswerve.PIDSwerve;
 import frc.robot.commands.pidswerve.PIDSwerveConstants.PIDSpeed;
@@ -34,6 +35,8 @@ import frc.robot.Field.ReefLevel;
 
 public class Superstructure extends SubsystemBase {
     public static final Superstructure instance = new Superstructure();
+    private static final TunableOption optOverrideClimberTiming = new TunableOption("Override Climber Timing", false);
+    private static final int climberTimeCutoff = 30; // seconds
     private ReefLevel activeReefLevel = ReefLevel.L4;
 
     public static enum EEPose {
@@ -379,14 +382,19 @@ public class Superstructure extends SubsystemBase {
 
     public Command GrabCage() {
         // TODO Reject if holding coral (need to expel it first)
-        return LoggedCommands.sequence("Grab cage",
-            AlgaeRoller.instance.StopAndClear(),
-            TriggerMoveToEEPose(EEPose.GROUND_CORAL),
-            EndEffector.instance.StopIntake(),
-            Intake.instance.Stop(),
-            WaitForEEPose(),
-            AlgaeRoller.instance.TriggerStow(),
-            Climber.instance.GrabCage());
+        return LoggedCommands.either("Grab cage",
+            Commands.sequence(
+                AlgaeRoller.instance.StopAndClear(),
+                TriggerMoveToEEPose(EEPose.GROUND_CORAL),
+                EndEffector.instance.StopIntake(),
+                Intake.instance.Stop(),
+                WaitForEEPose(),
+                AlgaeRoller.instance.TriggerStow(),
+                Climber.instance.GrabCage()),
+            Commands.sequence(
+                LoggedCommands.log("Cannot deploy before cutoff time (" + climberTimeCutoff + ")"),
+                Commands.runOnce(() -> LoggedAlert.Error("Climber", "Too Early", "Cannot deploy before cutoff time"))),
+            () -> optOverrideClimberTiming.get() || DriverStation.getMatchTime() <= climberTimeCutoff);
     }
 
     public Command Climb() {
