@@ -282,7 +282,7 @@ public class Superstructure extends SubsystemBase {
             AlgaeRoller.instance.TriggerStowWhenStopped())
             .handleInterrupt(() -> {
                 EndEffector.instance.StopIntake().schedule();
-                AlgaeRoller.instance.StopAndClear().schedule();
+                // AlgaeRoller.instance.StopAndClear().schedule(); // HACK
             });
     }
 

@@ -11,6 +11,7 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedCommands;
 import frc.robot.Ports;
@@ -48,7 +49,9 @@ public class AlgaeRoller extends SubsystemBase {
         // Expect to begin in STOWED position and hold it
         deployMotor.setPosition(AlgaeRollerPosition.STOWED.position);
         // startZero();
-        moveTo(AlgaeRollerPosition.STOWED);
+        // moveTo(AlgaeRollerPosition.STOWED);
+        // HACK
+        deployMotor.stopMotor();
 
         // Debugging help
         for (AlgaeRollerPosition position : AlgaeRollerPosition.values()) {
@@ -60,7 +63,7 @@ public class AlgaeRoller extends SubsystemBase {
 
     public void startZero() {
         zeroing = true;
-        deployMotor.setControl(deployZeroingControl);
+        // deployMotor.setControl(deployZeroingControl);
     }
 
     public Command Zero() {
@@ -71,7 +74,7 @@ public class AlgaeRoller extends SubsystemBase {
         DogLog.log("Algae Roller/Status", "Moving to " + position.name());
         waitingForClear = waitingForStop = false;
         currentTarget = position;
-        deployMotor.setControl(position.control);
+        // deployMotor.setControl(position.control);
     }
 
     private boolean atTarget() {
@@ -83,11 +86,13 @@ public class AlgaeRoller extends SubsystemBase {
     }
 
     private boolean isNear(AlgaeRollerPosition position) {
-        return deployMotor.getPosition().getValue().minus(position.position).abs(Units.Rotations) <= AlgaeRollerConstants.epsilon.in(Units.Rotations);
+        return true; // HACK
+        // return deployMotor.getPosition().getValue().minus(position.position).abs(Units.Rotations) <= AlgaeRollerConstants.epsilon.in(Units.Rotations);
     }
 
     public boolean isClear() {
-        return deployMotor.getPosition().getValue().lte(AlgaeRollerPosition.CLEAR.position.plus(AlgaeRollerConstants.epsilon));
+        // return deployMotor.getPosition().getValue().lte(AlgaeRollerPosition.CLEAR.position.plus(AlgaeRollerConstants.epsilon));
+        return true; // HACK
     }
 
     private void ensureClear() {
@@ -119,33 +124,42 @@ public class AlgaeRoller extends SubsystemBase {
     }
 
     public Command TriggerStowWhenClear() {
-        return LoggedCommands.runOnce("Stow algae roller when clear", this::stowWhenClear, this);
+        return Commands.none(); // HACK
+        // return LoggedCommands.runOnce("Stow algae roller when clear", this::stowWhenClear, this);
     }
 
     public Command TriggerStowWhenStopped() {
-        return LoggedCommands.runOnce("Stow algae roller when stopped", this::stowWhenStopped, this);
+        return Commands.none(); // HACK
+
+        // return LoggedCommands.runOnce("Stow algae roller when stopped", this::stowWhenStopped, this);
     }
 
     public Command TriggerStow() {
-        return LoggedCommands.runOnce("Stow algae roller", () -> moveTo(AlgaeRollerPosition.STOWED), this);
+        return Commands.none(); // HACK
+
+        // return LoggedCommands.runOnce("Stow algae roller", () -> moveTo(AlgaeRollerPosition.STOWED), this);
     }
 
     public Command TriggerL1Assist() {
-        return LoggedCommands.runOnce("Move algae roller to score L1", () -> moveTo(AlgaeRollerPosition.L1_SCORE), this);
+        return Commands.none(); // HACK
+
+        // return LoggedCommands.runOnce("Move algae roller to score L1", () -> moveTo(AlgaeRollerPosition.L1_SCORE), this);
     }
 
     public Command StartIntake() {
-        return LoggedCommands.runOnce("Intake algae", () -> rollerMotor.setControl(intakeControl), this);
+        return Commands.none(); // HACK
+        // return LoggedCommands.runOnce("Intake algae", () -> rollerMotor.setControl(intakeControl), this);
     }
 
     public Command StopIntake() {
-        return LoggedCommands.runOnce("Stop algae intake", () -> rollerMotor.stopMotor(), this);
+        return Commands.none(); // HACK
+        // return LoggedCommands.runOnce("Stop algae intake", () -> rollerMotor.stopMotor(), this);
     }
 
     public Command StopAndClear() {
         return LoggedCommands.runOnce("Stop algae intake and move to clear", () -> {
             rollerMotor.stopMotor();
-            moveTo(AlgaeRollerPosition.CLEAR);
+            // moveTo(AlgaeRollerPosition.CLEAR); HACK
         }, this);
     }
 
@@ -154,11 +168,13 @@ public class AlgaeRoller extends SubsystemBase {
     }
 
     public Command Expel() {
-        return LoggedCommands.runOnce("Expel algae", () -> rollerMotor.setControl(expelControl), this);
+        return Commands.none(); // HACK
+        // return LoggedCommands.runOnce("Expel algae", () -> rollerMotor.setControl(expelControl), this);
     }
 
     public Command GuideL1Coral() {
-        return LoggedCommands.runOnce("Guide L1 coral", () -> rollerMotor.setControl(L1AssistControl), this);
+        return Commands.none();
+        // return LoggedCommands.runOnce("Guide L1 coral", () -> rollerMotor.setControl(L1AssistControl), this);
     }
 
     @Override
@@ -184,8 +200,9 @@ public class AlgaeRoller extends SubsystemBase {
             DogLog.log("Algae Roller/Status", "Deploy zeroing complete");
             zeroing = false;
             deployMotor.stopMotor();
-            deployMotor.setPosition(AlgaeRollerPosition.STOWED.position);
-            deployMotor.setControl(currentTarget.control); // Return to the intended target
+            /// HACK
+            // deployMotor.setPosition(AlgaeRollerPosition.STOWED.position);
+            // deployMotor.setControl(currentTarget.control); // Return to the intended target
         }
 
         if (waitingForClear && Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH)) {
