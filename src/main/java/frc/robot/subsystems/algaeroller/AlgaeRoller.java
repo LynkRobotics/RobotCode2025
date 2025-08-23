@@ -8,6 +8,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -103,7 +104,7 @@ public class AlgaeRoller extends SubsystemBase {
     }
 
     private void stowWhenStopped() {
-        if (Elevator.instance.atTarget()) {
+        if (Elevator.instance.atFinalTarget()) {
             moveTo(AlgaeRollerPosition.STOWED);
         } else {
             DogLog.log("Algae Roller/Status", "Delaying stow due to elevator movement");
@@ -125,6 +126,10 @@ public class AlgaeRoller extends SubsystemBase {
 
     public Command TriggerStow() {
         return LoggedCommands.runOnce("Stow algae roller", () -> moveTo(AlgaeRollerPosition.STOWED), this);
+    }
+
+    public Command TriggerL1Assist() {
+        return LoggedCommands.runOnce("Move algae roller to score L1", () -> moveTo(AlgaeRollerPosition.L1_SCORE), this);
     }
 
     public Command StartIntake() {
@@ -166,28 +171,24 @@ public class AlgaeRoller extends SubsystemBase {
         DogLog.log("Algae Roller/Waiting for stop?", waitingForStop);
         DogLog.log("Algae Roller/Deploy Current", deployMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("Algae Roller/Deploy Velocity", deployMotor.getVelocity().getValueAsDouble());
+        DogLog.log("Algae Roller/Deploy Voltage", deployMotor.getMotorVoltage().getValueAsDouble());
         DogLog.log("Algae Roller/Deploy Position (rotations)", deployMotor.getPosition().getValue().in(Units.Rotations));
         DogLog.log("Algae Roller/Deploy Position (degrees)", deployMotor.getPosition().getValue().in(Units.Degrees));
         DogLog.log("Algae Roller/Intake Current", rollerMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("Algae Roller/Intake Velocity", rollerMotor.getVelocity().getValueAsDouble());
 
         // Detect deployment stalls by checking the current
-        if (stallDebouncer.calculate(deployMotor.getTorqueCurrent().getValue().gt(AlgaeRollerConstants.deployStallCurrent))) {
-            if (zeroing) {
-                DogLog.log("Algae Roller/Status", "Deploy zeroing complete");
-                zeroing = false;
-                deployMotor.stopMotor();
-                deployMotor.setPosition(AlgaeRollerPosition.STOWED.position);
-                deployMotor.setControl(currentTarget.control); // Return to the intended target
-            } else {
-                DogLog.log("Algae Roller/Status", "Deploy stall detected");
-                deployMotor.stopMotor();
-            }
+        if (zeroing && DriverStation.isEnabled() && stallDebouncer.calculate(deployMotor.getVelocity().getValueAsDouble() == 0.0)) {
+            DogLog.log("Algae Roller/Status", "Deploy zeroing complete");
+            zeroing = false;
+            deployMotor.stopMotor();
+            deployMotor.setPosition(AlgaeRollerPosition.STOWED.position);
+            deployMotor.setControl(currentTarget.control); // Return to the intended target
         }
 
         if (waitingForClear && Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH)) {
             moveTo(AlgaeRollerPosition.STOWED);
-        } else if (waitingForStop && Elevator.instance.atTarget()) {
+        } else if (waitingForStop && Elevator.instance.atFinalTarget()) {
             moveTo(AlgaeRollerPosition.STOWED);
         }
     }

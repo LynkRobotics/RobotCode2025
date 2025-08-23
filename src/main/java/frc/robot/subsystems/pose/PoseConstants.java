@@ -32,6 +32,7 @@ public class PoseConstants {
     private static final Distance centerToFrontBumper = robotFrameLength.div(2.0).plus(bumperWidth);
     private static final Distance reefCoralStandoff = Units.Inches.of(4.7); // How far between bumper and reef when scoring coral
     private static final Distance reefCoralOffset = centerToFrontBumper.plus(reefCoralStandoff);
+    private static final Distance reefL1ExtraOffset = Units.Inches.of(4.0);
     private static final Distance reefAlgaeStandoff = Units.Inches.of(-2.5); // How far between bumper and reef when intaking algae
     private static final Distance reefAlgaeOffset = centerToFrontBumper.plus(reefAlgaeStandoff);
     private static final Distance reefApproachOffset = Units.Inches.of(6.0); // How far away from the desired position to approach first
@@ -57,14 +58,9 @@ public class PoseConstants {
     private static final Translation2d rightCoralOffset = centerCoralOffset.plus(branchOffset);
     private static final Translation2d approachOffset = new Translation2d(reefApproachOffset, Units.Meters.zero());
     private static final Translation2d centerApproachOffset = algaeOffset.plus(approachOffset);
-    private static final Translation2d leftApproachOffset = leftCoralOffset.plus(approachOffset);
-    private static final Translation2d rightApproachOffset = rightCoralOffset.plus(approachOffset);
     public static final double approachDistanceToReefCenter = centerApproachOffset.getDistance(reefCenter);
-    // private static final Transform2d leftL1Transform = new Transform2d(-Units.inchesToMeters(4.0), -branchSeparation / 2.0 + Units.inchesToMeters(2.5), Rotation2d.kZero);
-    // private static final Transform2d rightL1Transform = new Transform2d(-Units.inchesToMeters(4.0), branchSeparation / 2.0 - Units.inchesToMeters(2.5), Rotation2d.kZero);
-    // private static final Transform2d leftL1OutsideTransform = new Transform2d(-Units.inchesToMeters(4.0), Units.inchesToMeters(4.25), Rotation2d.kZero);
-    // private static final Transform2d rightL1OutsideTransform = new Transform2d(-Units.inchesToMeters(4.0), -Units.inchesToMeters(4.25), Rotation2d.kZero);
-    // public static final double L1MoveForward = Units.inchesToMeters(6);
+    private static final Transform2d leftL1Transform = new Transform2d(reefL1ExtraOffset, branchSeparation.div(2.0), Rotation2d.kZero);
+    private static final Transform2d rightL1Transform = new Transform2d(reefL1ExtraOffset, branchSeparation.div(-2.0), Rotation2d.kZero);
     private static final Transform2d extraAlgaeBackupShort = new Transform2d(Units.Inches.of(-9.0), Units.Inches.zero(), Rotation2d.kZero);
     private static final Transform2d extraAlgaeBackupExtended = new Transform2d(Units.Inches.of(-18.0), Units.Inches.zero(), Rotation2d.kZero);
 
@@ -80,24 +76,22 @@ public class PoseConstants {
             directionFromCenter = Rotation2d.fromDegrees(directionDegrees);
             alignAlgae = new Pose2d(reefCenter.plus(algaeOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.kZero));
             alignCoralLeft = new Pose2d(reefCenter.plus(leftCoralOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.kZero));
-            // leftL1 = alignLeft.transformBy(leftL1Transform);
+            alignCoralL1Left = alignCoralLeft.transformBy(leftL1Transform);
             // leftL1Outside = alignLeft.transformBy(leftL1OutsideTransform);
             alignCoralRight = new Pose2d(reefCenter.plus(rightCoralOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.kZero));
-            // rightL1 = alignRight.transformBy(rightL1Transform);
+            alignCoralL1Right = alignCoralRight.transformBy(rightL1Transform);
             // rightL1Outside = alignRight.transformBy(rightL1OutsideTransform);
             approachAlgaeMiddle = new Pose2d(reefCenter.plus(centerApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.kZero));
             algaeBackupShort = approachAlgaeMiddle.plus(extraAlgaeBackupShort);
             algaeBackupExtended = approachAlgaeMiddle.plus(extraAlgaeBackupExtended);
-            approachCoralLeft = new Pose2d(reefCenter.plus(leftApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.kZero));
-            approachCoralRight = new Pose2d(reefCenter.plus(rightApproachOffset).rotateAround(reefCenter, directionFromCenter), directionFromCenter.plus(Rotation2d.kZero));
             this.algaeHigh = algaeHigh;
         }
 
         public final Rotation2d directionFromCenter;
         public final Pose2d alignCoralLeft, alignAlgae, alignCoralRight;
-        // public final Pose2d leftL1, rightL1;
+        public final Pose2d alignCoralL1Left, alignCoralL1Right;
         // public final Pose2d leftL1Outside, rightL1Outside;
-        public final Pose2d approachCoralLeft, approachAlgaeMiddle, approachCoralRight;
+        public final Pose2d approachAlgaeMiddle;
         public final Pose2d algaeBackupShort, algaeBackupExtended;
         public final boolean algaeHigh;
     }

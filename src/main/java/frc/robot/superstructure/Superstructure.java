@@ -144,23 +144,10 @@ public class Superstructure extends SubsystemBase {
                 LoggedCommands.parallel("PID Align " + (left ? "Left " : "Right ") + face.toString(),
                     Commands.sequence(
                         Commands.race(
-                            Commands.sequence(
-                                Commands.either(
-                                    Commands.sequence(
-                                        // new PIDSwerve(Swerve.instance, Pose.instance, left ? face.approachCoralLeft : face.approachCoralRight, true, false, PIDSpeed.TURBO),
-                                        new PIDSwerve(Swerve.instance, Pose.instance, left ? face.alignCoralLeft : face.alignCoralRight, true, true)
-                                    ),
-                                    Commands.sequence(
-                                        new PIDSwerve(Swerve.instance, Pose.instance, left ? face.approachCoralLeft : face.approachCoralRight, true, false, PIDSpeed.FAST), //, Constants.maxVisionDiffCoral),
-                                        Commands.either(
-                                            LoggedCommands.log("Elevator reached stop in time"),
-                                            LoggedCommands.sequence("Pause to wait for elevator to catch up",
-                                                Swerve.instance.Stop(),
-                                                Elevator.instance.WaitForNearNext()),
-                                            Elevator.instance::nearNextStop),
-                                        new PIDSwerve(Swerve.instance, Pose.instance, left ? face.alignCoralLeft : face.alignCoralRight, true, true)
-                                    ),
-                                    () -> true)), //RobotState.getNextStop() == Stop.L2 || RobotState.getNextStop() == Stop.L3)),
+                            Commands.either(
+                                new PIDSwerve(Swerve.instance, Pose.instance, left ? face.alignCoralL1Left : face.alignCoralL1Right, true, true),
+                                new PIDSwerve(Swerve.instance, Pose.instance, left ? face.alignCoralLeft : face.alignCoralRight, true, true),
+                                () -> activeReefLevel == ReefLevel.L1),
                             Commands.either(
                                 Commands.sequence(
                                     LoggedCommands.waitSeconds("Score coral watchdog", AutoConstants.scoreCoralTimeout),
@@ -171,15 +158,21 @@ public class Superstructure extends SubsystemBase {
                         Swerve.instance.Stop()),
                     Commands.sequence(
                         TriggerMoveToActiveCoral(),
-                        AlgaeRoller.instance.TriggerStowWhenStopped(),
+                        Commands.either(
+                            AlgaeRoller.instance.TriggerL1Assist(), // TODO And wait?
+                            AlgaeRoller.instance.TriggerStowWhenStopped(),
+                            () -> activeReefLevel == ReefLevel.L1),
                         WaitForEEPose())),
                         // LoggedCommands.deadline("Wait for auto up",
                         //     Elevator.instance.WaitForNext(),
                         //     Elevator.instance.AutoElevatorUp(left ? face.alignCoralLeft.getTranslation() : face.alignCoralRight.getTranslation())))),
                 PlaceCoral(),
-                TriggerMoveToEEPose(EEPose.GROUND_CORAL),
-                AlgaeRoller.instance.TriggerStowWhenStopped()
-            ),
+                Commands.either(
+                    Commands.none(),
+                    TriggerMoveToEEPose(EEPose.GROUND_CORAL),
+                    () -> EndEffector.instance.haveCoral()
+                ),
+                AlgaeRoller.instance.TriggerStowWhenStopped()),
             LoggedCommands.log("Cannot score coral without coral"),
             EndEffector.instance::haveCoral);
     }
@@ -266,12 +259,28 @@ public class Superstructure extends SubsystemBase {
 
     public Command PlaceCoral() {
         return LoggedCommands.either("Place Coral",
-            EndEffector.instance.ExpelCoral(ReefLevel.L2),
+            PlaceL1Coral(),
             Commands.either(
-                EndEffector.instance.ExpelCoral(ReefLevel.L3),
                 EndEffector.instance.ExpelCoral(ReefLevel.L4),
-                () -> activeReefLevel == ReefLevel.L3),
-            () -> activeReefLevel == ReefLevel.L2);
+                Commands.either(
+                    EndEffector.instance.ExpelCoral(ReefLevel.L2),
+                    EndEffector.instance.ExpelCoral(ReefLevel.L3),
+                    () -> activeReefLevel == ReefLevel.L2),
+                () -> activeReefLevel == ReefLevel.L4),
+            () -> activeReefLevel == ReefLevel.L1);
+    }
+
+    public Command PlaceL1Coral() {
+        return LoggedCommands.sequence("Place L1 Coral",
+            AlgaeRoller.instance.GuideL1Coral(),
+            EndEffector.instance.ExpelCoral(ReefLevel.L1),
+            AlgaeRoller.instance.StopIntake(),
+            TriggerMoveToEEPose(EEPose.GROUND_CORAL),
+            AlgaeRoller.instance.TriggerStowWhenStopped())
+            .handleInterrupt(() -> {
+                EndEffector.instance.StopIntake().schedule();
+                AlgaeRoller.instance.StopAndClear().schedule();
+            });
     }
 
     public Command PlacePiece() {
@@ -324,13 +333,14 @@ public class Superstructure extends SubsystemBase {
         // NOTE: Must not be holding any game piece already!
         return LoggedCommands.sequence("Intaking Coral",
             TriggerMoveToEEPose(EEPose.GROUND_CORAL),
+            AlgaeRoller.instance.TriggerStowWhenStopped(),
             WaitForEEPose(),
             Commands.parallel(
                 EndEffector.instance.StartCoralIntake(),
                 Intake.instance.Deploy()),
             EndEffector.instance.WaitForState(EEState.HAVE_CORAL),
             TriggerMoveToEEPose(EEPose.CORAL_HOLD),
-            AlgaeRoller.instance.TriggerStowWhenStopped(), // Will happen asynchronously as soon as possible
+            AlgaeRoller.instance.TriggerStowWhenStopped(),
             Controls.instance.TriggerRumble())
             .finallyDo((interrupted) -> {
                 IntakeExpel.schedule(); // TODO Make this a fixed command instead of new object?

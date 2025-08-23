@@ -100,6 +100,7 @@ public class EndEffector extends SubsystemBase {
             case L1 -> EEControl.CORAL_L1;
         };
         double postClearDelay = switch (level) {
+            case L1 -> 0.4;
             case L2, L3 -> 0.18;
             default -> 0.05;  
         };

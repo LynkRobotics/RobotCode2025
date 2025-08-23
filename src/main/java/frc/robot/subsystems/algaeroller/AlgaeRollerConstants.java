@@ -9,7 +9,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 
@@ -22,15 +21,14 @@ public class AlgaeRollerConstants {
 	public static final Voltage L1AssistVoltage = Units.Volts.of(3.5);
 
 	public static final Angle epsilon = Units.Degrees.of(8.0); // TODO From Citrus, but too generous?
-	public static final Time deployStallTime = Units.Seconds.of(0.1);
+	public static final Time deployStallTime = Units.Seconds.of(0.4);
 	public static final Voltage deployZeroingVoltage = Units.Volts.of(2.0);
-	public static final Current deployStallCurrent = Units.Amps.of(35.0);
 
 	public static enum AlgaeRollerPosition {
 		STOWED(90.0),
 		PROCESSOR(70.0),
 		CLEAR(65.0),
-		L1_SCORE(55.0),
+		L1_SCORE(64.0), // 1678 is 55.0, but our mechanism has slop and drops
 		DEPLOYED(23.0),
 		ALGAE_CLEAR(40.0);
 

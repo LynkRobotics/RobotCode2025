@@ -219,6 +219,10 @@ public class Elevator extends SubsystemBase {
         return mainMotor.getPosition().getValue().minus(currentTarget.position).abs(Units.Rotations) <= ElevatorConstants.positionError;
     }
 
+    public boolean atFinalTarget() {
+        return mainMotor.getPosition().getValue().minus(finalTarget.position).abs(Units.Rotations) <= ElevatorConstants.positionError;
+    }
+
     private double stopError(Stop stop) {
         return Math.abs(stop.height.minus(getHeight()).magnitude());
     }

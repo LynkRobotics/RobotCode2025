@@ -192,8 +192,7 @@ public class Autos extends SubsystemBase {
             Swerve.instance.CoastDriveMotors(),
             GoGetCoral("D to CS"),
             LoggedCommands.proxy(PathCommand("CS to near B")),
-            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
-            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.AB.approachCoralRight, true, false)))
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)))
         .handleInterrupt(() -> Vision.setCameraMode(CameraMode.DEFAULT));
 
         startingPaths.put(autoECDB, "Start towards EF");
