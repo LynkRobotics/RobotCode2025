@@ -55,6 +55,8 @@ public class Elevator extends SubsystemBase {
     private Stop currentTarget = finalTarget;
     private boolean waitingOnAlgaeBarClear = false;
 
+    private boolean speedLimited = false;
+
     public Elevator() {
         mainMotor = new TalonFX(Ports.ELEVATOR_MAIN.id, Ports.ELEVATOR_MAIN.bus.name);
         followerMotor = new TalonFX(Ports.ELEVATOR_FOLLOWER.id, Ports.ELEVATOR_FOLLOWER.bus.name);
@@ -278,6 +280,10 @@ public class Elevator extends SubsystemBase {
         return false;
     }
 
+    public boolean shouldLimitSpeed() {
+        return speedLimited;
+    }
+
     private void setCurrentTarget(Stop target, boolean requireAlgaeBarClear) {
         if (requireAlgaeBarClear && !AlgaeRoller.instance.isClear()) {
             // Set the target but not the set position (the current set position must be safe)
@@ -350,6 +356,9 @@ public class Elevator extends SubsystemBase {
         } else {
             clearState = ClearState.NOT_CLEAR;
         }
+
+        // Check if the speed should be limited
+        speedLimited = height.gt(Stop.SLOW_DOWN.height);
 
         // Check if we aren't moving towards the current target because we need to wait for the algae bar to be clear
         if (waitingOnAlgaeBarClear && AlgaeRoller.instance.isClear()) {

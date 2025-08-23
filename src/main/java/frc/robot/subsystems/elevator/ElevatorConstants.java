@@ -55,6 +55,7 @@ public class ElevatorConstants {
         BARGE_PREP(Units.Inches.of(30.0)),
         BARGE(Units.Inches.of(62.17)),
         CLIMB(Units.Inches.of(12.0)),
+        SLOW_DOWN(Units.Inches.of(42.0)),
         CLEAR_LOW(Units.Inches.of(12.0)),  // End-effector cannot pivot below this mark (except in limited "high clear" range)
         CLEAR_HIGH(Units.Inches.of(18.0)); // The Algae Roller must be deployed to a clear position below this mark
 
