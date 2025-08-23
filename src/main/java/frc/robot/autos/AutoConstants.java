@@ -35,7 +35,7 @@ public final class AutoConstants {
         EF_CLEAR(4.4, 2.19, -60.0),
         LOLLIPOP1(1.22, 2.19, 180.0),
         LOLLIPOP1_APPROACH(3.0, 2.19, 180.0),
-        LOLLIPOP1_THROUGH(3.0, 0.8, 180.0),
+        LOLLIPOP1_THROUGH(0.8, 2.19, 180.0),
         AB_APPROACH(2.0, 4.03, 180.0),
         LOLLIPOP2(1.22, 4.03, 180.0),
         LOLLIPOP2_THROUGH(0.8, 4.03, 180.0),
