@@ -31,7 +31,7 @@ public final class AutoConstants {
 
     // TODO Calculate from the field ... or use PathPlanner
     public enum AutoPose {
-        EF_APPROACH(5.3, 2.45, 120),
+        EF_APPROACH(5.3, 2.45, -60.0),
         EF_CLEAR(4.4, 2.19, -60.0),
         LOLLIPOP1(1.22, 2.19, 180.0),
         LOLLIPOP1_APPROACH(3.0, 2.19, 180.0),
