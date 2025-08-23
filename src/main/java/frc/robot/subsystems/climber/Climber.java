@@ -14,6 +14,7 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedCommands;
 import frc.robot.Ports;
@@ -22,6 +23,16 @@ import frc.robot.subsystems.climber.ClimberConstants.ClimberPosition;
 
 public class Climber extends SubsystemBase {
     public static final Climber instance = new Climber();
+
+    public enum ClimbState {
+        NONE,
+        GRABBING,
+        GRABBED,
+        CLIMBING,
+        CLIMBED
+    }
+
+    private ClimbState climbState = ClimbState.NONE;
 
     /* Devices */
     private final TalonFX deployMotor;
@@ -76,17 +87,19 @@ public class Climber extends SubsystemBase {
 
     public Command GrabCage() {
         return LoggedCommands.sequence("Grab Cage",
+            Commands.runOnce(() -> climbState = ClimbState.GRABBING),
             Deploy(),
             Intake(),
             LoggedCommands.waitSeconds("Pre-intake delay", 1.5),
             LoggedCommands.waitUntil("Wait until climber intake stalled", this::intakeStalled),
             LoggedCommands.waitSeconds("Post-intake delay", 0.5),
-            Controls.instance.TriggerRumble(),
-            LoggedCommands.print("Flash LEDs", "TODO Flash LEDs"));
+            Commands.runOnce(() -> climbState = ClimbState.GRABBED),
+            Controls.instance.TriggerRumble());
     }
 
     public Command Retract() {
         return LoggedCommands.sequence("Retract climber",
+            Commands.runOnce(() -> climbState = ClimbState.CLIMBING),
             LoggedCommands.runOnce("Stop climber intake", () -> intakeMotor.stopMotor(), this),
             FullyStow());
     }
@@ -94,7 +107,12 @@ public class Climber extends SubsystemBase {
     public Command RetractAndWait() {
         return LoggedCommands.sequence("Retract climber and wait",
             Retract(),
-            LoggedCommands.waitUntil("Wait until stowed", this::isFullyStowed));
+            LoggedCommands.waitUntil("Wait until stowed", this::isFullyStowed),
+            Commands.runOnce(() -> climbState = ClimbState.CLIMBED));
+    }
+
+    public ClimbState getClimbState() {
+        return climbState;
     }
 
     private boolean intakeStalled() {

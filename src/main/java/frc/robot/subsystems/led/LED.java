@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedCommands;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.Climber.ClimbState;
 import frc.robot.subsystems.endeffector.EndEffector;
 import frc.robot.superstructure.Superstructure;
 import frc.lib.util.CANdleGroup;
@@ -104,6 +106,7 @@ public class LED extends SubsystemBase {
         ALGAE_INTAKING(new LEDConfig(Color.cheesyBlue, true)),
         ALGAE(new LEDConfig(Color.cheesyBlue)),
         ENDGAME(new LEDConfig(LEDConstants.endGameAnimation)),
+        GRABBED(new LEDConfig(Color.dimYellow, true)),
         CLIMBING(new LEDConfig(LEDConstants.climbingAnimation)),
         CLIMBED(new LEDConfig(LEDConstants.climbedAnimation)),
         SERVICE_MODE(new LEDConfig(LEDConstants.serviceModeAnimation)),
@@ -216,13 +219,17 @@ public class LED extends SubsystemBase {
                     // DogLog.log("LED/Status", "State: " + climbState + "; timeLeft = " + String.format("%1.1f", timeLeft) + "; timer = " + String.format("%1.1f", endGameTimer.get()));
                 }
                 if (!endGameTimer.isRunning()) {
-                    // if (climbState == ClimbState.CLIMBING) {
-                    //     state = LEDState.CLIMBING;
-                    // } else if (climbState == ClimbState.CLIMBED) {
-                    //     state = LEDState.CLIMBED;
-                    // } else if (climbState == ClimbState.STARTED) {
-                    //     state = LEDState.SLOWMODE;
-                    if (EndEffector.instance.haveAlgae()) {
+                    ClimbState climbState = Climber.instance.getClimbState();
+                    
+                    if (climbState == ClimbState.CLIMBING) {
+                        state = LEDState.CLIMBING;
+                    } else if (climbState == ClimbState.CLIMBED) {
+                        state = LEDState.CLIMBED;
+                    } else if (climbState == ClimbState.GRABBING) {
+                        state = LEDState.SLOWMODE;
+                    } else if (climbState == ClimbState.GRABBED) {
+                        state = LEDState.GRABBED;
+                    } else if (EndEffector.instance.haveAlgae()) {
                         state = LEDState.ALGAE;
                     } else if (EndEffector.instance.intakingAlgae()) {
                         state = LEDState.ALGAE_INTAKING;
