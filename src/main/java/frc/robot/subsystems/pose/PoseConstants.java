@@ -33,7 +33,7 @@ public class PoseConstants {
     private static final Distance reefCoralStandoff = Units.Inches.of(4.7); // How far between bumper and reef when scoring coral
     private static final Distance reefCoralOffset = centerToFrontBumper.plus(reefCoralStandoff);
     private static final Distance reefL1ExtraOffset = Units.Inches.of(4.0);
-    private static final Distance reefAlgaeStandoff = Units.Inches.of(-2.5); // How far between bumper and reef when intaking algae
+    private static final Distance reefAlgaeStandoff = Units.Inches.of(-3.0); // How far between bumper and reef when intaking algae
     private static final Distance reefAlgaeOffset = centerToFrontBumper.plus(reefAlgaeStandoff);
     private static final Distance reefApproachOffset = Units.Inches.of(6.0); // How far away from the desired position to approach first
 

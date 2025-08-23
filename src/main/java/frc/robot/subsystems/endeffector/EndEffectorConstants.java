@@ -63,7 +63,7 @@ public class EndEffectorConstants {
         BARGE(-218.0),
         START(90.0),
         GROUND_INTAKE(-90.0),
-        REEF_INTAKE(-100.0),
+        REEF_INTAKE(-105.0),
         REEF_PREP(-60.0),
         IDLE_AFTER_SCORING(-45.0),
         ALGAE_HOLD(-120.0),
