@@ -12,7 +12,7 @@ public class PIDSwerveConstants {
     public static final double alignedTimerMax = 0.2;
     public static final double fastAlignedTimerMax = 0.1;
     
-    public static final double rotationKP = 0.015; // Small overshoot at 0.015, more noticeable with 0.020, but still functional
+    public static final double rotationKP = 0.011;
     public static final double rotationTolerance = 0.5; // degrees
     public static final double roughRotatationTolerance = 1.5; // degrees
     public static final double maxAngularVelocity = SwerveConstants.maxAngularVelocity / 2.0;
