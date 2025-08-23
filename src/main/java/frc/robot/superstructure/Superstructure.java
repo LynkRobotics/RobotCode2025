@@ -130,7 +130,7 @@ public class Superstructure extends SubsystemBase {
             () -> EndEffector.instance.inHighClearRange());
     }
 
-    private Command WaitForEEPose() {
+    public Command WaitForEEPose() {
         return LoggedCommands.waitUntil("Wait for EE Pose", () -> EndEffector.instance.inPosition() && Elevator.instance.atTarget());
     }
 

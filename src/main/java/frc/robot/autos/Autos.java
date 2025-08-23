@@ -388,6 +388,41 @@ public class Autos extends SubsystemBase {
         startingPaths.put(autoELolli, "Start towards EF");
         addAutoCommand(chooser, autoELolli);
 
+        Command autoGBarge = LoggedCommands.sequence("[Sublyme] G + Double Barge",
+            LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
+            Commands.either(
+                LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
+                LoggedCommands.log("Skip back up option"),
+                optBackupPush::get),
+            Superstructure.instance.SetActiveReefLevel(ReefLevel.L4),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.GH, true)),
+            LoggedCommands.proxy(Superstructure.instance.TriggerMoveToEEPose(EEPose.GROUND_CORAL)),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.GH_APPROACH.pose, true, false)),
+            LoggedCommands.proxy(DealgaefyMaybeMirror(ReefFace.GH, true)),
+            LoggedCommands.proxy(Superstructure.instance.TriggerMoveToEEPose(EEPose.ALGAE_HOLD)),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.BARGE_APPROACH.pose, true, false)),
+            LoggedCommands.proxy(Swerve.instance.Stop()),
+            LoggedCommands.proxy(Superstructure.instance.PrepBargeShot()),
+            LoggedCommands.proxy(Superstructure.instance.WaitForEEPose()),
+            LoggedCommands.proxy(Superstructure.instance.PlaceBargeAlgae()),
+            LoggedCommands.proxy(Superstructure.instance.TriggerMoveToEEPose(EEPose.GROUND_CORAL)),
+            LoggedCommands.proxy(Superstructure.instance.WaitForEEPose()),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.IJ_APPROACH.pose, true, false)),
+            LoggedCommands.proxy(DealgaefyMaybeMirror(ReefFace.GH, true)),
+            LoggedCommands.proxy(Superstructure.instance.TriggerMoveToEEPose(EEPose.ALGAE_HOLD)),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.BARGE_APPROACH.pose, true, false)),
+            LoggedCommands.proxy(Swerve.instance.Stop()),
+            LoggedCommands.proxy(Superstructure.instance.PrepBargeShot()),
+            LoggedCommands.proxy(Superstructure.instance.WaitForEEPose()),
+            LoggedCommands.proxy(Superstructure.instance.PlaceBargeAlgae()),
+            LoggedCommands.proxy(Superstructure.instance.TriggerMoveToEEPose(EEPose.GROUND_CORAL)),
+            LoggedCommands.proxy(Superstructure.instance.WaitForEEPose()),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.IJ_APPROACH.pose, true, false)),
+            LoggedCommands.proxy(Swerve.instance.Stop()));
+
+        startingPaths.put(autoGBarge, "Start to near G");
+        addAutoCommand(chooser, autoGBarge);
+
         Command autoDebug = LoggedCommands.sequence("Debug Drive",
             LoggedCommands.proxy(PathCommand("Debug Drive")),
             LoggedCommands.proxy(Swerve.instance.Stop()));
