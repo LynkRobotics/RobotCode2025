@@ -355,41 +355,32 @@ public class Autos extends SubsystemBase {
             LoggedCommands.proxy(Superstructure.instance.StartCoralIntake()),
             LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.LOLLIPOP1_THROUGH.pose, true, false)),
             LoggedCommands.proxy(Superstructure.instance.FinishCoralIntake()),
-            Commands.either(LoggedCommands.proxy(Superstructure.instance.CoralHold()), Commands.none(), () -> EndEffector.instance.haveCoral()),
+            IfHaveCoral(LoggedCommands.proxy(Superstructure.instance.CoralHold())),
             LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.AB_APPROACH.pose, true, false)),
-            Commands.either(
-                Commands.sequence(
-                    LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
-                    LoggedCommands.proxy(Superstructure.instance.TriggerMoveToEEPose(EEPose.GROUND_CORAL)),
-                    LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.AB_APPROACH.pose, true, false))),
-                Commands.none(),
-                () -> EndEffector.instance.haveCoral()),
+            IfHaveCoral(
+                LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false)),
+                LoggedCommands.proxy(Superstructure.instance.TriggerMoveToEEPose(EEPose.GROUND_CORAL)),
+                LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.AB_APPROACH.pose, true, false))),
             LoggedCommands.proxy(Superstructure.instance.StartCoralIntake()),
             LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.LOLLIPOP2_THROUGH.pose, true, false)),
             LoggedCommands.proxy(Superstructure.instance.FinishCoralIntake()),
-            Commands.either(LoggedCommands.proxy(Superstructure.instance.CoralHold()), Commands.none(), () -> EndEffector.instance.haveCoral()),
+            IfHaveCoral(LoggedCommands.proxy(Superstructure.instance.CoralHold())),
             LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.AB_APPROACH.pose, true, false)),
-            Commands.either(
-                Commands.sequence(
-                    LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, true)),
-                    LoggedCommands.proxy(Superstructure.instance.TriggerMoveToEEPose(EEPose.GROUND_CORAL)),
-                    LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.AB_APPROACH.pose, true, false))),
-                Commands.none(),
-                () -> EndEffector.instance.haveCoral()),
+            IfHaveCoral(
+                LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, true)),
+                LoggedCommands.proxy(Superstructure.instance.TriggerMoveToEEPose(EEPose.GROUND_CORAL)),
+                LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.AB_APPROACH.pose, true, false))),
             LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.LOLLIPOP3_APPROACH.pose, true, false)),
             LoggedCommands.proxy(Superstructure.instance.StartCoralIntake()),
             LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.LOLLIPOP3_THROUGH.pose, true, false)),
             LoggedCommands.proxy(Superstructure.instance.FinishCoralIntake()),
-            Commands.either(LoggedCommands.proxy(Superstructure.instance.CoralHold()), Commands.none(), () -> EndEffector.instance.haveCoral()),
+            IfHaveCoral(LoggedCommands.proxy(Superstructure.instance.CoralHold())),
             LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.AB_APPROACH.pose, true, false)),
             Superstructure.instance.SetActiveReefLevel(ReefLevel.L2),
-            Commands.either(
-                Commands.sequence(
-                    LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, true)),
-                    LoggedCommands.proxy(Superstructure.instance.TriggerMoveToEEPose(EEPose.GROUND_CORAL)),
-                    LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.AB_APPROACH.pose, true, false))),
-                Commands.none(),
-                () -> EndEffector.instance.haveCoral()),
+            IfHaveCoral(
+                LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, true)),
+                LoggedCommands.proxy(Superstructure.instance.TriggerMoveToEEPose(EEPose.GROUND_CORAL)),
+                LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.AB_APPROACH.pose, true, false))),
             Superstructure.instance.SetActiveReefLevel(ReefLevel.L4),
             LoggedCommands.proxy(Swerve.instance.Stop()));
 
@@ -404,6 +395,13 @@ public class Autos extends SubsystemBase {
         addAutoCommand(chooser, autoDebug);
 
         FollowPathCommand.warmupCommand().schedule();
+    }
+
+    private Command IfHaveCoral(Command... commands) {
+        return Commands.either(
+            Commands.none(),
+            Commands.sequence(commands),
+            () -> EndEffector.instance.haveCoral());
     }
 
     private Command PathCommand(String pathName) {
