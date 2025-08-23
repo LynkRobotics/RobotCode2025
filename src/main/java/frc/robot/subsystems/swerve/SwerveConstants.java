@@ -85,14 +85,6 @@ public class SwerveConstants {
     /* Swerve Profiling Values */
     /** Meters per Second */
     public static final double maxSpeed = 4.925568; //WCP SwerveX2t for SubLyme
-    /* These are theorectial values to start with, tune after
-     * Kraken FOC (L1.0): ft/s = 12.4 | m/s = 3.77952
-     * Kraken FOC (L1.5): ft/s = 14.2 | m/s = 4.32816
-     * Kraken FOC (L2.0): ft/s = 15.0 | m/s = 4.572
-     * Kraken FOC (L2.5): ft/s = 17.1 | m/s = 5.21208
-     * Kraken FOC (L3.0): ft/s = 16.5 | m/s = 5.0292
-     * Kraken FOC (L3.5): ft/s = 18.9 | m/s = 5.76072
-     */
     /** Radians per Second */
     // public static final double maxAngularVelocity = 10.0; //TODO: This must be tuned to specific robot
     public static final double driveRadius = Math.hypot(wheelBase.in(Units.Meters), trackWidth.in(Units.Meters)) / 2.0;

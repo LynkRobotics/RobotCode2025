@@ -13,7 +13,6 @@ import static edu.wpi.first.units.Units.*;
 import java.util.Collections;
 import java.util.Map;
 
-import frc.robot.Constants;
 import frc.robot.subsystems.pose.PoseConstants.ReefFace;
 import frc.robot.subsystems.swerve.SwerveConstants;
 
@@ -38,7 +37,7 @@ public final class AutoConstants {
 
     // TODO Find out why this doesn't work
     public static final RobotConfig robotConfig = new RobotConfig(
-        Mass.ofRelativeUnits(Constants.isRocky ? 145.0 : 132.0, Pounds),
+        Mass.ofRelativeUnits(135, Pounds),
         MomentOfInertia.ofRelativeUnits(6, KilogramSquareMeters), //6 kg m ^2: 1678 Choreo Constant
         new ModuleConfig(
             SwerveConstants.wheelCircumference / (Math.PI * 2.0),

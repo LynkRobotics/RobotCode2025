@@ -80,7 +80,7 @@ public class Robot extends TimedRobot {
             Pose.instance,
             Controls.instance,
             Superstructure.instance,
-            // Autos.instance
+            Autos.instance
         };
         
         if (Constants.atHQ) {

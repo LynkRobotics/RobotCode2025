@@ -36,6 +36,7 @@ import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants.CameraMode;
 import frc.robot.superstructure.Superstructure;
+import frc.robot.Field.ReefLevel;
 
 public class Autos extends SubsystemBase {
     public static final Autos instance = new Autos();
@@ -301,6 +302,36 @@ public class Autos extends SubsystemBase {
 
         startingPaths.put(autoG, "Start to near G");
         addAutoCommand(chooser, autoG);
+
+        Command autoGOnly = LoggedCommands.sequence("[Sublyme] G Only",
+            LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
+            Commands.either(
+                LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
+                LoggedCommands.log("Skip back up option"),
+                optBackupPush::get),
+                Superstructure.instance.SetActiveReefLevel(ReefLevel.L4),
+            LoggedCommands.proxy(PathCommand("Start to near G")),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.GH, true)),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.GH.approachAlgaeMiddle, true, false)),
+            LoggedCommands.proxy(Swerve.instance.Stop()));
+
+        startingPaths.put(autoGOnly, "Start to near G");
+        addAutoCommand(chooser, autoGOnly);
+
+        Command autoEOnly = LoggedCommands.sequence("[Sublyme] E Only",
+            LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
+            Commands.either(
+                LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
+                LoggedCommands.log("Skip back up option"),
+                optBackupPush::get),
+                Superstructure.instance.SetActiveReefLevel(ReefLevel.L4),
+            LoggedCommands.proxy(PathCommand("Start towards EF")),
+            LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.EF.approachAlgaeMiddle, true, false)),
+            LoggedCommands.proxy(Swerve.instance.Stop()));
+
+        startingPaths.put(autoEOnly, "Start towards EF");
+        addAutoCommand(chooser, autoEOnly);
 
         FollowPathCommand.warmupCommand().schedule();
     }
