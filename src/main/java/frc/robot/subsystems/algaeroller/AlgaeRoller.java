@@ -54,6 +54,8 @@ public class AlgaeRoller extends SubsystemBase {
         for (AlgaeRollerPosition position : AlgaeRollerPosition.values()) {
             SmartDashboard.putData("Algae Roller/Move to " + position.name(), LoggedCommands.runOnce("Move to " + position.name(), () -> moveTo(position), this));
         }
+        
+        SmartDashboard.putData("Algae Roller/Zero Algae Roller", Zero());
     }
 
     public void startZero() {
