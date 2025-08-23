@@ -45,7 +45,7 @@ public class ElevatorConstants {
         FEED_ALGAE(Units.Inches.of(2.0)),
         L2(Units.Inches.of(6.3)),
         L3(L2.height.plus(Units.Inches.of(16.0))),
-        L4(Units.Inches.of(60.25)),
+        L4(Units.Inches.of(62.25)),
         CORAL_HOLD(Units.Inches.of(13.21)),
         L2_ALGAE(Units.Inches.of(21.91)),
         L3_ALGAE(L2_ALGAE.height.plus(Units.Inches.of(16.0))),
