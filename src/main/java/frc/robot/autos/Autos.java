@@ -317,7 +317,7 @@ public class Autos extends SubsystemBase {
                 LoggedCommands.log("Skip back up option"),
                 optBackupPush::get),
                 Superstructure.instance.SetActiveReefLevel(ReefLevel.L4),
-            LoggedCommands.proxy(PathCommand("Start to near G")),
+            // LoggedCommands.proxy(PathCommand("Start to near G")),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.GH, true)),
             LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.GH.approachAlgaeMiddle, true, false)),
             LoggedCommands.proxy(Swerve.instance.Stop()));
@@ -332,7 +332,8 @@ public class Autos extends SubsystemBase {
                 LoggedCommands.log("Skip back up option"),
                 optBackupPush::get),
                 Superstructure.instance.SetActiveReefLevel(ReefLevel.L4),
-            LoggedCommands.proxy(PathCommand("Start towards EF")),
+            // LoggedCommands.proxy(PathCommand("Start towards EF")),
+            LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, AutoPose.EF_APPROACH.pose, true, false)),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
             LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, ReefFace.EF.approachAlgaeMiddle, true, false)),
             LoggedCommands.proxy(Swerve.instance.Stop()));
