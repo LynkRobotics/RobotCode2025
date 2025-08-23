@@ -55,7 +55,11 @@ public class Autos extends SubsystemBase {
         // Default named commands for PathPlanner
         SmartDashboard.putNumber("auto/Startup delay", 0.0);
         Autos.autoNamedCommand("Startup delay", Commands.defer(() -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()));
-        Autos.autoNamedCommand("Stop", Commands.runOnce(Swerve.instance::stopSwerve));        
+        Autos.autoNamedCommand("Stop", Commands.runOnce(Swerve.instance::stopSwerve));
+        
+        SmartDashboard.putData("auto/Debug Drive", Commands.sequence(
+            PathCommand("Debug Drive"),
+            Swerve.instance.Stop()));
     }
     
     public static void autoNamedCommand(String name, Command command) {
@@ -332,6 +336,13 @@ public class Autos extends SubsystemBase {
 
         startingPaths.put(autoEOnly, "Start towards EF");
         addAutoCommand(chooser, autoEOnly);
+
+        Command autoDebug = LoggedCommands.sequence("Debug Drive",
+            LoggedCommands.proxy(PathCommand("Debug Drive")),
+            LoggedCommands.proxy(Swerve.instance.Stop()));
+
+        startingPaths.put(autoDebug, "Debug Drive");
+        addAutoCommand(chooser, autoDebug);
 
         FollowPathCommand.warmupCommand().schedule();
     }
