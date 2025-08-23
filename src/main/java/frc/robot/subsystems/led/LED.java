@@ -12,7 +12,10 @@ import com.ctre.phoenix.led.CANdle;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.LoggedCommands;
 import frc.lib.util.CANdleGroup;
 
 public class LED extends SubsystemBase {
@@ -28,10 +31,13 @@ public class LED extends SubsystemBase {
     private static LEDState lastState = null;
     private static boolean blinkOff = false;
 
+    private SendableChooser<Color> colorChooser = new SendableChooser<Color>();
+
     private enum Color {
         off(0, 0, 0),
         red(255, 0, 0),
         green(0, 255, 0),
+        citrus(0x43, 0xAF, 0x1C),
         hightideTeal(44, 162, 165),
         blue(0, 0, 255),
         cheesyBlue(0, 112, 255),
@@ -81,7 +87,8 @@ public class LED extends SubsystemBase {
     }
 
     public enum LEDState {
-        STARTUP(new LEDConfig(LEDConstants.readyAnimation)),
+        // STARTUP(new LEDConfig(LEDConstants.readyAnimation)),
+        STARTUP(new LEDConfig(Color.citrus)),
         DISABLED(new LEDConfig(Color.disabled)),
         NORMAL(new LEDConfig(Color.lynk)),
         MANUAL(new LEDConfig(Color.hightideTeal)),
@@ -117,6 +124,25 @@ public class LED extends SubsystemBase {
 
         // Set color on the CANdles themselves
         setColor(Color.lynk, 0, LEDConstants.startIdx);
+
+        colorChooser = new SendableChooser<Color>();
+        SmartDashboard.putNumber("LED/start", 0);
+        SmartDashboard.putNumber("LED/count", 100);
+        for (Color color : Color.values()) {
+            colorChooser.addOption(color.name(), color);
+        }
+        SmartDashboard.putData("LED/color", colorChooser);
+        SmartDashboard.putData("LED/Set LED color",
+            LoggedCommands.runOnce("Set LED color",
+            () -> {
+                int start = (int)SmartDashboard.getNumber("LED/start", 0);
+                int cnt = (int)SmartDashboard.getNumber("LED/count", 100);
+                Color color = colorChooser.getSelected();
+                setColor(color, start, cnt);
+            }).ignoringDisable(true));
+
+        // Set color on the LEDs
+        setColor(Color.lynk, LEDConstants.startIdx, LEDConstants.numLEDs);
     }
 
     private static void setColor(Color color, int startIdx, int count) {
@@ -254,5 +280,5 @@ public class LED extends SubsystemBase {
 
         DogLog.log("LED/State", state.toString());
         lastState = state;
-    }
+    }    
 }

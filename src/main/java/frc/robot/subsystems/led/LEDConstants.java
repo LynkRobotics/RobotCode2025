@@ -17,12 +17,12 @@ public class LEDConstants {
     public static final String canBus = "rio";
     /* LED arrangement */
     public static final int startIdx = 8;
-    public static final int numLEDs = 86;
+    public static final int numLEDs = 13;
     public static final int totalLEDs = startIdx + numLEDs;
     public static final double brightness = Constants.atHQ ? 0.60 : 1.00;
     /* Animations */
-    public static final Animation readyAnimation = new FireAnimation(1.0, 0.38, numLEDs, 0.8, 0.2, false, startIdx);
-    public static final Animation climbedAnimation = new RainbowAnimation(1.0, 0.7, numLEDs, false, startIdx);
+    public static final Animation readyAnimation = new FireAnimation(1.0, 0.10, numLEDs, 0.2, 0.1, false, startIdx);
+    public static final Animation climbedAnimation = new RainbowAnimation(1.0, 0.5, numLEDs, false, startIdx);
     public static final Animation climbingAnimation = new LarsonAnimation(255, 64, 0, 0, 0.85, numLEDs, BounceMode.Front, 7, startIdx);
     public static final Animation endGameAnimation = new ColorFlowAnimation(255, 64, 0, 0, 0.85, numLEDs, ColorFlowAnimation.Direction.Forward, startIdx);
     public static final Animation serviceModeAnimation = new ColorFlowAnimation(0, 25, 25, 0, 0.3, numLEDs, ColorFlowAnimation.Direction.Backward, startIdx);

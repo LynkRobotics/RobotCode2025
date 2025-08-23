@@ -13,13 +13,15 @@ public class CANdleGroup {
     
     public CANdleGroup(CANdle... candles) {
         this.candles = candles;
-        applyConfigs();
+        // There appears to be a bug in the CANdle library where RGB isn's properly selected
+        // Keep the configuration set via Tuner X
+        // applyConfigs();
     }
 
     private void applyConfigs() {
         CANdleConfiguration config = new CANdleConfiguration();
         config.brightnessScalar = LEDConstants.brightness;
-        config.stripType = LEDStripType.GRB;
+        config.stripType = LEDStripType.RGB;
         config.v5Enabled = true;
         config.disableWhenLOS = false; //TODO: verify // TODO: true -- why is this triggering?
 

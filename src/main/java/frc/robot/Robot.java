@@ -24,6 +24,7 @@ import frc.robot.subsystems.controls.Controls;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.endeffector.EndEffector;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.led.LED;
 import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.vision.Vision;
@@ -73,7 +74,7 @@ public class Robot extends TimedRobot {
             EndEffector.instance,
             Elevator.instance,
             Intake.instance,
-            // LED.instance,
+            LED.instance,
             // RobotState.instance,
             Swerve.instance,
             Vision.instance,
