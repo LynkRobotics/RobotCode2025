@@ -244,8 +244,8 @@ public class Superstructure extends SubsystemBase {
     }
 
     public Command SmartScore(boolean left) {
-        return Commands.either(
-            LoggedCommands.proxy(Commands.select(left ? coralLeftCommands : coralRightCommands, () -> Pose.nearestFace(Pose.instance.getPose().getTranslation()))),
+        return LoggedCommands.either("Smart Score",
+            LoggedCommands.proxy(LoggedCommands.select("Coral select", left ? coralLeftCommands : coralRightCommands, () -> Pose.nearestFace(Pose.instance.getPose().getTranslation()))),
             Commands.either(
                 Commands.either(
                     LoggedCommands.proxy(PrepBargeShot()),
