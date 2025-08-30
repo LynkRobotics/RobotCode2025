@@ -82,10 +82,12 @@ public class EndEffector extends SubsystemBase {
         positionMotor.setPosition(directAbsPosition);
 
         // For basic debugging
-        for (EEPosition position : EEPosition.values()) {
-            SmartDashboard.putData("EndEffector/Move to " + position, LoggedCommands.runOnce("Move to " + position, () ->moveTo(position), this));;
-        }
-        SmartDashboard.putData("EndEffector/Expel Coral L3", ExpelCoral(Field.ReefLevel.L3));
+        // for (EEPosition position : EEPosition.values()) {
+        //     SmartDashboard.putData("EndEffector/Move to " + position, LoggedCommands.runOnce("Move to " + position, () ->moveTo(position), this));;
+        // }
+        // SmartDashboard.putData("EndEffector/Expel Coral L3", ExpelCoral(Field.ReefLevel.L3));
+
+        SmartDashboard.putData("EndEffector/Sensor Reset", SensorReset());
     }
 
     public boolean inPosition() {
@@ -238,6 +240,18 @@ public class EndEffector extends SubsystemBase {
             .handleInterrupt(() -> pieceMotor.stopMotor());
     }
 
+    public Command SensorReset() {
+        return LoggedCommands.runOnce("End Effector Sensor Reset", () -> {
+            if (algaeDetected()) {
+                state = EEState.HAVE_ALGAE;
+            } else if (coralDetected()) {
+                state = EEState.HAVE_CORAL;
+            } else {
+                state = EEState.EMPTY;
+            }
+        }, this);
+    }
+
     @Override
     public void periodic() {
         Command currentCommand = getCurrentCommand();
@@ -315,26 +329,33 @@ public class EndEffector extends SubsystemBase {
                 pieceMotor.setControl(EEControl.CORAL_HOLD.control);
                 intakeState = EEIntakeState.STOPPED;
             }
-        }
-        if (state == EEState.HAVE_CORAL) {
+        } else if (intakeState == EEIntakeState.SCORING_CORAL) {
             if (!coralDetected()) {
                 state = EEState.EMPTY;
-                DogLog.log("EndEffector/Status", "Coral lost");
+                DogLog.log("EndEffector/Status", "Coral released");
             }
-        } else if (state == EEState.HAVE_ALGAE) {
+        } else if (intakeState == EEIntakeState.SCORING_ALGAE) {
             if (!algaeDetected()) {
                 state = EEState.EMPTY;
-                DogLog.log("EndEffector/Status", "Algae lost");
+                DogLog.log("EndEffector/Status", "Algae released");
             }
         } else {
-            if (coralDetected()) {
-                state = EEState.HAVE_CORAL;
-                DogLog.log("EndEffector/Status", "Coral surprisingly detected");
-                pieceMotor.setControl(EEControl.CORAL_HOLD.control);
-            } else if (algaeDetected()) {
-                state = EEState.HAVE_ALGAE;
-                DogLog.log("EndEffector/Status", "Algae surprisingly detected");
-                pieceMotor.setControl(EEControl.ALGAE_HOLD.control);
+            // intakeState == EEIntakeState.STOPPED
+            if (state == EEState.HAVE_CORAL) {
+                if (!coralDetected()) {
+                    DogLog.log("EndEffector/Status", "Coral may be lost");
+                }
+            } else if (state == EEState.HAVE_ALGAE) {
+                if (!algaeDetected()) {
+                    DogLog.log("EndEffector/Status", "Algae may be lost");
+                }
+            } else {
+                // state == EEState.EMPTY
+                if (coralDetected()) {
+                    DogLog.log("EndEffector/Status", "Coral surprisingly detected");
+                } else if (algaeDetected()) {
+                    DogLog.log("EndEffector/Status", "Algae surprisingly detected");
+                }
             }
         }
     }
