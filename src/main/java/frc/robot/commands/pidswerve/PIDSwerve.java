@@ -21,7 +21,7 @@ public class PIDSwerve extends LoggedCommandBase {
     private final Pose2d targetPose;
     private final boolean precise;
     private final PIDController xPID, yPID;
-    private final PIDController rotationPID = new PIDController(PIDSwerveConstants.rotationKP, 0, 0);
+    private final PIDController rotationPID = new PIDController(PIDSwerveConstants.rotationKP, 0, PIDSwerveConstants.rotationKD);
     private final PIDSpeed speed;
     private final double maxVisionDiff;
     private final Timer alignedTimer = new Timer();

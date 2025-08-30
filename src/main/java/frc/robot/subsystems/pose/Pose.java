@@ -95,6 +95,20 @@ public class Pose extends SubsystemBase {
         //         builder.addDoubleProperty("Value", () -> reefBearing(getPose().getTranslation()).getDegrees(), null);
         //     }
         // });
+
+        // SmartDashboard.putNumber("Pose/Rot KP", PoseConstants.rotationPID.getP());
+        // SmartDashboard.putNumber("Pose/Rot KD", PoseConstants.rotationPID.getD());
+        // SmartDashboard.putData("Pose/Set Rot PID", LoggedCommands.runOnce("Set Pose Rotation PID", () ->
+        //     { PoseConstants.rotationPID.setPID(SmartDashboard.getNumber("Pose/Rot KP", 0.0), 0.0,
+        //         SmartDashboard.getNumber("Pose/Rot KD", 0.0));
+        //     }).ignoringDisable(true));
+
+        // SmartDashboard.putNumber("Pose/Rot KS", PoseConstants.rotationKS);
+        // SmartDashboard.putData("Pose/Rot @ KS", LoggedCommands.startEnd("Rot @ KS",
+        //     () -> Swerve.instance.drive(new Translation2d(0, 0),
+        //         SmartDashboard.getNumber("Pose/Rot KS", 0.0) * PIDSwerveConstants.maxAngularVelocity,
+        //         true),
+        //         Swerve.instance::Stop, Swerve.instance));
     }
 
     public static String prettyPose(Pose2d pose) {
@@ -129,11 +143,12 @@ public class Pose extends SubsystemBase {
         return angleErrorToSpeed(angleError, PoseConstants.rotationPID);
     }
 
+    // TODO Unify with PID Swerve logic
     public static double angleErrorToSpeed(Rotation2d angleError, PIDController pid) {
         double angleErrorDeg = angleError.getDegrees();
         double correction = pid.calculate(angleErrorDeg);
         double feedForward = PoseConstants.rotationKS * Math.signum(correction);
-        double output = MathUtil.clamp(correction + feedForward, -1.0, 1.0);
+        double output = MathUtil.clamp(correction + feedForward, -PoseConstants.rotationMax, PoseConstants.rotationMax);
 
         DogLog.log("Pose/Angle Error", angleErrorDeg);
         DogLog.log("Pose/Angle PID correction", correction);
