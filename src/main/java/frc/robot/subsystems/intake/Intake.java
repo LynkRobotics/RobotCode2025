@@ -176,7 +176,7 @@ public class Intake extends SubsystemBase {
                 DogLog.log("Intake/Status", "Intake deploy zeroing complete");
                 zeroing = false;
                 deployMotor.stopMotor();
-                deployMotor.setPosition(IntakePosition.DEPLOYED.position);
+                deployMotor.setPosition(IntakePosition.FULLY_DEPLOYED.position);
                 deployMotor.setControl(desiredState.control); // Return to the desiredState
             } else {
                 DogLog.log("Intake/Status", "Intake deploy stall detected");
