@@ -35,6 +35,8 @@ public class Controls extends SubsystemBase{
 
     public Controls() {
         SmartDashboard.putNumber("TeleOp Speed Governor", 1.0);
+        SmartDashboard.putNumber("TeleOp Translation Expo", 1.0);
+        SmartDashboard.putNumber("TeleOp Rotation Expo", 1.0);
 
         Pose pose = Pose.instance;
         SmartDashboard.putData(LoggedCommands.runOnce("Zero Gyro", pose::zeroGyro));
