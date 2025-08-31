@@ -108,7 +108,10 @@ public class EndEffector extends SubsystemBase {
         };
 
         return LoggedCommands.sequence("Expel coral for " + level,
-            Commands.runOnce(() -> pieceMotor.setControl(control.control), this),
+            Commands.runOnce(() -> {
+                intakeState = EEIntakeState.SCORING_CORAL;
+                pieceMotor.setControl(control.control);
+            }, this),
             LoggedCommands.waitUntil("Wait for coral to clear", () -> state == EEState.EMPTY),
             Commands.waitSeconds(postClearDelay),
             Commands.runOnce(pieceMotor::stopMotor, this))
@@ -234,7 +237,10 @@ public class EndEffector extends SubsystemBase {
 
     public Command PlaceBargeAlgae() {
         return LoggedCommands.sequence("Place barge algae",
-            LoggedCommands.runOnce("Expel algae into barge", () -> pieceMotor.setControl(EEControl.ALGAE_BARGE_SCORE.control), this),
+            LoggedCommands.runOnce("Expel algae into barge", () -> {
+                intakeState = EEIntakeState.SCORING_ALGAE;
+                pieceMotor.setControl(EEControl.ALGAE_BARGE_SCORE.control);
+            }, this),
             Commands.waitSeconds(0.3),
             LoggedCommands.runOnce("Stop motor", () -> pieceMotor.stopMotor(), this))
             .handleInterrupt(() -> pieceMotor.stopMotor());
