@@ -43,14 +43,14 @@ public class DetectionSubsystem extends SubsystemBase {
       double timestamp = result.getTimestampSeconds();
       
       PhotonTrackedTarget target = result.getBestTarget();
-
-      if (target.objDetectId == 0) { // if the object we detect is algae, discard
-        //do nothing
-      } else if (target.objDetectId == 1) { //if the object we detect is coral, report data 
-        coralTransform = target.getBestCameraToTarget();
-        objectTargetData.add(new ObjectTargetData(target.objDetectId, target.getDetectedObjectConfidence(), coralTransform));
+      if (target.getDetectedObjectConfidence() >= 0.85) { //todo tune
+        if (target.objDetectId == 0) { // if the object we detect is algae, discard
+          //do nothing
+        } else if (target.objDetectId == 1) { //if the object we detect is coral, report data 
+          coralTransform = target.getBestCameraToTarget();
+          objectTargetData.add(new ObjectTargetData(target.objDetectId, target.getDetectedObjectConfidence(), coralTransform));
+        }
       }
-
     }
     return objectTargetData;
   }
