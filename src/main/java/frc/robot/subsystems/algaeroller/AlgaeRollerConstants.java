@@ -13,6 +13,8 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 
 public class AlgaeRollerConstants {
+	public static final boolean enabled = true; // Used once at SCRAP with roller removed
+
     /* Motor Control Values */
     public static final double deployGearing = (62.0 / 8.0) * (68.0 / 18.0) * (15.0 / 9.0);
 	public static final double rollerGearing = (18.0 / 12.0);

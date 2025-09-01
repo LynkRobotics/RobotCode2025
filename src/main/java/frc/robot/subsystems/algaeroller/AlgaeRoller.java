@@ -48,10 +48,12 @@ public class AlgaeRoller extends SubsystemBase {
 
         // Expect to begin in STOWED position and hold it
         deployMotor.setPosition(AlgaeRollerPosition.STOWED.position);
-        // startZero();
-        // moveTo(AlgaeRollerPosition.STOWED);
-        // HACK
-        deployMotor.stopMotor();
+        if (AlgaeRollerConstants.enabled) {
+            // startZero();
+            moveTo(AlgaeRollerPosition.STOWED);
+        } else {
+            deployMotor.stopMotor();
+        }
 
         // Debugging help
         for (AlgaeRollerPosition position : AlgaeRollerPosition.values()) {
@@ -63,7 +65,9 @@ public class AlgaeRoller extends SubsystemBase {
 
     public void startZero() {
         zeroing = true;
-        // deployMotor.setControl(deployZeroingControl);
+        if (AlgaeRollerConstants.enabled) {
+            deployMotor.setControl(deployZeroingControl);
+        }
     }
 
     public Command Zero() {
@@ -74,7 +78,9 @@ public class AlgaeRoller extends SubsystemBase {
         DogLog.log("Algae Roller/Status", "Moving to " + position.name());
         waitingForClear = waitingForStop = false;
         currentTarget = position;
-        // deployMotor.setControl(position.control);
+        if (AlgaeRollerConstants.enabled) {
+            deployMotor.setControl(position.control);
+        }
     }
 
     private boolean atTarget() {
@@ -86,13 +92,13 @@ public class AlgaeRoller extends SubsystemBase {
     }
 
     private boolean isNear(AlgaeRollerPosition position) {
-        return true; // HACK
-        // return deployMotor.getPosition().getValue().minus(position.position).abs(Units.Rotations) <= AlgaeRollerConstants.epsilon.in(Units.Rotations);
+        if (!AlgaeRollerConstants.enabled) return true;
+        return deployMotor.getPosition().getValue().minus(position.position).abs(Units.Rotations) <= AlgaeRollerConstants.epsilon.in(Units.Rotations);
     }
 
     public boolean isClear() {
-        // return deployMotor.getPosition().getValue().lte(AlgaeRollerPosition.CLEAR.position.plus(AlgaeRollerConstants.epsilon));
-        return true; // HACK
+        if (!AlgaeRollerConstants.enabled) return true;
+        return deployMotor.getPosition().getValue().lte(AlgaeRollerPosition.CLEAR.position.plus(AlgaeRollerConstants.epsilon));
     }
 
     private void ensureClear() {
@@ -124,57 +130,57 @@ public class AlgaeRoller extends SubsystemBase {
     }
 
     public Command TriggerStowWhenClear() {
-        return Commands.none(); // HACK
-        // return LoggedCommands.runOnce("Stow algae roller when clear", this::stowWhenClear, this);
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
+        return LoggedCommands.runOnce("Stow algae roller when clear", this::stowWhenClear, this);
     }
 
     public Command TriggerStowWhenStopped() {
-        return Commands.none(); // HACK
-
-        // return LoggedCommands.runOnce("Stow algae roller when stopped", this::stowWhenStopped, this);
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
+        return LoggedCommands.runOnce("Stow algae roller when stopped", this::stowWhenStopped, this);
     }
 
     public Command TriggerStow() {
-        return Commands.none(); // HACK
-
-        // return LoggedCommands.runOnce("Stow algae roller", () -> moveTo(AlgaeRollerPosition.STOWED), this);
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
+        return LoggedCommands.runOnce("Stow algae roller", () -> moveTo(AlgaeRollerPosition.STOWED), this);
     }
 
     public Command TriggerL1Assist() {
-        return Commands.none(); // HACK
-
-        // return LoggedCommands.runOnce("Move algae roller to score L1", () -> moveTo(AlgaeRollerPosition.L1_SCORE), this);
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
+        return LoggedCommands.runOnce("Move algae roller to score L1", () -> moveTo(AlgaeRollerPosition.L1_SCORE), this);
     }
 
     public Command StartIntake() {
-        return Commands.none(); // HACK
-        // return LoggedCommands.runOnce("Intake algae", () -> rollerMotor.setControl(intakeControl), this);
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
+        return LoggedCommands.runOnce("Intake algae", () -> rollerMotor.setControl(intakeControl), this);
     }
 
     public Command StopIntake() {
-        return Commands.none(); // HACK
-        // return LoggedCommands.runOnce("Stop algae intake", () -> rollerMotor.stopMotor(), this);
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
+        return LoggedCommands.runOnce("Stop algae intake", () -> rollerMotor.stopMotor(), this);
     }
 
     public Command StopAndClear() {
         return LoggedCommands.runOnce("Stop algae intake and move to clear", () -> {
             rollerMotor.stopMotor();
-            // moveTo(AlgaeRollerPosition.CLEAR); HACK
+            if (AlgaeRollerConstants.enabled) {
+                moveTo(AlgaeRollerPosition.CLEAR);
+            }
         }, this);
     }
 
     public Command TriggerDeploy() {
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
         return LoggedCommands.runOnce("Deploy algae intake", () -> moveTo(AlgaeRollerPosition.DEPLOYED), this);
     }
 
     public Command Expel() {
-        return Commands.none(); // HACK
-        // return LoggedCommands.runOnce("Expel algae", () -> rollerMotor.setControl(expelControl), this);
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
+        return LoggedCommands.runOnce("Expel algae", () -> rollerMotor.setControl(expelControl), this);
     }
 
     public Command GuideL1Coral() {
-        return Commands.none();
-        // return LoggedCommands.runOnce("Guide L1 coral", () -> rollerMotor.setControl(L1AssistControl), this);
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
+        return LoggedCommands.runOnce("Guide L1 coral", () -> rollerMotor.setControl(L1AssistControl), this);
     }
 
     @Override
@@ -200,9 +206,10 @@ public class AlgaeRoller extends SubsystemBase {
             DogLog.log("Algae Roller/Status", "Deploy zeroing complete");
             zeroing = false;
             deployMotor.stopMotor();
-            /// HACK
-            // deployMotor.setPosition(AlgaeRollerPosition.STOWED.position);
-            // deployMotor.setControl(currentTarget.control); // Return to the intended target
+            if (AlgaeRollerConstants.enabled) {
+                deployMotor.setPosition(AlgaeRollerPosition.STOWED.position);
+                deployMotor.setControl(currentTarget.control); // Return to the intended target
+            }
         }
 
         if (waitingForClear && Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH)) {
