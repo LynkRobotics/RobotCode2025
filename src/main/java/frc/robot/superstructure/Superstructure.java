@@ -320,12 +320,22 @@ public class Superstructure extends SubsystemBase {
             AlgaeRoller.instance.TriggerStowWhenStopped());
     }
 
-    public Command SmartIntake() {
+    public Command SmartCoralIntake() {
         return Commands.either(
             AlgaeHold(),
             Commands.either(
                 CoralHold(),
                 IntakeCoral(),
+                () -> EndEffector.instance.haveCoral()),
+            () -> EndEffector.instance.haveAlgae());
+    }
+
+    public Command SmartAlgaeIntake() {
+        return Commands.either(
+            AlgaeHold(),
+            Commands.either(
+                CoralHold(),
+                IntakeGroundAlgae(),
                 () -> EndEffector.instance.haveCoral()),
             () -> EndEffector.instance.haveAlgae());
     }

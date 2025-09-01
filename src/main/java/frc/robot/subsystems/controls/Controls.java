@@ -82,8 +82,8 @@ public class Controls extends SubsystemBase{
         final Trigger expel = driver.start();
         final Trigger alignmentToggle = driver.rightStick();
 
-        intakeCoral.whileTrue(Superstructure.instance.SmartIntake());
-        intakeGroundAlgae.whileTrue(Superstructure.instance.IntakeGroundAlgae());
+        intakeCoral.whileTrue(Superstructure.instance.SmartCoralIntake());
+        intakeGroundAlgae.whileTrue(Superstructure.instance.SmartAlgaeIntake());
 
         // zero.onTrue(Elevator.instance.Zero());
         expel.whileTrue(Intake.instance.ExpelForever()).onFalse(Intake.instance.Stop());
