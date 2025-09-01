@@ -183,6 +183,7 @@ public class Superstructure extends SubsystemBase {
                         // LoggedCommands.deadline("Wait for auto up",
                         //     Elevator.instance.WaitForNext(),
                         //     Elevator.instance.AutoElevatorUp(left ? face.alignCoralLeft.getTranslation() : face.alignCoralRight.getTranslation())))),
+                // LoggedCommands.waitUntil("DEBUG: Infinite Wait", () -> false), // Used for debugging
                 PlaceCoral(),
                 Commands.either(
                     Commands.none(),
@@ -296,7 +297,7 @@ public class Superstructure extends SubsystemBase {
             AlgaeRoller.instance.TriggerStowWhenStopped())
             .handleInterrupt(() -> {
                 EndEffector.instance.StopIntake().schedule();
-                // AlgaeRoller.instance.StopAndClear().schedule(); // HACK
+                AlgaeRoller.instance.StopAndClear().schedule(); // HACK
             });
     }
 
