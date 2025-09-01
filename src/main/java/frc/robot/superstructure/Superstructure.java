@@ -105,7 +105,7 @@ public class Superstructure extends SubsystemBase {
     private Command TriggerMoveToL4() {
         return LoggedCommands.sequence("Move to L4 sequence",
             Commands.either(
-                Commands.none(),
+                LoggedCommands.log("No need to prep L4"),
                 Commands.sequence(
                     TriggerMoveToEEPose(EEPose.L4_PREP),
                     AlgaeRoller.instance.TriggerStowWhenClear(),
