@@ -44,6 +44,7 @@ public class Superstructure extends SubsystemBase {
         L2(EEPosition.L23, Stop.L2),
         L3(EEPosition.L23, Stop.L3),
         L4(EEPosition.L4, Stop.L4),
+        L4_PREP(EEPosition.CORAL_HOLD, Stop.L4_PREP),
         BARGE_PREP(EEPosition.BARGE, Stop.BARGE_PREP),
         BARGE(EEPosition.BARGE, Stop.BARGE),
         GROUND_CORAL(EEPosition.GROUND_INTAKE, Stop.STOW),
@@ -101,6 +102,19 @@ public class Superstructure extends SubsystemBase {
             Elevator.instance.TriggerMoveToDirect(pose.stop));
     }
 
+    private Command TriggerMoveToL4() {
+        return LoggedCommands.sequence("Move to L4 sequence",
+            Commands.either(
+                Commands.none(),
+                Commands.sequence(
+                    TriggerMoveToEEPose(EEPose.L4_PREP),
+                    AlgaeRoller.instance.TriggerStowWhenClear(),
+                    WaitForEEPose()),
+                () -> Elevator.instance.aboveStop(Stop.L4_PREP)),
+            TriggerMoveToEEPose(EEPose.L4));
+    }
+
+    // NOTE: Can block in the case of L4, which uses an interim position
     private Command TriggerMoveToActiveCoral() {
         return Commands.either(
             Commands.either(
@@ -108,7 +122,7 @@ public class Superstructure extends SubsystemBase {
                 Commands.either(
                     Commands.sequence(
                         AlgaeRoller.instance.TriggerStowWhenClear(),
-                        TriggerMoveToEEPose(EEPose.L4)),
+                        TriggerMoveToL4()),
                     Commands.sequence(
                         AlgaeRoller.instance.TriggerStow(),
                         Commands.either(

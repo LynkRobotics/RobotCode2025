@@ -267,6 +267,12 @@ public class Elevator extends SubsystemBase {
         return getHeight(mainMotor.getPosition().getValueAsDouble());
     }
 
+    public boolean nearOrAbove(Stop stop) {
+        // In theory -- but these have an old implementation
+        // return nearStop(stop) || aboveStop(stop);
+        return getHeight().gte(stop.height.minus(ElevatorConstants.epsilonThreshold));
+    }
+
     public double raisedPercentage() {
         return MathUtil.clamp(getHeight().minus(Stop.CORAL_HOLD.height).div(Stop.L4.height).magnitude(), 0.0, 1.0);
     }
