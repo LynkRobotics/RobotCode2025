@@ -61,8 +61,21 @@ public class DetectionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    List<Camera> camerasEnabled = new LinkedList<Camera>();
     for (Camera cameraType : DetectionConstants.camerasAvailable) {
       cameras.put(cameraType, new PhotonCamera(cameraType.name()));
+      camerasEnabled.add(cameraType);
     }
+
+    for (var cameraType : camerasEnabled) {
+      String logPrefix = "Detection/" + cameraType + "/";
+      for (ObjectTargetData objectTargetData : processCamera(cameraType)) {
+        DogLog.log(logPrefix + "Transform", objectTargetData.transform);
+        DogLog.log(logPrefix + "Confidence", objectTargetData.confidence);
+        DogLog.log(logPrefix + "Object Id", objectTargetData.objectId);
+      }
+    }
+    
+    
   }
 }
