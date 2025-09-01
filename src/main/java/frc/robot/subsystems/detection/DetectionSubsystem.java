@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -23,14 +24,14 @@ public class DetectionSubsystem extends SubsystemBase {
 
   private static final EnumMap<Camera, PhotonCamera> cameras = new EnumMap<>(Camera.class); 
 
-  public record ObjectTargetData(double timestamp, int objectId, String objectName, double confidence, Transform3d transform) {
-  }
+  public record ObjectTargetData(int objectId, double confidence, Transform3d transform) {
+  } // 0 = algae, 1 = coral
 
   static {
     for (Camera cameraType : DetectionConstants.camerasAvailable) {
       cameras.put(cameraType, new PhotonCamera(cameraType.name()));
     }
-  }
+  } //
 
   public DetectionSubsystem() {
 
@@ -39,12 +40,21 @@ public class DetectionSubsystem extends SubsystemBase {
   private List<ObjectTargetData> processCamera(Camera cameraType){
     List<ObjectTargetData> objectTargetData = new LinkedList<>();
     PhotonCamera camera = cameras.get(cameraType);
+    Transform3d coralTransform;
     List<PhotonPipelineResult> results = camera.getAllUnreadResults();
 
     for (PhotonPipelineResult result : results) {
       double timestamp = result.getTimestampSeconds();
+      
+      PhotonTrackedTarget target = result.getBestTarget();
 
-      //todo add object target data
+      if (target.objDetectId == 0) { // if the object we detect is algae, discard
+        //do nothing
+      } else if (target.objDetectId == 1) { //if the object we detect is coral, report data 
+        coralTransform = target.getBestCameraToTarget();
+        objectTargetData.add(new ObjectTargetData(target.objDetectId, target.getDetectedObjectConfidence(), coralTransform));
+      }
+
     }
     return objectTargetData;
   }
