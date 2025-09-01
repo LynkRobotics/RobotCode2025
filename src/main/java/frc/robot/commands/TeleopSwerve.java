@@ -63,9 +63,11 @@ public class TeleopSwerve extends LoggedCommandBase {
         double rotationExpo = SmartDashboard.getNumber("TeleOp Rotation Expo", 1.0);
         
         if (translationExpo != 1.0) {
-            translationExpo = Math.abs(Math.pow(Math.abs(translationVal), translationExpo)) * Math.signum(rotationVal);
+            translationVal = Math.abs(Math.pow(Math.abs(translationVal), translationExpo)) * Math.signum(translationVal);
+            strafeVal = Math.abs(Math.pow(Math.abs(strafeVal), translationExpo)) * Math.signum(strafeVal);
         }
         translationVal *= teleOpMult;
+        strafeVal *= teleOpMult;
         
         if (rotationExpo != 1.0) {
             rotationVal = Math.abs(Math.pow(Math.abs(rotationVal), rotationExpo)) * Math.signum(rotationVal);
