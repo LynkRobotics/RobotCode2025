@@ -33,10 +33,6 @@ public class DetectionSubsystem extends SubsystemBase {
     }
   } //
 
-  public DetectionSubsystem() {
-
-  }
-
   private List<ObjectTargetData> processCamera(Camera cameraType){
     List<ObjectTargetData> objectTargetData = new LinkedList<>();
     PhotonCamera camera = cameras.get(cameraType);
