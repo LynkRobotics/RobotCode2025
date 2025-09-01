@@ -325,7 +325,7 @@ public class Superstructure extends SubsystemBase {
     public Command CoralHold() {
         return LoggedCommands.sequence("Hold coral",
             TriggerMoveToEEPose(EEPose.CORAL_HOLD),
-            AlgaeRoller.instance.TriggerStowWhenStopped());
+            AlgaeRoller.instance.TriggerStowWhenStoppedAndPivotClear());
     }
 
     public Command AlgaeHold() {
@@ -371,7 +371,7 @@ public class Superstructure extends SubsystemBase {
         EndEffector.instance.StopIntake(),
         Intake.instance.Stop(),
         TriggerMoveToEEPose(EEPose.CORAL_HOLD),
-        AlgaeRoller.instance.TriggerStowWhenStopped());
+        AlgaeRoller.instance.TriggerStowWhenStoppedAndPivotClear());
     }
 
     // TODO Use StartCoralIntake() && Finish Coral Intake
@@ -386,7 +386,7 @@ public class Superstructure extends SubsystemBase {
                 Intake.instance.Deploy()),
             EndEffector.instance.WaitForState(EEState.HAVE_CORAL),
             TriggerMoveToEEPose(EEPose.CORAL_HOLD),
-            AlgaeRoller.instance.TriggerStowWhenStopped(),
+            AlgaeRoller.instance.TriggerStowWhenStoppedAndPivotClear(),
             Controls.instance.TriggerRumble())
             .finallyDo((interrupted) -> {
                 IntakeExpel.schedule(); // TODO Make this a fixed command instead of new object?

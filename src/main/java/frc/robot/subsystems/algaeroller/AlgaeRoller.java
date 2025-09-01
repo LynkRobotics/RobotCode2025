@@ -17,6 +17,7 @@ import frc.lib.util.LoggedCommands;
 import frc.robot.Ports;
 import frc.robot.subsystems.algaeroller.AlgaeRollerConstants.AlgaeRollerPosition;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.endeffector.EndEffector;
 
 public class AlgaeRoller extends SubsystemBase {
     public static final AlgaeRoller instance = new AlgaeRoller();
@@ -36,6 +37,7 @@ public class AlgaeRoller extends SubsystemBase {
 
     boolean waitingForClear = false;
     boolean waitingForStop = false;
+    boolean waitingForPivotClear = false;
 
     AlgaeRollerPosition currentTarget = AlgaeRollerPosition.STOWED;
     
@@ -113,6 +115,8 @@ public class AlgaeRoller extends SubsystemBase {
         } else {
             DogLog.log("Algae Roller/Status", "Delaying stow due to elevator position");
             waitingForClear = true;
+            waitingForStop = false;
+            waitingForPivotClear = false;
         }
     }
 
@@ -122,6 +126,21 @@ public class AlgaeRoller extends SubsystemBase {
         } else {
             DogLog.log("Algae Roller/Status", "Delaying stow due to elevator movement");
             waitingForStop = true;
+            waitingForClear = false;
+            waitingForPivotClear = false;
+        }
+    }
+
+    private void stowWhenStoppedAndPivotClear() {
+        waitingForStop = !Elevator.instance.atFinalTarget();
+        waitingForPivotClear = !EndEffector.instance.inHighClearRange();
+        waitingForClear = false;
+
+        if (waitingForStop && waitingForPivotClear) {
+            DogLog.log("Algae Roller/Status", "Delaying stow until elevator stopped and pivot clear");
+            waitingForPivotClear = true;
+        } else {
+            moveTo(AlgaeRollerPosition.STOWED);
         }
     }
 
@@ -137,6 +156,11 @@ public class AlgaeRoller extends SubsystemBase {
     public Command TriggerStowWhenStopped() {
         if (!AlgaeRollerConstants.enabled) return Commands.none();
         return LoggedCommands.runOnce("Stow algae roller when stopped", this::stowWhenStopped, this);
+    }
+
+    public Command TriggerStowWhenStoppedAndPivotClear() {
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
+        return LoggedCommands.runOnce("Stow algae roller when stopped", this::stowWhenStoppedAndPivotClear, this);
     }
 
     public Command TriggerStow() {
@@ -193,6 +217,7 @@ public class AlgaeRoller extends SubsystemBase {
         DogLog.log("Algae Roller/Clear?", isClear());
         DogLog.log("Algae Roller/Waiting for clear?", waitingForClear);
         DogLog.log("Algae Roller/Waiting for stop?", waitingForStop);
+        DogLog.log("Algae Roller/Waiting for pivot clear?", waitingForPivotClear);
         DogLog.log("Algae Roller/Deploy Current", deployMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("Algae Roller/Deploy Velocity", deployMotor.getVelocity().getValueAsDouble());
         DogLog.log("Algae Roller/Deploy Voltage", deployMotor.getMotorVoltage().getValueAsDouble());
@@ -213,9 +238,25 @@ public class AlgaeRoller extends SubsystemBase {
         }
 
         if (waitingForClear && Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH)) {
-            moveTo(AlgaeRollerPosition.STOWED);
-        } else if (waitingForStop && Elevator.instance.atFinalTarget()) {
-            moveTo(AlgaeRollerPosition.STOWED);
+            if (waitingForStop || waitingForPivotClear) {
+                waitingForClear = false;
+            } else {
+                moveTo(AlgaeRollerPosition.STOWED);
+            }
+        }
+        if (waitingForStop && Elevator.instance.atFinalTarget()) {
+            if (waitingForClear || waitingForPivotClear) {
+                waitingForStop = false;
+            } else {
+                moveTo(AlgaeRollerPosition.STOWED);
+            }
+        }
+        if (waitingForPivotClear && EndEffector.instance.inHighClearRange()) {
+            if (waitingForClear || waitingForStop) {
+                waitingForPivotClear = false;
+            } else {
+                moveTo(AlgaeRollerPosition.STOWED);
+            }
         }
     }
 }
