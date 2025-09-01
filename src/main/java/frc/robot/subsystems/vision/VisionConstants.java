@@ -21,10 +21,7 @@ public class VisionConstants {
     public enum Camera {
         FRONT("AprilTagCam", new Transform3d(
             new Translation3d(Units.Inches.of(-3.0), Units.Inches.of(-10.5), Units.Inches.of(8.375)), 
-            new Rotation3d(Units.Degree.of(0), Units.Degree.of(-11.2), Units.Degree.of(156.0)))),
-        REAR("Detection Cam", new Transform3d(
-            new Translation3d(Units.Inches.of(-0.109), Units.Inches.of(-4.550), Units.Inches.of(39.230)),
-			new Rotation3d(Units.Degree.of(0.0), Units.Degree.of(-33.0), Units.Degree.of(0.0))));
+            new Rotation3d(Units.Degree.of(0), Units.Degree.of(-11.2), Units.Degree.of(156.0))));
     
         public final String name;
         public final Transform3d robotToCamera;
@@ -46,7 +43,6 @@ public class VisionConstants {
 
         CameraMode(double front, double rear) {
             stddev.put(Camera.FRONT, front);
-            stddev.put(Camera.REAR, rear);
         }
 
         public double getStdDev(Camera camera) {
