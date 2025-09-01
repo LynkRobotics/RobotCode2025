@@ -58,20 +58,25 @@ public class TeleopSwerve extends LoggedCommandBase {
         double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband);
 
         // TODO Get *every* time?
-        double translationExpo = SmartDashboard.getNumber("TeleOp Translation Expo", 1.0);
+        // double translationExpo = SmartDashboard.getNumber("TeleOp Translation Expo", 1.0);
+        // double rotationExpo = SmartDashboard.getNumber("TeleOp Rotation Expo", 1.0);
         double teleOpMult = SmartDashboard.getNumber("TeleOp Speed Governor", 1.0);
-        double rotationExpo = SmartDashboard.getNumber("TeleOp Rotation Expo", 1.0);
         
-        if (translationExpo != 1.0) {
-            translationVal = Math.abs(Math.pow(Math.abs(translationVal), translationExpo)) * Math.signum(translationVal);
-            strafeVal = Math.abs(Math.pow(Math.abs(strafeVal), translationExpo)) * Math.signum(strafeVal);
-        }
+        // Use exponential controls
+        // if (translationExpo != 1.0) {
+        //     translationVal = Math.abs(Math.pow(Math.abs(translationVal), translationExpo)) * Math.signum(translationVal);
+        //     strafeVal = Math.abs(Math.pow(Math.abs(strafeVal), translationExpo)) * Math.signum(strafeVal);
+        // }
+        // if (rotationExpo != 1.0) {
+        //     rotationVal = Math.abs(Math.pow(Math.abs(rotationVal), rotationExpo)) * Math.signum(rotationVal);
+        // }
+        translationVal = translationVal * translationVal * Math.signum(translationVal);
+        strafeVal = strafeVal * strafeVal * Math.signum(strafeVal);
+        rotationVal = rotationVal * rotationVal * Math.signum(rotationVal);
+
         translationVal *= teleOpMult;
         strafeVal *= teleOpMult;
         
-        if (rotationExpo != 1.0) {
-            rotationVal = Math.abs(Math.pow(Math.abs(rotationVal), rotationExpo)) * Math.signum(rotationVal);
-        }
 
         // Driver position is inverted for Red alliance, so adjust field-oriented controls
         if (Robot.isRed()) {
