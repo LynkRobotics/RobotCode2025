@@ -51,6 +51,7 @@ public class EndEffector extends SubsystemBase {
 
     private Debouncer coralDebouncer = new Debouncer(EndEffectorConstants.coralSensorDebounce.in(Units.Seconds), Debouncer.DebounceType.kBoth);
     private Debouncer algaeDebouncer = new Debouncer(EndEffectorConstants.algaeSensorDebounce.in(Units.Seconds), Debouncer.DebounceType.kBoth);
+    private Debouncer algaeStallDebouncer = new Debouncer(EndEffectorConstants.algaeStallDebounce.in(Units.Seconds), Debouncer.DebounceType.kRising);
 
     /* Devices */
     private final TalonFX positionMotor;
@@ -151,6 +152,7 @@ public class EndEffector extends SubsystemBase {
                     LoggedAlert.Error("End Effector", "Bad state", "End Effector state was not empty: " + state);
                     state = EEState.EMPTY;
                 }
+                algaeStallDebouncer.calculate(false); // Reset stall debouncer
                 intakeState = EEIntakeState.INTAKING_ALGAE;
                 pieceMotor.setControl(EEControl.ALGAE_INTAKE.control);
             }, this);
@@ -206,6 +208,10 @@ public class EndEffector extends SubsystemBase {
 
     private boolean algaeDetected() {
         return algaeDebouncer.calculate(algaeDetectedRaw());
+    }
+
+    private boolean algaeStalled() {
+        return algaeStallDebouncer.calculate(pieceMotor.getVelocity().getValue().lt(EndEffectorConstants.algaeStallVelocity));
     }
 
     private boolean okToMove() {
@@ -282,6 +288,7 @@ public class EndEffector extends SubsystemBase {
         DogLog.log("EndEffector/CANdi connected", candi.isConnected());
         DogLog.log("EndEffector/Coral detected", coralDetected());
         DogLog.log("EndEffector/Algae detected", algaeDetected());
+        DogLog.log("EndEffector/Algae stalled", algaeStalled());
 
         DogLog.log("EndEffector/State", state.name());
         DogLog.log("EndEffector/Intake State", intakeState.name());
@@ -322,15 +329,13 @@ public class EndEffector extends SubsystemBase {
         }
         
         if (intakeState == EEIntakeState.INTAKING_ALGAE) {
-            // TODO Also check stall
-            if (algaeDetected()) { // TODO Wait 0.2s before/after detection? can't we just bump the debounce up?
+            if (algaeDetected() || algaeStalled()) {
                 state = EEState.HAVE_ALGAE;
                 DogLog.log("EndEffector/Status", "Algae acquired");
                 pieceMotor.setControl(EEControl.ALGAE_HOLD.control);
                 intakeState = EEIntakeState.STOPPED;
             }
         } else if (intakeState == EEIntakeState.INTAKING_CORAL) {
-            // TODO Also check to stall?
             if (coralDetected()) {
                 state = EEState.HAVE_CORAL;
                 DogLog.log("EndEffector/Status", "Coral acquired");

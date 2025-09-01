@@ -15,6 +15,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
@@ -33,7 +34,9 @@ public class EndEffectorConstants {
 	public static final Angle pivotEpsilon = Units.Degrees.of(2.0);
 
 	public static final Time coralSensorDebounce = Units.Seconds.of(0.04);
-	public static final Time algaeSensorDebounce = Units.Seconds.of(0.09);
+	public static final Time algaeSensorDebounce = Units.Seconds.of(0.10);
+	public static final Time algaeStallDebounce = Units.Seconds.of(0.12);
+	public static final AngularVelocity algaeStallVelocity = Units.RotationsPerSecond.of(3.0);
 
 	public static enum EEControl {
 		CORAL_INTAKE(6.0),
