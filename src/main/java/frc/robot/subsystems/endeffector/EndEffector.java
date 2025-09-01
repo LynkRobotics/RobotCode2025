@@ -325,6 +325,7 @@ public class EndEffector extends SubsystemBase {
             // TODO Also check stall
             if (algaeDetected()) { // TODO Wait 0.2s before/after detection? can't we just bump the debounce up?
                 state = EEState.HAVE_ALGAE;
+                DogLog.log("EndEffector/Status", "Algae acquired");
                 pieceMotor.setControl(EEControl.ALGAE_HOLD.control);
                 intakeState = EEIntakeState.STOPPED;
             }
@@ -332,6 +333,7 @@ public class EndEffector extends SubsystemBase {
             // TODO Also check to stall?
             if (coralDetected()) {
                 state = EEState.HAVE_CORAL;
+                DogLog.log("EndEffector/Status", "Coral acquired");
                 pieceMotor.setControl(EEControl.CORAL_HOLD.control);
                 intakeState = EEIntakeState.STOPPED;
             }
