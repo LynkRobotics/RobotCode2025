@@ -65,7 +65,6 @@ public class Robot extends TimedRobot {
                 .withNtPublish(Constants.atHQ));
 
         DogLog.log("Misc/RIO Serial Number", RobotController.getSerialNumber());
-        DogLog.log("Misc/Is Rocky?", Constants.isRocky);
 
         // Ensure all subsystems get instantiated, and in order as necessary
         @SuppressWarnings("unused")
