@@ -18,6 +18,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.Constants;
 import frc.robot.Robot;
 
 public class EndEffectorConstants {
@@ -114,8 +115,8 @@ public class EndEffectorConstants {
 
 		config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
-		config.MotionMagic.MotionMagicCruiseVelocity = 2.0;
-		config.MotionMagic.MotionMagicAcceleration = 1.0;
+		config.MotionMagic.MotionMagicCruiseVelocity = 2.0 * Constants.mechanismSlowdown;
+		config.MotionMagic.MotionMagicAcceleration = 1.0 * Constants.mechanismSlowdown;
 
 		config.Voltage.PeakForwardVoltage = 12.0;
 		config.Voltage.PeakReverseVoltage = -12.0;
