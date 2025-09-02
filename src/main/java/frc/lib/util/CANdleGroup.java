@@ -2,11 +2,11 @@ package frc.lib.util;
 
 import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
-import com.ctre.phoenix.led.CANdle.LEDStripType;
-import com.ctre.phoenix.led.CANdleConfiguration;
+// import com.ctre.phoenix.led.CANdle.LEDStripType;
+// import com.ctre.phoenix.led.CANdleConfiguration;
 
 import dev.doglog.DogLog;
-import frc.robot.subsystems.led.LEDConstants;
+// import frc.robot.subsystems.led.LEDConstants;
 
 public class CANdleGroup {
     private CANdle[] candles;
@@ -18,17 +18,17 @@ public class CANdleGroup {
         // applyConfigs();
     }
 
-    private void applyConfigs() {
-        CANdleConfiguration config = new CANdleConfiguration();
-        config.brightnessScalar = LEDConstants.brightness;
-        config.stripType = LEDStripType.RGB;
-        config.v5Enabled = true;
-        config.disableWhenLOS = false; //TODO: verify // TODO: true -- why is this triggering?
+    // private void applyConfigs() {
+    //     CANdleConfiguration config = new CANdleConfiguration();
+    //     config.brightnessScalar = LEDConstants.brightness;
+    //     config.stripType = LEDStripType.RGB;
+    //     config.v5Enabled = true;
+    //     config.disableWhenLOS = false; //TODO: verify // TODO: true -- why is this triggering?
 
-        for (CANdle candle : candles) {
-            candle.configAllSettings(config);
-        }
-    }
+    //     for (CANdle candle : candles) {
+    //         candle.configAllSettings(config);
+    //     }
+    // }
 
     public void animate(Animation animation) {
         DogLog.log("LED/Status", "Setting animation");
