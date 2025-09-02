@@ -45,7 +45,7 @@ public class IntakeConstants {
 	public static final Time expelTime = Units.Seconds.of(0.5);
 
 	public static final Voltage intakeVoltage = Units.Volts.of(-12.0);
-	public static final Voltage intakeExpelVoltage = Units.Volts.of(-12.0);
+	public static final Voltage intakeExpelVoltage = Units.Volts.of(12.0);
 
     public static TalonFXConfiguration getDeployConfig() {
         TalonFXConfiguration config = new TalonFXConfiguration();
