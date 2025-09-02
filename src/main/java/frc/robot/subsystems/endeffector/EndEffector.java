@@ -115,13 +115,17 @@ public class EndEffector extends SubsystemBase {
             }, this),
             LoggedCommands.waitUntil("Wait for coral to clear", () -> state == EEState.EMPTY),
             Commands.waitSeconds(postClearDelay),
-            Commands.runOnce(pieceMotor::stopMotor, this))
+            Commands.runOnce(() -> {
+                pieceMotor.stopMotor();
+                intakeState = EEIntakeState.STOPPED;
+            }, this))
             .handleInterrupt(() -> {
                 if (haveCoral()) {
                     pieceMotor.setControl(EEControl.CORAL_HOLD.control);
                 } else {
                     pieceMotor.stopMotor();
                 }
+                intakeState = EEIntakeState.STOPPED;
             });
     }
 
