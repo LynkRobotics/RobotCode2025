@@ -45,6 +45,7 @@ public class Superstructure extends SubsystemBase {
         L3(EEPosition.L23, Stop.L3),
         L4(EEPosition.L4, Stop.L4),
         L4_PREP(EEPosition.CORAL_HOLD, Stop.L4_PREP),
+        L4_HOLDHIGH(EEPosition.CORAL_HOLD, Stop.L4),
         BARGE_PREP(EEPosition.BARGE, Stop.BARGE_PREP),
         BARGE(EEPosition.BARGE, Stop.BARGE),
         GROUND_CORAL(EEPosition.GROUND_INTAKE, Stop.STOW),
@@ -109,9 +110,16 @@ public class Superstructure extends SubsystemBase {
                 Commands.sequence(
                     TriggerMoveToEEPose(EEPose.L4_PREP),
                     AlgaeRoller.instance.TriggerStowWhenClear(),
-                    WaitForEEPose()),
-                () -> Elevator.instance.aboveStop(Stop.L4_PREP)),
-            TriggerMoveToEEPose(EEPose.L4));
+                    WaitForEEPose().until(() -> EndEffector.instance.inPosition()), // Elevator target can change as soon as EE is in position
+                    Commands.either(
+                        LoggedCommands.log("Already at L4_PREP when End Effector in position"),
+                        Commands.sequence(
+                            TriggerMoveToEEPose(EEPose.L4_HOLDHIGH),
+                            WaitForEEPose().until(() -> Elevator.instance.nearOrAbove(Stop.L4_PREP))),
+                        () -> Elevator.instance.nearOrAbove(Stop.L4_PREP))),
+                () -> Elevator.instance.nearOrAbove(Stop.L4_PREP)),
+            TriggerMoveToEEPose(EEPose.L4),
+            AlgaeRoller.instance.TriggerStowWhenClear());
     }
 
     // NOTE: Can block in the case of L4, which uses an interim position
