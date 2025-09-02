@@ -109,3 +109,26 @@ wpi.java.configureTestTasks(test)
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
 }
+
+tasks.register("writeGitInfo") {
+    // Define an output stream to write to instead of terminal
+    def stdout = new ByteArrayOutputStream()
+
+    // Execute the git command
+    exec {
+        commandLine "git", "describe", "--tags", "--always", "--dirty"
+        // Write to the output stream instead of terminal
+        standardOutput = stdout
+    }
+
+    // Parse the output into a string
+    def gitInfo = stdout.toString().trim()
+
+    // Create a new file
+    new File(
+        // Join project directory and deploy directory
+        projectDir.toString() + "/src/main/deploy",
+        // File name to write to
+        "version.txt"
+    ).text = gitInfo // Set the contents of the file to the variable branch
+}
