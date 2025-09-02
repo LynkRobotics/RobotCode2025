@@ -319,7 +319,7 @@ public class Elevator extends SubsystemBase {
         if (direct) {
             // We are explicitly asking to move directly to a position
             setCurrentTarget(target, false);
-        } else if(goingUp) {
+        } else if (goingUp) {
             // We need to wait for the algae bar to be clear if we are below the CLEAR_HIGH mark
             setCurrentTarget(target, currentPosition.lt(Stop.CLEAR_HIGH.position));
         } else if (currentPosition.gt(Stop.CLEAR_HIGH.position)) {
