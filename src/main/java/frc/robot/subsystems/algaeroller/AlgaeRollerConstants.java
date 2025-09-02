@@ -23,11 +23,12 @@ public class AlgaeRollerConstants {
 	public static final Voltage L1AssistVoltage = Units.Volts.of(3.5);
 
 	public static final Angle epsilon = Units.Degrees.of(8.0); // TODO From Citrus, but too generous?
-	public static final Time deployStallTime = Units.Seconds.of(0.4);
+	public static final Time deployStallTime = Units.Seconds.of(0.3);
 	public static final Voltage deployZeroingVoltage = Units.Volts.of(2.0);
 
 	public static enum AlgaeRollerPosition {
-		STOWED(90.0),
+		ZEROED(90.0), // There's a little tension when zeroing
+		STOWED(88.0), // Don't want to hold it against the hard stop, stalling the motor
 		PROCESSOR(70.0),
 		CLEAR(65.0),
 		L1_SCORE(64.0), // 1678 is 55.0, but our mechanism has slop and drops
@@ -67,11 +68,11 @@ public class AlgaeRollerConstants {
 
 		config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-		config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-		config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = AlgaeRollerPosition.STOWED.position.in(Units.Rotations);
+		// config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+		// config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = AlgaeRollerPosition.STOWED.position.in(Units.Rotations);
 
-		config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-		config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -1000;
+		// config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+		// config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -1000;
 
 		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 

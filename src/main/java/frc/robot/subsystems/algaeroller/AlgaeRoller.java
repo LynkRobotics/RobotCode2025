@@ -32,7 +32,7 @@ public class AlgaeRoller extends SubsystemBase {
     private final ControlRequest expelControl = new VoltageOut(AlgaeRollerConstants.expelVoltage).withEnableFOC(true);
     private final ControlRequest L1AssistControl = new VoltageOut(AlgaeRollerConstants.L1AssistVoltage).withEnableFOC(true);
 
-    private static final Debouncer stallDebouncer = new Debouncer(AlgaeRollerConstants.deployStallTime.in(Units.Seconds), DebounceType.kRising);
+    private final Debouncer stallDebouncer = new Debouncer(AlgaeRollerConstants.deployStallTime.in(Units.Seconds), DebounceType.kRising);
     private boolean zeroing = false;
 
     boolean waitingForClear = false;
@@ -49,10 +49,10 @@ public class AlgaeRoller extends SubsystemBase {
         rollerMotor.getConfigurator().apply(AlgaeRollerConstants.getRollerMotorConfig());
 
         // Expect to begin in STOWED position and hold it
-        deployMotor.setPosition(AlgaeRollerPosition.STOWED.position);
+        deployMotor.setPosition(AlgaeRollerPosition.ZEROED.position);
         if (AlgaeRollerConstants.enabled) {
-            // startZero();
-            moveTo(AlgaeRollerPosition.STOWED);
+            startZero();
+            // moveTo(currentTarget);
         } else {
             deployMotor.stopMotor();
         }
@@ -67,6 +67,8 @@ public class AlgaeRoller extends SubsystemBase {
 
     public void startZero() {
         zeroing = true;
+        stallDebouncer.calculate(false);
+        DogLog.log("Algae Roller/Status", "Zeroing");
         if (AlgaeRollerConstants.enabled) {
             deployMotor.setControl(deployZeroingControl);
         }
@@ -230,9 +232,9 @@ public class AlgaeRoller extends SubsystemBase {
         if (zeroing && DriverStation.isEnabled() && stallDebouncer.calculate(deployMotor.getVelocity().getValueAsDouble() == 0.0)) {
             DogLog.log("Algae Roller/Status", "Deploy zeroing complete");
             zeroing = false;
-            deployMotor.stopMotor();
             if (AlgaeRollerConstants.enabled) {
-                deployMotor.setPosition(AlgaeRollerPosition.STOWED.position);
+                deployMotor.stopMotor();
+                deployMotor.setPosition(AlgaeRollerPosition.ZEROED.position);
                 deployMotor.setControl(currentTarget.control); // Return to the intended target
             }
         }
