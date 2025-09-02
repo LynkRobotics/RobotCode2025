@@ -151,7 +151,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     public Command WaitForEEPose() {
-        return LoggedCommands.waitUntil("Wait for EE Pose", () -> EndEffector.instance.inPosition() && Elevator.instance.atTarget());
+        return LoggedCommands.waitUntil("Wait for EE Pose", () -> EndEffector.instance.inPosition() && Elevator.instance.atFinalTarget());
     }
 
     private void setFaceCommands(ReefFace face) {
