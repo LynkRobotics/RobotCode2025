@@ -51,7 +51,7 @@ public class Climber extends SubsystemBase {
         intakeMotor = new TalonFX(Ports.CLIMBER_ROLLERS.id, Ports.CLIMBER_ROLLERS.bus.name);
         intakeMotor.getConfigurator().apply(ClimberConstants.getIntakeMotorConfig());
 
-        deployMotor.setPosition(ClimberPosition.STOWED.angle);
+        deployMotor.setPosition(ClimberConstants.startsClear ? ClimberPosition.CLEAR.angle : ClimberPosition.STOWED.angle);
         deployMotor.setControl(ClimberPosition.CLEAR.control);
 
         SmartDashboard.putData("Climber/Start Reset", StartReset());
