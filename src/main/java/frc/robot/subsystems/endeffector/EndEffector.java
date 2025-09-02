@@ -221,13 +221,19 @@ public class EndEffector extends SubsystemBase {
     private boolean okToMove() {
         return (Elevator.instance.isClear(Elevator.ClearState.CLEAR_LOW) &&
             (Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH) || AlgaeRoller.instance.isClear())) ||
-            inHighClearRange();
+            highClearSafe();
+    }
+
+    private boolean highClearSafe() {
+        return inHighClearRange() && inHighClearRange(desiredPosition.position);
+    }
+
+    private boolean inHighClearRange(Angle position) {
+        return position.gte(EEPosition.HIGH_CLEAR_START.position) && position.lte(EEPosition.HIGH_CLEAR_END.position);
     }
 
     public boolean inHighClearRange() {
-        Angle position = positionMotor.getPosition().getValue();
-
-        return position.gte(EEPosition.HIGH_CLEAR_START.position) && position.lte(EEPosition.HIGH_CLEAR_END.position);
+        return inHighClearRange(positionMotor.getPosition().getValue());
     }
 
     public Angle getAbsolutePosition() {

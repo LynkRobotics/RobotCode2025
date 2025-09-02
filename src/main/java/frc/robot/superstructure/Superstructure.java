@@ -128,9 +128,7 @@ public class Superstructure extends SubsystemBase {
             Commands.either(
                 TriggerMoveToEEPoseDirect(EEPose.L1),
                 Commands.either(
-                    Commands.sequence(
-                        AlgaeRoller.instance.TriggerStowWhenClear(),
-                        TriggerMoveToL4()),
+                    TriggerMoveToL4(),
                     Commands.sequence(
                         AlgaeRoller.instance.TriggerStow(),
                         Commands.either(
@@ -142,14 +140,14 @@ public class Superstructure extends SubsystemBase {
             Commands.either(
                 TriggerMoveToEEPose(EEPose.L1),
                 Commands.either(
-                    TriggerMoveToEEPose(EEPose.L4),
+                    TriggerMoveToL4(),
                     Commands.either(
                         TriggerMoveToEEPose(EEPose.L2),
                         TriggerMoveToEEPose(EEPose.L3),
                         () -> activeReefLevel == ReefLevel.L2),
                     () -> activeReefLevel == ReefLevel.L4),
                 () -> activeReefLevel == ReefLevel.L1),
-            () -> EndEffector.instance.inHighClearRange());
+            () -> EndEffector.instance.inHighClearRange()); // All scoring positions are in high clear range, so it's safe to move if EE is already in the high clear range
     }
 
     public Command WaitForEEPose() {
