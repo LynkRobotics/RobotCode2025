@@ -9,7 +9,10 @@ import java.nio.file.Files;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.net.WebServer;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotController;
@@ -24,7 +27,6 @@ import frc.lib.util.Elastic;
 import frc.robot.autos.Autos;
 import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.swerve.Swerve;
-import frc.robot.subsystems.vision.Vision;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -73,18 +75,8 @@ public class Robot extends TimedRobot {
         // Ensure all subsystems get instantiated, and in order as necessary
         @SuppressWarnings("unused")
         Subsystem[] subsystems = new Subsystem[] {
-            // Climber.instance,
-            // EndEffector.instance,
-            // Elevator.instance,
-            // Intake.instance,
-            // LED.instance,
-            // RobotState.instance,
             Swerve.instance,
-            Vision.instance,
-            Pose.instance,
-            // Controls.instance,
-            // Superstructure.instance,
-            // Autos.instance
+            Pose.instance
         };
         
         if (Constants.atHQ) {
@@ -144,6 +136,7 @@ public class Robot extends TimedRobot {
         }
 
         // Schedule the autonomous command
+        Pose.instance.setPose(new Pose2d(Units.Meters.of(7.228), Units.Meters.of(1.926), Rotation2d.kZero));
         autoCommand = Autos.instance.getAutonomousCommand();
         if (autoCommand != null) {
             DogLog.log("Misc/Robot Status", "Running auto command " + autoCommand.getName());

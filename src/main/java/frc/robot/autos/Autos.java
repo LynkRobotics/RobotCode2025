@@ -9,30 +9,16 @@ import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static frc.robot.Options.optBackupPush;
-
 import frc.lib.util.LoggedAlert;
 import frc.lib.util.LoggedCommands;
 
-import frc.robot.Constants;
-import frc.robot.Robot;
-import frc.robot.subsystems.pose.Pose;
-import frc.robot.subsystems.pose.PoseConstants.ReefFace;
 import frc.robot.subsystems.swerve.Swerve;
-import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionConstants.CameraMode;
-import frc.robot.Field.ReefLevel;
-import frc.robot.autos.AutoConstants.AutoPose;
 
 public class Autos extends SubsystemBase {
     public static final Autos instance = new Autos();
@@ -97,20 +83,5 @@ public class Autos extends SubsystemBase {
         }
 
         return LoggedCommands.logWithName("Path: " + pathName, pathCommand);
-    }
-
-    @Override
-    public void periodic() {
-        if (DriverStation.isEnabled()) {
-            return;
-        }
-
-        Command autoCommand = getAutonomousCommand();
-        String poseDifference = "N/A";
-        boolean differenceOK = false;
-
-        SmartDashboard.putString("autoSetup/Starting Pose Error", poseDifference);
-        SmartDashboard.putBoolean("autoSetup/Starting Pose OK", differenceOK);
-        SmartDashboard.putBoolean("autoSetup/Red Alliance?", Robot.isRed());
     }
 }

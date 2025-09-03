@@ -11,10 +11,9 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
 import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
-import frc.robot.Ports;
 
 public class SwerveConstants {
-    public static final String swerveCanBus = Ports.Bus.SWERVE.name;
+    public static final String swerveCanBus = "LynkSwerve";
     public static final double slowMode = 0.5;
     
     public static final COTSTalonFXSwerveConstants chosenModule = COTSTalonFXSwerveConstants.WCP.SwerveX2t.KrakenX60(COTSTalonFXSwerveConstants.WCP.SwerveX2t.driveRatios.X3_10);
