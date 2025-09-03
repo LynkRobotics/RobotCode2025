@@ -22,16 +22,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.lib.util.Elastic;
 import frc.robot.autos.Autos;
-import frc.robot.subsystems.climber.Climber;
-import frc.robot.subsystems.controls.Controls;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.endeffector.EndEffector;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.led.LED;
 import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.superstructure.Superstructure;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -80,24 +73,24 @@ public class Robot extends TimedRobot {
         // Ensure all subsystems get instantiated, and in order as necessary
         @SuppressWarnings("unused")
         Subsystem[] subsystems = new Subsystem[] {
-            Climber.instance,
-            EndEffector.instance,
-            Elevator.instance,
-            Intake.instance,
-            LED.instance,
+            // Climber.instance,
+            // EndEffector.instance,
+            // Elevator.instance,
+            // Intake.instance,
+            // LED.instance,
             // RobotState.instance,
             Swerve.instance,
             Vision.instance,
             Pose.instance,
-            Controls.instance,
-            Superstructure.instance,
-            Autos.instance
+            // Controls.instance,
+            // Superstructure.instance,
+            // Autos.instance
         };
         
         if (Constants.atHQ) {
             DriverStation.silenceJoystickConnectionWarning(true);
         }
-        Controls.instance.configureButtonBindings();
+        // Controls.instance.configureButtonBindings();
 
         DogLog.log("Misc/Robot Status", "Robot has Started");
         SmartDashboard.putData("Field Selector", fieldSelector);
@@ -180,7 +173,6 @@ public class Robot extends TimedRobot {
         Swerve swerve = Swerve.instance;
         swerve.stopSwerve();
         CommandScheduler.getInstance().schedule(swerve.BrakeDriveMotors());
-        swerve.setDefaultCommand(Controls.instance.TeleOpSwerve());
 
         if (!Constants.atHQ) {
             Elastic.selectTab("Primary");
