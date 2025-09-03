@@ -62,8 +62,8 @@ public class PoseConstants {
     public static final double approachDistanceToReefCenter = centerApproachOffset.getDistance(reefCenter);
     private static final Transform2d leftL1Transform = new Transform2d(reefL1ExtraOffset, branchSeparation.div(2.0), Rotation2d.kZero);
     private static final Transform2d rightL1Transform = new Transform2d(reefL1ExtraOffset, branchSeparation.div(-2.0), Rotation2d.kZero);
-    private static final Transform2d extraAlgaeBackupShort = new Transform2d(Units.Inches.of(-9.0), Units.Inches.zero(), Rotation2d.kZero);
-    private static final Transform2d extraAlgaeBackupExtended = new Transform2d(Units.Inches.of(-18.0), Units.Inches.zero(), Rotation2d.kZero);
+    private static final Transform2d extraAlgaeBackupShort = new Transform2d(Units.Inches.of(9.0), Units.Inches.zero(), Rotation2d.kZero);
+    private static final Transform2d extraAlgaeBackupExtended = new Transform2d(Units.Inches.of(18.0), Units.Inches.zero(), Rotation2d.kZero);
 
     public static enum ReefFace {
         AB(-180, true),
