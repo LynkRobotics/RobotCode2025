@@ -62,6 +62,8 @@ public class Robot extends TimedRobot {
         DogLog.log("Misc/Robot Status", "Robot has Started");
         SmartDashboard.putData("Field Selector", fieldSelector);
         SmartDashboard.putData("Field", field);
+
+        Pose.instance.setPose(new Pose2d(Units.Meters.of(7.228), Units.Meters.of(1.926), Rotation2d.kZero));
     }
 
     /**
@@ -111,7 +113,6 @@ public class Robot extends TimedRobot {
         }
 
         // Schedule the autonomous command
-        Pose.instance.setPose(new Pose2d(Units.Meters.of(7.228), Units.Meters.of(1.926), Rotation2d.kZero));
         autoCommand = Autos.instance.getAutonomousCommand();
         if (autoCommand != null) {
             DogLog.log("Misc/Robot Status", "Running auto command " + autoCommand.getName());

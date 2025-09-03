@@ -37,14 +37,14 @@ public class Pose extends SubsystemBase {
         poseEstimator = new SwerveDrivePoseEstimator(SwerveConstants.swerveKinematics, getGyroYaw(), Swerve.instance.getModulePositions(), new Pose2d());
 
         RobotConfig config;
-        try {
-            config = RobotConfig.fromGUISettings();
-            DogLog.log("Pose/Status", "Loaded robot config from GUI file");
-        } catch (Exception e) {
-            DriverStation.reportError(e.getMessage(), false);
+        // try {
+        //     config = RobotConfig.fromGUISettings();
+        //     DogLog.log("Pose/Status", "Loaded robot config from GUI file");
+        // } catch (Exception e) {
+        //     DriverStation.reportError(e.getMessage(), false);
             config = AutoConstants.robotConfig;
             DogLog.log("Pose/Status", "Using robot config from code");
-        }
+        // }
 
         AutoBuilder.configure(
             this::getPose,
@@ -53,7 +53,7 @@ public class Pose extends SubsystemBase {
             (speeds, feedforwards) -> Swerve.instance.driveRobotRelativeAuto(speeds),
             // TODO Configure PIDs
             new PPHolonomicDriveController(
-                new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                new PIDConstants(10.0, 0.0, 0.0), //Translation PID constants
                 new PIDConstants(5, 0.0, 0.0)  // Rotation PID constants
             ),
             // AutoConstants.robotConfig,

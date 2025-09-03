@@ -17,7 +17,7 @@ public final class AutoConstants {
         MomentOfInertia.ofRelativeUnits(6, KilogramSquareMeters), //6 kg m ^2: 1678 Choreo Constant
         new ModuleConfig(
             SwerveConstants.wheelCircumference / (Math.PI * 2.0),
-            SwerveConstants.maxSpeed, 
+            SwerveConstants.maxSpeed,
             1.1, // 1678 Choreo Constant
             DCMotor.getKrakenX60Foc(1),
             SwerveConstants.chosenModule.driveGearRatio,
