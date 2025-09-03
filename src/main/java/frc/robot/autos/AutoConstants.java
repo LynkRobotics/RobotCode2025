@@ -61,7 +61,6 @@ public final class AutoConstants {
         Map.entry(ReefFace.IJ, ReefFace.EF),
         Map.entry(ReefFace.KL, ReefFace.CD)));
 
-    // TODO Find out why this doesn't work
     public static final RobotConfig robotConfig = new RobotConfig(
         Mass.ofRelativeUnits(135, Pounds),
         MomentOfInertia.ofRelativeUnits(6, KilogramSquareMeters), //6 kg m ^2: 1678 Choreo Constant

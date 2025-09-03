@@ -61,8 +61,10 @@ public class Autos extends SubsystemBase {
         Autos.autoNamedCommand("Stop", Commands.runOnce(Swerve.instance::stopSwerve));
         
         SmartDashboard.putData("auto/Debug Drive", Commands.sequence(
-            PathCommand("Debug Drive"),
-            Swerve.instance.Stop()));
+            LoggedCommands.log("Before Path Command"),
+            LoggedCommands.proxy(PathCommand("Debug Drive")),
+            LoggedCommands.log("After Path Command"),
+            LoggedCommands.proxy(Swerve.instance.Stop())));
     }
     
     public static void autoNamedCommand(String name, Command command) {

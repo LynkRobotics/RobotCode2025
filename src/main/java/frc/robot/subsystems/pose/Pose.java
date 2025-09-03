@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.FlippingUtil;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
@@ -20,6 +21,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.pose.PoseConstants.ReefFace;
@@ -55,6 +57,16 @@ public class Pose extends SubsystemBase {
         Vision.setPoseEstimator(poseEstimator);
         Vision.setHeadingProvider(this::getHeading);
 
+        RobotConfig config;
+        try {
+            config = RobotConfig.fromGUISettings();
+            DogLog.log("Pose/Status", "Loaded robot config from GUI file");
+        } catch (Exception e) {
+            DriverStation.reportError(e.getMessage(), false);
+            config = AutoConstants.robotConfig;
+            DogLog.log("Pose/Status", "Using robot config from code");
+        }
+
         AutoBuilder.configure(
             this::getPose,
             this::setPose,
@@ -65,7 +77,8 @@ public class Pose extends SubsystemBase {
                 new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
                 new PIDConstants(5, 0.0, 0.0)  // Rotation PID constants
             ),
-            AutoConstants.robotConfig,
+            // AutoConstants.robotConfig,
+            config,
             Robot::isRed,
             Swerve.instance // Reference to Swerve subsystem to set requirements
         );
