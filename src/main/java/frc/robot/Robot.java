@@ -4,18 +4,12 @@
 
 package frc.robot;
 
-import java.io.File;
-import java.nio.file.Files;
-
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.net.WebServer;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -23,7 +17,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.lib.util.Elastic;
 import frc.robot.autos.Autos;
 import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.swerve.Swerve;
@@ -50,9 +43,6 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotInit() {
-        // Serve up deployed files for Elastic dashboard
-        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
-
         DogLog.setOptions(
             new DogLogOptions()
                 .withCaptureConsole(true)
@@ -62,27 +52,12 @@ public class Robot extends TimedRobot {
                 .withLogExtras(true)
                 .withNtPublish(Constants.atHQ));
 
-        DogLog.log("Misc/RIO Serial Number", RobotController.getSerialNumber());
-
-        File deployDir = Filesystem.getDeployDirectory();
-        File versionFile = new File(deployDir, "version.txt");
-        try {
-            Files.lines(versionFile.toPath()).forEach((line) -> DogLog.log("Misc/Version", line));
-        } catch (Exception e) {
-            DogLog.log("Misc/Version", "UNKNOWN");
-        }
-
         // Ensure all subsystems get instantiated, and in order as necessary
         @SuppressWarnings("unused")
         Subsystem[] subsystems = new Subsystem[] {
             Swerve.instance,
             Pose.instance
         };
-        
-        if (Constants.atHQ) {
-            DriverStation.silenceJoystickConnectionWarning(true);
-        }
-        // Controls.instance.configureButtonBindings();
 
         DogLog.log("Misc/Robot Status", "Robot has Started");
         SmartDashboard.putData("Field Selector", fieldSelector);
@@ -142,10 +117,6 @@ public class Robot extends TimedRobot {
             DogLog.log("Misc/Robot Status", "Running auto command " + autoCommand.getName());
             autoCommand.schedule();
         }
-
-        if (!Constants.atHQ) {
-            Elastic.selectTab("Primary");
-        }
     }
 
     /** This function is called periodically during autonomous. */
@@ -166,10 +137,6 @@ public class Robot extends TimedRobot {
         Swerve swerve = Swerve.instance;
         swerve.stopSwerve();
         CommandScheduler.getInstance().schedule(swerve.BrakeDriveMotors());
-
-        if (!Constants.atHQ) {
-            Elastic.selectTab("Primary");
-        }
     }
 
     /** This function is called periodically during operator control. */

@@ -30,7 +30,7 @@ public class Pose extends SubsystemBase {
     private final Pigeon2 gyro;
 
     public Pose() {
-        gyro = new Pigeon2(PoseConstants.pigeonID, SwerveConstants.swerveCanBus);
+        gyro = new Pigeon2(0, SwerveConstants.swerveCanBus);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);        
 
@@ -74,19 +74,6 @@ public class Pose extends SubsystemBase {
     
     public Rotation2d getGyroYaw() {
         return new Rotation2d(gyro.getYaw().getValue());
-    }
-
-    public Rotation2d getGyroRoll() {
-        return new Rotation2d(gyro.getRoll().getValue());
-    }
-
-    public Rotation2d getGyroPitch() {
-        return new Rotation2d(gyro.getPitch().getValue());
-    }
-
-    public void zeroGyro() {
-        gyro.setYaw(0);
-        DogLog.log("Pose/Gyro/Status", "Zeroed Gyro Yaw");
     }
 
     public Pose2d getPose() {
