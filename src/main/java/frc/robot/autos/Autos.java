@@ -52,12 +52,13 @@ public class Autos extends SubsystemBase {
         } catch (Exception exception) {
             return LoggedCommands.log("Missing PathPlanner path due to failure to load \"" + pathName + "\": " + exception.getMessage());
         }
-
+        
         return LoggedCommands.logWithName("Path: " + pathName, pathCommand);
     }
 
     private Command ChoreoTest() {
         return LoggedCommands.sequence("Auto/Status/DebugDrive Running", 
+            autoFactory.resetOdometry("DebugDrive"), //TODO: choreo has the option of resetting your odom to a certain pose, instead of hacking at robotInit
             LoggedCommands.log("Auto/Status/Running Debug Drive Choreo Path"),
             autoFactory.trajectoryCmd("DebugDrive"),
             LoggedCommands.log("Auto/Status/Finished Debug Drive Choreo Path"),
