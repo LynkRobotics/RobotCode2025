@@ -34,11 +34,11 @@ import java.util.EnumMap;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.wpilibj.RobotController;
-import frc.lib.util.COTSTalonFXSwerveConstants;
+// import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 
 public final class Constants {
-    public static final boolean atHQ = false; //TODO: consider a field calibration option to allow NT broadcasting
+    public static final boolean atHQ = true; //TODO: consider a field calibration option to allow NT broadcasting
     public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
     public static final double stickDeadband = 0.1;
     public static final double driveStickSensitivity = 1.00; 
@@ -61,18 +61,18 @@ public final class Constants {
     public static final int errorTime = 7000;
 
     public static final class Swerve {
-        public static final String swerveCanBus = "lynk";
+        public static final String swerveCanBus = "LynkSwerve";
         public static final double slowMode = 0.3;
 
-        public static final COTSTalonFXSwerveConstants chosenModule =  
-            COTSTalonFXSwerveConstants.SDS.MK4i.KrakenX60(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L2);
+        // public static final COTSTalonFXSwerveConstants chosenModule =  
+        //     COTSTalonFXSwerveConstants.SDS.MK4i.KrakenX60(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L2);
 
         /* Drivetrain Constants */
-        public static final double trackWidth = Units.inchesToMeters(isRocky ? 21.75 : 21.75);
+        public static final double trackWidth = Units.inchesToMeters(21);
         /* Center to Center distance of left and right modules in meters. */
-        public static final double wheelBase = Units.inchesToMeters(isRocky ? 24.75 : 15.75);
+        public static final double wheelBase = Units.inchesToMeters(21);
         /* Center to Center distance of front and rear module wheels in meters. */
-        public static final double wheelCircumference = chosenModule.wheelCircumference * 0.97845; // testing
+        public static final double wheelCircumference = Math.PI * Units.inchesToMeters(2.0); //chosenModule.wheelCircumference * 0.97845; // testing
 
         /* Swerve Kinematics 
          * No need to ever change this unless you are not doing a traditional rectangular/square 4 module swerve */
@@ -83,15 +83,15 @@ public final class Constants {
             new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0));
 
         /* Module Gear Ratios */
-        public static final double driveGearRatio = chosenModule.driveGearRatio;
-        public static final double angleGearRatio = chosenModule.angleGearRatio;
+        public static final double driveGearRatio = 6.48; //chosenModule.driveGearRatio;
+        public static final double angleGearRatio = 12.1; //chosenModule.angleGearRatio;
 
         /* Motor Inverts */
-        public static final InvertedValue angleMotorInvert = chosenModule.angleMotorInvert;
-        public static final InvertedValue driveMotorInvert = chosenModule.driveMotorInvert;
+        public static final InvertedValue angleMotorInvert = InvertedValue.CounterClockwise_Positive; //chosenModule.angleMotorInvert;
+        public static final InvertedValue driveMotorInvert = InvertedValue.CounterClockwise_Positive; //chosenModule.driveMotorInvert;
 
         /* Angle Encoder Invert */
-        public static final SensorDirectionValue cancoderInvert = chosenModule.cancoderInvert;
+        public static final SensorDirectionValue cancoderInvert = SensorDirectionValue.CounterClockwise_Positive; //chosenModule.cancoderInvert;
 
         /* Swerve Current Limiting */
         public static final int angleCurrentLimit = 25;
@@ -110,9 +110,9 @@ public final class Constants {
         public static final double closedLoopRamp = 0.0;
 
         /* Angle Motor PID Values */
-        public static final double angleKP = chosenModule.angleKP;
-        public static final double angleKI = chosenModule.angleKI;
-        public static final double angleKD = chosenModule.angleKD;
+        public static final double angleKP = 100.0; //chosenModule.angleKP;
+        public static final double angleKI = 0.0; //chosenModule.angleKI;
+        public static final double angleKD = 0.0; //chosenModule.angleKD;
 
         /* Drive Motor PID Values */
         public static final double driveKP = 0.10; //TODO: This must be tuned to specific robot
@@ -154,44 +154,44 @@ public final class Constants {
 
         /* Front Left Module - Module 0 */
         public static final class Mod0 { 
-            public static final int driveMotorID = 1;
-            public static final int angleMotorID = 2;
+            public static final int driveMotorID = 0;
+            public static final int angleMotorID = 1;
             public static final int canCoderID = 0;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? -97.6 : 33.9 + 180.0);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-177.71);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
 
         /* Front Right Module - Module 1 */
         public static final class Mod1 { 
-            public static final int driveMotorID = 18;
-            public static final int angleMotorID = 19;
+            public static final int driveMotorID = 2;
+            public static final int angleMotorID = 3;
             public static final int canCoderID = 1;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? -38.8 : -72.2 + 180.0);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(3.60);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
         
         /* Back Left Module - Module 2 */
         public static final class Mod2 { 
-            public static final int driveMotorID = 8;
-            public static final int angleMotorID = 9;
+            public static final int driveMotorID = 4;
+            public static final int angleMotorID = 5;
             public static final int canCoderID = 2;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? 6.4 : 162.6 + 180.0);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-127.18);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
 
         /* Back Right Module - Module 3 */
         public static final class Mod3 { 
-            public static final int driveMotorID = 10;
-            public static final int angleMotorID = 11;
+            public static final int driveMotorID = 6;
+            public static final int angleMotorID = 7;
             public static final int canCoderID = 3;
             public static final String canBusID = swerveCanBus;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(isRocky ? 52.9 : -25.4 + 180.0);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-33.31);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, canBusID, angleOffset);
         }
@@ -429,7 +429,7 @@ public final class Constants {
     }
 
     public static final class Pose {
-        public static final int pigeonID = 1;
+        public static final int pigeonID = 0;
 
         public static final PIDController rotationPID = new PIDController(0.014, 0.0, 0.0); // kI was 0.050 for NCCMP 2024
         public static final double rotationKS = 0.02;
@@ -617,7 +617,7 @@ public final class Constants {
                 Swerve.maxSpeed * 0.95, // Leave a little headroom for inefficiencies
                 1.916, // 3847 Spectrum Vex GripLock v2 CoF
                 DCMotor.getKrakenX60Foc(1),
-                Swerve.chosenModule.driveGearRatio,
+                6.48, // Swerve.chosenModule.driveGearRatio,
                 Swerve.driveCurrentLimit,
                 1),
             new Translation2d(Swerve.wheelBase / 2.0, Swerve.trackWidth / 2.0),

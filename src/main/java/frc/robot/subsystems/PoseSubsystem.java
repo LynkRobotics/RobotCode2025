@@ -30,7 +30,7 @@ import frc.robot.Robot;
 public class PoseSubsystem extends SubsystemBase {
     private static PoseSubsystem instance;
     private final Swerve s_Swerve;
-    private final VisionSubsystem s_Vision;
+    // private final VisionSubsystem s_Vision;
 
     private final SwerveDrivePoseEstimator poseEstimator;
     private final Pigeon2 gyro;
@@ -41,12 +41,12 @@ public class PoseSubsystem extends SubsystemBase {
         FAR
     }
 
-    public PoseSubsystem(Swerve s_Swerve, VisionSubsystem s_Vision) {
+    public PoseSubsystem(Swerve s_Swerve) { //}, VisionSubsystem s_Vision) {
         assert(instance == null);
         instance = this;
         
         this.s_Swerve = s_Swerve;
-        this.s_Vision = s_Vision;
+        // this.s_Vision = s_Vision;
 
         gyro = new Pigeon2(Pose.pigeonID, Constants.Swerve.swerveCanBus);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
@@ -323,13 +323,14 @@ public class PoseSubsystem extends SubsystemBase {
     }
 
     public double visionDifference() {
-        Pose2d visionPose = s_Vision.lastPose();
+        // Pose2d visionPose = s_Vision.lastPose();
 
-        if (visionPose == null) {
-            return Double.POSITIVE_INFINITY;
-        }
+        // if (visionPose == null) {
+        //     return Double.POSITIVE_INFINITY;
+        // }
 
-        return getPose().getTranslation().getDistance(visionPose.getTranslation());
+        // return getPose().getTranslation().getDistance(visionPose.getTranslation());
+        return 0.0;
     }
 
     @Override
