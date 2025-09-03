@@ -137,6 +137,10 @@ public class EndEffector extends SubsystemBase {
         return state == EEState.HAVE_ALGAE;
     }
 
+    public boolean haveNothing() {
+        return state == EEState.EMPTY;
+    }
+
     public boolean intakingAlgae() {
         return intakeState == EEIntakeState.INTAKING_ALGAE;
     }
