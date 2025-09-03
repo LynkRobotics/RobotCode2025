@@ -6,8 +6,10 @@ import frc.robot.subsystems.pose.Pose;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-
+import choreo.trajectory.SwerveSample;
 import dev.doglog.DogLog;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -20,6 +22,10 @@ public class Swerve extends SubsystemBase {
     public static final Swerve instance = new Swerve();
     
     public SwerveModule[] mSwerveMods;
+
+    private final PIDController xController = new PIDController(10, 0, 0);
+    private final PIDController yController = new PIDController(10, 0, 0);
+    private final PIDController rotController = new PIDController(7.5, 0, 0);
 
     public Swerve() {
         mSwerveMods = new SwerveModule[] {
@@ -66,6 +72,18 @@ public class Swerve extends SubsystemBase {
         for(SwerveModule mod : mSwerveMods) {
             mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
         }
+    }
+
+    public void followTrajectory(SwerveSample sample) { //choreo specifc code
+        Pose2d pose = Pose.instance.getPose();
+
+        ChassisSpeeds speeds = new ChassisSpeeds(
+            sample.vx + xController.calculate(pose.getX(), sample.x),
+            sample.vy + yController.calculate(pose.getY(), sample.y),
+            sample.omega + rotController.calculate(pose.getRotation().getRadians(), sample.heading)
+        );
+
+        driveRobotRelativeAuto(speeds);
     }
 
     public void alignStraight() {

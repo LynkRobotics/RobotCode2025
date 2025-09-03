@@ -4,16 +4,20 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.path.PathPlannerPath;
 
+import choreo.auto.AutoFactory;
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.lib.util.LoggedCommands;
-
+import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.swerve.Swerve;
 
 public class Autos extends SubsystemBase {
     public static final Autos instance = new Autos();
     private Command autoCommand;
+    private final AutoFactory autoFactory;
 
     public Autos() {
         autoCommand = LoggedCommands.sequence("Debug Drive",
@@ -22,12 +26,21 @@ public class Autos extends SubsystemBase {
 
 
         FollowPathCommand.warmupCommand().schedule();
+
+        //CHOREO
+        autoFactory = new AutoFactory(
+        Pose.instance::getPose,
+        Pose.instance::setPose, 
+        Swerve.instance::followTrajectory, 
+        true, 
+        Swerve.instance);
     }
     
     public Command getAutonomousCommand() {
-        return autoCommand;
+        return ChoreoTest();
     }
 
+    //PATHPLANNER
     private Command PathCommand(String pathName) {
         Command pathCommand;
         
@@ -41,5 +54,14 @@ public class Autos extends SubsystemBase {
         }
 
         return LoggedCommands.logWithName("Path: " + pathName, pathCommand);
+    }
+
+    private Command ChoreoTest() {
+        return LoggedCommands.sequence("Auto/Status/DebugDrive Running", 
+            LoggedCommands.log("Auto/Status/Running Debug Drive Choreo Path"),
+            autoFactory.trajectoryCmd("DebugDrive"),
+            LoggedCommands.log("Auto/Status/Finished Debug Drive Choreo Path"),
+            Commands.runOnce(Swerve.instance::stopSwerve)
+        );
     }
 }
