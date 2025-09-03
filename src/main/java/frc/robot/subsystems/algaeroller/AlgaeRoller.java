@@ -80,7 +80,7 @@ public class AlgaeRoller extends SubsystemBase {
 
     private void moveTo(AlgaeRollerPosition position) {
         DogLog.log("Algae Roller/Status", "Moving to " + position.name());
-        waitingForClear = waitingForStop = false;
+        waitingForClear = waitingForStop = waitingForPivotClear = false;
         currentTarget = position;
         if (AlgaeRollerConstants.enabled) {
             deployMotor.setControl(position.control);
@@ -109,6 +109,7 @@ public class AlgaeRoller extends SubsystemBase {
         if (!isClear()) {
             moveTo(AlgaeRollerPosition.CLEAR);
         }
+        waitingForPivotClear = waitingForClear = waitingForStop = false;
     }
 
     private void stowWhenClear() {
