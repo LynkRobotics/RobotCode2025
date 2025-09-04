@@ -16,14 +16,14 @@ public class SwerveConstants {
     public static final String swerveCanBus = "LynkSwerve";
     public static final double slowMode = 0.5;
     
-    public static final COTSTalonFXSwerveConstants chosenModule = COTSTalonFXSwerveConstants.WCP.SwerveX2t.KrakenX60(COTSTalonFXSwerveConstants.WCP.SwerveX2t.driveRatios.X3_10);
+    // public static final COTSTalonFXSwerveConstants chosenModule = COTSTalonFXSwerveConstants.WCP.SwerveX2t.KrakenX60(COTSTalonFXSwerveConstants.WCP.SwerveX2t.driveRatios.X3_10);
 
     /* Drivetrain Constants */
     public static final Distance trackWidth = Units.Inches.of(21.0);
     /* Center to Center distance of left and right modules in meters. */
     public static final Distance wheelBase = Units.Inches.of(21.0);
     /* Center to Center distance of front and rear module wheels in meters. */
-    public static final double wheelCircumference = chosenModule.wheelCircumference * 0.98685; // based on testing
+    public static final double wheelCircumference = Math.PI * 2 * 0.0254; //chosenModule.wheelCircumference * 0.98685; // based on testing
 
     /* Swerve Kinematics 
      * No need to ever change this unless you are not doing a traditional rectangular/square 4 module swerve */
@@ -34,15 +34,15 @@ public class SwerveConstants {
         new Translation2d(wheelBase.div(2.0).unaryMinus(), trackWidth.div(2.0).unaryMinus()));
 
     /* Module Gear Ratios */
-    public static final double driveGearRatio = chosenModule.driveGearRatio;
-    public static final double angleGearRatio = chosenModule.angleGearRatio;
+    public static final double driveGearRatio = 6.48; //chosenModule.driveGearRatio;
+    public static final double angleGearRatio = 12.1; //chosenModule.angleGearRatio;
 
     /* Motor Inverts */
-    public static final InvertedValue angleMotorInvert = chosenModule.angleMotorInvert;
-    public static final InvertedValue driveMotorInvert = chosenModule.driveMotorInvert;
+    public static final InvertedValue angleMotorInvert = InvertedValue.CounterClockwise_Positive; //chosenModule.angleMotorInvert;
+    public static final InvertedValue driveMotorInvert = InvertedValue.CounterClockwise_Positive; // chosenModule.driveMotorInvert;
 
     /* Angle Encoder Invert */
-    public static final SensorDirectionValue cancoderInvert = chosenModule.cancoderInvert;
+    public static final SensorDirectionValue cancoderInvert = SensorDirectionValue.CounterClockwise_Positive; //chosenModule.cancoderInvert;
 
     /* Swerve Current Limiting */
     public static final int angleCurrentLimit = 40;
@@ -62,9 +62,9 @@ public class SwerveConstants {
     public static final double closedLoopRamp = 0.0;
 
     /* Angle Motor PID Values */
-    public static final double angleKP = chosenModule.angleKP;
-    public static final double angleKI = chosenModule.angleKI;
-    public static final double angleKD = chosenModule.angleKD;
+    public static final double angleKP = 100.0; //chosenModule.angleKP;
+    public static final double angleKI = 0.0; //chosenModule.angleKI;
+    public static final double angleKD = 0.0; //chosenModule.angleKD;
 
     /* Drive Motor PID Values */
     public static final double driveKP = 0.10; //TODO: This must be tuned to specific robot

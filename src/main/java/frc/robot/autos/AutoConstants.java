@@ -20,7 +20,7 @@ public final class AutoConstants {
             SwerveConstants.maxSpeed,
             1.1, // 1678 Choreo Constant
             DCMotor.getKrakenX60Foc(1),
-            SwerveConstants.chosenModule.driveGearRatio,
+            6.48, // SwerveConstants.chosenModule.driveGearRatio,
             SwerveConstants.driveStatorCurrentLimit,
             1),
         new Translation2d(SwerveConstants.wheelBase.div(2.0), SwerveConstants.trackWidth.div(2.0)),
