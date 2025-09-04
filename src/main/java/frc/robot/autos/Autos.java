@@ -9,16 +9,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.lib.util.LoggedCommands;
 
-import frc.robot.subsystems.swerve.Swerve;
-
 public class Autos extends SubsystemBase {
     public static final Autos instance = new Autos();
     private Command autoCommand;
 
     public Autos() {
         autoCommand = LoggedCommands.sequence("Debug Drive",
-            LoggedCommands.proxy(PathCommand("Debug Drive")),
-            LoggedCommands.proxy(Swerve.instance.Stop()));    
+            LoggedCommands.proxy(PathCommand("Debug Drive"))
+            // LoggedCommands.proxy(Swerve.instance.Stop())
+            );    
 
 
         FollowPathCommand.warmupCommand().schedule();

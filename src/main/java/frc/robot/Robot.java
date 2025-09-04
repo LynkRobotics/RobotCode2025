@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.autos.Autos;
 import frc.robot.subsystems.pose.Pose;
-import frc.robot.subsystems.swerve.Swerve;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -31,7 +30,6 @@ import frc.robot.subsystems.swerve.Swerve;
  * project.
  */
 public class Robot extends TimedRobot {
-    public static final CTREConfigs ctreConfigs = new CTREConfigs();
     public static final Field2d field = new Field2d();
     public static final SendableChooser<String> fieldSelector = new SendableChooser<>();
 
@@ -55,7 +53,7 @@ public class Robot extends TimedRobot {
         // Ensure all subsystems get instantiated, and in order as necessary
         @SuppressWarnings("unused")
         Subsystem[] subsystems = new Subsystem[] {
-            Swerve.instance,
+            // Swerve.instance,
             Pose.instance
         };
 
@@ -105,13 +103,6 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         DogLog.log("Misc/Robot Status", "Auto has begun");
 
-        // Ensure the Swerve subsystem doesn't run a default command, in case we previously were in teleop mode
-        Command oldDefault = Swerve.instance.getDefaultCommand();
-        Swerve.instance.removeDefaultCommand();
-        if (oldDefault != null && oldDefault.isScheduled()) {
-            oldDefault.cancel();
-        }
-
         // Schedule the autonomous command
         autoCommand = Autos.instance.getAutonomousCommand();
         if (autoCommand != null) {
@@ -133,11 +124,6 @@ public class Robot extends TimedRobot {
         if (autoCommand != null) {
             autoCommand.cancel();
         }
-
-        // Run the TeleOp Swerve command by default
-        Swerve swerve = Swerve.instance;
-        swerve.stopSwerve();
-        CommandScheduler.getInstance().schedule(swerve.BrakeDriveMotors());
     }
 
     /** This function is called periodically during operator control. */

@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems.pose;
 
-import com.ctre.phoenix6.configs.Pigeon2Configuration;
-import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.config.PIDConstants;
@@ -13,29 +11,18 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import dev.doglog.DogLog;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.swerve.Swerve;
-import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.Robot;
 import frc.robot.autos.AutoConstants;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveConstants;
 
 public class Pose extends SubsystemBase {
     public static final Pose instance = new Pose();
 
-    private final SwerveDrivePoseEstimator poseEstimator;
-    private final Pigeon2 gyro;
-
     public Pose() {
-        gyro = new Pigeon2(0, SwerveConstants.swerveCanBus);
-        gyro.getConfigurator().apply(new Pigeon2Configuration());
-        gyro.setYaw(0);        
-
-        poseEstimator = new SwerveDrivePoseEstimator(SwerveConstants.swerveKinematics, getGyroYaw(), Swerve.instance.getModulePositions(), new Pose2d());
-
         RobotConfig config;
         // try {
         //     config = RobotConfig.fromGUISettings();
@@ -49,17 +36,20 @@ public class Pose extends SubsystemBase {
         AutoBuilder.configure(
             this::getPose,
             this::setPose,
-            Swerve.instance::getSpeeds,
-            (speeds, feedforwards) -> Swerve.instance.driveRobotRelativeAuto(speeds),
+            () -> Drive.mInstance.getState().Speeds,
+            (desiredSpeeds, feedforwards) -> Drive.mInstance.setSwerveRequest(DriveConstants.PIDToPoseRequest
+                .withVelocityX(desiredSpeeds.vxMetersPerSecond)
+				.withVelocityY(desiredSpeeds.vyMetersPerSecond)
+				.withRotationalRate(desiredSpeeds.omegaRadiansPerSecond)),
             // TODO Configure PIDs
             new PPHolonomicDriveController(
-                new PIDConstants(10.0, 0.0, 0.0), //Translation PID constants
+                new PIDConstants(5.0, 0.0, 0.0), //Translation PID constants
                 new PIDConstants(5, 0.0, 0.0)  // Rotation PID constants
             ),
             // AutoConstants.robotConfig,
             config,
             Robot::isRed,
-            Swerve.instance // Reference to Swerve subsystem to set requirements
+            Drive.mInstance
         );
 
         PathPlannerLogging.setLogTargetPoseCallback((targetPose) -> {
@@ -73,15 +63,15 @@ public class Pose extends SubsystemBase {
         });    }
     
     public Rotation2d getGyroYaw() {
-        return new Rotation2d(gyro.getYaw().getValue());
+        return new Rotation2d(Drive.mInstance.getGeneratedDrive().getPigeon2().getYaw().getValue());
     }
 
     public Pose2d getPose() {
-        return poseEstimator.getEstimatedPosition();
+        return Drive.mInstance.getPose();
     }
 
     public void setPose(Pose2d pose) {
-        poseEstimator.resetPosition(getGyroYaw(), Swerve.instance.getModulePositions(), pose);
+        Drive.mInstance.getGeneratedDrive().resetPose(pose);
         DogLog.log("Pose/Status/Setting Pose", pose);
     }
 
@@ -91,7 +81,6 @@ public class Pose extends SubsystemBase {
 
     @Override
     public void periodic() {
-        poseEstimator.update(getGyroYaw(), Swerve.instance.getModulePositions());
         Pose2d pose = getPose();
         Robot.field.setRobotPose(pose);
 
