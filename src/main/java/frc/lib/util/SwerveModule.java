@@ -58,8 +58,10 @@ public class SwerveModule {
         mDriveMotor.getConfigurator().setPosition(0.0);
     }
 
-    public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop){
+    public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
+        DogLog.log("Swerve/Mod " + moduleNumber + "/Desired State", desiredState);
         desiredState.optimize(getState().angle); //TODO Test
+        DogLog.log("Swerve/Mod " + moduleNumber + "/Desired State (Opt)", desiredState);
         mAngleMotor.setControl(anglePosition.withPosition(desiredState.angle.getRotations()));
         setSpeed(desiredState, isOpenLoop);
     }
@@ -67,11 +69,14 @@ public class SwerveModule {
     private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop){
         if(isOpenLoop){
             driveDutyCycle.Output = desiredState.speedMetersPerSecond / SwerveConstants.maxSpeed;
+            DogLog.log("Swerve/Mod " + moduleNumber + "/Duty Cycle", driveDutyCycle.Output);
             mDriveMotor.setControl(driveDutyCycle);
         }
         else {
             driveVelocity.Velocity = Conversions.MPSToRPS(desiredState.speedMetersPerSecond, SwerveConstants.wheelCircumference);
-            driveVelocity.FeedForward = driveFeedForward.calculate(desiredState.speedMetersPerSecond);
+            // driveVelocity.FeedForward = driveFeedForward.calculate(desiredState.speedMetersPerSecond);
+            DogLog.log("Swerve/Mod " + moduleNumber + "/Drive Velocity (RPS)", driveVelocity.Velocity);
+            DogLog.log("Swerve/Mod " + moduleNumber + "/Drive FF (V)", driveVelocity.FeedForward);
             mDriveMotor.setControl(driveVelocity);
         }
     }
@@ -125,7 +130,9 @@ public class SwerveModule {
         );
     }
 
-    public SwerveModulePosition getPosition(){
+    public SwerveModulePosition getPosition() {
+        DogLog.log("Swerve/Mod " + moduleNumber + "/Drive Position (Rot)", mDriveMotor.getPosition().getValueAsDouble());
+        DogLog.log("Swerve/Mod " + moduleNumber + "/Drive Rotor Position (Rot)", mDriveMotor.getRotorPosition().getValueAsDouble());
         return new SwerveModulePosition(
             Conversions.rotationsToMeters(mDriveMotor.getPosition().getValueAsDouble(), SwerveConstants.wheelCircumference), 
             Rotation2d.fromRotations(mAngleMotor.getPosition().getValueAsDouble())

@@ -16,14 +16,14 @@ public class SwerveConstants {
     public static final String swerveCanBus = "LynkSwerve";
     public static final double slowMode = 0.5;
     
-    // public static final COTSTalonFXSwerveConstants chosenModule = COTSTalonFXSwerveConstants.WCP.SwerveX2t.KrakenX60(COTSTalonFXSwerveConstants.WCP.SwerveX2t.driveRatios.X3_10);
+    public static final COTSTalonFXSwerveConstants chosenModule = COTSTalonFXSwerveConstants.WCP.SwerveX2t.KrakenX60(COTSTalonFXSwerveConstants.WCP.SwerveX2t.driveRatios.X3_10);
 
     /* Drivetrain Constants */
     public static final Distance trackWidth = Units.Inches.of(21.0);
     /* Center to Center distance of left and right modules in meters. */
     public static final Distance wheelBase = Units.Inches.of(21.0);
     /* Center to Center distance of front and rear module wheels in meters. */
-    public static final double wheelCircumference = Math.PI * 2 * 0.0254; //chosenModule.wheelCircumference * 0.98685; // based on testing
+    public static final double wheelCircumference = chosenModule.wheelCircumference * 0.98685; // based on testing
 
     /* Swerve Kinematics 
      * No need to ever change this unless you are not doing a traditional rectangular/square 4 module swerve */
@@ -77,9 +77,9 @@ public class SwerveConstants {
     public static final double driveKF = 0.0; //Leave driveKF at 0.0 
 
     /* Drive Motor Characterization Values From SYSID */ 
-    public static final double driveKS = 0.00; //1678 Constant 
-    public static final double driveKV = 0.124; //1678 Constant
-    public static final double driveKA = 0.00; //1678 Constant  
+    public static final double driveKS = 0.00;
+    public static final double driveKV = 1.1;
+    public static final double driveKA = 0.00;  
 
     /* Swerve Profiling Values */
     /** Meters per Second */

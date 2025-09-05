@@ -57,9 +57,20 @@ public class Swerve extends SubsystemBase {
     }
 
     public void driveRobotRelative(ChassisSpeeds desiredChassisSpeeds, boolean isOpenLoop) {
+        DogLog.log("Swerve/Desired Chassis Speeds", desiredChassisSpeeds);
+        DogLog.log("Swerve/Desired vx", desiredChassisSpeeds.vxMetersPerSecond);
+        DogLog.log("Swerve/Desired vy", desiredChassisSpeeds.vyMetersPerSecond);
+        DogLog.log("Swerve/Desired omega", desiredChassisSpeeds.omegaRadiansPerSecond);
+
         ChassisSpeeds.discretize(desiredChassisSpeeds, 0.02); 
         
-        SwerveModuleState[] swerveModuleStates = SwerveConstants.swerveKinematics.toSwerveModuleStates(desiredChassisSpeeds); 
+        SwerveModuleState[] swerveModuleStates = SwerveConstants.swerveKinematics.toSwerveModuleStates(desiredChassisSpeeds);
+
+        DogLog.log("Swerve/Mod0 Speed", swerveModuleStates[0].speedMetersPerSecond);
+        DogLog.log("Swerve/Mod1 Speed", swerveModuleStates[1].speedMetersPerSecond);
+        DogLog.log("Swerve/Mod2 Speed", swerveModuleStates[2].speedMetersPerSecond);
+        DogLog.log("Swerve/Mod3 Speed", swerveModuleStates[3].speedMetersPerSecond);
+
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.maxSpeed);
 
         DogLog.log("Swerve/Desired Module States", swerveModuleStates);
@@ -88,7 +99,9 @@ public class Swerve extends SubsystemBase {
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
         for(SwerveModule mod : mSwerveMods){
             positions[mod.moduleNumber] = mod.getPosition();
+            DogLog.log("Swerve/Mod " + mod.moduleNumber + "/Position", positions[mod.moduleNumber]);
         }
+        DogLog.log("Swerve/Module Positions", positions);
         return positions;
     }
 
