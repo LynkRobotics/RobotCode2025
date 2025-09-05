@@ -278,6 +278,11 @@ public class EndEffector extends SubsystemBase {
         }, this);
     }
 
+    public Command ResetPosition() {
+        // Used only for system recovery
+        return LoggedCommands.runOnce("Reset End Effector position", () -> positionMotor.setPosition(directCancoder.getPosition().getValueAsDouble()), this);
+    }
+
     @Override
     public void periodic() {
         Command currentCommand = getCurrentCommand();

@@ -25,6 +25,7 @@ public class AlgaeRollerConstants {
 	public static final Angle epsilon = Units.Degrees.of(8.0); // TODO From Citrus, but too generous?
 	public static final Time deployStallTime = Units.Seconds.of(0.3);
 	public static final Voltage deployZeroingVoltage = Units.Volts.of(2.0);
+	public static final Voltage safeClearVoltage = Units.Volts.of(-1.5);
 
 	public static enum AlgaeRollerPosition {
 		ZEROED(90.0), // There's a little tension when zeroing

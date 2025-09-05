@@ -28,6 +28,7 @@ public class AlgaeRoller extends SubsystemBase {
     
     /* Control Requests */
     private final ControlRequest deployZeroingControl = new VoltageOut(AlgaeRollerConstants.deployZeroingVoltage).withEnableFOC(true);
+    private final ControlRequest safeClearControl = new VoltageOut(AlgaeRollerConstants.safeClearVoltage).withEnableFOC(false);
     private final ControlRequest intakeControl = new VoltageOut(AlgaeRollerConstants.intakeVoltage).withEnableFOC(true);
     private final ControlRequest expelControl = new VoltageOut(AlgaeRollerConstants.expelVoltage).withEnableFOC(true);
     private final ControlRequest L1AssistControl = new VoltageOut(AlgaeRollerConstants.L1AssistVoltage).withEnableFOC(true);
@@ -76,6 +77,14 @@ public class AlgaeRoller extends SubsystemBase {
 
     public Command Zero() {
         return LoggedCommands.runOnce("Triggering zero of Algae Roller", this::startZero, this);
+    }
+
+    public Command SafeClear() {
+        // Used just for system recovery
+        return LoggedCommands.sequence("Safely clear the algae roller",
+            LoggedCommands.runOnce("Safely move algae roller to clear", () -> deployMotor.setControl(safeClearControl), this),
+            Commands.waitSeconds(2.0),
+            LoggedCommands.runOnce("Stop motor", () -> deployMotor.stopMotor(), this));
     }
 
     private void moveTo(AlgaeRollerPosition position) {

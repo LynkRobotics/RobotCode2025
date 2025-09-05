@@ -501,6 +501,28 @@ public class Superstructure extends SubsystemBase {
         return activeReefLevel;
     }
 
+    public Command SystemRecovery() {
+        return LoggedCommands.sequence("System Recovery",
+            AlgaeRoller.instance.StopIntake(),
+            EndEffector.instance.StopIntake(),
+            Climber.instance.Stop(),
+            Intake.instance.ZeroIntake(),
+            AlgaeRoller.instance.SafeClear(),
+            // TODO Elevator.instance.SafeClear(),
+            EndEffector.instance.SensorReset(),
+            EndEffector.instance.ResetPosition(),
+            EndEffector.instance.TriggerMoveTo(EEPosition.CORAL_HOLD),
+            LoggedCommands.waitUntil("End Effector in coral hold position", () -> EndEffector.instance.inPosition()),
+            EndEffector.instance.ExpelCoral(ReefLevel.L4),
+            EndEffector.instance.TriggerMoveTo(EEPosition.GROUND_INTAKE),
+            LoggedCommands.waitUntil("End Effector in ground intake position", () -> EndEffector.instance.inPosition()),
+            Elevator.instance.Zero(),
+            AlgaeRoller.instance.Zero(),
+            Intake.instance.Expel(),
+            Commands.waitSeconds(2.0),
+            Intake.instance.Stop());
+    }
+
     @Override
     public void periodic() {
         DogLog.log("Superstructure/Active Reef Level", activeReefLevel);

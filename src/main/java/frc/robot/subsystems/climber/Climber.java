@@ -69,6 +69,14 @@ public class Climber extends SubsystemBase {
         }, this);
     }
 
+    public Command Stop() {
+        // Used only for recovery situations
+        return LoggedCommands.runOnce("Stop Climber motors", () -> {
+            deployMotor.stopMotor();
+            intakeMotor.stopMotor();
+        }, this);
+    }
+
     private Command Deploy() {
         return LoggedCommands.runOnce("Deploy climber", () -> {
             deployMotor.setControl(ClimberPosition.DEPLOYED.control);
