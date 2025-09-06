@@ -31,9 +31,9 @@ public class PoseConstants {
     public static final Distance bumperWidth = Units.Inches.of(2.75);
 
     private static final Distance centerToFrontBumper = robotFrameLength.div(2.0).plus(bumperWidth);
-    private static final Distance reefCoralStandoff = Units.Inches.of(4.7); // How far between bumper and reef when scoring coral
+    private static final Distance reefCoralStandoff = Units.Inches.of(5.2); // How far between bumper and reef when scoring coral
     private static final Distance reefCoralOffset = centerToFrontBumper.plus(reefCoralStandoff);
-    private static final Distance reefL1ExtraOffset = Units.Inches.of(2.5);
+    private static final Distance reefL1ExtraOffset = Units.Inches.of(2.0);
     private static final Distance reefAlgaeStandoff = Units.Inches.of(-3.0); // How far between bumper and reef when intaking algae
     private static final Distance reefAlgaeOffset = centerToFrontBumper.plus(reefAlgaeStandoff);
     private static final Distance reefApproachOffset = Units.Inches.of(6.0); // How far away from the desired position to approach first
@@ -62,8 +62,8 @@ public class PoseConstants {
     public static final double approachDistanceToReefCenter = centerApproachOffset.getDistance(reefCenter);
     private static final Transform2d leftL1Transform = new Transform2d(reefL1ExtraOffset, branchSeparation.div(2.0), Rotation2d.kZero);
     private static final Transform2d rightL1Transform = new Transform2d(reefL1ExtraOffset, branchSeparation.div(-2.0), Rotation2d.kZero);
-    private static final Transform2d extraAlgaeBackupShort = new Transform2d(Units.Inches.of(-9.0), Units.Inches.zero(), Rotation2d.kZero);
-    private static final Transform2d extraAlgaeBackupExtended = new Transform2d(Units.Inches.of(-18.0), Units.Inches.zero(), Rotation2d.kZero);
+    private static final Transform2d extraAlgaeBackupShort = new Transform2d(Units.Inches.of(9.0), Units.Inches.zero(), Rotation2d.kZero);
+    private static final Transform2d extraAlgaeBackupExtended = new Transform2d(Units.Inches.of(18.0), Units.Inches.zero(), Rotation2d.kZero);
 
     public static enum ReefFace {
         AB(-180, true),

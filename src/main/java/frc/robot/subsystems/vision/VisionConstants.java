@@ -35,9 +35,9 @@ public class VisionConstants {
     public static final Camera[] camerasAvailable = Camera.values();
 
     public enum CameraMode {
-        DEFAULT(1.0, Double.POSITIVE_INFINITY),
-        FRONT(1.0, Double.POSITIVE_INFINITY),
-        REAR(1.0, Double.POSITIVE_INFINITY);
+        DEFAULT(1.3, Double.POSITIVE_INFINITY),
+        FRONT(1.3, Double.POSITIVE_INFINITY),
+        REAR(1.3, Double.POSITIVE_INFINITY);
 
         private final EnumMap<Camera, Double> stddev = new EnumMap<>(Camera.class);
 

@@ -35,8 +35,8 @@ public class Controls extends SubsystemBase{
 
     public Controls() {
         SmartDashboard.putNumber("TeleOp Speed Governor", 1.0);
-        SmartDashboard.putNumber("TeleOp Translation Expo", 2.0);
-        SmartDashboard.putNumber("TeleOp Rotation Expo", 2.0);
+        // SmartDashboard.putNumber("TeleOp Translation Expo", 2.0);
+        // SmartDashboard.putNumber("TeleOp Rotation Expo", 2.0);
 
         Pose pose = Pose.instance;
         SmartDashboard.putData(LoggedCommands.runOnce("Zero Gyro", pose::zeroGyro));
@@ -82,8 +82,8 @@ public class Controls extends SubsystemBase{
         final Trigger expel = driver.start();
         final Trigger alignmentToggle = driver.rightStick();
 
-        intakeCoral.whileTrue(Superstructure.instance.SmartIntake());
-        intakeGroundAlgae.whileTrue(Superstructure.instance.IntakeGroundAlgae());
+        intakeCoral.whileTrue(Superstructure.instance.SmartCoralIntake());
+        intakeGroundAlgae.whileTrue(Superstructure.instance.SmartAlgaeIntake());
 
         // zero.onTrue(Elevator.instance.Zero());
         expel.whileTrue(Intake.instance.ExpelForever()).onFalse(Intake.instance.Stop());

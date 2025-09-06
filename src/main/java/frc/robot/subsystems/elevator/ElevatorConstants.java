@@ -9,6 +9,7 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
+import frc.robot.Constants;
 import frc.robot.Robot;
 
 public class ElevatorConstants {
@@ -43,9 +44,10 @@ public class ElevatorConstants {
         STOW(Units.Inches.of(0.0)),
         L1(Units.Inches.of(0.0)),
         FEED_ALGAE(Units.Inches.of(2.0)),
-        L2(Units.Inches.of(6.3)),
+        L2(Units.Inches.of(7.0)),
         L3(L2.height.plus(Units.Inches.of(16.0))),
-        L4(Units.Inches.of(61.50)),
+        L4_PREP(Units.Inches.of(30.0)),
+        L4(Units.Inches.of(60.25)),
         CORAL_HOLD(Units.Inches.of(13.21)),
         L2_ALGAE(Units.Inches.of(21.91)),
         L3_ALGAE(L2_ALGAE.height.plus(Units.Inches.of(16.0))),
@@ -83,7 +85,7 @@ public class ElevatorConstants {
 		config.Slot0.kS = 0.45;
 		config.Slot0.kG = 0.35;
 
-		config.MotionMagic.MotionMagicCruiseVelocity = 20.0;
+		config.MotionMagic.MotionMagicCruiseVelocity = 20.0 * Constants.mechanismSlowdown;
 
 		config.CurrentLimits.SupplyCurrentLimitEnable = Robot.isReal();
 		config.CurrentLimits.SupplyCurrentLimit = 80.0;

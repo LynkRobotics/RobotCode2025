@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import java.io.File;
+import java.nio.file.Files;
+
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
 import edu.wpi.first.net.WebServer;
@@ -65,7 +68,14 @@ public class Robot extends TimedRobot {
                 .withNtPublish(Constants.atHQ));
 
         DogLog.log("Misc/RIO Serial Number", RobotController.getSerialNumber());
-        DogLog.log("Misc/Is Rocky?", Constants.isRocky);
+
+        File deployDir = Filesystem.getDeployDirectory();
+        File versionFile = new File(deployDir, "version.txt");
+        try {
+            Files.lines(versionFile.toPath()).forEach((line) -> DogLog.log("Misc/Version", line));
+        } catch (Exception e) {
+            DogLog.log("Misc/Version", "UNKNOWN");
+        }
 
         // Ensure all subsystems get instantiated, and in order as necessary
         @SuppressWarnings("unused")

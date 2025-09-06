@@ -17,6 +17,7 @@ import frc.lib.util.LoggedCommands;
 import frc.robot.Ports;
 import frc.robot.subsystems.algaeroller.AlgaeRollerConstants.AlgaeRollerPosition;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.endeffector.EndEffector;
 
 public class AlgaeRoller extends SubsystemBase {
     public static final AlgaeRoller instance = new AlgaeRoller();
@@ -27,15 +28,17 @@ public class AlgaeRoller extends SubsystemBase {
     
     /* Control Requests */
     private final ControlRequest deployZeroingControl = new VoltageOut(AlgaeRollerConstants.deployZeroingVoltage).withEnableFOC(true);
+    private final ControlRequest safeClearControl = new VoltageOut(AlgaeRollerConstants.safeClearVoltage).withEnableFOC(false);
     private final ControlRequest intakeControl = new VoltageOut(AlgaeRollerConstants.intakeVoltage).withEnableFOC(true);
     private final ControlRequest expelControl = new VoltageOut(AlgaeRollerConstants.expelVoltage).withEnableFOC(true);
     private final ControlRequest L1AssistControl = new VoltageOut(AlgaeRollerConstants.L1AssistVoltage).withEnableFOC(true);
 
-    private static final Debouncer stallDebouncer = new Debouncer(AlgaeRollerConstants.deployStallTime.in(Units.Seconds), DebounceType.kRising);
+    private final Debouncer stallDebouncer = new Debouncer(AlgaeRollerConstants.deployStallTime.in(Units.Seconds), DebounceType.kRising);
     private boolean zeroing = false;
 
     boolean waitingForClear = false;
     boolean waitingForStop = false;
+    boolean waitingForPivotClear = false;
 
     AlgaeRollerPosition currentTarget = AlgaeRollerPosition.STOWED;
     
@@ -47,11 +50,13 @@ public class AlgaeRoller extends SubsystemBase {
         rollerMotor.getConfigurator().apply(AlgaeRollerConstants.getRollerMotorConfig());
 
         // Expect to begin in STOWED position and hold it
-        deployMotor.setPosition(AlgaeRollerPosition.STOWED.position);
-        // startZero();
-        // moveTo(AlgaeRollerPosition.STOWED);
-        // HACK
-        deployMotor.stopMotor();
+        deployMotor.setPosition(AlgaeRollerPosition.ZEROED.position);
+        if (AlgaeRollerConstants.enabled) {
+            startZero();
+            // moveTo(currentTarget);
+        } else {
+            deployMotor.stopMotor();
+        }
 
         // Debugging help
         for (AlgaeRollerPosition position : AlgaeRollerPosition.values()) {
@@ -63,18 +68,32 @@ public class AlgaeRoller extends SubsystemBase {
 
     public void startZero() {
         zeroing = true;
-        // deployMotor.setControl(deployZeroingControl);
+        stallDebouncer.calculate(false);
+        DogLog.log("Algae Roller/Status", "Zeroing");
+        if (AlgaeRollerConstants.enabled) {
+            deployMotor.setControl(deployZeroingControl);
+        }
     }
 
     public Command Zero() {
         return LoggedCommands.runOnce("Triggering zero of Algae Roller", this::startZero, this);
     }
 
+    public Command SafeClear() {
+        // Used just for system recovery
+        return LoggedCommands.sequence("Safely clear the algae roller",
+            LoggedCommands.runOnce("Safely move algae roller to clear", () -> deployMotor.setControl(safeClearControl), this),
+            Commands.waitSeconds(2.0),
+            LoggedCommands.runOnce("Stop motor", () -> deployMotor.stopMotor(), this));
+    }
+
     private void moveTo(AlgaeRollerPosition position) {
         DogLog.log("Algae Roller/Status", "Moving to " + position.name());
-        waitingForClear = waitingForStop = false;
+        waitingForClear = waitingForStop = waitingForPivotClear = false;
         currentTarget = position;
-        // deployMotor.setControl(position.control);
+        if (AlgaeRollerConstants.enabled) {
+            deployMotor.setControl(position.control);
+        }
     }
 
     private boolean atTarget() {
@@ -86,36 +105,55 @@ public class AlgaeRoller extends SubsystemBase {
     }
 
     private boolean isNear(AlgaeRollerPosition position) {
-        return true; // HACK
-        // return deployMotor.getPosition().getValue().minus(position.position).abs(Units.Rotations) <= AlgaeRollerConstants.epsilon.in(Units.Rotations);
+        if (!AlgaeRollerConstants.enabled) return true;
+        return deployMotor.getPosition().getValue().minus(position.position).abs(Units.Rotations) <= AlgaeRollerConstants.epsilon.in(Units.Rotations);
     }
 
     public boolean isClear() {
-        // return deployMotor.getPosition().getValue().lte(AlgaeRollerPosition.CLEAR.position.plus(AlgaeRollerConstants.epsilon));
-        return true; // HACK
+        if (!AlgaeRollerConstants.enabled) return true;
+        return deployMotor.getPosition().getValue().lte(AlgaeRollerPosition.CLEAR.position.plus(AlgaeRollerConstants.epsilon));
     }
 
     private void ensureClear() {
         if (!isClear()) {
             moveTo(AlgaeRollerPosition.CLEAR);
         }
+        waitingForPivotClear = waitingForClear = waitingForStop = false;
     }
 
     private void stowWhenClear() {
-        if (Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH)) {
-            moveTo(AlgaeRollerPosition.STOWED);
-        } else {
+        waitingForStop = false;
+        waitingForPivotClear = false;
+        waitingForClear = !Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH);
+
+        if (waitingForClear) {
             DogLog.log("Algae Roller/Status", "Delaying stow due to elevator position");
-            waitingForClear = true;
+        } else {
+            moveTo(AlgaeRollerPosition.STOWED);
         }
     }
 
     private void stowWhenStopped() {
-        if (Elevator.instance.atFinalTarget()) {
-            moveTo(AlgaeRollerPosition.STOWED);
-        } else {
+        waitingForStop = !Elevator.instance.atFinalTarget();
+        waitingForPivotClear = false;
+        waitingForClear = false;
+
+        if (waitingForStop) {
             DogLog.log("Algae Roller/Status", "Delaying stow due to elevator movement");
-            waitingForStop = true;
+        } else {
+            moveTo(AlgaeRollerPosition.STOWED);
+        }
+    }
+
+    private void stowWhenStoppedAndPivotClear() {
+        waitingForStop = !Elevator.instance.atFinalTarget();
+        waitingForPivotClear = !EndEffector.instance.inHighClearRange();
+        waitingForClear = false;
+
+        if (waitingForStop || waitingForPivotClear) {
+            DogLog.log("Algae Roller/Status", "Delaying stow until elevator stopped and pivot clear");
+        } else {
+            moveTo(AlgaeRollerPosition.STOWED);
         }
     }
 
@@ -124,57 +162,62 @@ public class AlgaeRoller extends SubsystemBase {
     }
 
     public Command TriggerStowWhenClear() {
-        return Commands.none(); // HACK
-        // return LoggedCommands.runOnce("Stow algae roller when clear", this::stowWhenClear, this);
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
+        return LoggedCommands.runOnce("Stow algae roller when clear", this::stowWhenClear, this);
     }
 
     public Command TriggerStowWhenStopped() {
-        return Commands.none(); // HACK
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
+        return LoggedCommands.runOnce("Stow algae roller when stopped", this::stowWhenStopped, this);
+    }
 
-        // return LoggedCommands.runOnce("Stow algae roller when stopped", this::stowWhenStopped, this);
+    public Command TriggerStowWhenStoppedAndPivotClear() {
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
+        return LoggedCommands.runOnce("Stow algae roller when stopped", this::stowWhenStoppedAndPivotClear, this);
     }
 
     public Command TriggerStow() {
-        return Commands.none(); // HACK
-
-        // return LoggedCommands.runOnce("Stow algae roller", () -> moveTo(AlgaeRollerPosition.STOWED), this);
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
+        return LoggedCommands.runOnce("Stow algae roller", () -> moveTo(AlgaeRollerPosition.STOWED), this);
     }
 
     public Command TriggerL1Assist() {
-        return Commands.none(); // HACK
-
-        // return LoggedCommands.runOnce("Move algae roller to score L1", () -> moveTo(AlgaeRollerPosition.L1_SCORE), this);
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
+        return LoggedCommands.runOnce("Move algae roller to score L1", () -> moveTo(AlgaeRollerPosition.L1_SCORE), this);
     }
 
     public Command StartIntake() {
-        return Commands.none(); // HACK
-        // return LoggedCommands.runOnce("Intake algae", () -> rollerMotor.setControl(intakeControl), this);
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
+        return LoggedCommands.runOnce("Intake algae", () -> rollerMotor.setControl(intakeControl), this);
     }
 
     public Command StopIntake() {
-        return Commands.none(); // HACK
-        // return LoggedCommands.runOnce("Stop algae intake", () -> rollerMotor.stopMotor(), this);
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
+        return LoggedCommands.runOnce("Stop algae intake", () -> rollerMotor.stopMotor(), this);
     }
 
     public Command StopAndClear() {
         return LoggedCommands.runOnce("Stop algae intake and move to clear", () -> {
             rollerMotor.stopMotor();
-            // moveTo(AlgaeRollerPosition.CLEAR); HACK
+            if (AlgaeRollerConstants.enabled) {
+                moveTo(AlgaeRollerPosition.CLEAR);
+            }
         }, this);
     }
 
     public Command TriggerDeploy() {
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
         return LoggedCommands.runOnce("Deploy algae intake", () -> moveTo(AlgaeRollerPosition.DEPLOYED), this);
     }
 
     public Command Expel() {
-        return Commands.none(); // HACK
-        // return LoggedCommands.runOnce("Expel algae", () -> rollerMotor.setControl(expelControl), this);
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
+        return LoggedCommands.runOnce("Expel algae", () -> rollerMotor.setControl(expelControl), this);
     }
 
     public Command GuideL1Coral() {
-        return Commands.none();
-        // return LoggedCommands.runOnce("Guide L1 coral", () -> rollerMotor.setControl(L1AssistControl), this);
+        if (!AlgaeRollerConstants.enabled) return Commands.none();
+        return LoggedCommands.runOnce("Guide L1 coral", () -> rollerMotor.setControl(L1AssistControl), this);
     }
 
     @Override
@@ -187,6 +230,7 @@ public class AlgaeRoller extends SubsystemBase {
         DogLog.log("Algae Roller/Clear?", isClear());
         DogLog.log("Algae Roller/Waiting for clear?", waitingForClear);
         DogLog.log("Algae Roller/Waiting for stop?", waitingForStop);
+        DogLog.log("Algae Roller/Waiting for pivot clear?", waitingForPivotClear);
         DogLog.log("Algae Roller/Deploy Current", deployMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("Algae Roller/Deploy Velocity", deployMotor.getVelocity().getValueAsDouble());
         DogLog.log("Algae Roller/Deploy Voltage", deployMotor.getMotorVoltage().getValueAsDouble());
@@ -199,16 +243,33 @@ public class AlgaeRoller extends SubsystemBase {
         if (zeroing && DriverStation.isEnabled() && stallDebouncer.calculate(deployMotor.getVelocity().getValueAsDouble() == 0.0)) {
             DogLog.log("Algae Roller/Status", "Deploy zeroing complete");
             zeroing = false;
-            deployMotor.stopMotor();
-            /// HACK
-            // deployMotor.setPosition(AlgaeRollerPosition.STOWED.position);
-            // deployMotor.setControl(currentTarget.control); // Return to the intended target
+            if (AlgaeRollerConstants.enabled) {
+                deployMotor.stopMotor();
+                deployMotor.setPosition(AlgaeRollerPosition.ZEROED.position);
+                deployMotor.setControl(currentTarget.control); // Return to the intended target
+            }
         }
 
         if (waitingForClear && Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH)) {
-            moveTo(AlgaeRollerPosition.STOWED);
-        } else if (waitingForStop && Elevator.instance.atFinalTarget()) {
-            moveTo(AlgaeRollerPosition.STOWED);
+            if (waitingForStop || waitingForPivotClear) {
+                waitingForClear = false;
+            } else {
+                moveTo(AlgaeRollerPosition.STOWED);
+            }
+        }
+        if (waitingForStop && Elevator.instance.atFinalTarget()) {
+            if (waitingForClear || waitingForPivotClear) {
+                waitingForStop = false;
+            } else {
+                moveTo(AlgaeRollerPosition.STOWED);
+            }
+        }
+        if (waitingForPivotClear && EndEffector.instance.inHighClearRange()) {
+            if (waitingForClear || waitingForStop) {
+                waitingForPivotClear = false;
+            } else {
+                moveTo(AlgaeRollerPosition.STOWED);
+            }
         }
     }
 }

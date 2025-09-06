@@ -1,0 +1,93 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.03,
+        "y": 2.76
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.129900445914175,
+        "y": 2.3243157189724433
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.8039321192052977,
+        "y": 2.572185430463577
+      },
+      "prevControl": {
+        "x": 3.0907203373808207,
+        "y": 2.981761452608073
+      },
+      "nextControl": {
+        "x": 2.5171439010297747,
+        "y": 2.162609408319081
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.6562086092715231,
+        "y": 1.0176738410596022
+      },
+      "prevControl": {
+        "x": 2.0577121147172557,
+        "y": 1.5910802720618964
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Station pickup"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.225716928769656,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 1.05,
+      "rotationDegrees": -145.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.8477922077922029,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 1.5,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 270.0,
+        "maxAngularAcceleration": 540.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.6,
+    "maxAcceleration": 6.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 1080.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": -170.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -59.99999999999999
+  },
+  "useDefaultConstraints": false
+}

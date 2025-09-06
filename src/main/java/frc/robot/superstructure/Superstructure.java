@@ -6,6 +6,7 @@ import static frc.robot.Options.optMirrorAuto;
 
 import java.util.EnumMap;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -44,6 +45,8 @@ public class Superstructure extends SubsystemBase {
         L2(EEPosition.L23, Stop.L2),
         L3(EEPosition.L23, Stop.L3),
         L4(EEPosition.L4, Stop.L4),
+        L4_PREP(EEPosition.CORAL_HOLD, Stop.L4_PREP),
+        L4_HOLDHIGH(EEPosition.CORAL_HOLD, Stop.L4),
         BARGE_PREP(EEPosition.BARGE, Stop.BARGE_PREP),
         BARGE(EEPosition.BARGE, Stop.BARGE),
         GROUND_CORAL(EEPosition.GROUND_INTAKE, Stop.STOW),
@@ -65,6 +68,18 @@ public class Superstructure extends SubsystemBase {
             this.stop = stop;
         }
     }
+
+    public static enum SuperState {
+        INTAKING_CORAL,
+        INTAKING_ALGAE,
+        SCORING_CORAL,
+        SCORING_ALGAE,
+        DEFAULT,
+        NONE
+    }
+
+    private SuperState superState = SuperState.DEFAULT;
+    private Command defaultPositionCommand = AssumeDefaultPosition();
 
     EnumMap<ReefFace, Command> coralLeftCommands = new EnumMap<>(ReefFace.class);
     EnumMap<ReefFace, Command> coralRightCommands = new EnumMap<>(ReefFace.class);
@@ -101,14 +116,32 @@ public class Superstructure extends SubsystemBase {
             Elevator.instance.TriggerMoveToDirect(pose.stop));
     }
 
+    private Command TriggerMoveToL4() {
+        return LoggedCommands.sequence("Move to L4 sequence",
+            Commands.either(
+                LoggedCommands.log("No need to prep L4"),
+                Commands.sequence(
+                    TriggerMoveToEEPose(EEPose.L4_PREP),
+                    AlgaeRoller.instance.TriggerStowWhenClear(),
+                    WaitForEEPose().until(() -> EndEffector.instance.inPosition()), // Elevator target can change as soon as EE is in position
+                    Commands.either(
+                        LoggedCommands.log("Already at L4_PREP when End Effector in position"),
+                        Commands.sequence(
+                            TriggerMoveToEEPose(EEPose.L4_HOLDHIGH),
+                            WaitForEEPose().until(() -> Elevator.instance.nearOrAbove(Stop.L4_PREP))),
+                        () -> Elevator.instance.nearOrAbove(Stop.L4_PREP))),
+                () -> Elevator.instance.nearOrAbove(Stop.L4_PREP)),
+            TriggerMoveToEEPose(EEPose.L4),
+            AlgaeRoller.instance.TriggerStowWhenClear());
+    }
+
+    // NOTE: Can block in the case of L4, which uses an interim position
     private Command TriggerMoveToActiveCoral() {
         return Commands.either(
             Commands.either(
                 TriggerMoveToEEPoseDirect(EEPose.L1),
                 Commands.either(
-                    Commands.sequence(
-                        AlgaeRoller.instance.TriggerStowWhenClear(),
-                        TriggerMoveToEEPose(EEPose.L4)),
+                    TriggerMoveToL4(),
                     Commands.sequence(
                         AlgaeRoller.instance.TriggerStow(),
                         Commands.either(
@@ -120,18 +153,18 @@ public class Superstructure extends SubsystemBase {
             Commands.either(
                 TriggerMoveToEEPose(EEPose.L1),
                 Commands.either(
-                    TriggerMoveToEEPose(EEPose.L4),
+                    TriggerMoveToL4(),
                     Commands.either(
                         TriggerMoveToEEPose(EEPose.L2),
                         TriggerMoveToEEPose(EEPose.L3),
                         () -> activeReefLevel == ReefLevel.L2),
                     () -> activeReefLevel == ReefLevel.L4),
                 () -> activeReefLevel == ReefLevel.L1),
-            () -> EndEffector.instance.inHighClearRange());
+            () -> EndEffector.instance.inHighClearRange()); // All scoring positions are in high clear range, so it's safe to move if EE is already in the high clear range
     }
 
     public Command WaitForEEPose() {
-        return LoggedCommands.waitUntil("Wait for EE Pose", () -> EndEffector.instance.inPosition() && Elevator.instance.atTarget());
+        return LoggedCommands.waitUntil("Wait for EE Pose", () -> EndEffector.instance.inPosition() && Elevator.instance.atFinalTarget());
     }
 
     private void setFaceCommands(ReefFace face) {
@@ -140,10 +173,20 @@ public class Superstructure extends SubsystemBase {
         deAlgaefyLeftCommands.put(face, DeAlgaefy(face));
         deAlgaefyRightCommands.put(face, DeAlgaefy(face));
     }
+
+    private Command SetSuperState(SuperState state) {
+        return LoggedCommands.runOnce("Set Superstate to " + state, () -> superState = state);
+    }
+
+    private void setSuperStateInterrupted() {
+        DogLog.log(LoggedCommands.key, "Interrupted, setting superstate to NONE");
+        superState = SuperState.NONE;
+    }
     
     public Command ScoreCoral(ReefFace face, boolean left) {
         return Commands.either(
             LoggedCommands.sequence("Auto Align " + (left ? "Left " : "Right ") + face.toString() + " & Score",
+                SetSuperState(SuperState.SCORING_CORAL),
                 LoggedCommands.parallel("PID Align " + (left ? "Left " : "Right ") + face.toString(),
                     Commands.sequence(
                         Commands.race(
@@ -169,13 +212,10 @@ public class Superstructure extends SubsystemBase {
                         // LoggedCommands.deadline("Wait for auto up",
                         //     Elevator.instance.WaitForNext(),
                         //     Elevator.instance.AutoElevatorUp(left ? face.alignCoralLeft.getTranslation() : face.alignCoralRight.getTranslation())))),
+                // LoggedCommands.waitUntil("DEBUG: Infinite Wait", () -> false), // Used for debugging
                 PlaceCoral(),
-                Commands.either(
-                    Commands.none(),
-                    TriggerMoveToEEPose(EEPose.GROUND_CORAL),
-                    () -> EndEffector.instance.haveCoral()
-                ),
-                AlgaeRoller.instance.TriggerStowWhenStopped()),
+                SetSuperState(SuperState.NONE))
+                .handleInterrupt(this::setSuperStateInterrupted),
             LoggedCommands.log("Cannot score coral without coral"),
             EndEffector.instance::haveCoral);
     }
@@ -191,6 +231,7 @@ public class Superstructure extends SubsystemBase {
         EEPose algaeInvertLiftPose = face.algaeHigh ? EEPose.REEF_INTAKE_L2_LIFT : EEPose.REEF_INTAKE_L3_LIFT;
 
         return LoggedCommands.sequence("Fully acquire Algae from " + face.toString(),
+            SetSuperState(SuperState.INTAKING_ALGAE),
             LoggedCommands.deadline("Acquire Algae from " + face.toString(),
                 Commands.sequence(
                     EndEffector.instance.WaitForAlgae(),
@@ -215,7 +256,9 @@ public class Superstructure extends SubsystemBase {
                 TriggerMoveToEEPoseDirect(algaeInvertLiftPose),
                 TriggerMoveToEEPoseDirect(algaeLiftPose),
                 optInvertAlgae),    
-            new PIDSwerve(Swerve.instance, Pose.instance, extendedBackup ? face.algaeBackupExtended : face.algaeBackupShort, true, false));
+            new PIDSwerve(Swerve.instance, Pose.instance, extendedBackup ? face.algaeBackupExtended : face.algaeBackupShort, true, false),
+            SetSuperState(SuperState.NONE))
+            .handleInterrupt(this::setSuperStateInterrupted);
     }
 
     public Command SetStop(Stop stop) {
@@ -231,16 +274,25 @@ public class Superstructure extends SubsystemBase {
 
     public Command PrepBargeShot() {
         return LoggedCommands.sequence("Prepare barge shot",
-        TriggerMoveToEEPose(EEPose.BARGE_PREP),
-        AlgaeRoller.instance.TriggerStowWhenClear(),
-        WaitForEEPose(),
-        TriggerMoveToEEPoseDirect(EEPose.BARGE));
+            SetSuperState(SuperState.SCORING_ALGAE),
+            TriggerMoveToEEPose(EEPose.BARGE_PREP),
+            AlgaeRoller.instance.TriggerStowWhenClear(),
+            WaitForEEPose(),
+            TriggerMoveToEEPoseDirect(EEPose.BARGE),
+            WaitForEEPose(),
+            LoggedCommands.idle("Idle to maintain barge pose"),
+            SetSuperState(SuperState.NONE))
+            .handleInterrupt(this::setSuperStateInterrupted);
     }
 
     private Command ProcessorAlign() {
+        // TODO
         return LoggedCommands.sequence("Align to processor",
+            SetSuperState(SuperState.SCORING_ALGAE),
             new PIDSwerve(Swerve.instance, Pose.instance, PoseConstants.processorApproach, true, false, PIDSpeed.FAST),
-            new PIDSwerve(Swerve.instance, Pose.instance, PoseConstants.processorScore, true, true, PIDSpeed.FAST));
+            new PIDSwerve(Swerve.instance, Pose.instance, PoseConstants.processorScore, true, true, PIDSpeed.FAST),
+            SetSuperState(SuperState.NONE))
+            .handleInterrupt(this::setSuperStateInterrupted);
     }
 
     public Command SmartScore(boolean left) {
@@ -261,16 +313,20 @@ public class Superstructure extends SubsystemBase {
     }
 
     public Command PlaceCoral() {
-        return LoggedCommands.either("Place Coral",
-            PlaceL1Coral(),
+        return LoggedCommands.sequence("Place Coral",
+            SetSuperState(SuperState.SCORING_CORAL),
             Commands.either(
-                EndEffector.instance.ExpelCoral(ReefLevel.L4),
+                PlaceL1Coral(),
                 Commands.either(
-                    EndEffector.instance.ExpelCoral(ReefLevel.L2),
-                    EndEffector.instance.ExpelCoral(ReefLevel.L3),
-                    () -> activeReefLevel == ReefLevel.L2),
-                () -> activeReefLevel == ReefLevel.L4),
-            () -> activeReefLevel == ReefLevel.L1);
+                    EndEffector.instance.ExpelCoral(ReefLevel.L4),
+                    Commands.either(
+                        EndEffector.instance.ExpelCoral(ReefLevel.L2),
+                        EndEffector.instance.ExpelCoral(ReefLevel.L3),
+                        () -> activeReefLevel == ReefLevel.L2),
+                    () -> activeReefLevel == ReefLevel.L4),
+                () -> activeReefLevel == ReefLevel.L1),
+            SetSuperState(SuperState.NONE))
+            .handleInterrupt(this::setSuperStateInterrupted);
     }
 
     public Command PlaceL1Coral() {
@@ -282,7 +338,7 @@ public class Superstructure extends SubsystemBase {
             AlgaeRoller.instance.TriggerStowWhenStopped())
             .handleInterrupt(() -> {
                 EndEffector.instance.StopIntake().schedule();
-                // AlgaeRoller.instance.StopAndClear().schedule(); // HACK
+                AlgaeRoller.instance.StopAndClear().schedule(); // HACK
             });
     }
 
@@ -295,9 +351,10 @@ public class Superstructure extends SubsystemBase {
 
     public Command PlaceBargeAlgae() {
         return LoggedCommands.sequence("Place barge algae",
+            SetSuperState(SuperState.SCORING_ALGAE),
             EndEffector.instance.PlaceBargeAlgae(),
-            TriggerMoveToEEPose(EEPose.GROUND_CORAL),
-            AlgaeRoller.instance.TriggerStowWhenStopped());
+            SetSuperState(SuperState.NONE))
+            .handleInterrupt(this::setSuperStateInterrupted);
     }
 
     public static Command WaitForCoral() {
@@ -311,7 +368,7 @@ public class Superstructure extends SubsystemBase {
     public Command CoralHold() {
         return LoggedCommands.sequence("Hold coral",
             TriggerMoveToEEPose(EEPose.CORAL_HOLD),
-            AlgaeRoller.instance.TriggerStowWhenStopped());
+            AlgaeRoller.instance.TriggerStowWhenStoppedAndPivotClear());
     }
 
     public Command AlgaeHold() {
@@ -320,20 +377,40 @@ public class Superstructure extends SubsystemBase {
             AlgaeRoller.instance.TriggerStowWhenStopped());
     }
 
-    public Command SmartIntake() {
+    public Command SmartCoralIntake() {
         return Commands.either(
-            AlgaeHold(),
+            IntakeCoral(),
+            AssumeDefaultPosition(),
+            () -> EndEffector.instance.haveNothing());
+    }
+
+    public Command SmartAlgaeIntake() {
+        return Commands.either(
+            IntakeGroundAlgae(),
+            AssumeDefaultPosition(),
+            () -> EndEffector.instance.haveNothing());
+    }
+
+    public Command AssumeDefaultPosition() {
+        return LoggedCommands.sequence("Assume default position",
+            AlgaeRoller.instance.StopIntake(),
             Commands.either(
-                CoralHold(),
-                IntakeCoral(),
-                () -> EndEffector.instance.haveCoral()),
-            () -> EndEffector.instance.haveAlgae());
+                AlgaeHold(),
+                Commands.either(
+                    CoralHold(),
+                    Commands.sequence(
+                        TriggerMoveToEEPose(EEPose.GROUND_CORAL),
+                        AlgaeRoller.instance.TriggerStowWhenStopped()),
+                    () -> EndEffector.instance.haveCoral()),
+                () -> EndEffector.instance.haveAlgae()),
+            SetSuperState(SuperState.DEFAULT));
     }
 
     private Command IntakeExpel = Intake.instance.Expel();
 
     public Command StartCoralIntake() {
         return LoggedCommands.sequence("Start Coral Intake",
+            SetSuperState(SuperState.INTAKING_CORAL),
             TriggerMoveToEEPose(EEPose.GROUND_CORAL),
             AlgaeRoller.instance.TriggerStowWhenStopped(),
             WaitForEEPose(),
@@ -344,16 +421,19 @@ public class Superstructure extends SubsystemBase {
 
     public Command FinishCoralIntake() {
         return LoggedCommands.sequence("Finish Coral Intake",
-        EndEffector.instance.StopIntake(),
-        Intake.instance.Stop(),
-        TriggerMoveToEEPose(EEPose.CORAL_HOLD),
-        AlgaeRoller.instance.TriggerStowWhenStopped());
+            Commands.either(
+                Commands.none(),
+                EndEffector.instance.StopIntake(),
+                EndEffector.instance::haveCoral),
+            Intake.instance.Stop(),
+            SetSuperState(SuperState.NONE));
     }
 
     // TODO Use StartCoralIntake() && Finish Coral Intake
     private Command IntakeCoral() {
         // NOTE: Must not be holding any game piece already!
         return LoggedCommands.sequence("Intaking Coral",
+            SetSuperState(SuperState.INTAKING_CORAL),
             TriggerMoveToEEPose(EEPose.GROUND_CORAL),
             AlgaeRoller.instance.TriggerStowWhenStopped(),
             WaitForEEPose(),
@@ -361,12 +441,12 @@ public class Superstructure extends SubsystemBase {
                 EndEffector.instance.StartCoralIntake(),
                 Intake.instance.Deploy()),
             EndEffector.instance.WaitForState(EEState.HAVE_CORAL),
-            TriggerMoveToEEPose(EEPose.CORAL_HOLD),
-            AlgaeRoller.instance.TriggerStowWhenStopped(),
-            Controls.instance.TriggerRumble())
+            Controls.instance.TriggerRumble(),
+            SetSuperState(SuperState.NONE))
             .finallyDo((interrupted) -> {
                 IntakeExpel.schedule(); // TODO Make this a fixed command instead of new object?
                 if (interrupted) {
+                    setSuperStateInterrupted();
                     // We didn't get coral, so stop the intake
                     EndEffector.instance.StopIntake().schedule();
                 }
@@ -405,6 +485,7 @@ public class Superstructure extends SubsystemBase {
 
     public Command IntakeGroundAlgae() {
         return LoggedCommands.sequence("Intake ground algae",
+            SetSuperState(SuperState.INTAKING_ALGAE),
             Commands.deadline(
                 EndEffector.instance.WaitForAlgae(),
                 Commands.sequence(
@@ -415,12 +496,43 @@ public class Superstructure extends SubsystemBase {
                     AlgaeRoller.instance.TriggerDeploy(),
                     AlgaeRoller.instance.StartIntake())),
             AlgaeRoller.instance.StopIntake(),
-            TriggerMoveToEEPose(EEPose.ALGAE_HOLD),
-            AlgaeRoller.instance.TriggerStowWhenStopped())
-            .handleInterrupt(() -> AlgaeRoller.instance.StopAndClear().schedule());
+            SetSuperState(SuperState.NONE))
+            .handleInterrupt(this::setSuperStateInterrupted);
     }
 
     public ReefLevel activeReefLevel() {
         return activeReefLevel;
+    }
+
+    public Command SystemRecovery() {
+        return LoggedCommands.sequence("System Recovery",
+            AlgaeRoller.instance.StopIntake(),
+            EndEffector.instance.StopIntake(),
+            Climber.instance.Stop(),
+            Intake.instance.ZeroIntake(),
+            AlgaeRoller.instance.SafeClear(),
+            // TODO Elevator.instance.SafeClear(),
+            EndEffector.instance.SensorReset(),
+            EndEffector.instance.ResetPosition(),
+            EndEffector.instance.TriggerMoveTo(EEPosition.CORAL_HOLD),
+            LoggedCommands.waitUntil("End Effector in coral hold position", () -> EndEffector.instance.inPosition()),
+            EndEffector.instance.ExpelCoral(ReefLevel.L4),
+            EndEffector.instance.TriggerMoveTo(EEPosition.GROUND_INTAKE),
+            LoggedCommands.waitUntil("End Effector in ground intake position", () -> EndEffector.instance.inPosition()),
+            Elevator.instance.Zero(),
+            AlgaeRoller.instance.Zero(),
+            Intake.instance.Expel(),
+            Commands.waitSeconds(2.0),
+            Intake.instance.Stop());
+    }
+
+    @Override
+    public void periodic() {
+        DogLog.log("Superstructure/Active Reef Level", activeReefLevel);
+        DogLog.log("Superstructure/Super State", superState);
+
+        if (superState == SuperState.NONE && !defaultPositionCommand.isScheduled()) {
+            defaultPositionCommand.schedule();
+        }
     }
 }

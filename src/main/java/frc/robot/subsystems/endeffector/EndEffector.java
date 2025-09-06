@@ -51,6 +51,7 @@ public class EndEffector extends SubsystemBase {
 
     private Debouncer coralDebouncer = new Debouncer(EndEffectorConstants.coralSensorDebounce.in(Units.Seconds), Debouncer.DebounceType.kBoth);
     private Debouncer algaeDebouncer = new Debouncer(EndEffectorConstants.algaeSensorDebounce.in(Units.Seconds), Debouncer.DebounceType.kBoth);
+    private Debouncer algaeStallDebouncer = new Debouncer(EndEffectorConstants.algaeStallDebounce.in(Units.Seconds), Debouncer.DebounceType.kRising);
 
     /* Devices */
     private final TalonFX positionMotor;
@@ -114,13 +115,17 @@ public class EndEffector extends SubsystemBase {
             }, this),
             LoggedCommands.waitUntil("Wait for coral to clear", () -> state == EEState.EMPTY),
             Commands.waitSeconds(postClearDelay),
-            Commands.runOnce(pieceMotor::stopMotor, this))
+            Commands.runOnce(() -> {
+                pieceMotor.stopMotor();
+                intakeState = EEIntakeState.STOPPED;
+            }, this))
             .handleInterrupt(() -> {
                 if (haveCoral()) {
                     pieceMotor.setControl(EEControl.CORAL_HOLD.control);
                 } else {
                     pieceMotor.stopMotor();
                 }
+                intakeState = EEIntakeState.STOPPED;
             });
     }
 
@@ -130,6 +135,10 @@ public class EndEffector extends SubsystemBase {
 
     public boolean haveAlgae() {
         return state == EEState.HAVE_ALGAE;
+    }
+
+    public boolean haveNothing() {
+        return state == EEState.EMPTY;
     }
 
     public boolean intakingAlgae() {
@@ -151,6 +160,7 @@ public class EndEffector extends SubsystemBase {
                     LoggedAlert.Error("End Effector", "Bad state", "End Effector state was not empty: " + state);
                     state = EEState.EMPTY;
                 }
+                algaeStallDebouncer.calculate(false); // Reset stall debouncer
                 intakeState = EEIntakeState.INTAKING_ALGAE;
                 pieceMotor.setControl(EEControl.ALGAE_INTAKE.control);
             }, this);
@@ -208,16 +218,26 @@ public class EndEffector extends SubsystemBase {
         return algaeDebouncer.calculate(algaeDetectedRaw());
     }
 
+    private boolean algaeStalled() {
+        return algaeStallDebouncer.calculate(pieceMotor.getVelocity().getValue().lt(EndEffectorConstants.algaeStallVelocity));
+    }
+
     private boolean okToMove() {
         return (Elevator.instance.isClear(Elevator.ClearState.CLEAR_LOW) &&
             (Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH) || AlgaeRoller.instance.isClear())) ||
-            inHighClearRange();
+            highClearSafe();
+    }
+
+    private boolean highClearSafe() {
+        return inHighClearRange() && inHighClearRange(desiredPosition.position);
+    }
+
+    private boolean inHighClearRange(Angle position) {
+        return position.gte(EEPosition.HIGH_CLEAR_START.position) && position.lte(EEPosition.HIGH_CLEAR_END.position);
     }
 
     public boolean inHighClearRange() {
-        Angle position = positionMotor.getPosition().getValue();
-
-        return position.gte(EEPosition.HIGH_CLEAR_START.position) && position.lte(EEPosition.HIGH_CLEAR_END.position);
+        return inHighClearRange(positionMotor.getPosition().getValue());
     }
 
     public Angle getAbsolutePosition() {
@@ -246,6 +266,11 @@ public class EndEffector extends SubsystemBase {
             .handleInterrupt(() -> pieceMotor.stopMotor());
     }
 
+    public Command ForceHaveCoral() {
+        // Used at the start of Auto
+        return LoggedCommands.runOnce("Force coral possession", () -> state = EEState.HAVE_CORAL);
+    }
+
     public Command SensorReset() {
         return LoggedCommands.runOnce("End Effector Sensor Reset", () -> {
             if (algaeDetected()) {
@@ -256,6 +281,11 @@ public class EndEffector extends SubsystemBase {
                 state = EEState.EMPTY;
             }
         }, this);
+    }
+
+    public Command ResetPosition() {
+        // Used only for system recovery
+        return LoggedCommands.runOnce("Reset End Effector position", () -> positionMotor.setPosition(directCancoder.getPosition().getValueAsDouble()), this);
     }
 
     @Override
@@ -282,6 +312,7 @@ public class EndEffector extends SubsystemBase {
         DogLog.log("EndEffector/CANdi connected", candi.isConnected());
         DogLog.log("EndEffector/Coral detected", coralDetected());
         DogLog.log("EndEffector/Algae detected", algaeDetected());
+        DogLog.log("EndEffector/Algae stalled", algaeStalled());
 
         DogLog.log("EndEffector/State", state.name());
         DogLog.log("EndEffector/Intake State", intakeState.name());
@@ -298,7 +329,7 @@ public class EndEffector extends SubsystemBase {
         DogLog.log("EndEffector/Absolute position (deg)", getAbsolutePosition().in(Units.Degrees));
         DogLog.log("EndEffector/Absolute position (rot)", getAbsolutePosition().in(Units.Rotations));
 
-        SmartDashboard.putString("EndEffector/Held Game Piece", haveAlgae() ? "#48B6AB" : haveCoral() ? "#FFFFFF" : "#888888");
+        SmartDashboard.putString("EndEffector/Held Game Piece", haveAlgae() ? "#48B6AB" : haveCoral() ? "#FFFFFF" : "#666666");
 
         if (!atDesiredPosition) {
             // TODO Debounce?
@@ -322,16 +353,16 @@ public class EndEffector extends SubsystemBase {
         }
         
         if (intakeState == EEIntakeState.INTAKING_ALGAE) {
-            // TODO Also check stall
-            if (algaeDetected()) { // TODO Wait 0.2s before/after detection? can't we just bump the debounce up?
+            if (algaeDetected() || algaeStalled()) {
                 state = EEState.HAVE_ALGAE;
+                DogLog.log("EndEffector/Status", "Algae acquired");
                 pieceMotor.setControl(EEControl.ALGAE_HOLD.control);
                 intakeState = EEIntakeState.STOPPED;
             }
         } else if (intakeState == EEIntakeState.INTAKING_CORAL) {
-            // TODO Also check to stall?
             if (coralDetected()) {
                 state = EEState.HAVE_CORAL;
+                DogLog.log("EndEffector/Status", "Coral acquired");
                 pieceMotor.setControl(EEControl.CORAL_HOLD.control);
                 intakeState = EEIntakeState.STOPPED;
             }

@@ -13,9 +13,11 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.Constants;
 
 public class ClimberConstants {
     /* Motor Config Values */
+	public static final boolean startsClear = Constants.atHQ; // At HQ, it's annoying to reset the climber every time, so hold it in CLEAR state
     public static final double intakeGearing = (18.0 / 12.0);
     public static final double deployGearing = (36.0 / 1.0);
     public static final Voltage intakeVoltage = Units.Volts.of(8.0);

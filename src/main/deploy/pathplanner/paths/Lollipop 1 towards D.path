@@ -3,41 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.9904180463576155,
-        "y": 2.7901076158940405
+        "x": 1.4600786423841061,
+        "y": 0.7416390728476824
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.4887575622440963,
-        "y": 1.9090563529930642
+        "x": 1.9600786423841061,
+        "y": 0.7416390728476823
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Lollipop 1 - After"
     },
     {
       "anchor": {
-        "x": 1.21,
-        "y": 0.919
+        "x": 3.6393004966887417,
+        "y": 2.368791390728477
       },
       "prevControl": {
-        "x": 2.517529715270234,
-        "y": 2.0376711894156347
+        "x": 3.414114238410596,
+        "y": 1.962003311258279
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Control Station"
+      "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.1,
-      "rotationDegrees": 119.99999999999999
-    },
-    {
-      "waypointRelativePos": 0.4070305272895447,
-      "rotationDegrees": 55.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -50,14 +41,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.3,
-    "rotation": 55.0
+    "velocity": 1.6,
+    "rotation": -119.99999999999999
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": -125.00000000000001
   },
   "useDefaultConstraints": true
 }

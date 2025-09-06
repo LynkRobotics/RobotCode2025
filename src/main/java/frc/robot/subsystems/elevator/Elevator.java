@@ -267,6 +267,12 @@ public class Elevator extends SubsystemBase {
         return getHeight(mainMotor.getPosition().getValueAsDouble());
     }
 
+    public boolean nearOrAbove(Stop stop) {
+        // In theory -- but these have an old implementation
+        // return nearStop(stop) || aboveStop(stop);
+        return getHeight().gte(stop.height.minus(ElevatorConstants.epsilonThreshold));
+    }
+
     public double raisedPercentage() {
         return MathUtil.clamp(getHeight().minus(Stop.CORAL_HOLD.height).div(Stop.L4.height).magnitude(), 0.0, 1.0);
     }
@@ -313,7 +319,7 @@ public class Elevator extends SubsystemBase {
         if (direct) {
             // We are explicitly asking to move directly to a position
             setCurrentTarget(target, false);
-        } else if(goingUp) {
+        } else if (goingUp) {
             // We need to wait for the algae bar to be clear if we are below the CLEAR_HIGH mark
             setCurrentTarget(target, currentPosition.lt(Stop.CLEAR_HIGH.position));
         } else if (currentPosition.gt(Stop.CLEAR_HIGH.position)) {
