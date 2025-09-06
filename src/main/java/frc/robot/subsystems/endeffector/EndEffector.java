@@ -266,6 +266,11 @@ public class EndEffector extends SubsystemBase {
             .handleInterrupt(() -> pieceMotor.stopMotor());
     }
 
+    public Command ForceHaveCoral() {
+        // Used at the start of Auto
+        return LoggedCommands.runOnce("Force coral possession", () -> state = EEState.HAVE_CORAL);
+    }
+
     public Command SensorReset() {
         return LoggedCommands.runOnce("End Effector Sensor Reset", () -> {
             if (algaeDetected()) {

@@ -122,24 +122,26 @@ public class AlgaeRoller extends SubsystemBase {
     }
 
     private void stowWhenClear() {
-        if (Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH)) {
-            moveTo(AlgaeRollerPosition.STOWED);
-        } else {
+        waitingForStop = false;
+        waitingForPivotClear = false;
+        waitingForClear = !Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH);
+
+        if (waitingForClear) {
             DogLog.log("Algae Roller/Status", "Delaying stow due to elevator position");
-            waitingForClear = true;
-            waitingForStop = false;
-            waitingForPivotClear = false;
+        } else {
+            moveTo(AlgaeRollerPosition.STOWED);
         }
     }
 
     private void stowWhenStopped() {
-        if (Elevator.instance.atFinalTarget()) {
-            moveTo(AlgaeRollerPosition.STOWED);
-        } else {
+        waitingForStop = !Elevator.instance.atFinalTarget();
+        waitingForPivotClear = false;
+        waitingForClear = false;
+
+        if (waitingForStop) {
             DogLog.log("Algae Roller/Status", "Delaying stow due to elevator movement");
-            waitingForStop = true;
-            waitingForClear = false;
-            waitingForPivotClear = false;
+        } else {
+            moveTo(AlgaeRollerPosition.STOWED);
         }
     }
 
@@ -148,9 +150,8 @@ public class AlgaeRoller extends SubsystemBase {
         waitingForPivotClear = !EndEffector.instance.inHighClearRange();
         waitingForClear = false;
 
-        if (waitingForStop && waitingForPivotClear) {
+        if (waitingForStop || waitingForPivotClear) {
             DogLog.log("Algae Roller/Status", "Delaying stow until elevator stopped and pivot clear");
-            waitingForPivotClear = true;
         } else {
             moveTo(AlgaeRollerPosition.STOWED);
         }

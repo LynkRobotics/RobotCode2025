@@ -17,7 +17,7 @@ import edu.wpi.first.units.measure.Voltage;
 public class IntakeConstants {
     public enum IntakePosition {
         FULLY_DEPLOYED(3.0),
-        DEPLOYED(15.0),
+        DEPLOYED(5.0),
         RETRACTED(55.0),
         FULL_STOW(83.0);
 

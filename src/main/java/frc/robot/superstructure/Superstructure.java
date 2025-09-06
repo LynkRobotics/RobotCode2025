@@ -78,7 +78,7 @@ public class Superstructure extends SubsystemBase {
         NONE
     }
 
-    private SuperState superState = SuperState.NONE;
+    private SuperState superState = SuperState.DEFAULT;
     private Command defaultPositionCommand = AssumeDefaultPosition();
 
     EnumMap<ReefFace, Command> coralLeftCommands = new EnumMap<>(ReefFace.class);
@@ -421,7 +421,10 @@ public class Superstructure extends SubsystemBase {
 
     public Command FinishCoralIntake() {
         return LoggedCommands.sequence("Finish Coral Intake",
-            EndEffector.instance.StopIntake(),
+            Commands.either(
+                Commands.none(),
+                EndEffector.instance.StopIntake(),
+                EndEffector.instance::haveCoral),
             Intake.instance.Stop(),
             SetSuperState(SuperState.NONE));
     }
