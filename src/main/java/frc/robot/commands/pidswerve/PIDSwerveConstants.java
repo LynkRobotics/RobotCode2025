@@ -21,6 +21,10 @@ public class PIDSwerveConstants {
     public static final double objRotationKP = 0.013;
     public static final double objRotationKD = 0.00;
 
+    public static final double distanceAfterLock = 1.0; // Meters to drive after locking the object
+    public static final double lockPitch = 7.5; // How close to get to lock
+    public static final double objSeekSpeed = 0.25;    // Speed when pursuing the object    
+
     public enum PIDSpeed {
         SLOW(SwerveConstants.maxSpeed / 8.0),
         FAST(SwerveConstants.maxSpeed / 3.0),

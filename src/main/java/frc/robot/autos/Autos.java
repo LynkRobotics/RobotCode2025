@@ -79,13 +79,21 @@ public class Autos extends SubsystemBase {
             Swerve.instance.Stop());
     }
 
-    public Command HuntCoralAuto() {
-        return LoggedCommands.sequence("Hunt Coral (Auto)",
-            // Intake already down
-            Detection.instance.WaitForObject(),
-            new SwerveToObject());
-    }
-
+    public Command HuntCoralAuto(String pathName) {
+        return UntilCoral(            
+                Commands.parallel(
+                    LoggedCommands.proxy(Superstructure.instance.StartCoralIntake()),
+                    LoggedCommands.proxy(PathCommand(pathName))),
+                LoggedCommands.proxy(Detection.instance.WaitForObject()),
+                LoggedCommands.proxy(new SwerveToObject()),
+                LoggedCommands.proxy(Swerve.instance.Stop()),
+                Commands.waitSeconds(1.0),
+                LoggedCommands.proxy(Intake.instance.Jog()),
+                Commands.waitSeconds(2.0))
+            .withName("Hunt Down Coral (Auto)")
+            .andThen(LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition()));
+        }
+    
     public static void autoNamedCommand(String name, Command command) {
         NamedCommands.registerCommand(name, LoggedCommands.logWithName(name + " (auto)", command));
     }
@@ -287,38 +295,22 @@ public class Autos extends SubsystemBase {
         //     optBackupPush::get),
         Commands.parallel(
             Commands.sequence(
-                Superstructure.instance.SetActiveReefLevel(ReefLevel.L4),
                 LoggedCommands.proxy(EndEffector.instance.ForceHaveCoral()),
                 LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition())),
             LoggedCommands.proxy(PathCommand("Start towards EF"))),
         LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
         LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition()),
-        UntilCoral(
-            Commands.parallel(
-                LoggedCommands.proxy(Superstructure.instance.StartCoralIntake()),
-                LoggedCommands.proxy(PathCommand("E to Hunt"))),
-            LoggedCommands.proxy(HuntCoralAuto()),
-            LoggedCommands.proxy(Swerve.instance.Stop()),
-            Commands.waitSeconds(2.0)),
-        LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition()),
+        LoggedCommands.proxy(HuntCoralAuto("E to Hunt")),
         Commands.deadline(
             IfHaveCoral(LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false))),
             LoggedCommands.proxy(Intake.instance.ExpelForever())),
-        UntilCoral(
-            Commands.parallel(
-                LoggedCommands.proxy(Superstructure.instance.StartCoralIntake()),
-                LoggedCommands.proxy(PathCommand("D to Hunt"))),
-            LoggedCommands.proxy(HuntCoralAuto()),
-            LoggedCommands.proxy(Swerve.instance.Stop()),
-            Commands.waitSeconds(2.0)),
-        LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition()),
+        LoggedCommands.proxy(HuntCoralAuto("D to Hunt")),
         Commands.deadline(
             IfHaveCoral(LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, true))),
             LoggedCommands.proxy(Intake.instance.ExpelForever())),
         LoggedCommands.proxy(Swerve.instance.Stop()),
-        LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition()),
         LoggedCommands.proxy(Intake.instance.Stop()),
-        Superstructure.instance.SetActiveReefLevel(ReefLevel.L4));
+        LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition()));
 
         startingPaths.put(autoEDCHunt, "Start towards EF");
         addAutoCommand(chooser, autoEDCHunt);

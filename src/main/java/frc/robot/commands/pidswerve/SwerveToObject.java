@@ -17,9 +17,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class SwerveToObject extends LoggedCommandBase {
     private final PIDController rotationPID = new PIDController(PIDSwerveConstants.objRotationKP, 0, PIDSwerveConstants.objRotationKD);
-    private final double distanceAfterLock = 1.0; // Meters;
-    private final double lockPitch = 7.5;
-    private final double speed = 0.15;
     private boolean locked = false;
     private Translation2d lockedPosition;
 
@@ -58,7 +55,7 @@ public class SwerveToObject extends LoggedCommandBase {
         DogLog.log("SwerveToObject/Locked", locked);
         DogLog.log("SwerveToObject/Locked Position", lockedPosition);
 
-        if (!locked && Detection.instance.getRecentObject().pitch() < lockPitch) {
+        if (!locked && Detection.instance.getRecentObject().pitch() < PIDSwerveConstants.lockPitch) {
             DogLog.log("SwerveToObject/Status", "Locked");
             locked = true;
             lockedPosition = position;
@@ -70,11 +67,11 @@ public class SwerveToObject extends LoggedCommandBase {
 
         /* Drive */
         Swerve.instance.driveRobotRelativeAuto(
-            new ChassisSpeeds(speed * SwerveConstants.maxSpeed, 0.0, rotationVal * PIDSwerveConstants.maxAngularVelocity));
+            new ChassisSpeeds(PIDSwerveConstants.objSeekSpeed * SwerveConstants.maxSpeed, 0.0, rotationVal * PIDSwerveConstants.maxAngularVelocity));
     }
 
     @Override
     public boolean isFinished() {
-        return (locked && (Math.abs(Pose.instance.getPose().getTranslation().getDistance(lockedPosition)) >= distanceAfterLock));
+        return (locked && (Math.abs(Pose.instance.getPose().getTranslation().getDistance(lockedPosition)) >= PIDSwerveConstants.distanceAfterLock));
     }
 }

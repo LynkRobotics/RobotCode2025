@@ -126,6 +126,13 @@ public class Intake extends SubsystemBase {
         return LoggedCommands.runOnce("Deploy Intake", this::runDeploy, this);
     }
 
+    public Command Jog() {
+        return LoggedCommands.sequence("Jog Intake",
+            LoggedCommands.runOnce("Jog intake up a bit", () -> { deployMotor.setControl(IntakePosition.JOGGED.control); }, this),
+            Commands.waitSeconds(0.4),
+            Deploy());
+    }
+
     public Command Expel() {
         return LoggedCommands.runOnce("Expel from Intake", this::runExpel, this);
     }
