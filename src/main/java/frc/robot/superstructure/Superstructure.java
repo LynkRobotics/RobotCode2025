@@ -94,6 +94,12 @@ public class Superstructure extends SubsystemBase {
         for (EEPose pose: EEPose.values()) {
             SmartDashboard.putData("Superstructure/Move EE to " + pose, TriggerMoveToEEPose(pose));
         }
+
+        SmartDashboard.putData("Superstructure/Sensor & Position Reset",
+            LoggedCommands.sequence("Sensor & Position Reset",
+                EndEffector.instance.SensorReset(),
+                AssumeDefaultPosition(),
+                WaitForEEPose()));
     }
 
     public Command SetActiveReefLevel(ReefLevel level) {
