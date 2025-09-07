@@ -24,6 +24,7 @@ import frc.lib.util.Elastic;
 import frc.robot.autos.Autos;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.controls.Controls;
+import frc.robot.subsystems.detection.Detection;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.endeffector.EndEffector;
 import frc.robot.subsystems.intake.Intake;
@@ -85,10 +86,10 @@ public class Robot extends TimedRobot {
             Elevator.instance,
             Intake.instance,
             LED.instance,
-            // RobotState.instance,
             Swerve.instance,
             Vision.instance,
             Pose.instance,
+            Detection.instance,
             Controls.instance,
             Superstructure.instance,
             Autos.instance

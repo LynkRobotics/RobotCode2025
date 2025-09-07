@@ -17,7 +17,10 @@ public class PIDSwerveConstants {
     public static final double rotationTolerance = 0.5; // degrees
     public static final double roughRotatationTolerance = 1.5; // degrees
     public static final double maxAngularVelocity = SwerveConstants.maxAngularVelocity / 2.0;
-        
+
+    public static final double objRotationKP = 0.013;
+    public static final double objRotationKD = 0.00;
+
     public enum PIDSpeed {
         SLOW(SwerveConstants.maxSpeed / 8.0),
         FAST(SwerveConstants.maxSpeed / 3.0),

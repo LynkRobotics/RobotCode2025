@@ -27,13 +27,14 @@ import frc.lib.util.LoggedCommands;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.commands.pidswerve.PIDSwerve;
+import frc.robot.commands.pidswerve.SwerveToObject;
+import frc.robot.subsystems.detection.Detection;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants.Stop;
 import frc.robot.subsystems.endeffector.EndEffector;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.pose.PoseConstants.ReefFace;
-import frc.robot.subsystems.robotstate.RobotState;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants.CameraMode;
@@ -64,6 +65,22 @@ public class Autos extends SubsystemBase {
         SmartDashboard.putData("auto/Debug Drive", Commands.sequence(
             PathCommand("Debug Drive"),
             Swerve.instance.Stop()));
+
+        SmartDashboard.putData("auto/Swerve To Object", Commands.sequence(
+            Detection.instance.WaitForObject(),
+            new SwerveToObject(),
+            Swerve.instance.Stop()));
+
+        SmartDashboard.putData("auto/Hunt Coral", HuntCoral());
+    }
+
+    public Command HuntCoral() {
+        return LoggedCommands.sequence("Hunt Coral",
+            Superstructure.instance.StartCoralIntake(),
+            Detection.instance.WaitForObject(),
+            UntilCoral(new SwerveToObject()),
+            Superstructure.instance.FinishCoralIntake(),
+            Swerve.instance.Stop());
     }
     
     public static void autoNamedCommand(String name, Command command) {
@@ -116,7 +133,7 @@ public class Autos extends SubsystemBase {
             Commands.either(
                 Superstructure.WaitForCoralReady(),
                 LoggedCommands.log("Missing coral"),
-                RobotState::haveCoral),
+                () -> false), //RobotState::haveCoral),
             LoggedCommands.proxy(Elevator.instance.GoToNext()));
     }
 
