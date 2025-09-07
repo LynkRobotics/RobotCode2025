@@ -129,7 +129,7 @@ public class Intake extends SubsystemBase {
     public Command Jog() {
         return LoggedCommands.sequence("Jog Intake",
             LoggedCommands.runOnce("Jog intake up a bit", () -> { deployMotor.setControl(IntakePosition.JOGGED.control); }, this),
-            Commands.waitSeconds(0.4),
+            Commands.waitSeconds(0.3),
             Deploy());
     }
 

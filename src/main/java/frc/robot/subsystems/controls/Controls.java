@@ -21,6 +21,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.superstructure.Superstructure;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.Field.ReefLevel;
+import frc.robot.autos.Autos;
 
 public class Controls extends SubsystemBase{
     public static final Controls instance = new Controls();
@@ -101,6 +102,7 @@ public class Controls extends SubsystemBase{
         alignmentToggle.onTrue(LoggedCommands.runOnce("Toggle Alignment", optAutoReefAiming::toggle));
 
         if (Constants.atHQ) {
+            driver.povLeft().whileTrue(Autos.instance.HuntCoral());
             // driver.povUp().whileTrue(
             //     Commands.sequence(
             //         new PIDSwerve(Swerve.instance, Pose.instance, new Pose2d(0.0, 0.0, Rotation2d.kZero), false, true),

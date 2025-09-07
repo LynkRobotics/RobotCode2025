@@ -14,8 +14,10 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedCommands;
+import frc.robot.subsystems.swerve.Swerve;
 
 public class Detection extends SubsystemBase {
     public static final Detection instance = new Detection();
@@ -50,6 +52,16 @@ public class Detection extends SubsystemBase {
 
     public Command WaitForObject() {
         return LoggedCommands.waitUntil("Wait for object", this::haveRecentObject);
+    }
+
+    public Command StopUntilObject() {
+        return Commands.either(
+            LoggedCommands.log("Already have recent object"),
+            LoggedCommands.sequence("Stop to wait for object",
+                Swerve.instance.Stop(),
+                LoggedCommands.runOnce("Take photo without object", camera::takeOutputSnapshot),
+                LoggedCommands.waitUntil("Wait for object", this::haveRecentObject)),
+            this::haveRecentObject);
     }
 
     @Override

@@ -62,32 +62,34 @@ public class Autos extends SubsystemBase {
             PathCommand("Debug Drive"),
             Swerve.instance.Stop()));
 
-        SmartDashboard.putData("auto/Swerve To Object", Commands.sequence(
-            Detection.instance.WaitForObject(),
-            new SwerveToObject(),
-            Swerve.instance.Stop()));
-
         SmartDashboard.putData("auto/Hunt Coral", HuntCoral());
     }
 
     public Command HuntCoral() {
         return LoggedCommands.sequence("Hunt Coral",
-            Superstructure.instance.StartCoralIntake(),
-            Detection.instance.WaitForObject(),
-            UntilCoral(new SwerveToObject()),
-            Superstructure.instance.FinishCoralIntake(),
-            Swerve.instance.Stop());
+            LoggedCommands.proxy(HuntCoralAuto(null)),
+            LoggedCommands.proxy(Swerve.instance.Stop()),
+            LoggedCommands.proxy(Intake.instance.Stop()),
+            LoggedCommands.proxy(Superstructure.instance.FinishCoralIntake()));
+    }
+
+    public Command HuntCoralAuto() {
+        return HuntCoralAuto(null);
     }
 
     public Command HuntCoralAuto(String pathName) {
         return UntilCoral(            
                 Commands.parallel(
                     LoggedCommands.proxy(Superstructure.instance.StartCoralIntake()),
-                    LoggedCommands.proxy(PathCommand(pathName))),
-                LoggedCommands.proxy(Detection.instance.WaitForObject()),
+                    pathName != null ? LoggedCommands.proxy(PathCommand(pathName)) : Commands.none()),
+                LoggedCommands.proxy(Detection.instance.StopUntilObject()),
                 LoggedCommands.proxy(new SwerveToObject()),
                 LoggedCommands.proxy(Swerve.instance.Stop()),
-                Commands.waitSeconds(1.0),
+                Commands.waitSeconds(0.6),
+                LoggedCommands.proxy(Intake.instance.Jog()),
+                Commands.waitSeconds(1.2),
+                LoggedCommands.proxy(Intake.instance.Jog()),
+                Commands.waitSeconds(1.5),
                 LoggedCommands.proxy(Intake.instance.Jog()),
                 Commands.waitSeconds(2.0))
             .withName("Hunt Down Coral (Auto)")
@@ -287,16 +289,15 @@ public class Autos extends SubsystemBase {
         startingPaths.put(autoEDCZone, "Start towards EF");
         addAutoCommand(chooser, autoEDCZone);
 
-        Command autoEDCHunt = LoggedCommands.sequence("[Sublyme] EDC hunt",
+        Command autoEDCBSideHunt = LoggedCommands.sequence("[Sublyme] EDCB sideways hunt",
         // LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
         // Commands.either(
         //     LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
         //     LoggedCommands.log("Skip back up option"),
         //     optBackupPush::get),
         Commands.parallel(
-            Commands.sequence(
-                LoggedCommands.proxy(EndEffector.instance.ForceHaveCoral()),
-                LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition())),
+            LoggedCommands.proxy(EndEffector.instance.ForceHaveCoral()),
+            LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition()),
             LoggedCommands.proxy(PathCommand("Start towards EF"))),
         LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
         LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition()),
@@ -308,12 +309,49 @@ public class Autos extends SubsystemBase {
         Commands.deadline(
             IfHaveCoral(LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, true))),
             LoggedCommands.proxy(Intake.instance.ExpelForever())),
+        LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition()),
+        LoggedCommands.proxy(HuntCoralAuto()),
+        Commands.deadline(
+            IfHaveCoral(LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false))),
+            LoggedCommands.proxy(Intake.instance.ExpelForever())),
         LoggedCommands.proxy(Swerve.instance.Stop()),
         LoggedCommands.proxy(Intake.instance.Stop()),
         LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition()));
 
-        startingPaths.put(autoEDCHunt, "Start towards EF");
-        addAutoCommand(chooser, autoEDCHunt);
+        startingPaths.put(autoEDCBSideHunt, "Start towards EF");
+        addAutoCommand(chooser, autoEDCBSideHunt);
+
+        Command autoEDCBDirectHunt = LoggedCommands.sequence("[Sublyme] EDCB direct hunt",
+        // LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
+        // Commands.either(
+        //     LoggedCommands.deferredProxy("Back up push", this::BackUpCommand),
+        //     LoggedCommands.log("Skip back up option"),
+        //     optBackupPush::get),
+        Commands.parallel(
+            LoggedCommands.proxy(EndEffector.instance.ForceHaveCoral()),
+            LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition()),
+            LoggedCommands.proxy(PathCommand("Start towards EF"))),
+        LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
+        LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition()),
+        LoggedCommands.proxy(HuntCoralAuto("E to Direct Hunt")),
+        Commands.deadline(
+            IfHaveCoral(LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false))),
+            LoggedCommands.proxy(Intake.instance.ExpelForever())),
+        LoggedCommands.proxy(HuntCoralAuto()),
+        Commands.deadline(
+            IfHaveCoral(LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, true))),
+            LoggedCommands.proxy(Intake.instance.ExpelForever())),
+        LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition()),
+        LoggedCommands.proxy(HuntCoralAuto()),
+        Commands.deadline(
+            IfHaveCoral(LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.AB, false))),
+            LoggedCommands.proxy(Intake.instance.ExpelForever())),
+        LoggedCommands.proxy(Swerve.instance.Stop()),
+        LoggedCommands.proxy(Intake.instance.Stop()),
+        LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition()));
+
+        startingPaths.put(autoEDCBDirectHunt, "Start towards EF");
+        addAutoCommand(chooser, autoEDCBDirectHunt);
 
         Command autoGBarge = LoggedCommands.sequence("[Sublyme] G + Double Barge",
             LoggedCommands.defer("Startup delay", () -> Commands.waitSeconds(SmartDashboard.getNumber("auto/Startup delay", 0.0)), Set.of()),
