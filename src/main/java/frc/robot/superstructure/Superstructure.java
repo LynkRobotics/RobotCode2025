@@ -534,7 +534,7 @@ public class Superstructure extends SubsystemBase {
         DogLog.log("Superstructure/Active Reef Level", activeReefLevel);
         DogLog.log("Superstructure/Super State", superState);
 
-        if (superState == SuperState.NONE && !defaultPositionCommand.isScheduled()) {
+        if (superState == SuperState.NONE && !defaultPositionCommand.isScheduled() && DriverStation.isTeleopEnabled()) {
             defaultPositionCommand.schedule();
         }
     }

@@ -330,6 +330,9 @@ public class EndEffector extends SubsystemBase {
         DogLog.log("EndEffector/Absolute position (rot)", getAbsolutePosition().in(Units.Rotations));
 
         SmartDashboard.putString("EndEffector/Held Game Piece", haveAlgae() ? "#48B6AB" : haveCoral() ? "#FFFFFF" : "#666666");
+        SmartDashboard.putBoolean("EndEffector/Have Coral", haveCoral());
+        SmartDashboard.putBoolean("EndEffector/Coral Sensor", coralDetectedRaw());
+        SmartDashboard.putBoolean("EndEffector/Algae Sensor", algaeDetectedRaw());
 
         if (!atDesiredPosition) {
             // TODO Debounce?

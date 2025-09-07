@@ -64,9 +64,6 @@ public class Intake extends SubsystemBase {
         // We *should* be fully stowed, but given all the testing we do, also zero to start
         deployMotor.setPosition(IntakePosition.FULL_STOW.position);
         startZero();
-
-        // We could start by holding the state *if* we didn't start by zeroing
-        // deployMotor.setControl(desiredState.control);
     }
 
     private void startZero() {

@@ -134,7 +134,7 @@ public class AlgaeRoller extends SubsystemBase {
     }
 
     private void stowWhenStopped() {
-        waitingForStop = !Elevator.instance.atFinalTarget();
+        waitingForStop = !Elevator.instance.atTarget() || !Elevator.instance.atFinalTarget();
         waitingForPivotClear = false;
         waitingForClear = false;
 
@@ -146,7 +146,7 @@ public class AlgaeRoller extends SubsystemBase {
     }
 
     private void stowWhenStoppedAndPivotClear() {
-        waitingForStop = !Elevator.instance.atFinalTarget();
+        waitingForStop = !Elevator.instance.atTarget() || !Elevator.instance.atFinalTarget();
         waitingForPivotClear = !EndEffector.instance.inHighClearRange();
         waitingForClear = false;
 
@@ -257,7 +257,7 @@ public class AlgaeRoller extends SubsystemBase {
                 moveTo(AlgaeRollerPosition.STOWED);
             }
         }
-        if (waitingForStop && Elevator.instance.atFinalTarget()) {
+        if (waitingForStop && Elevator.instance.atTarget() && Elevator.instance.atFinalTarget()) {
             if (waitingForClear || waitingForPivotClear) {
                 waitingForStop = false;
             } else {
