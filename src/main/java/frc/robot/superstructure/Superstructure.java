@@ -178,8 +178,12 @@ public class Superstructure extends SubsystemBase {
         return LoggedCommands.runOnce("Set Superstate to " + state, () -> superState = state);
     }
 
-    private void setSuperStateInterrupted() {
-        DogLog.log(LoggedCommands.key, "Interrupted, setting superstate to NONE");
+    private void setSuperStateDone(boolean interrupted) {
+        if (interrupted) {
+            DogLog.log(LoggedCommands.key, "Interrupted, setting superstate to NONE");
+        } else {
+            DogLog.log(LoggedCommands.key, "Completed, setting superstate to NONE");
+        }
         superState = SuperState.NONE;
     }
     
@@ -213,9 +217,8 @@ public class Superstructure extends SubsystemBase {
                         //     Elevator.instance.WaitForNext(),
                         //     Elevator.instance.AutoElevatorUp(left ? face.alignCoralLeft.getTranslation() : face.alignCoralRight.getTranslation())))),
                 // LoggedCommands.waitUntil("DEBUG: Infinite Wait", () -> false), // Used for debugging
-                PlaceCoral(),
-                SetSuperState(SuperState.NONE))
-                .handleInterrupt(this::setSuperStateInterrupted),
+                PlaceCoral())
+            .finallyDo(this::setSuperStateDone),
             LoggedCommands.log("Cannot score coral without coral"),
             EndEffector.instance::haveCoral);
     }
@@ -256,9 +259,8 @@ public class Superstructure extends SubsystemBase {
                 TriggerMoveToEEPoseDirect(algaeInvertLiftPose),
                 TriggerMoveToEEPoseDirect(algaeLiftPose),
                 optInvertAlgae),    
-            new PIDSwerve(Swerve.instance, Pose.instance, extendedBackup ? face.algaeBackupExtended : face.algaeBackupShort, true, false),
-            SetSuperState(SuperState.NONE))
-            .handleInterrupt(this::setSuperStateInterrupted);
+            new PIDSwerve(Swerve.instance, Pose.instance, extendedBackup ? face.algaeBackupExtended : face.algaeBackupShort, true, false))
+            .finallyDo(this::setSuperStateDone);
     }
 
     public Command SetStop(Stop stop) {
@@ -280,9 +282,8 @@ public class Superstructure extends SubsystemBase {
             WaitForEEPose(),
             TriggerMoveToEEPoseDirect(EEPose.BARGE),
             WaitForEEPose(),
-            LoggedCommands.idle("Idle to maintain barge pose"),
-            SetSuperState(SuperState.NONE))
-            .handleInterrupt(this::setSuperStateInterrupted);
+            LoggedCommands.idle("Idle to maintain barge pose"))
+            .finallyDo(this::setSuperStateDone);
     }
 
     private Command ProcessorAlign() {
@@ -290,9 +291,8 @@ public class Superstructure extends SubsystemBase {
         return LoggedCommands.sequence("Align to processor",
             SetSuperState(SuperState.SCORING_ALGAE),
             new PIDSwerve(Swerve.instance, Pose.instance, PoseConstants.processorApproach, true, false, PIDSpeed.FAST),
-            new PIDSwerve(Swerve.instance, Pose.instance, PoseConstants.processorScore, true, true, PIDSpeed.FAST),
-            SetSuperState(SuperState.NONE))
-            .handleInterrupt(this::setSuperStateInterrupted);
+            new PIDSwerve(Swerve.instance, Pose.instance, PoseConstants.processorScore, true, true, PIDSpeed.FAST))
+            .finallyDo(this::setSuperStateDone);
     }
 
     public Command SmartScore(boolean left) {
@@ -324,9 +324,8 @@ public class Superstructure extends SubsystemBase {
                         EndEffector.instance.ExpelCoral(ReefLevel.L3),
                         () -> activeReefLevel == ReefLevel.L2),
                     () -> activeReefLevel == ReefLevel.L4),
-                () -> activeReefLevel == ReefLevel.L1),
-            SetSuperState(SuperState.NONE))
-            .handleInterrupt(this::setSuperStateInterrupted);
+                () -> activeReefLevel == ReefLevel.L1))
+            .finallyDo(this::setSuperStateDone);
     }
 
     public Command PlaceL1Coral() {
@@ -352,9 +351,8 @@ public class Superstructure extends SubsystemBase {
     public Command PlaceBargeAlgae() {
         return LoggedCommands.sequence("Place barge algae",
             SetSuperState(SuperState.SCORING_ALGAE),
-            EndEffector.instance.PlaceBargeAlgae(),
-            SetSuperState(SuperState.NONE))
-            .handleInterrupt(this::setSuperStateInterrupted);
+            EndEffector.instance.PlaceBargeAlgae())
+            .finallyDo(this::setSuperStateDone);
     }
 
     public static Command WaitForCoral() {
@@ -441,15 +439,15 @@ public class Superstructure extends SubsystemBase {
                 EndEffector.instance.StartCoralIntake(),
                 Intake.instance.Deploy()),
             EndEffector.instance.WaitForState(EEState.HAVE_CORAL),
-            Controls.instance.TriggerRumble(),
-            SetSuperState(SuperState.NONE))
+            Controls.instance.TriggerRumble())
             .finallyDo((interrupted) -> {
-                IntakeExpel.schedule(); // TODO Make this a fixed command instead of new object?
+                IntakeExpel.schedule();
                 if (interrupted) {
-                    setSuperStateInterrupted();
                     // We didn't get coral, so stop the intake
+                    // TODO Make this a fixed object, instead of dynamically creating it?
                     EndEffector.instance.StopIntake().schedule();
                 }
+                setSuperStateDone(interrupted);
             });
     }
 
@@ -495,9 +493,8 @@ public class Superstructure extends SubsystemBase {
                     EndEffector.instance.StartAlgaeIntake(),
                     AlgaeRoller.instance.TriggerDeploy(),
                     AlgaeRoller.instance.StartIntake())),
-            AlgaeRoller.instance.StopIntake(),
-            SetSuperState(SuperState.NONE))
-            .handleInterrupt(this::setSuperStateInterrupted);
+            AlgaeRoller.instance.StopIntake())
+            .finallyDo(this::setSuperStateDone);
     }
 
     public ReefLevel activeReefLevel() {
