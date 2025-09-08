@@ -243,8 +243,8 @@ public class LED extends SubsystemBase {
                             case L3 -> LEDState.CORAL_L3;
                             case L4 -> LEDState.CORAL_L4;
                         };
-                    // } else {
-                    //     state = optAutoReefAiming.get() ? LEDState.NORMAL : LEDState.MANUAL;
+                    } else {
+                        state = LEDState.NORMAL;
                     }        
                 }
             }
