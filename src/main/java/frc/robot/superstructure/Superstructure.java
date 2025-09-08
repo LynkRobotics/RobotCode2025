@@ -417,7 +417,6 @@ public class Superstructure extends SubsystemBase {
             SetSuperState(SuperState.INTAKING_CORAL),
             TriggerMoveToEEPose(EEPose.GROUND_CORAL),
             AlgaeRoller.instance.TriggerStowWhenStopped(),
-            WaitForEEPose(),
             Commands.parallel(
                 EndEffector.instance.StartCoralIntake(),
                 Intake.instance.Deploy()));
@@ -440,7 +439,6 @@ public class Superstructure extends SubsystemBase {
             SetSuperState(SuperState.INTAKING_CORAL),
             TriggerMoveToEEPose(EEPose.GROUND_CORAL),
             AlgaeRoller.instance.TriggerStowWhenStopped(),
-            WaitForEEPose(),
             Commands.parallel(
                 EndEffector.instance.StartCoralIntake(),
                 Intake.instance.Deploy()),

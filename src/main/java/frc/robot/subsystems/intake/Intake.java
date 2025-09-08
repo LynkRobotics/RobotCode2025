@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedCommands;
 import frc.robot.Ports;
+import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.IntakeConstants.IntakePosition;
 
 public class Intake extends SubsystemBase {
@@ -31,6 +32,7 @@ public class Intake extends SubsystemBase {
     private IntakePosition desiredState = IntakePosition.RETRACTED;
     private boolean atDesiredState = true;
     private boolean intaking = false;
+    private boolean indexerWaiting = false;
 
     /* Devices */
     private final TalonFX deployMotor;
@@ -76,6 +78,10 @@ public class Intake extends SubsystemBase {
         deployMotor.setControl(desiredState.control);
     }
 
+    public boolean elevatorReady() {
+        return Elevator.instance.atTarget() && Elevator.instance.atFinalTarget();
+    }
+
     public boolean intaking() {
         return intaking;
     }
@@ -86,14 +92,18 @@ public class Intake extends SubsystemBase {
         setDeploy(IntakePosition.DEPLOYED);
         intakeMotor.setControl(intakeControl);
         intaking = true;
-        indexMotor.setControl(indexControl);
+        if (elevatorReady()) {
+            indexMotor.setControl(indexControl);
+        } else {
+            indexerWaiting = true;
+        }
     }
 
     private void runExpel() {
         DogLog.log("Intake/Status", "Expelling Intake");
         setDeploy(IntakePosition.DEPLOYED);
         intakeMotor.setControl(intakeExpelControl);
-        intaking = false;
+        intaking = indexerWaiting = false;
         indexMotor.setControl(indexExpelControl);
         expelTimer.restart();
     }
@@ -115,7 +125,7 @@ public class Intake extends SubsystemBase {
     private void stopSpinning() {
         DogLog.log("Intake/Status", "Stopping Intake spinning");
         intakeMotor.stopMotor();
-        intaking = false;
+        intaking = indexerWaiting = false;
         indexMotor.stopMotor();
     }
 
@@ -171,6 +181,7 @@ public class Intake extends SubsystemBase {
         DogLog.log("Intake/At Desired State", atDesiredState);
         DogLog.log("Intake/Zeroing?", zeroing);
         DogLog.log("Intake/Intaking?", intaking);
+        DogLog.log("Intake/Indexer waiting?", indexerWaiting);
         DogLog.log("Intake/Deploy Current", deployMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("Intake/Deploy Voltage", deployMotor.getMotorVoltage().getValueAsDouble());
         DogLog.log("Intake/Deploy Velocity", deployMotor.getVelocity().getValueAsDouble());
@@ -192,6 +203,17 @@ public class Intake extends SubsystemBase {
             } else {
                 DogLog.log("Intake/Status", "Intake deploy stall detected");
                 deployMotor.stopMotor();
+            }
+        }
+
+        if (indexerWaiting) {
+            if (!intaking) {
+                DogLog.log("Intake/Status", "Indexing waiting but not intaking?!");
+                indexerWaiting = false;
+            } else if (elevatorReady()) {
+                DogLog.log("Intake/Status", "Elevator now ready; enabling indexer");
+                indexerWaiting = false;
+                indexMotor.setControl(indexControl);
             }
         }
 
