@@ -69,7 +69,6 @@ public class Autos extends SubsystemBase {
         return LoggedCommands.sequence("Hunt Coral",
             LoggedCommands.proxy(HuntCoralAuto(null)),
             LoggedCommands.proxy(Swerve.instance.Stop()),
-            LoggedCommands.proxy(Intake.instance.Stop()),
             LoggedCommands.proxy(Superstructure.instance.FinishCoralIntake()));
     }
 
@@ -93,6 +92,7 @@ public class Autos extends SubsystemBase {
                 LoggedCommands.proxy(Intake.instance.Jog()),
                 Commands.waitSeconds(2.0))
             .withName("Hunt Down Coral (Auto)")
+            .andThen(LoggedCommands.proxy(Intake.instance.StopSpinning()))
             .andThen(LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition()));
         }
     

@@ -108,17 +108,20 @@ public class Intake extends SubsystemBase {
 
     private void stopIntake() {
         DogLog.log("Intake/Status", "Stopping Intake");
+        stopSpinning();
+        setDeploy(IntakePosition.RETRACTED);
+    }
+
+    private void stopSpinning() {
+        DogLog.log("Intake/Status", "Stopping Intake spinning");
         intakeMotor.stopMotor();
         intaking = false;
         indexMotor.stopMotor();
-        setDeploy(IntakePosition.RETRACTED);
     }
 
     private void fullStow() {
         DogLog.log("Intake/Status", "Fully stowing Intake");
-        intakeMotor.stopMotor();
-        intaking = false;
-        indexMotor.stopMotor();
+        stopSpinning();
         setDeploy(IntakePosition.FULL_STOW);
     }
 
@@ -145,6 +148,10 @@ public class Intake extends SubsystemBase {
 
     public Command Stop() {
         return LoggedCommands.runOnce("Stop Intake", this::stopIntake, this);
+    }
+
+    public Command StopSpinning() {
+        return LoggedCommands.runOnce("Stop Intake Spinning", this::stopSpinning, this);
     }
 
     public Command FullStow() {
