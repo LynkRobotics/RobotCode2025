@@ -332,12 +332,12 @@ public class Elevator extends SubsystemBase {
             setCurrentTarget(Stop.CLEAR_LOW, true);
         } else {
             // Check if the End Effector needs to pivot
-            if (!EndEffector.instance.inPosition()) {
+            if (EndEffector.instance.waitingToPivot()) {
                 // If the End Effector is waiting to pivot, we need to move to CLEAR_LOW
                 // to enable it to pivot before moving to our final target
                 setCurrentTarget(Stop.CLEAR_LOW, true);
             } else {
-                // The End Effector is already in position, so we can move to our target
+                // The End Effector doesn't need to wait for the elevator, so we can move to our target
                 setCurrentTarget(target, true);
             }
         }

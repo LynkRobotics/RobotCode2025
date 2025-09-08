@@ -32,6 +32,7 @@ public class EndEffectorConstants {
 	public static final Current algaeStatorCurrentThreshold = Units.Amps.of(70.0);
 	public static final Current coralStatorCurrentThreshold = Units.Amps.of(60.0);
 	public static final Angle pivotEpsilon = Units.Degrees.of(2.0);
+	public static final Angle smallMovementThreshold = Units.Degrees.of(5.0); // 1678 used 10.0
 
 	public static final Time coralSensorDebounce = Units.Seconds.of(0.04);
 	public static final Time algaeSensorDebounce = Units.Seconds.of(0.10);

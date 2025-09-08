@@ -224,8 +224,19 @@ public class EndEffector extends SubsystemBase {
 
     private boolean okToMove() {
         return (Elevator.instance.isClear(Elevator.ClearState.CLEAR_LOW) &&
-            (Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH) || AlgaeRoller.instance.isClear())) ||
-            highClearSafe();
+            (Elevator.instance.isClear(Elevator.ClearState.CLEAR_HIGH) || AlgaeRoller.instance.isClear())) || movementSafe();
+    }
+
+    public boolean waitingToPivot() {
+        return waitingToPivot;
+    }
+
+    private boolean movementSafe() {
+        return highClearSafe() || smallMovement();
+    }
+
+    private boolean smallMovement() {
+        return positionMotor.getPosition().getValue().minus(desiredPosition.position).abs(Units.Degrees) <= EndEffectorConstants.smallMovementThreshold.in(Units.Degrees);
     }
 
     private boolean highClearSafe() {
