@@ -91,14 +91,12 @@ public class LED extends SubsystemBase {
     }
 
     public enum LEDState {
-        // STARTUP(new LEDConfig(LEDConstants.readyAnimation)),
         STARTUP(new LEDConfig(Color.citrus)),
         DISABLED(new LEDConfig(Color.disabled)),
         NORMAL(new LEDConfig(Color.lynk)),
         MANUAL(new LEDConfig(Color.hightideTeal)),
         SLOWMODE(new LEDConfig(Color.dimYellow)),
         CORAL_L1(new LEDConfig(Color.magenta, 0.25)),
-        // CORAL_L1OUTSIDE(new LEDConfig(Color.cheesyBlue, 0.25)),
         CORAL_L2(new LEDConfig(Color.green, 0.50)),
         CORAL_L3(new LEDConfig(Color.magenta, 0.75)),
         CORAL_L4(new LEDConfig(Color.green, 1.00)),
@@ -238,7 +236,6 @@ public class LED extends SubsystemBase {
                     } else if (EndEffector.instance.haveCoral()) {
                         state = switch (Superstructure.instance.activeReefLevel()) {
                             case L1 -> LEDState.CORAL_L1;
-                            // case L1 -> optL1Outside.get() ? LEDState.CORAL_L1OUTSIDE : LEDState.CORAL_L1;
                             case L2 -> LEDState.CORAL_L2;
                             case L3 -> LEDState.CORAL_L3;
                             case L4 -> LEDState.CORAL_L4;

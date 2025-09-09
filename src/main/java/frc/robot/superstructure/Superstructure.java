@@ -219,10 +219,6 @@ public class Superstructure extends SubsystemBase {
                             AlgaeRoller.instance.TriggerStowWhenStopped(),
                             () -> activeReefLevel == ReefLevel.L1),
                         WaitForEEPose())),
-                        // LoggedCommands.deadline("Wait for auto up",
-                        //     Elevator.instance.WaitForNext(),
-                        //     Elevator.instance.AutoElevatorUp(left ? face.alignCoralLeft.getTranslation() : face.alignCoralRight.getTranslation())))),
-                // LoggedCommands.waitUntil("DEBUG: Infinite Wait", () -> false), // Used for debugging
                 PlaceCoral())
             .finallyDo(this::setSuperStateDone),
             LoggedCommands.log("Cannot score coral without coral"),
@@ -269,13 +265,6 @@ public class Superstructure extends SubsystemBase {
             .finallyDo(this::setSuperStateDone);
     }
 
-    public Command SetStop(Stop stop) {
-        return LoggedCommands.sequence("Set stop to " + stop,
-            // RobotState.SetCoralMode(),
-            Commands.runOnce(() -> Elevator.instance.setNextStop(stop)));
-    }
-
-    // Example of state?
     public boolean shouldMirror() {
         return optMirrorAuto.get() && DriverStation.isAutonomousEnabled();
     }
@@ -293,7 +282,6 @@ public class Superstructure extends SubsystemBase {
     }
 
     private Command ProcessorAlign() {
-        // TODO
         return LoggedCommands.sequence("Align to processor",
             SetSuperState(SuperState.SCORING_ALGAE),
             new PIDSwerve(Swerve.instance, Pose.instance, PoseConstants.processorApproach, true, false, PIDSpeed.FAST),

@@ -13,21 +13,10 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 
 public class ElevatorConstants {
-    // NOTE Elevator height is measured from the ground to top of the carriage
-    public static final double thickness = 2.0; // Thickness of the elevator (only for Mechanism2d visualization)
-    public static final double setback = 9.5; // Distance from front edge of robot (only for Mechanism2d visualization)
-    public static final double bellyHeight = 0.755; // Height of the top surface of the belly pan from the ground
-    public static final Distance baseHeight = Units.Inches.of(12.0 + bellyHeight); // TODO // Height of elevator in inches when it is at zero position
-    public static final Distance maxHeight = Units.Inches.of(63.0); // TODO 72.0 + bellyHeight; // Height that elevator should never exceed
-    public static final double endEffectorHeight = 6.0; // Height of end effector "target" above elevator height
-    // public static final PerUnit<AngleUnit, DistanceUnit> rotperInch = PerUnit.combine(Units.Rotations.of(0.704), Units.Inches.of(1.0));
-    // TODO Reevaluate these values
-
     public static final double rotPerInch = 4.35 / 29.25; // Rotations to drive elevator one inch
     public static final Time stallTimeout = Units.Seconds.of(0.06);
     public static final Distance autoZeroHeight = Units.Inches.of(6.0);
 
-    public static final Distance safetyMargin = Units.Inches.of(1.5);   // How many inches away from safe mark to still be considered safe
     public static final double positionError = rotPerInch * 0.5; // Allowable rotation error to be considered in position
     public static final double positionCloseError = rotPerInch * 6.0; // Allowable rotation error to be considered in position
     public static final double stopError = 0.25;      // Allowable inches of error to be considered at a stop

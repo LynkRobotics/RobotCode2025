@@ -28,7 +28,6 @@ import frc.robot.Robot;
 import frc.robot.commands.pidswerve.PIDSwerve;
 import frc.robot.commands.pidswerve.SwerveToObject;
 import frc.robot.subsystems.detection.Detection;
-import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.endeffector.EndEffector;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.pose.Pose;
@@ -148,25 +147,6 @@ public class Autos extends SubsystemBase {
             LoggedCommands.race("Backup with timeout",
                 LoggedCommands.waitSeconds("Backup timeout", 3), // TODO Make constant
                 new PIDSwerve(Swerve.instance, Pose.instance, Pose.instance.getPose().transformBy(transform), false, true));
-    }
-
-    @SuppressWarnings ("unused")
-    private Command BackUpAndWaitForCoral() {
-        Transform2d transform = new Transform2d(-AutoConstants.backUpCSDistance, 0.0, Rotation2d.kZero); 
-        return LoggedCommands.deadline("Backup and wait for Coral",
-            Superstructure.WaitForCoral(),
-            Commands.sequence(
-                Commands.defer(() -> new PIDSwerve(Swerve.instance, Pose.instance, Pose.instance.getPose().transformBy(transform), false, false), Set.of(Swerve.instance)),
-                Commands.defer(() -> new PIDSwerve(Swerve.instance, Pose.instance, Pose.instance.getPose().transformBy(transform), false, false), Set.of(Swerve.instance))
-            ));
-    }
-
-    @SuppressWarnings ("unused")
-    private Command PathWithRaise(String pathName, ReefFace face, boolean left) {
-        return LoggedCommands.deadline("Follow Path with Raise",
-            PathCommand(pathName),
-            Elevator.instance.AutoElevatorUp(left ? face.alignCoralLeft.getTranslation() : face.alignCoralRight.getTranslation())
-        ); 
     }
 
     public Command ScoreCoralMaybeMirror(ReefFace face, boolean left) {
