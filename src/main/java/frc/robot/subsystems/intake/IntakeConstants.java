@@ -43,6 +43,7 @@ public class IntakeConstants {
 
 	public static final Voltage indexVoltage = Units.Volts.of(10.0);
 	public static final Voltage indexExpelVoltage = Units.Volts.of(-8.0);
+	public static final Time indexBBDebounce  = Units.Seconds.of(0.04);
 	public static final Time expelTime = Units.Seconds.of(0.5);
 
 	public static final Voltage intakeVoltage = Units.Volts.of(-12.0);

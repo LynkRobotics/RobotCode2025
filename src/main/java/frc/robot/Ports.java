@@ -16,7 +16,8 @@ public enum Ports {
 	CLIMBER_ROLLERS(18, Bus.MECH), //Climber Intake
 	CANDLE(21, Bus.MECH),
 	ENCODER_41T(4, Bus.RIO), // Top End Effector (direct)
-	ENCODER_40T(5, Bus.RIO); // Bottom End Effector (geared)
+	ENCODER_40T(5, Bus.RIO), // Bottom End Effector (geared)
+	INDEXER_BEAMBREAK(8, null); // Digital Input
 
     public enum Bus {
         RIO("rio"),
@@ -29,12 +30,6 @@ public enum Ports {
             this.name = name;
         }
     }    
-
-	// EE_CORAL_BREAMBREAK(1, "RioDigitalIn"),
-	// EE_ALGAE_BEAMBREAK(0, "RioDigitalIn"),
-	// INDEXER_BEAMBREAK(8, "RioDigitalIn"),
-
-	// PHYSICAL_BUTTON(9, "RioDigitalIn");
 
 	public final int id;
 	public final Bus bus;

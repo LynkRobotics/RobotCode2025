@@ -11,6 +11,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,6 +28,7 @@ public class Intake extends SubsystemBase {
     private static final Timer expelTimer = new Timer();
 
     private static final Debouncer stallDebouncer = new Debouncer(IntakeConstants.deployStallTime.in(Units.Seconds), DebounceType.kRising);
+    private Debouncer indexDebouncer = new Debouncer(IntakeConstants.indexBBDebounce.in(Units.Seconds), Debouncer.DebounceType.kBoth);
     private boolean zeroing = false;
 
     private IntakePosition desiredState = IntakePosition.RETRACTED;
@@ -38,6 +40,7 @@ public class Intake extends SubsystemBase {
     private final TalonFX deployMotor;
     private final TalonFX intakeMotor;
     private final TalonFX indexMotor;
+    private final DigitalInput indexBeambreak;
 
     /* Control Requests */
     private final VoltageOut deployZeroingControl = new VoltageOut(IntakeConstants.deployZeroingVoltage).withEnableFOC(true);
@@ -51,6 +54,7 @@ public class Intake extends SubsystemBase {
         deployMotor = new TalonFX(Ports.CORAL_DEPLOY.id, Ports.CORAL_DEPLOY.bus.name);
         intakeMotor = new TalonFX(Ports.CORAL_ROLLERS.id, Ports.CORAL_ROLLERS.bus.name);
         indexMotor = new TalonFX(Ports.INDEXER.id, Ports.INDEXER.bus.name);
+        indexBeambreak = new DigitalInput(9); // Hack Ports.INDEXER_BEAMBREAK.id);
 
         /* Configs */
         deployMotor.getConfigurator().apply(IntakeConstants.getDeployConfig());
@@ -66,6 +70,14 @@ public class Intake extends SubsystemBase {
         // We *should* be fully stowed, but given all the testing we do, also zero to start
         deployMotor.setPosition(IntakePosition.FULL_STOW.position);
         startZero();
+    }
+
+    private boolean intakeBlockedRaw() {
+        return !indexBeambreak.get();
+    }
+
+    public boolean coralInIndexer() {
+        return indexDebouncer.calculate(intakeBlockedRaw());
     }
 
     private void startZero() {
@@ -182,6 +194,8 @@ public class Intake extends SubsystemBase {
         DogLog.log("Intake/Zeroing?", zeroing);
         DogLog.log("Intake/Intaking?", intaking);
         DogLog.log("Intake/Indexer waiting?", indexerWaiting);
+        DogLog.log("Intake/Coral in Indexer?", coralInIndexer());
+        DogLog.log("Intake/Raw beambreak", intakeBlockedRaw());
         DogLog.log("Intake/Deploy Current", deployMotor.getTorqueCurrent().getValueAsDouble());
         DogLog.log("Intake/Deploy Voltage", deployMotor.getMotorVoltage().getValueAsDouble());
         DogLog.log("Intake/Deploy Velocity", deployMotor.getVelocity().getValueAsDouble());

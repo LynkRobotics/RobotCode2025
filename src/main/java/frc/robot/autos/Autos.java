@@ -77,25 +77,59 @@ public class Autos extends SubsystemBase {
     }
 
     public Command HuntCoralAuto(String pathName) {
-        return UntilCoral(            
+        return UntilCoralHold(            
                 Commands.parallel(
                     LoggedCommands.proxy(Superstructure.instance.StartCoralIntake()),
                     pathName != null ? LoggedCommands.proxy(PathCommand(pathName)) : Commands.none()),
                 LoggedCommands.proxy(Detection.instance.StopUntilObject()),
                 LoggedCommands.proxy(new SwerveToObject()),
                 LoggedCommands.proxy(Swerve.instance.Stop()),
-                Commands.waitSeconds(0.6),
-                LoggedCommands.proxy(Intake.instance.Jog()),
-                Commands.waitSeconds(1.2),
-                LoggedCommands.proxy(Intake.instance.Jog()),
-                Commands.waitSeconds(1.5),
-                LoggedCommands.proxy(Intake.instance.Jog()),
-                Commands.waitSeconds(2.0))
+                LoggedCommands.proxy(RepeatedlyJogIntake()))
             .withName("Hunt Down Coral (Auto)")
             .andThen(LoggedCommands.proxy(Intake.instance.StopSpinning()))
             .andThen(LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition()));
-        }
-    
+    }
+
+    public Command RepeatedlyJogIntake() {
+        return LoggedCommands.sequence("Repeatedly Jog Intake",
+            Commands.waitSeconds(0.5),
+            Intake.instance.Jog(),
+            Commands.waitSeconds(1.0),
+            Intake.instance.Jog(),
+            Commands.waitSeconds(1.0),
+            Intake.instance.Jog(),
+            Commands.waitSeconds(1.0),
+            Intake.instance.Jog(),
+            Commands.waitSeconds(1.0),
+            Intake.instance.Jog(),
+            Commands.waitSeconds(2.0));
+    }
+
+    public Command SeekAndScore(String pathName, ReefFace face, boolean left) {
+        return Commands.sequence(
+            UntilCoralDetected(
+                Commands.parallel(
+                    LoggedCommands.proxy(Superstructure.instance.StartCoralIntake()),
+                    pathName != null ? LoggedCommands.proxy(PathCommand(pathName)) : Commands.none()),
+                LoggedCommands.proxy(Detection.instance.StopUntilObject()),
+                LoggedCommands.proxy(new SwerveToObject()),
+                LoggedCommands.proxy(Swerve.instance.Stop()),
+                LoggedCommands.proxy(RepeatedlyJogIntake())),
+            UntilCoralHold(
+                Commands.race(
+                    LoggedCommands.proxy(new PIDSwerve(Swerve.instance, Pose.instance, left ? face.alignCoralLeft : face.alignCoralRight, true, true)),
+                    LoggedCommands.proxy(RepeatedlyJogIntake()))),
+            UntilCoralHold(
+                LoggedCommands.proxy(Swerve.instance.Stop()),
+                LoggedCommands.proxy(RepeatedlyJogIntake()),
+                LoggedCommands.idle("Pathological failure")),
+            Commands.deadline(
+                LoggedCommands.proxy(ScoreCoralMaybeMirror(face, left)),
+                LoggedCommands.proxy(Intake.instance.ExpelForever())),
+            LoggedCommands.proxy(Intake.instance.StopSpinning()),
+            LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition()));
+    }
+
     public static void autoNamedCommand(String name, Command command) {
         NamedCommands.registerCommand(name, LoggedCommands.logWithName(name + " (auto)", command));
     }
@@ -199,7 +233,7 @@ public class Autos extends SubsystemBase {
             //     LoggedCommands.proxy(PathCommand("Start towards EF"))),
             LoggedCommands.proxy(EndEffector.instance.ForceHaveCoral()),
             LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
-            UntilCoral(
+            UntilCoralHold(
                 LoggedCommands.proxy(Superstructure.instance.StartCoralIntake()),
                 LoggedCommands.proxy(PathCommand("E to Lollipop")),
                 LoggedCommands.proxy(Swerve.instance.Stop()),
@@ -227,7 +261,7 @@ public class Autos extends SubsystemBase {
                 LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition())),
             LoggedCommands.proxy(PathCommand("Start towards EF"))),
         LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
-        UntilCoral(
+        UntilCoralHold(
             Commands.parallel(
                 LoggedCommands.proxy(Superstructure.instance.StartCoralIntake()),
                 LoggedCommands.proxy(PathCommand("E to Station"))),
@@ -236,7 +270,7 @@ public class Autos extends SubsystemBase {
         LoggedCommands.proxy(Superstructure.instance.FinishCoralIntake()),
         LoggedCommands.proxy(PathCommand("Station towards D")),
         IfHaveCoral(LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false))),
-        UntilCoral(
+        UntilCoralHold(
             Commands.parallel(
                 LoggedCommands.proxy(Superstructure.instance.StartCoralIntake()),
                 LoggedCommands.proxy(PathCommand("D to Station"))),
@@ -264,7 +298,7 @@ public class Autos extends SubsystemBase {
                 LoggedCommands.proxy(Superstructure.instance.AssumeDefaultPosition())),
             LoggedCommands.proxy(PathCommand("Start towards EF"))),
         LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.EF, true)),
-        UntilCoral(
+        UntilCoralHold(
             Commands.parallel(
                 LoggedCommands.proxy(Superstructure.instance.StartCoralIntake()),
                 LoggedCommands.proxy(PathCommand("E to Drop Zone"))),
@@ -273,7 +307,7 @@ public class Autos extends SubsystemBase {
         Commands.deadline(
             IfHaveCoral(LoggedCommands.proxy(ScoreCoralMaybeMirror(ReefFace.CD, false))),
             LoggedCommands.proxy(Intake.instance.ExpelForever())),
-        UntilCoral(
+        UntilCoralHold(
             Commands.parallel(
                 LoggedCommands.proxy(Superstructure.instance.StartCoralIntake()),
                 LoggedCommands.proxy(PathCommand("D to Drop Zone"))),
@@ -405,13 +439,26 @@ public class Autos extends SubsystemBase {
             () -> EndEffector.instance.haveCoral());
     }
 
-    private Command UntilCoral(Command... commands) {
+    private Command UntilCoralHold(Command... commands) {
         return Commands.either(
             LoggedCommands.none("Already have coral"),
             Commands.race(
                 LoggedCommands.waitUntil("Monitoring for coral", () -> EndEffector.instance.haveCoral()),
                 Commands.sequence(commands)),
-            () -> EndEffector.instance.haveCoral());
+            EndEffector.instance::haveCoral);
+    }
+
+    private boolean coralDetected() {
+        return EndEffector.instance.haveCoral() || Intake.instance.coralInIndexer();
+    }
+
+    private Command UntilCoralDetected(Command... commands) {
+        return Commands.either(
+            LoggedCommands.none("Coral already detected"),
+            Commands.race(
+                LoggedCommands.waitUntil("Detecting coral", this::coralDetected),
+                Commands.sequence(commands)),
+            this::coralDetected);
     }
 
     private Command PathCommand(String pathName) {
