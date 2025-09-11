@@ -371,9 +371,9 @@ public class Superstructure extends SubsystemBase {
 
     public Command SmartCoralIntake() {
         return Commands.either(
-            AlgaeHold(),
+            CoralHold(),
             IntakeCoral(),
-            () -> EndEffector.instance.haveAlgae());
+            () -> EndEffector.instance.haveCoral());
     }
 
     public Command SmartAlgaeIntake() {
