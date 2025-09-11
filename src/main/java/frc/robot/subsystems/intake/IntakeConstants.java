@@ -18,6 +18,7 @@ public class IntakeConstants {
     public enum IntakePosition {
         FULLY_DEPLOYED(3.0),
         DEPLOYED(5.0),
+        HOLD(15.0),
         JOGGED(40.0),
         RETRACTED(55.0),
         FULL_STOW(83.0);

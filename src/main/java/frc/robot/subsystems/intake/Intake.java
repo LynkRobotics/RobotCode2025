@@ -134,6 +134,12 @@ public class Intake extends SubsystemBase {
         setDeploy(IntakePosition.RETRACTED);
     }
 
+    private void holdCoral() {
+        DogLog.log("Intake/Status", "Holding Coral");
+        stopSpinning();
+        setDeploy(IntakePosition.HOLD);
+    }
+
     private void stopSpinning() {
         DogLog.log("Intake/Status", "Stopping Intake spinning");
         intakeMotor.stopMotor();
@@ -170,6 +176,10 @@ public class Intake extends SubsystemBase {
 
     public Command Stop() {
         return LoggedCommands.runOnce("Stop Intake", this::stopIntake, this);
+    }
+
+    public Command HoldCoral() {
+        return LoggedCommands.runOnce("Hold Coral", this::holdCoral, this);
     }
 
     public Command StopSpinning() {

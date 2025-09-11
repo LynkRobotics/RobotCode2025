@@ -371,9 +371,9 @@ public class Superstructure extends SubsystemBase {
 
     public Command SmartCoralIntake() {
         return Commands.either(
+            AlgaeHold(),
             IntakeCoral(),
-            AssumeDefaultPosition(),
-            () -> EndEffector.instance.haveNothing());
+            () -> EndEffector.instance.haveAlgae());
     }
 
     public Command SmartAlgaeIntake() {
@@ -399,6 +399,8 @@ public class Superstructure extends SubsystemBase {
     }
 
     private Command IntakeExpel = Intake.instance.Expel();
+    private Command IntakeHold = Intake.instance.HoldCoral();
+    private Command EEStop = EndEffector.instance.StopIntake();
 
     public Command StartCoralIntake() {
         return LoggedCommands.sequence("Start Coral Intake",
@@ -425,19 +427,29 @@ public class Superstructure extends SubsystemBase {
         // NOTE: Must not be holding any game piece already!
         return LoggedCommands.sequence("Intaking Coral",
             SetSuperState(SuperState.INTAKING_CORAL),
-            TriggerMoveToEEPose(EEPose.GROUND_CORAL),
-            AlgaeRoller.instance.TriggerStowWhenStopped(),
+            Commands.either(
+                LoggedCommands.none("Not moving algae because already holding algae"),
+                Commands.sequence(
+                    TriggerMoveToEEPose(EEPose.GROUND_CORAL),
+                    AlgaeRoller.instance.TriggerStowWhenStopped()),
+                EndEffector.instance::haveAlgae),
             Commands.parallel(
                 EndEffector.instance.StartCoralIntake(),
                 Intake.instance.Deploy()),
-            EndEffector.instance.WaitForState(EEState.HAVE_CORAL),
+            Commands.either(
+                LoggedCommands.waitUntil("Waiting for coral in indexer", Intake.instance::coralInIndexer),
+                EndEffector.instance.WaitForState(EEState.HAVE_CORAL),
+                EndEffector.instance::haveAlgae),
             Controls.instance.TriggerRumble())
             .finallyDo((interrupted) -> {
-                IntakeExpel.schedule();
-                if (interrupted) {
-                    // We didn't get coral, so stop the intake
-                    // TODO Make this a fixed object, instead of dynamically creating it?
-                    EndEffector.instance.StopIntake().schedule();
+                if (Intake.instance.coralInIndexer()) {
+                    IntakeHold.schedule();
+                } else {
+                    IntakeExpel.schedule();
+                }
+                if (interrupted && EndEffector.instance.haveNothing()) {
+                    // We don't have anything, so stop the intake
+                    EEStop.schedule();
                 }
                 setSuperStateDone(interrupted);
             });
