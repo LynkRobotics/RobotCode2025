@@ -364,10 +364,12 @@ public class Superstructure extends SubsystemBase {
     public Command FullBargeShot() {
         return LoggedCommands.sequence("Full barge shot",
             SetSuperState(SuperState.SCORING_ALGAE),
-            DriveUntilBarge(),
-            TriggerMoveToEEPose(EEPose.BARGE_PREP),
-            AlgaeRoller.instance.TriggerStowWhenClear(),
-            WaitForEEPose(),
+            Commands.parallel(
+                DriveUntilBarge(),
+                Commands.sequence(
+                    TriggerMoveToEEPose(EEPose.BARGE_PREP),
+                    AlgaeRoller.instance.TriggerStowWhenClear(),
+                    WaitForEEPose())),
             TriggerMoveToEEPoseDirect(EEPose.BARGE),
             WaitForEEPose(),
             PlaceBargeAlgae())
