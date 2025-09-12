@@ -1,12 +1,20 @@
 package frc.robot.superstructure;
 
 import static frc.robot.Options.optAlgaeBargeOnly;
+import static frc.robot.Options.optFullBargeAuto;
 import static frc.robot.Options.optInvertAlgae;
 import static frc.robot.Options.optMirrorAuto;
 
 import java.util.EnumMap;
+import java.util.Set;
+
+import com.reduxrobotics.sensors.canandcolor.Canandcolor;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,9 +37,11 @@ import frc.robot.subsystems.endeffector.EndEffector;
 import frc.robot.subsystems.endeffector.EndEffector.EEState;
 import frc.robot.subsystems.endeffector.EndEffectorConstants.EEPosition;
 import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.pose.Pose;
 import frc.robot.subsystems.pose.PoseConstants;
 import frc.robot.subsystems.pose.PoseConstants.ReefFace;
+import frc.robot.Robot;
 import frc.robot.Field.ReefLevel;
 
 public class Superstructure extends SubsystemBase {
@@ -39,6 +49,27 @@ public class Superstructure extends SubsystemBase {
     private static final TunableOption optOverrideClimberTiming = new TunableOption("Override Climber Timing", false);
     private static final int climberTimeCutoff = 30; // seconds
     private ReefLevel activeReefLevel = ReefLevel.L4;
+    private Canandcolor canandcolor = new Canandcolor(0);
+    private static final double hueMaxDelta = 0.075; 
+    private static final double satMaxDelta = 0.300;
+    private static final double valMaxDelta = 0.500;
+    private static final FieldColor[] fieldColors = FieldColor.values();
+    private final double colorSeekSpeed = 0.3 * SwerveConstants.maxSpeed;
+    private final Rotation2d bargeRotation = Rotation2d.fromDegrees(-15);
+
+    public static enum FieldColor {
+        RED(0.062, 0.912, 0.695),
+        BLUE(0.558, 0.729, 0.370),
+        CARPET(0.255, 0.590, 0.180);
+
+        public final double hue, sat, val;
+
+        FieldColor(double h, double s, double v) {
+            hue = h;
+            sat = s;
+            val = v;
+        }
+    }
 
     public static enum EEPose {
         L1(EEPosition.L1, Stop.L1),
@@ -100,6 +131,55 @@ public class Superstructure extends SubsystemBase {
                 EndEffector.instance.SensorReset(),
                 AssumeDefaultPosition(),
                 WaitForEEPose()));
+    }
+
+    private FieldColor getFieldColor() {
+        return getFieldColor(canandcolor.getHSVHue(), canandcolor.getHSVSaturation(), canandcolor.getHSVValue());
+    }
+
+    private FieldColor getFieldColor(double hue, double sat, double val) {
+        for (FieldColor color: fieldColors) {
+            if (Math.abs(color.hue - hue) < hueMaxDelta && Math.abs(color.sat - sat) < satMaxDelta && Math.abs(color.val - val) < valMaxDelta) {
+                return color;
+            }
+        }
+
+        return null;
+    }
+
+    private Command WaitForColor(FieldColor color) {
+        return LoggedCommands.waitUntil("Waiting for color " + color.name(), () -> getFieldColor() == color);
+    }
+
+    public Command AwayUntilColor(FieldColor color) {
+        return LoggedCommands.sequence("Drive until color " + color.name(),
+            LoggedCommands.runOnce("Drive forward", () -> Swerve.instance.drive(new Translation2d(Robot.isRed() ? -colorSeekSpeed : colorSeekSpeed, 0), 0.0, true)),
+            WaitForColor(color),
+            Swerve.instance.Stop());
+    }
+
+    public Command ForwardUntilColor(FieldColor color) {
+        return LoggedCommands.sequence("Drive until color " + color.name(),
+            LoggedCommands.runOnce("Drive forward",
+                () -> Swerve.instance.driveRobotRelativeAuto(new ChassisSpeeds(colorSeekSpeed, 0.0, 0.0))),
+            WaitForColor(color),
+            Swerve.instance.Stop());
+    }
+
+    // Turn to the angle we want to use for the barge
+    private Command BargeTurn() {
+        return LoggedCommands.defer("Turn for barge", () -> {
+            Pose2d pose = Pose.instance.getPose();
+            Rotation2d rotation = Robot.isRed() ? bargeRotation.plus(Rotation2d.k180deg) : bargeRotation;
+            return new PIDSwerve(Swerve.instance, Pose.instance, new Pose2d(pose.getX(), pose.getY(), rotation), false, false);
+        }, Set.of(Swerve.instance));
+    }
+
+    public Command DriveUntilBarge() {
+        return LoggedCommands.sequence("Drive until barge",
+            BargeTurn(),
+            AwayUntilColor(Robot.isRed() ? FieldColor.RED : FieldColor.BLUE),
+            Swerve.instance.Stop());
     }
 
     public Command SetActiveReefLevel(ReefLevel level) {
@@ -281,6 +361,19 @@ public class Superstructure extends SubsystemBase {
             .finallyDo(this::setSuperStateDone);
     }
 
+    public Command FullBargeShot() {
+        return LoggedCommands.sequence("Full barge shot",
+            SetSuperState(SuperState.SCORING_ALGAE),
+            DriveUntilBarge(),
+            TriggerMoveToEEPose(EEPose.BARGE_PREP),
+            AlgaeRoller.instance.TriggerStowWhenClear(),
+            WaitForEEPose(),
+            TriggerMoveToEEPoseDirect(EEPose.BARGE),
+            WaitForEEPose(),
+            PlaceBargeAlgae())
+            .finallyDo(this::setSuperStateDone);
+    }
+
     private Command ProcessorAlign() {
         return LoggedCommands.sequence("Align to processor",
             SetSuperState(SuperState.SCORING_ALGAE),
@@ -294,7 +387,10 @@ public class Superstructure extends SubsystemBase {
             LoggedCommands.proxy(LoggedCommands.select("Coral select", left ? coralLeftCommands : coralRightCommands, () -> Pose.nearestFace(Pose.instance.getPose().getTranslation()))),
             Commands.either(
                 Commands.either(
-                    LoggedCommands.proxy(PrepBargeShot()),
+                    Commands.either(
+                        LoggedCommands.proxy(FullBargeShot()),
+                        LoggedCommands.proxy(PrepBargeShot()),
+                        optFullBargeAuto::get),
                     LoggedCommands.proxy(ProcessorAlign()),
                     () -> { return optAlgaeBargeOnly.get() || !Pose.instance.nearProcessor(); }),
                 LoggedCommands.proxy(Commands.select(left ? deAlgaefyLeftCommands : deAlgaefyRightCommands, () -> Pose.nearestFace(Pose.instance.getPose().getTranslation()))),
@@ -531,6 +627,10 @@ public class Superstructure extends SubsystemBase {
     public void periodic() {
         DogLog.log("Superstructure/Active Reef Level", activeReefLevel);
         DogLog.log("Superstructure/Super State", superState);
+        DogLog.log("Superstructure/Color", getFieldColor());
+        DogLog.log("Superstructure/Hue", canandcolor.getHSVHue());
+        DogLog.log("Superstructure/Saturation", canandcolor.getHSVSaturation());
+        DogLog.log("Superstructure/Value", canandcolor.getHSVValue());
 
         if (superState == SuperState.NONE && !defaultPositionCommand.isScheduled() && DriverStation.isTeleopEnabled()) {
             defaultPositionCommand.schedule();

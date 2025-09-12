@@ -88,7 +88,6 @@ public class Controls extends SubsystemBase{
 
         // zero.onTrue(Elevator.instance.Zero());
         expel.whileTrue(Intake.instance.ExpelForever()).onFalse(Intake.instance.Stop());
-        // score.whileTrue(Superstructure.ScoreGamePiece()); // Also useful to dump Algae or put it into Processor
 
         L4.onTrue(Superstructure.instance.SetActiveReefLevel(ReefLevel.L4));
         L3.onTrue(Superstructure.instance.SetActiveReefLevel(ReefLevel.L3));
@@ -103,6 +102,7 @@ public class Controls extends SubsystemBase{
 
         if (Constants.atHQ) {
             driver.povLeft().whileTrue(Autos.instance.HuntCoral());
+
             // driver.povUp().whileTrue(
             //     Commands.sequence(
             //         new PIDSwerve(Swerve.instance, Pose.instance, new Pose2d(0.0, 0.0, Rotation2d.kZero), false, true),
