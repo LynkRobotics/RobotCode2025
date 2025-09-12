@@ -54,8 +54,8 @@ public class Superstructure extends SubsystemBase {
     private static final double satMaxDelta = 0.300;
     private static final double valMaxDelta = 0.500;
     private static final FieldColor[] fieldColors = FieldColor.values();
-    private final double colorSeekSpeed = 0.3 * SwerveConstants.maxSpeed;
-    private final Rotation2d bargeRotation = Rotation2d.fromDegrees(-15);
+    private final double colorSeekSpeed = 0.2 * SwerveConstants.maxSpeed; // Any faster and we'll overshoot by too much
+    private final Rotation2d bargeRotation = Rotation2d.fromDegrees(-25); // 1678 uses 20 degrees, but our sensor is too far back
 
     public static enum FieldColor {
         RED(0.062, 0.912, 0.695),
