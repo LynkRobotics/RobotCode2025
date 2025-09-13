@@ -139,8 +139,8 @@ public class Superstructure extends SubsystemBase {
 
     private void setCanAndColorSettings() { //TODO: Move elsewhere
         CanandcolorSettings settings = canandcolor.getSettings();
+        settings.setProximityFramePeriod(0); //We're not using proximity on this sensor, so why use it?
         settings.setColorFramePeriod(0.020); //Default is 0.025 (or 25ms), would like to test all the way down to 5ms (NOTE: when testing monitor CAN Utilization in the DriverStation)
-        settings.setColorIntegrationPeriod(ColorPeriod.k25ms);
 
         canandcolor.setSettings(settings);
     }
