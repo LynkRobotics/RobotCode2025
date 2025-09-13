@@ -92,6 +92,8 @@ public class SwerveToObject extends LoggedCommandBase {
 
         if (locked) {
             rotationVal = 0.0;
+        } else if (!Detection.instance.haveRecentObject()) {
+            speed = rotationVal = 0.0;
         }
 
         /* Drive */
