@@ -9,6 +9,8 @@ import java.util.EnumMap;
 import java.util.Set;
 
 import com.reduxrobotics.sensors.canandcolor.Canandcolor;
+import com.reduxrobotics.sensors.canandcolor.CanandcolorSettings;
+import com.reduxrobotics.sensors.canandcolor.ColorPeriod;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -131,6 +133,16 @@ public class Superstructure extends SubsystemBase {
                 EndEffector.instance.SensorReset(),
                 AssumeDefaultPosition(),
                 WaitForEEPose()));
+        
+        setCanAndColorSettings();
+    }
+
+    private void setCanAndColorSettings() { //TODO: Move elsewhere
+        CanandcolorSettings settings = canandcolor.getSettings();
+        settings.setColorFramePeriod(0.020); //Default is 0.025 (or 25ms), would like to test all the way down to 5ms (NOTE: when testing monitor CAN Utilization in the DriverStation)
+        settings.setColorIntegrationPeriod(ColorPeriod.k25ms);
+
+        canandcolor.setSettings(settings);
     }
 
     private FieldColor getFieldColor() {
