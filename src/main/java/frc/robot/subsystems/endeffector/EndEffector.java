@@ -13,6 +13,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -48,6 +49,10 @@ public class EndEffector extends SubsystemBase {
     private EEPosition desiredPosition = EEPosition.START;
     private boolean atDesiredPosition = true;
     private boolean waitingToPivot = false;
+
+    private Angle totalError = Units.Degrees.of(0.0);
+    private double cumError = 0;
+    private int errorCount = 0;
 
     private Debouncer coralDebouncer = new Debouncer(EndEffectorConstants.coralSensorDebounce.in(Units.Seconds), Debouncer.DebounceType.kBoth);
     private Debouncer algaeDebouncer = new Debouncer(EndEffectorConstants.algaeSensorDebounce.in(Units.Seconds), Debouncer.DebounceType.kBoth);
@@ -344,17 +349,34 @@ public class EndEffector extends SubsystemBase {
         SmartDashboard.putBoolean("EndEffector/Have Coral", haveCoral());
         SmartDashboard.putBoolean("EndEffector/Coral Sensor", coralDetectedRaw());
         SmartDashboard.putBoolean("EndEffector/Algae Sensor", algaeDetectedRaw());
+        SmartDashboard.putNumber("EndEffector/Total Error", totalError.in(Units.Degrees));
+        SmartDashboard.putNumber("EndEffector/Cumulative Error", cumError);
+        SmartDashboard.putNumber("EndEffector/Total Errors", errorCount);
 
         if (!atDesiredPosition) {
-            // TODO Debounce?
             if (desiredPosition.position.minus(position).abs(Units.Degrees) < EndEffectorConstants.pivotEpsilon.in(Units.Degrees)) {
                 atDesiredPosition = true;
-                // Hack if necessary to reseed the desired position
-                // if (desiredPosition == EEPosition.GROUND_INTAKE) {
-                //     positionMotor.setPosition(directCancoder.getAbsolutePosition().getValue());            
-                // }
             }
         }
+
+        // Correct for motor slippage
+        if (atDesiredPosition) {
+            Angle motorPosition = positionMotor.getPosition().getValue();
+            AngularVelocity motorVelocity = positionMotor.getVelocity().getValue();
+            Angle directPosition = directCancoder.getPosition().getValue();
+            Angle error = motorPosition.minus(directPosition);
+
+            if (error.abs(Units.Degrees) > EndEffectorConstants.positionResetEpisilon.in(Units.Degrees) &&
+                motorVelocity.abs(Units.RotationsPerSecond) < EndEffectorConstants.positionResetMaxVel.in(Units.RotationsPerSecond)) {
+                DogLog.log("EndEffector/Status", "Correcting for motor slippage of " + String.format("%1.2f", error.in(Units.Degrees)) + " degrees");
+                totalError = totalError.plus(error);
+                cumError += Math.abs(error.in(Units.Degrees));
+                errorCount++;
+                positionMotor.setPosition(directPosition);
+                atDesiredPosition = false;
+            }
+        }
+
         if (waitingToPivot) {
             if (atDesiredPosition) {
                 // Unclear how we'd get here, but if we are in position, there's no need to wait
